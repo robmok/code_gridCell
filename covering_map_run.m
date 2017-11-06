@@ -1,8 +1,9 @@
 clear all;
 % close all;
 
-% wd='/Users/robert.mok/Dropbox/Grid_cell_model';
-wd='/Users/robertmok/Dropbox/Grid_cell_model';
+% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+
 cd(wd);
 codeDir = [wd '/code_gridCell'];
 saveDir = [wd '/data_gridCell'];
