@@ -50,8 +50,7 @@ for iterI = 1:nIter
     end
     
     %%
-    clusInd  = 1:nClus;
-    epsMuVec = zeros(nClus,1);
+
     updatedC = nan(nTrials,1);
     magChg   = nan(nTrials,1);
     epsMuAll = nan(nTrials,2);
@@ -65,9 +64,6 @@ for iterI = 1:nIter
             if iTrl == nTrials/2 && warpBox,
                 trials(nTrials/2+1:end,:) = trialsExpand;
             end
-            
-            
-            
             
             dist2Clus = sqrt(sum([mu(:,1,iTrl)'-trials(iTrl,1); mu(:,2,iTrl)'-trials(iTrl,2)].^2)); % vectorising euclid dist - sqrt(sum((a-b).^2)), since can't use xval method
             closestC=find(min(dist2Clus)==dist2Clus);
@@ -118,6 +114,29 @@ for iterI = 1:nIter
                 end
                 
                 epsMu = epsMuOrig*deltaEpsMu^magChg(iTrl); %squared because it's deltaMu (e.g. .99) to the power of nTimes it was updated, making it slightly smaller each time
+                
+                % new - adaptive learning rate (momentum-like)
+%                 % need to save each clusters'previous update and position
+%               
+
+%                 prevUpd - this is the amount the cluster moved and the
+%                 dir for x and y. this is deltaMu on previous trial (but
+%                 need to add the momentum thing)
+
+%                 momentumUpdate:
+%                 alpha = 0.2% ? - if alpha is 0, then same as now, and move a good amount, not weightnig previous trials. if alpha is .99, then
+%                 weighting the previous trial a lot and not moving much
+
+%                 currUpd = epsMu*(currClusLoc-dataPts); % on current trial
+%                 deltaMuCurrTrial = (1-alpha)*currUpd + alpha*prevUpd;
+
+               
+            %PLAN - store last update for each cluster separately, - i.e.
+            %deltaMu for each cluster. Then do the update below by
+            %adjusting the formula for deltaMu.
+
+
+                
             else
                 epsMu = epsMuOrig;
             end
