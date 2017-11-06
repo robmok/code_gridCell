@@ -1,4 +1,4 @@
-function [muEndBest, muAllBest, tsseTrls, epsMuAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,deltaEpsMu,nTrials,nIter,warpBox,resetEps)
+function [muEndBest, muAllBest, tsseTrls, epsMuAll,deltaMu] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,deltaEpsMu,nTrials,nIter,warpBox,resetEps)
 
 spacing=linspace(-1,1,101); 
 
@@ -54,8 +54,10 @@ for iterI = 1:nIter
     updatedC = nan(nTrials,1);
     magChg   = nan(nTrials,1);
     epsMuAll = nan(nTrials,2);
-    deltaMu  = nan(nClus,2,nTrials);
+    deltaMu  = zeros(nClus,2,nTrials);
     distTrl  = nan(nTrials,nClus);
+    
+    clusUpdates = zeros(nClus,2)+.01;
     
     for iTrl=1:length(trials)
         for iClus = 1:nClus,
@@ -88,32 +90,44 @@ for iterI = 1:nIter
             %log which cluster has been updated
             updatedC(iTrl) = closestC;
             
-            if iTrl~=1,
-                %slow down learning rate over time
-                magChg(iTrl)=nnz(updatedC==closestC); %magnitude of change proportional to how many times the cluster has moved
-                %             epsMu(iTrl+1) = epsMu(1); %no slowing down
-                %             epsMu(iTrl) = epsMu(iTrl-1)*deltaEpsMu;
-                
-                
-                %resetting learning rate
-                %still need to think if the amount i'm resetting to is
-                %calculated correctly, and whether these are good numbers (prob
-                %doesn't matter too much, but sth like high, med low sounds OK)
-                if resetEps == 1,
-                    if iTrl > nTrials*.5
-                        magChg(iTrl)=nnz(updatedC==closestC)*.5;
-                    end
-                elseif resetEps == 2,
-                    if iTrl > nTrials*.25 && iTrl <= nTrials*.5
-                        magChg(iTrl)=nnz(updatedC==closestC)*.75;
-                    elseif iTrl > nTrials*.5 && iTrl <= nTrials*.75
-                        magChg(iTrl)=nnz(updatedC==closestC)*.25;
-                    elseif iTrl > nTrials*.75 && iTrl <= nTrials
-                        magChg(iTrl)=nnz(updatedC==closestC)*.75;
-                    end
-                end
-                
-                epsMu = epsMuOrig*deltaEpsMu^magChg(iTrl); %squared because it's deltaMu (e.g. .99) to the power of nTimes it was updated, making it slightly smaller each time
+%             if iTrl~=1,
+%                 %slow down learning rate over time
+%                 magChg(iTrl)=nnz(updatedC==closestC); %magnitude of change proportional to how many times the cluster has moved
+%                 %             epsMu(iTrl+1) = epsMu(1); %no slowing down
+%                 %             epsMu(iTrl) = epsMu(iTrl-1)*deltaEpsMu;
+%                 
+%                 
+%                 %resetting learning rate
+%                 %still need to think if the amount i'm resetting to is
+%                 %calculated correctly, and whether these are good numbers (prob
+%                 %doesn't matter too much, but sth like high, med low sounds OK)
+%                 if resetEps == 1,
+%                     if iTrl > nTrials*.5
+%                         magChg(iTrl)=nnz(updatedC==closestC)*.5;
+%                     end
+%                 elseif resetEps == 2,
+%                     if iTrl > nTrials*.25 && iTrl <= nTrials*.5
+%                         magChg(iTrl)=nnz(updatedC==closestC)*.75;
+%                     elseif iTrl > nTrials*.5 && iTrl <= nTrials*.75
+%                         magChg(iTrl)=nnz(updatedC==closestC)*.25;
+%                     elseif iTrl > nTrials*.75 && iTrl <= nTrials
+%                         magChg(iTrl)=nnz(updatedC==closestC)*.75;
+%                     end
+%                 end
+%                 
+%                 epsMu = epsMuOrig*deltaEpsMu^magChg(iTrl); %squared because it's deltaMu (e.g. .99) to the power of nTimes it was updated, making it slightly smaller each time
+% 
+%             else
+%                 epsMu = epsMuOrig;
+%             end
+
+
+
+            epsMu = epsMuOrig;
+            epsMuAll(iTrl,:) = [epsMu,closestC];
+
+            
+            
                 
                 % new - adaptive learning rate (momentum-like)
 %                 % need to save each clusters'previous update and position
@@ -134,24 +148,38 @@ for iterI = 1:nIter
             %PLAN - store last update for each cluster separately, - i.e.
             %deltaMu for each cluster. Then do the update below by
             %adjusting the formula for deltaMu.
-
-
-                
-            else
-                epsMu = epsMuOrig;
-            end
-            epsMuAll(iTrl,:) = [epsMu,closestC];
             
-            epsMuVec = zeros(nClus,1);
-            epsMuVec(closestC) = epsMu;
-            deltaMu(:,1,iTrl) = epsMuVec.*(trials(iTrl,1)-mu(:,1,iTrl));
-            deltaMu(:,2,iTrl) = epsMuVec.*(trials(iTrl,2)-mu(:,2,iTrl));
+            
+            % - set alpha (e.g. 0.2)
+            % - update closest cluster
+            % - save each cluster's update (save for each update/trial, or
+            % just save the last update)
+            
+            % the update will be: 
+                %(1-alpha)*(epsMu*(trials(iTrl,1)-mu(closestC,1,iTrl)))+(alpha*clusUpdates(closestC,1)
+   
+                
+                alpha = 0.8;
+                
+                deltaMu(closestC,1,iTrl) = (1-alpha)*(epsMu*(trials(iTrl,1)-mu(closestC,1,iTrl)))+(alpha*clusUpdates(closestC,1));
+                deltaMu(closestC,2,iTrl) = (1-alpha)*(epsMu*(trials(iTrl,2)-mu(closestC,2,iTrl)))+(alpha*clusUpdates(closestC,2));
+                 
+                clusUpdates(closestC,1)=deltaMu(closestC,1,iTrl);
+                clusUpdates(closestC,2)=deltaMu(closestC,2,iTrl);
+            
+            deltaMuVec = zeros(nClus,2);
+            deltaMuVec(closestC,:) = deltaMu(closestC,:,iTrl); % only update winner
+            
+            
             % update mean estimates
             if iTrl~=length(trials) %no need to update for last trial +1)
-                mu(:,1,iTrl+1) = mu(:,1,iTrl) + deltaMu(:,1,iTrl);
-                mu(:,2,iTrl+1) = mu(:,2,iTrl) + deltaMu(:,2,iTrl);
+                mu(:,1,iTrl+1) = mu(:,1,iTrl) + deltaMuVec(:,1);
+                mu(:,2,iTrl+1) = mu(:,2,iTrl) + deltaMuVec(:,2);
             end
+            
         end
+        
+        
         
         % compute sse on each trial with respect to 'all trials' - independent data - looks similar if you change 'dataPtsTest' to 'trials'; also useful if want to test less vs more trials on training so that you equate SSE by number of test points
         for iClus = 1:size(mu,1),
@@ -164,45 +192,7 @@ for iterI = 1:nIter
             sseTrl(iClus)=sum(sum([mu(iClus,1,iTrl)-dataPtsTest(indTrl==iClus,1), mu(iClus,2,iTrl)-dataPtsTest(indTrl==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
         end
         tsseTrls(iTrl,iterI)=sum(sseTrl);
-        
-        
-        % idea: resetting the learning rate at some point to 'adapt' to new
-        % environment. useful if morph the box shape in real time.
-        
-        %     % might also be interesting to know if this actually improves SSE, since
-        %     % allows the first go/first few gos where things get stuck to improve
-        %     if iTrl == round(length(trials)*.25) || iTrl == round(length(trials)*.5) || iTrl == round(length(trials)*.75)
-        %     if iTrl == round(length(trials)*.5)
-        %         epsMu(iTrl+1)=epsMu(1); %reset learning rate at some point, see what happens
-        %     end
-        %
-        
-        % %
-        %     %     %could also reset to half the previous original learning rate each time...
-        %     if iTrl == round(length(trials)*.25)
-        %         epsMu(iTrl+1)=epsMu(1)*.75;
-        %     elseif iTrl == round(length(trials)*.5)
-        %         epsMu(iTrl+1)=epsMu(1)*.5;
-        %     elseif iTrl == round(length(trials)*.75)
-        %         epsMu(iTrl+1)=epsMu(1)*.25;
-        %     end
-        
-        %     if iTrl == round(length(trials)*.25)
-        %         epsMu(iTrl+1)=epsMu(1)*.75;
-        %     elseif iTrl == round(length(trials)*.33)
-        %         epsMu(iTrl+1)=epsMu(1)*.66;
-        %     elseif iTrl == round(length(trials)*.5)
-        %         epsMu(iTrl+1)=epsMu(1)*.5;
-        %     elseif iTrl == round(length(trials)*.66)
-        %         epsMu(iTrl+1)=epsMu(1)*.33;
-        %     elseif iTrl == round(length(trials)*.75)
-        %         epsMu(iTrl+1)=epsMu(1)*.25;
-        %     end
-        
-        %     %put a limit of lowest learning rate
-        %     if epsMu(iTrl+1)<=.1,
-        %         epsMu(iTrl+1) = .1;
-        %     end
+
         
     end
     muEnd(:,:,iterI)=mu(:,:,end);

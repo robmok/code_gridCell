@@ -1,8 +1,8 @@
 clear all;
 % close all;
 
-% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -11,7 +11,7 @@ addpath(codeDir); addpath(saveDir);
 
 % nClus   = 20;
 clus2run = [20, 40, 60, 80]; %run multuple cluster numbers
-clus2run = 40;
+clus2run = 20;
 nTrials = 2500; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 colgrey = [.5, .5, .5];
@@ -22,7 +22,7 @@ locRange = 1;%1; from -locRange to locRange
 stepSize=diff(linspace(-1,1,nSteps)); stepSize=stepSize(1); %smallest diff between locs
 
 % parameters
-epsMuOrig=.6;% %learning rate / starting learning rate %.6
+epsMuOrig=.2;% %learning rate / starting learning rate %.6
 deltaEpsMu = .96;% %change in learning rate over time (slow down with 'learning')
 % deltaEpsMu = .99; % slower decrease in learning rate for expanding (if no
 % reset)
@@ -80,7 +80,7 @@ nIter=6; %how many iterations (starting points)
 tic
 for iClus2run = 1:length(clus2run)    
     nClus = clus2run(iClus2run);
-    [muEnd, muAll, tsseTrls, epsMuAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,deltaEpsMu,nTrials,nIter,warpBox,resetEps);
+    [muEnd, muAll, tsseTrls, epsMuAll,deltaMu] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,deltaEpsMu,nTrials,nIter,warpBox,resetEps);
 
     if saveDat,
         % save simulations - might not need all tsseTrls if not viewing
@@ -102,7 +102,7 @@ toc
 savePlots=0;
 
 %set to load in data (note divide by value in variable)
-if 1
+if 0
     epsMuOrig10 = 6;
     deltaEpsMu100 = 96; %96, 98
     nClus = 40;
@@ -130,8 +130,8 @@ if savePlots,
 end
 
 % plot change in learning rate for each cluster:
-figure;
-plot(epsMuAll(:,1),'.');
+% figure;
+% plot(epsMuAll(:,1),'.');
 
 % plot lowest and highest SSE
 iToPlot=[1,2,3,nIter-2,nIter-1,nIter];
