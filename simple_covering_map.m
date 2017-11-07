@@ -1,12 +1,12 @@
 clear all;
 % close all;
 
-% wd='/Users/robert.mok/Dropbox/Grid_cell_model';
-wd='/Users/robertmok/Dropbox/Grid_cell_model';
+wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 cd(wd);
 
-nClus   = 60;
-nTrials = 2500; %how many locations in the box / trials - 2.5k ; 5k if reset
+nClus   = 40;
+nTrials = 5000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 colgrey = [.5, .5, .5];
 colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
@@ -18,7 +18,7 @@ stepSize=diff(linspace(-1,1,nSteps)); stepSize=stepSize(1); %smallest diff betwe
 
 
 % parameters
-epsMuOrig=.6;% %learning rate / starting learning rate %.6
+epsMuOrig=.2;% %learning rate / starting learning rate %.6
 deltaEpsMu = .96;% %change in learning rate over time (slow down with 'learning')
 
 % deltaEpsMu = .99; % slower decrease in learning rate for expanding (if no
@@ -129,80 +129,78 @@ for iterI = 1:nIter
     distTrl  = nan(nTrials,nClus);
 
     for iTrl=1:length(trials)
-        for iClus = 1:nClus,
+        
+        %if change size of box half way
+        if iTrl == nTrials/2 && warpBox,
+            trials(nTrials/2+1:end,:) = trialsExpand;
+        end
+        
+        
+        
+        
+        dist2Clus = sqrt(sum([mu(:,1,iTrl)'-trials(iTrl,1); mu(:,2,iTrl)'-trials(iTrl,2)].^2)); % vectorising euclid dist - sqrt(sum((a-b).^2)), since can't use xval method
+        closestC=find(min(dist2Clus)==dist2Clus);
+        if numel(closestC)>1, %if more than 1, randomly choose one
+            closestC = randsample(closestC,1);
+        end
+        
+        
+        %moved learning rate change to up here - now update epsMu(iTrl), not epsMu(iTrl-1)
+        
+        %need to think how to update per cluster - since before just
+        %defined x proprtion of trials. i suppose this is ok too - since
+        %resetting them all a bit is better than just resetting one (prob
+        %doesnt do anything).
+        % the Q is whether should reset them all to a similar level - now
+        % the ones that have been updated the most will have reset more and
+        % move less...
+        %         if iTrl == nTrials/2,
+        %             updatedC = [];
+        %         end
+        
+        %log which cluster has been updated
+        updatedC(iTrl) = closestC;
+        
+        if iTrl~=1,
+            %slow down learning rate over time
+            magChg(iTrl)=nnz(updatedC==closestC); %magnitude of change proportional to how many times the cluster has moved
+            epsMu(iTrl+1) = epsMu(1); %no slowing down
+            %             epsMu(iTrl) = epsMu(iTrl-1)*deltaEpsMu;
             
-            %if change size of box half way
-            if iTrl == nTrials/2 && warpBox,
-               trials(nTrials/2+1:end,:) = trialsExpand;
-            end
             
-            
-            
-            
-            dist2Clus = sqrt(sum([mu(:,1,iTrl)'-trials(iTrl,1); mu(:,2,iTrl)'-trials(iTrl,2)].^2)); % vectorising euclid dist - sqrt(sum((a-b).^2)), since can't use xval method
-            closestC=find(min(dist2Clus)==dist2Clus);
-            if numel(closestC)>1, %if more than 1, randomly choose one
-                closestC = randsample(closestC,1);
-            end
-            
-            
-            %moved learning rate change to up here - now update epsMu(iTrl), not epsMu(iTrl-1)
-            
-            %need to think how to update per cluster - since before just
-            %defined x proprtion of trials. i suppose this is ok too - since
-            %resetting them all a bit is better than just resetting one (prob
-            %doesnt do anything).
-            % the Q is whether should reset them all to a similar level - now
-            % the ones that have been updated the most will have reset more and
-            % move less...
-            %         if iTrl == nTrials/2,
-            %             updatedC = [];
-            %         end
-            
-            %log which cluster has been updated
-            updatedC(iTrl) = closestC;
-            
-            if iTrl~=1,
-                %slow down learning rate over time
-                magChg(iTrl)=nnz(updatedC==closestC); %magnitude of change proportional to how many times the cluster has moved
-                %             epsMu(iTrl+1) = epsMu(1); %no slowing down
-                %             epsMu(iTrl) = epsMu(iTrl-1)*deltaEpsMu;
-                
-                
-                %resetting learning rate
-                %still need to think if the amount i'm resetting to is
-                %calculated correctly, and whether these are good numbers (prob
-                %doesn't matter too much, but sth like high, med low sounds OK)
-                if resetEps == 1,
-                    if iTrl > nTrials*.5
-                        magChg(iTrl)=nnz(updatedC==closestC)*.75;
-                    end
-                elseif resetEps == 2,
-                    if iTrl > nTrials*.25 && iTrl <= nTrials*.5
-                        magChg(iTrl)=nnz(updatedC==closestC)*.75;
-                    elseif iTrl > nTrials*.5 && iTrl <= nTrials*.75
-                        magChg(iTrl)=nnz(updatedC==closestC)*.25;
-                    elseif iTrl > nTrials*.75 && iTrl <= nTrials
-                        magChg(iTrl)=nnz(updatedC==closestC)*.25;
-                    end
-                    
+            %resetting learning rate
+            %still need to think if the amount i'm resetting to is
+            %calculated correctly, and whether these are good numbers (prob
+            %doesn't matter too much, but sth like high, med low sounds OK)
+            if resetEps == 1,
+                if iTrl > nTrials*.5
+                    magChg(iTrl)=nnz(updatedC==closestC)*.75;
                 end
-                                
-                epsMu = epsMuOrig*deltaEpsMu^magChg(iTrl); %squared because it's deltaMu (e.g. .99) to the power of nTimes it was updated, making it slightly smaller each time
-            else
-                epsMu = epsMuOrig;
+            elseif resetEps == 2,
+                if iTrl > nTrials*.25 && iTrl <= nTrials*.5
+                    magChg(iTrl)=nnz(updatedC==closestC)*.75;
+                elseif iTrl > nTrials*.5 && iTrl <= nTrials*.75
+                    magChg(iTrl)=nnz(updatedC==closestC)*.25;
+                elseif iTrl > nTrials*.75 && iTrl <= nTrials
+                    magChg(iTrl)=nnz(updatedC==closestC)*.25;
+                end
+                
             end
-            epsMuAll(iTrl,:) = [epsMu,closestC];
             
-            epsMuVec = zeros(nClus,1);
-            epsMuVec(closestC) = epsMu;
-            deltaMu(:,1,iTrl) = epsMuVec.*(trials(iTrl,1)-mu(:,1,iTrl));
-            deltaMu(:,2,iTrl) = epsMuVec.*(trials(iTrl,2)-mu(:,2,iTrl));
-            % update mean estimates
-            if iTrl~=length(trials) %no need to update for last trial +1)
-                mu(:,1,iTrl+1) = mu(:,1,iTrl) + deltaMu(:,1,iTrl);
-                mu(:,2,iTrl+1) = mu(:,2,iTrl) + deltaMu(:,2,iTrl);
-            end
+            %                 epsMu = epsMuOrig*deltaEpsMu^magChg(iTrl); %squared because it's deltaMu (e.g. .99) to the power of nTimes it was updated, making it slightly smaller each time
+        else
+            epsMu = epsMuOrig;
+        end
+        epsMuAll(iTrl,:) = [epsMu(iTrl),closestC];
+        
+        epsMuVec = zeros(nClus,1);
+        epsMuVec(closestC) = epsMu(iTrl);
+        deltaMu(:,1,iTrl) = epsMuVec.*(trials(iTrl,1)-mu(:,1,iTrl));
+        deltaMu(:,2,iTrl) = epsMuVec.*(trials(iTrl,2)-mu(:,2,iTrl));
+        % update mean estimates
+        if iTrl~=length(trials) %no need to update for last trial +1)
+            mu(:,1,iTrl+1) = mu(:,1,iTrl) + deltaMu(:,1,iTrl);
+            mu(:,2,iTrl+1) = mu(:,2,iTrl) + deltaMu(:,2,iTrl);
         end
         
         % compute sse on each trial with respect to 'all trials' - independent data - looks similar if you change 'dataPtsTest' to 'trials'; also useful if want to test less vs more trials on training so that you equate SSE by number of test points
@@ -280,7 +278,7 @@ saveplots=0;
 
 
 %set to load in data (note divide by value in variable)
-if 1
+if 0
     epsMuOrig10 = 6;
     deltaEpsMu100 = 96;
     nClus = 30;
@@ -360,6 +358,29 @@ for iTrl = 1:nTrials
 end
 % xlim([min(trials(:,1))-.1,max(trials(:,1))+.1]); ylim([min(trials(:,2))-.1,max(trials(:,2))+.1]);
 
+%%
+
+toPlot = 1;
+colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
+
+figure('units','normalized','outerposition',[0 0 1 1]);
+for iTrl = 1:nTrials
+    if mod(iTrl,250)==0
+%         iPlot=iPlot+1;
+        voronoi(muAll(:,1,iTrl,toPlot),muAll(:,2,iTrl,toPlot),'k')
+    end
+    if warpBox,
+    xlim([-1.1,2.1]); ylim([-1.1,1.1]);
+    else
+    xlim([-1.1,1.1]); ylim([-1.1,1.1]);
+    end
+    if mod(iTrl,50)==0, %plot centers after x trials
+        for i=1:nClus
+            plot(squeeze(muAll(i,1,iTrl,toPlot)),squeeze(muAll(i,2,iTrl,toPlot)),'.','Color',colors(i,:),'MarkerSize',20); hold on;
+        end
+        drawnow;
+    end
+end
 %% plot final centres 
 for i = 1:nIter
     figure;
