@@ -2,7 +2,7 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -11,7 +11,7 @@ addpath(codeDir); addpath(saveDir);
 
 % nClus   = 20;
 clus2run = [20, 40, 60, 80]; %run multuple cluster numbers
-clus2run = 20;
+clus2run = 40;
 nTrials = 2500; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 colgrey = [.5, .5, .5];
@@ -22,7 +22,7 @@ locRange = 1;%1; from -locRange to locRange
 stepSize=diff(linspace(-1,1,nSteps)); stepSize=stepSize(1); %smallest diff between locs
 
 % parameters
-epsMuOrig=.2;% %learning rate / starting learning rate %.6
+epsMuOrig=.1;% %learning rate / starting learning rate %.6
 deltaEpsMu = .96;% %change in learning rate over time (slow down with 'learning')
 % deltaEpsMu = .99; % slower decrease in learning rate for expanding (if no
 % reset)
@@ -76,7 +76,7 @@ warpType = 'sq2rect';
 %%
 saveDat=0; %save simulations - cluster centres and tsse
 
-nIter=6; %how many iterations (starting points)
+nIter=1; %how many iterations (starting points)
 tic
 for iClus2run = 1:length(clus2run)    
     nClus = clus2run(iClus2run);
@@ -96,6 +96,9 @@ for iClus2run = 1:length(clus2run)
     end
 end
 toc
+
+
+
 %% Plot (with/without load in data)
 
 % save plots?
@@ -134,9 +137,9 @@ end
 % plot(epsMuAll(:,1),'.');
 
 % plot lowest and highest SSE
-iToPlot=[1,2,3,nIter-2,nIter-1,nIter];
+iToPlot=size(muEnd,3);
 figure;
-for i = 1:6
+for i = 1:iToPlot
     subplot(2,3,i); hold on;
 %     plot(dataPtsTest(:,1),dataPtsTest(:,2),'.','Color',colgrey,'MarkerSize',2); hold on;
     voronoi(squeeze(muEnd(:,1,i)),squeeze(muEnd(:,2,i)),'k')
@@ -203,6 +206,7 @@ end
 
 %% over time - one plot
 
+toPlot = 1;
 figure('units','normalized','outerposition',[0 0 1 1]);
 for iTrl = 1:nTrials
     if mod(iTrl,250)==0

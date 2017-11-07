@@ -57,7 +57,7 @@ for iterI = 1:nIter
     deltaMu  = zeros(nClus,2,nTrials);
     distTrl  = nan(nTrials,nClus);
     
-    clusUpdates = zeros(nClus,2)+.01;
+    clusUpdates = zeros(nClus,2)+.5;
     
     for iTrl=1:length(trials)
         for iClus = 1:nClus,
@@ -159,10 +159,10 @@ for iterI = 1:nIter
                 %(1-alpha)*(epsMu*(trials(iTrl,1)-mu(closestC,1,iTrl)))+(alpha*clusUpdates(closestC,1)
    
                 
-                alpha = 0.8;
+                alpha = 0.9;
                 
-                deltaMu(closestC,1,iTrl) = (1-alpha)*(epsMu*(trials(iTrl,1)-mu(closestC,1,iTrl)))+(alpha*clusUpdates(closestC,1));
-                deltaMu(closestC,2,iTrl) = (1-alpha)*(epsMu*(trials(iTrl,2)-mu(closestC,2,iTrl)))+(alpha*clusUpdates(closestC,2));
+                deltaMu(closestC,1,iTrl) = ((1-alpha)*(epsMu*(trials(iTrl,1)-mu(closestC,1,iTrl))))+(alpha*clusUpdates(closestC,1));
+                deltaMu(closestC,2,iTrl) = ((1-alpha)*(epsMu*(trials(iTrl,2)-mu(closestC,2,iTrl))))+(alpha*clusUpdates(closestC,2));
                  
                 clusUpdates(closestC,1)=deltaMu(closestC,1,iTrl);
                 clusUpdates(closestC,2)=deltaMu(closestC,2,iTrl);
@@ -204,12 +204,17 @@ tsseIter = tsseTrls(end,:);
 [indVal, indSSE1] = sort(tsseIter);
 [y, indSSE2] = sort(indSSE1); %use indSSE2 to sort for plotting
 
-bestWorst3=[1,2,3,nIter-2,nIter-1,nIter];
-muEndBest = nan(nClus,2,length(bestWorst3)); % save best.worse 3 clusters at end of learning
-muAllBest = nan(nClus,2,nTrials,length(bestWorst3)); % save trials to plot over time
-for iterI = 1:length(bestWorst3),
-    muEndBest(:,:,iterI) = muEnd(:,:,indSSE2==bestWorst3(iterI));
-    muAllBest(:,:,:,iterI) = muAll(:,:,:,indSSE2==bestWorst3(iterI));
+if size(muEnd,3) >= 6,
+    bestWorst3=[1,2,3,nIter-2,nIter-1,nIter];
+    muEndBest = nan(nClus,2,length(bestWorst3)); % save best.worse 3 clusters at end of learning
+    muAllBest = nan(nClus,2,nTrials,length(bestWorst3)); % save trials to plot over time
+    for iterI = 1:length(bestWorst3),
+        muEndBest(:,:,iterI) = muEnd(:,:,indSSE2==bestWorst3(iterI));
+        muAllBest(:,:,:,iterI) = muAll(:,:,:,indSSE2==bestWorst3(iterI));
+    end
+else
+    muEndBest = muEnd;
+    muAllBest = muAll;
 end
 
 end
