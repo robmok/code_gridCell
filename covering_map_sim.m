@@ -1,9 +1,13 @@
-function [muEndBest, muAllBest, tsseTrls, epsMuAll,deltaMu,clusUpdAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha)
+function [muEndBest, muAllBest, tsseTrls,sseTrl,epsMuAll,deltaMu,clusUpdAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha)
 
 spacing=linspace(-1,1,101); 
 stepSize=diff(spacing(1:2));
 
-%for crossvalidation
+%for crossvalidation - 
+%%%%%%%%%
+%NOTE NEED TO CHANGE THE SHAPE OF THIS LATER
+%%%%%%%%%
+
 nTrialsTest = nTrials;
 % nTrialsTest = 5000; %keep it constant if want to compare with nTrials above
 dataPtsTest = [randsample(linspace(-locRange,locRange,101),nTrialsTest,'true'); randsample(linspace(-locRange,locRange,101),nTrialsTest,'true')]'; % random points in a box
@@ -11,6 +15,7 @@ dataPtsTest = [randsample(linspace(-locRange,locRange,101),nTrialsTest,'true'); 
 muAll    = nan(nClus,2,nTrials,nIter);
 tsseTrls = nan(nTrials,nIter);
 muEnd    = nan(nClus,2,nIter);
+sseTrl = zeros(nClus,nTrials,nIter);
 
 
 for iterI = 1:nIter
@@ -35,7 +40,26 @@ for iterI = 1:nIter
             % use this to select from the PAIR in trapPts
             trialInd=randi(length(trapPts),nTrials,1);
             trials=trapPts(:,trialInd)';
-
+            
+            
+        case 'trapzSq' %probably need a more narrow trapezium!
+            trapY=trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
+            trapX=spacing;
+            trapPts=[];
+            for i=1:length(trapY),
+               trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
+            end
+            %make square box attached to it
+            sqX=spacing;
+            sqY=spacing(1:floor(length(spacing)/2));
+            for i=1:length(sqX),
+                for j=1:length(sqY),
+                trapPts = [trapPts, [sqX(i); sqY(j)]];
+                end
+            end
+            % use this to select from the PAIR in trapPts
+            trialInd=randi(length(trapPts),nTrials,1);
+            trials=trapPts(:,trialInd)';
     end
     
     % if expand box
@@ -51,12 +75,50 @@ for iterI = 1:nIter
     mu = nan(nClus,2,nTrials);
     for clusterI = 1:nClus
         %     mu(clusterI,:,1) = -locRange + locRange.*2.*rand(1,2);  %random location in box - uniform distr from -1 to 1 (see help rand)
-        mu(clusterI,:,1) = trials(randi(length(trials)),:);   %intiate each cluster with one data point - Forgy method
+        %     mu(clusterI,:,1) = trials(randi(length(trials)),:);   %intiate each cluster with one data point - Forgy method
         
-        % k means++?
+        % k means++
+        % initializing using dataPtsTest - not trials. prob doesn't matter
+        % but this way it's just any random points in the box 
+        %%%%%%
+        %(THOUGH NEED TO AUTOMATICALLY CHANGE THE SHAPE OF THE BOX FOR TEST
+        %DATAPTS LATER)
+        %%%%%%
         
+        if clusterI==1,% random datapoint as 1st cluster
+            mu(clusterI,:,1) = dataPtsTest(randi(length(dataPtsTest)),:); 
+        end
+        if clusterI~=nClus, % no need update k+1
+            clear distInit
+            for iClus = 1:clusterI,% loop over clusters that exist now
+                distInit(:,iClus)=sum([mu(iClus,1,1)-dataPtsTest(:,1),  mu(iClus,2,1)-dataPtsTest(:,2)].^2,2); %squared euclid for k means
+            end
+            [indValsInit, indInit]=min(distInit,[],2); % find which clusters are points closest to
+            
+            distClus=[];
+            for iClus = 1:clusterI,
+                indOrig(:,clusterI) = indInit==iClus;
+                distClusTmp = sum([(mu(iClus,1,1)-dataPtsTest(indOrig(:,clusterI),1)), (mu(iClus,2,1)-dataPtsTest(indOrig(:,clusterI),2))].^2,2);
+                distClus = [distClus; [distClusTmp, repmat(iClus,length(distClusTmp),1)]];
+            end
+            
+            %need to keep track of the indices of the original dist variable - get the
+            %datapoints that were the farthest from all clusters, get that cluster and see which datapoint that was relative to that cluster (since i just save the distance)
+            distClusNorm = distClus(:,1)./sum(distClus(:,1));
+            distClusPr   = cumsum(distClusNorm(:,1)); %get cumsum, then generate rand val from 0 to 1 and choose smallest val - the larger the dis, the more likely the rand value will lie between it and its previous value in a cumsum plot
+            ind=find(rand(1)<distClusPr,1);% %find smallest value that is larger than the random value (0 to 1 uniform distr)
+            
+            %                     tmp(i)=distClus(ind,1); %testing if getting the right values; if plot, see that it should be lower pr for closer values, higher for larger. note if very few high distances, this hist will look normally distributed
+            
+            clusInd = distClus(ind,2); %find which is the closest cluster
+            indDat = find(distInit(:,clusInd)==distClus(ind,1)); %find where the datapoint is in the original vector
+            
+            if size(indDat,1)>1,
+                indDat=indDat(randi(size(indDat,1),1));
+            end
+            mu(clusterI+1,:,1) = dataPtsTest(indDat,:);
+        end
     end
-    
     %%
 
     updatedC = nan(nTrials,1);
@@ -64,9 +126,10 @@ for iterI = 1:nIter
     deltaMu  = zeros(nClus,2,nTrials);
     distTrl  = nan(nTrials,nClus);
     
-    clusUpdates = zeros(nClus,2)+.01;
+    clusUpdates = zeros(nClus,2)+.01; %acutally starting at 0 is OK, since there was no momentum from last trial
     
     clusUpdAll{nClus}=[];
+    
     
     for iTrl=1:length(trials)
             
@@ -141,11 +204,10 @@ for iterI = 1:nIter
         end
         [indValsTrl, indTrl]=min(distTrl,[],2); % find which clusters are points closest to
         
-        sseTrl = zeros(iClus,1);
         for iClus = 1:size(mu,1),
-            sseTrl(iClus)=sum(sum([mu(iClus,1,iTrl)-dataPtsTest(indTrl==iClus,1), mu(iClus,2,iTrl)-dataPtsTest(indTrl==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
+            sseTrl(iClus,iTrl,iterI)=sum(sum([mu(iClus,1,iTrl)-dataPtsTest(indTrl==iClus,1), mu(iClus,2,iTrl)-dataPtsTest(indTrl==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
         end
-        tsseTrls(iTrl,iterI)=sum(sseTrl);
+        tsseTrls(iTrl,iterI)=sum(sseTrl(:,iTrl,iterI));
 
         
     end
