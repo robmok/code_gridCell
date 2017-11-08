@@ -1,6 +1,7 @@
 function [muEndBest, muAllBest, tsseTrls, epsMuAll,deltaMu,clusUpdAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha)
 
 spacing=linspace(-1,1,101); 
+stepSize=diff(spacing(1:2));
 
 %for crossvalidation
 nTrialsTest = nTrials;
@@ -23,10 +24,18 @@ for iterI = 1:nIter
         case 'rect'
             trials=[randsample(-1:diff(spacing(1:2)):2,nTrials,'true'); randsample(spacing,nTrials,'true')]';
             
-        case 'trap'
-            
-%             trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)])
-            
+        case 'trapz'
+            trapY=trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
+            trapX=spacing;
+            trapPts=[];
+            for i=1:length(trapY),
+               trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
+            end
+            trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1            
+            % use this to select from the PAIR in trapPts
+            trialInd=randi(length(trapPts),nTrials,1);
+            trials=trapPts(:,trialInd)';
+
     end
     
     % if expand box

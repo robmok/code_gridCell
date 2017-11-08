@@ -1,8 +1,8 @@
 clear all;
 % close all;
 
-wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -12,7 +12,7 @@ addpath(codeDir); addpath(saveDir);
 % nClus   = 20;
 clus2run = [20, 40, 60, 80]; %run multuple cluster numbers
 clus2run = 40;
-nTrials = 30000; %how many locations in the box / trials - 2.5k ; 5k if reset
+nTrials = 20000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 colgrey = [.5, .5, .5];
 
@@ -23,7 +23,7 @@ stepSize=diff(linspace(-1,1,nSteps)); stepSize=stepSize(1); %smallest diff betwe
 
 % parameters
 epsMuOrig=.075;% %learning rate / starting learning rate %.075
-epsMuOrig=.1;%
+% epsMuOrig=.1;%
 % deltaEpsMu = .96;% %change in learning rate over time (slow down with 'learning')
 % deltaEpsMu = .99; % slower decrease in learning rate for expanding (if no
 % reset)
@@ -53,7 +53,7 @@ epsMuOrig10=epsMuOrig*10;
 % the orig then 50% the orig) %- not using this yet
 
 %define box / environement - random points in a box
-box = 'square';
+box = 'square'; %square, rect, trapz
 
 % change box shape during learning
 %rectangle
@@ -62,7 +62,7 @@ warpType = 'sq2rect';
 
 %mometum-like adaptive learning rate - define alpha (higher = weight
 %previous update (direction and magnitude) more; 0 = don't weight previous at all)
-alpha = 0.8;
+alpha = 0;
 alpha10 = alpha*10; %for saving simulations - multiple by values to save the files with params
 
 
@@ -201,7 +201,7 @@ for iTrl = 1:nTrials
         for i=1:nClus
             plot(squeeze(muAll(i,1,iTrl,toPlot)),squeeze(muAll(i,2,iTrl,toPlot)),'.','Color',colors(i,:),'MarkerSize',20); hold on;
         end
-%         drawnow;
+        drawnow;
     end
 end
 voronoi(muAll(:,1,iTrl,toPlot),muAll(:,2,iTrl,toPlot),'k'); %final one - if plotting at END above
@@ -240,15 +240,32 @@ for iTrl = 1:nTrials
     end
 end
 
-
 %% plot final centres 
-
+toPlot=1;
 colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
+
+% for i = 1:nIter
+%     figure;
+% %     plot(trials(:,1),trials(:,2),'Color',colgrey); hold on;
+%     for iClus = 1:nClus
+%         plot(squeeze(muEnd(iClus,1,i)),squeeze(muEnd(iClus,2,i)),'.','Color',colors(iClus,:),'MarkerSize',25); hold on; %plot cluster final point
+%     end
+%     if warpBox,
+%         xlim([-1.1,2.1]); ylim([-1.1,1.1]);
+%     else
+%         xlim([-1.1,1.1]); ylim([-1.1,1.1]);
+%     end
+% end
+% voronoi(squeeze(muEnd(:,1,i)),squeeze(muEnd(:,2,i)))
+
+%plot over average of final trials
+nTrlsToPlot = 200;
 
 for i = 1:nIter
     figure;
     for iClus = 1:nClus
-        plot(squeeze(muEnd(iClus,1,i)),squeeze(muEnd(iClus,2,i)),'.','Color',colors(iClus,:),'MarkerSize',25); hold on; %plot cluster final point
+        plot(mean(squeeze(muAll(iClus,1,nTrials-nTrlsToPlot:end,toPlot))),squeeze(mean(muAll(iClus,2,nTrials-nTrlsToPlot:end,toPlot))),'.','Color',colors(i,:),'MarkerSize',20); hold on;
+        
     end
     if warpBox,
         xlim([-1.1,2.1]); ylim([-1.1,1.1]);
@@ -256,5 +273,4 @@ for i = 1:nIter
         xlim([-1.1,1.1]); ylim([-1.1,1.1]);
     end
 end
-voronoi(squeeze(muEnd(:,1,i)),squeeze(muEnd(:,2,i)))
-
+% voronoi(squeeze(mean(muAll(:,1,nTrials-nTrlsToPlot:end,toPlot),3)),squeeze(mean(muAll(:,2,nTrials-nTrlsToPlot:end,toPlot),3)),'k');
