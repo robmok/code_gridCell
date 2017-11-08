@@ -4,13 +4,8 @@ spacing=linspace(-1,1,101);
 stepSize=diff(spacing(1:2));
 
 %for crossvalidation - 
-%%%%%%%%%
-%NOTE NEED TO CHANGE THE SHAPE OF THIS LATER
-%%%%%%%%%
-
 nTrialsTest = nTrials;
 % nTrialsTest = 5000; %keep it constant if want to compare with nTrials above
-dataPtsTest = [randsample(linspace(-locRange,locRange,101),nTrialsTest,'true'); randsample(linspace(-locRange,locRange,101),nTrialsTest,'true')]'; % random points in a box
 
 muAll    = nan(nClus,2,nTrials,nIter);
 tsseTrls = nan(nTrials,nIter);
@@ -25,10 +20,11 @@ for iterI = 1:nIter
     
     switch box
         case 'square'
-            trials=[randsample(spacing,nTrials,'true'); randsample(spacing,nTrials,'true')]';
+            trials      = [randsample(spacing,nTrials,'true'); randsample(spacing,nTrials,'true')]';
+            dataPtsTest = [randsample(linspace(-locRange,locRange,101),nTrialsTest,'true'); randsample(linspace(-locRange,locRange,101),nTrialsTest,'true')]'; % random points in a box
         case 'rect'
-            trials=[randsample(-1:diff(spacing(1:2)):2,nTrials,'true'); randsample(spacing,nTrials,'true')]';
-            
+            trials      = [randsample(-1:diff(spacing(1:2)):2,nTrials,'true'); randsample(spacing,nTrials,'true')]';
+            dataPtsTest = [randsample(-1:diff(spacing(1:2)):2,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
         case 'trapz'
             trapY=trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
             trapX=spacing;
@@ -38,9 +34,10 @@ for iterI = 1:nIter
             end
             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1            
             % use this to select from the PAIR in trapPts
-            trialInd=randi(length(trapPts),nTrials,1);
-            trials=trapPts(:,trialInd)';
-            
+            trialInd     = randi(length(trapPts),nTrials,1);
+            trials       = trapPts(:,trialInd)';
+            trialIndTest = randi(length(trapPts),nTrials,1);
+            dataPtsTest  = trapPts(:,trialIndTest)';
             
         case 'trapzSq' %probably need a more narrow trapezium!
             trapY=trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
@@ -60,6 +57,8 @@ for iterI = 1:nIter
             % use this to select from the PAIR in trapPts
             trialInd=randi(length(trapPts),nTrials,1);
             trials=trapPts(:,trialInd)';
+            trialIndTest = randi(length(trapPts),nTrials,1);
+            dataPtsTest  = trapPts(:,trialIndTest)';
     end
     
     % if expand box
@@ -79,10 +78,7 @@ for iterI = 1:nIter
         
         % k means++
         % initializing using dataPtsTest - not trials. prob doesn't matter
-        % but this way it's just any random points in the box 
-        %%%%%%
-        %(THOUGH NEED TO AUTOMATICALLY CHANGE THE SHAPE OF THE BOX FOR TEST
-        %DATAPTS LATER)
+        % but this way it's just any random points in the box
         %%%%%%
         
         if clusterI==1,% random datapoint as 1st cluster
@@ -143,6 +139,19 @@ for iterI = 1:nIter
             if numel(closestC)>1, %if more than 1, randomly choose one
                 closestC = randsample(closestC,1);
             end
+            
+            
+            %stochastic update - select one of the closest clusters with a random
+            %element
+            
+%             c = 0.75; % stochastic parameter - 1 is same as k means (?), 0 - random
+%             dist2Clus2 = exp(-c.*dist2Clus)./ sum(exp(-c.*dist2Clus));
+%             distClusPr = cumsum(dist2Clus2);
+%             closestC=find(rand(1)<distClusPr,1);
+% %             dist2Clus2(ind);
+          
+            
+            
 
             %log which cluster has been updated
             updatedC(iTrl) = closestC;

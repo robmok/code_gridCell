@@ -23,7 +23,7 @@ stepSize=diff(linspace(-1,1,nSteps)); stepSize=stepSize(1); %smallest diff betwe
 
 % parameters
 epsMuOrig=.075;% %learning rate / starting learning rate %.075
-% epsMuOrig=.1;%
+epsMuOrig=.1;%
 % deltaEpsMu = .96;% %change in learning rate over time (slow down with 'learning')
 % deltaEpsMu = .99; % slower decrease in learning rate for expanding (if no
 % reset)
@@ -62,7 +62,7 @@ warpType = 'sq2rect';
 
 %mometum-like adaptive learning rate - define alpha (higher = weight
 %previous update (direction and magnitude) more; 0 = don't weight previous at all)
-alpha = 0;
+alpha = 0.8;
 alpha10 = alpha*10; %for saving simulations - multiple by values to save the files with params
 
 
