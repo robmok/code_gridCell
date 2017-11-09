@@ -143,13 +143,50 @@ for iterI = 1:nIter
             
             %stochastic update - select one of the closest clusters with a random
             %element
+                
+            c = .01; %constant - the larger, the more deterministic
+            % because this is trial by trial (not like k means), constant
+            % must be much smaller than their recommendation (2). need it
+            % to be much slower
             
-%             c = 0.75; % stochastic parameter - 1 is same as k means (?), 0 - random
-%             dist2Clus2 = exp(-c.*dist2Clus)./ sum(exp(-c.*dist2Clus));
-%             distClusPr = cumsum(dist2Clus2);
-%             closestC=find(rand(1)<distClusPr,1);
-% %             dist2Clus2(ind);
-          
+             %Q - is this going to get too big too fast? at some point it'll
+            %be standard k means - if too fast then it's the same
+            
+            % depends on number of trials, so set it depend on nTrls?
+                        
+%             beta=c*(iTrl-1); % so this gets bigger, and more deterministic with more trials
+            beta=c*(iTrl+nTrials/10); %new - no need to be so stochatic at start
+            
+            %or keep beta constant so always a bit stochastic
+%            c = 20; %2 k is deterministic
+%            beta = c;
+            
+            % stochastic parameter - large is same as k means (?), 0 - random
+            
+            dist2Clus2 = exp(-beta.*dist2Clus)./ sum(exp(-beta.*dist2Clus));
+            distClusPr = cumsum(dist2Clus2);
+            closestC=find(rand(1)<distClusPr,1);
+                    
+% %             
+%             testing and plotting to see what's best - try to define c
+%             according to nTrials
+%             for iTrl=1:10000,
+%                 beta=c*(iTrl-1); % so this gets bigger, and more deterministic with more trials
+%                 %constantly stochastic at some num
+% %                 c = 5; %2k = determinstic
+%                 beta = 50;
+%                 
+%                 dist2Clus2 = exp(-beta.*dist2Clus)./ sum(exp(-beta.*dist2Clus));
+%                 distClusPr = cumsum(dist2Clus2);
+%                 closestC=find(rand(1)<distClusPr,1);
+%                 
+%                 xx(iTrl) = dist2Clus2(closestC); % this allows us to plot if it selects the most probable ones or not, so slowly goes toward 1 = always choose the closest one - should be random initially then going to 1
+%                 yy(iTrl) = dist2Clus(closestC); 
+%             end
+%             figure; plot(xx);
+%             figure; plot(yy);
+%             
+            
             
             
 

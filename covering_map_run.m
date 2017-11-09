@@ -1,8 +1,8 @@
 clear all;
 % close all;
 
-wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -12,7 +12,7 @@ addpath(codeDir); addpath(saveDir);
 % nClus   = 20;
 clus2run = [20, 40, 60, 80]; %run multuple cluster numbers
 clus2run = 40;
-nTrials = 5000; %how many locations in the box / trials - 2.5k ; 5k if reset
+nTrials = 20000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 colgrey = [.5, .5, .5];
 
@@ -23,7 +23,7 @@ stepSize=diff(linspace(-1,1,nSteps)); stepSize=stepSize(1); %smallest diff betwe
 
 % parameters
 epsMuOrig=.075;% %learning rate / starting learning rate %.075
-epsMuOrig=.1;%
+% epsMuOrig=.1;%
 % deltaEpsMu = .96;% %change in learning rate over time (slow down with 'learning')
 % deltaEpsMu = .99; % slower decrease in learning rate for expanding (if no
 % reset)
@@ -201,7 +201,7 @@ for iTrl = 1:nTrials
         for i=1:nClus
             plot(squeeze(muAll(i,1,iTrl,toPlot)),squeeze(muAll(i,2,iTrl,toPlot)),'.','Color',colors(i,:),'MarkerSize',20); hold on;
         end
-        drawnow;
+%         drawnow;
     end
 end
 voronoi(muAll(:,1,iTrl,toPlot),muAll(:,2,iTrl,toPlot),'k'); %final one - if plotting at END above
@@ -236,7 +236,7 @@ for iTrl = 1:nTrials
         for i=1:nClus
             plot(squeeze(muAll(i,1,iTrl,toPlot)),squeeze(muAll(i,2,iTrl,toPlot)),'.','Color',colors(i,:),'MarkerSize',40); hold on; %make marker size bigger - larger/smoother firing field!
         end
-        drawnow;
+%         drawnow;
     end
 end
 
@@ -261,7 +261,7 @@ colors = distinguishable_colors(nClus); %function for making distinguishable col
 %plot over average of final trials
 nTrlsToPlot = [3000, 2000, 1000, 500, 200, 100];
 
-nTrlsToPlot = 500;
+nTrlsToPlot = 1000;
 
 for iToPlot=1:length(nTrlsToPlot)
     for i = 1%:nIter
@@ -276,7 +276,7 @@ for iToPlot=1:length(nTrlsToPlot)
             xlim([-1.1,1.1]); ylim([-1.1,1.1]);
         end
     end
-%     voronoi(squeeze(mean(muAll(:,1,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),squeeze(mean(muAll(:,2,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),'k');
+    voronoi(squeeze(mean(muAll(:,1,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),squeeze(mean(muAll(:,2,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),'k');
 end
 
 %%
