@@ -1,4 +1,4 @@
-function [muEndBest, muAllBest, tsseTrls,sseTrl,epsMuAll,deltaMu,clusUpdAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha)
+function [muEndBest, muAllBest, tsseTrls,sseTrl,epsMuAll,deltaMu] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,c)
 
 spacing=linspace(-1,1,101); 
 stepSize=diff(spacing(1:2));
@@ -134,47 +134,45 @@ for iterI = 1:nIter
                 trials(nTrials*.75+1:end,:) = trialsExpand;
             end
             
+            %compute distances
             dist2Clus = sqrt(sum([mu(:,1,iTrl)'-trials(iTrl,1); mu(:,2,iTrl)'-trials(iTrl,2)].^2)); % vectorising euclid dist - sqrt(sum((a-b).^2)), since can't use xval method
-            closestC=find(min(dist2Clus)==dist2Clus);
-            if numel(closestC)>1, %if more than 1, randomly choose one
-                closestC = randsample(closestC,1);
-            end
+
+%             %deterministic update
+%             closestC=find(min(dist2Clus)==dist2Clus);
+%             if numel(closestC)>1, %if more than 1, randomly choose one
+%                 closestC = randsample(closestC,1);
+%             end
+
+
+            %stochastic update - sel 1 of the closest clusters w random element - stochastic parameter c - large is deterministic, 0 - random            
             
-            
-            %stochastic update - select one of the closest clusters with a random
-            %element
-                
-            c = .01; %constant - the larger, the more deterministic
+%             c = .0025; %constant - the larger, the more deterministic            
             % because this is trial by trial (not like k means), constant
             % must be much smaller than their recommendation (2). need it
             % to be much slower
             
-             %Q - is this going to get too big too fast? at some point it'll
-            %be standard k means - if too fast then it's the same
-            
-            % depends on number of trials, so set it depend on nTrls?
-                        
 %             beta=c*(iTrl-1); % so this gets bigger, and more deterministic with more trials
-            beta=c*(iTrl+nTrials/10); %new - no need to be so stochatic at start
+            beta=c*(iTrl+nTrials/10); %new - maybe no need to be so stochatic at start -BUT should this AND c be determined by nTrials?
             
             %or keep beta constant so always a bit stochastic
-%            c = 20; %2 k is deterministic
-%            beta = c;
-            
-            % stochastic parameter - large is same as k means (?), 0 - random
+            if c == 999, %hack just to test this
+                c = 15; %2 k is deterministic
+                beta = c;
+            end
             
             dist2Clus2 = exp(-beta.*dist2Clus)./ sum(exp(-beta.*dist2Clus));
             distClusPr = cumsum(dist2Clus2);
-            closestC=find(rand(1)<distClusPr,1);
-                    
-% %             
-%             testing and plotting to see what's best - try to define c
-%             according to nTrials
+            closestC=find(rand(1)<distClusPr,1);    
+            
+% %             testing and plotting to see what's best - try to define c
+% %             according to nTrials
 %             for iTrl=1:10000,
-%                 beta=c*(iTrl-1); % so this gets bigger, and more deterministic with more trials
+% %                 beta=c*(iTrl-1); % so this gets bigger, and more deterministic with more trials
+% %                 beta=c*(iTrl+nTrials/10); %new - no need to be so stochatic at start
+% 
 %                 %constantly stochastic at some num
 % %                 c = 5; %2k = determinstic
-%                 beta = 50;
+%                 beta = 15;
 %                 
 %                 dist2Clus2 = exp(-beta.*dist2Clus)./ sum(exp(-beta.*dist2Clus));
 %                 distClusPr = cumsum(dist2Clus2);
@@ -184,11 +182,8 @@ for iterI = 1:nIter
 %                 yy(iTrl) = dist2Clus(closestC); 
 %             end
 %             figure; plot(xx);
-%             figure; plot(yy);
-%             
-            
-            
-            
+%             figure; plot(yy);             
+
 
             %log which cluster has been updated
             updatedC(iTrl) = closestC;
@@ -200,21 +195,12 @@ for iterI = 1:nIter
 %             new - adaptive learning rate (momentum-like)
 %             need to save each clusters'previous update and position
 %             
-%             prevUpd - this is the amount the cluster moved and the
-%             dir for x and y. this is deltaMu on previous trial (but
-%             need to add the momentum thing)
-%             
 %             momentumUpdate:
 %             alpha = 0.2% ? - if alpha is 0, then same as now, and move a good amount, not weightnig previous trials. if alpha is .99, then
 %             weighting the previous trial a lot and not moving much
 %             
 %             currUpd = epsMu*(currClusLoc-dataPts); % on current trial
 %             deltaMuCurrTrial = (1-alpha)*currUpd + alpha*prevUpd;
-
-               
-            %PLAN - store last update for each cluster separately, - i.e.
-            %deltaMu for each cluster. Then do the update below by
-            %adjusting the formula for deltaMu.
             
             
             % - set alpha (e.g. 0.2)
@@ -222,8 +208,6 @@ for iterI = 1:nIter
             % - save each cluster's update (save for each update/trial, or
             % just save the last update)
             
-            % the update will be: 
-            %      (1-alpha)*(epsMu*(trials(iTrl,1)-mu(closestC,1,iTrl)))+(alpha*clusUpdates(closestC,1)
             
             deltaMu(closestC,1,iTrl) = ((1-alpha)*(epsMu*(trials(iTrl,1)-mu(closestC,1,iTrl))))+(alpha*clusUpdates(closestC,1));
             deltaMu(closestC,2,iTrl) = ((1-alpha)*(epsMu*(trials(iTrl,2)-mu(closestC,2,iTrl))))+(alpha*clusUpdates(closestC,2));
@@ -231,7 +215,8 @@ for iterI = 1:nIter
             clusUpdates(closestC,1)=deltaMu(closestC,1,iTrl);
             clusUpdates(closestC,2)=deltaMu(closestC,2,iTrl);
             
-            clusUpdAll{closestC}(length(clusUpdAll{closestC})+1)=deltaMu(closestC,1,iTrl);
+%             clusUpdAll{closestC}(length(clusUpdAll{closestC})+1)=deltaMu(closestC,1,iTrl);
+%             %outputted this to check how each cluster updated
             
             
             deltaMuVec = zeros(nClus,2);
