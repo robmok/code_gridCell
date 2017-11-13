@@ -1,7 +1,13 @@
 %% Plot (with/without load in data)
 
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+cd(wd);
+saveDir = [wd '/data_gridCell'];
+
 % save plots?
 savePlots=0;
+
+% covering_map_dat_60clus_30000trls_eps100_alpha2_20iters
 
 %set to load in data (note divide by value in variable)
 if 1
@@ -10,13 +16,28 @@ if 1
 %     deltaEpsMu100 = 96; %96, 98
     nClus = 40;
     nTrials = 30000;
-    nIter=5;
-%     nIter=20; %for warpBox, for now
+%     nIter=5;
+    nIter=20;
     warpBox=0;
-    alpha10=8;
+    alpha10=0;
+    alpha10=5; %0,2, 5, 9, 95 (95 looks like it goes really bad)
+    
+    % load up - check SSE, check variance of SEE across clusters, check how 60 degrees the hex map is 
+    
+    % Compare the different parameters better (epsMu, alpha, c)
+    % to do: 
+    % - plotting the clusters at diff time points to visualise it better -
+    % esp for 30k, e.g. snapshots (-500, 0, +500) at 5k (still learning), then 15k, 20k,
+    % 25k, 30k
+    % - SSE for best, or average of top 3? compare across 
+    
+    %important - Find out how to calcuate gridness - apply to above.
+    
+    
+    
 %     fname=[saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_deltaMu%d_%diters',nClus,nTrials,epsMuOrig10,deltaEpsMu100,nIter)];
-%     fname=[saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_%diters',nClus,nTrials,epsMuOrig1000 ,alpha10,nIter)];
-    fname=[saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,c10k,nIter)];
+    fname=[saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_%diters',nClus,nTrials,epsMuOrig1000 ,alpha10,nIter)];
+%     fname=[saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,c10k,nIter)];
     
     if warpBox,
         fname = [fname '_warpBox'];
@@ -24,8 +45,7 @@ if 1
     load(fname);
 end
 
-
-
+%%
 colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
 
 figure; plot(tsseTrls);
@@ -160,7 +180,7 @@ colors = distinguishable_colors(nClus); %function for making distinguishable col
 %plot over average of final trials
 nTrlsToPlot = [3000, 2000, 1000, 500, 200, 100];
 
-nTrlsToPlot = 1000;
+nTrlsToPlot = 1;
 
 for iToPlot=1:length(nTrlsToPlot)
     for i = 1%:nIter
@@ -178,12 +198,14 @@ for iToPlot=1:length(nTrlsToPlot)
     voronoi(squeeze(mean(muAll(:,1,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),squeeze(mean(muAll(:,2,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),'k');
 end
 
-%%
+%
 
-avgTrlSSE = mean(sseTrl,1);
+iter=1;
+
+avgTrlSSE = squeeze(mean(sseTrl(:,:,iter),1));
 
 for iClus=1:nClus,
-    devAvgSSE(iClus,:)=(sseTrl(iClus,:)-avgTrlSSE);
+    devAvgSSE(iClus,:)=sseTrl(iClus,:,iter)-avgTrlSSE(:,:,iter);
 end
 
 stdAcrossClus=std(devAvgSSE);
@@ -191,6 +213,6 @@ varAcrossClus=var(devAvgSSE);
 
 figure; plot(devAvgSSE');
 figure; plot(varAcrossClus)
-figure; plot(stdAcrossClus)
+% figure; plot(stdAcrossClus)
 
 
