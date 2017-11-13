@@ -163,6 +163,8 @@ for iterI = 1:nIter
             distClusPr = cumsum(dist2Clus2);
             closestC=find(rand(1)<distClusPr,1);    
             
+            
+            
 % %             testing and plotting to see what's best - try to define c
 % %             according to nTrials
 %             for iTrl=1:10000,
