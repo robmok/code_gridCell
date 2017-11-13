@@ -64,7 +64,8 @@ alphaVals = .9;
 %(not changing over trials)
 % cVals = [nTrials/(nTrials*100), nTrials/(nTrials*100*2), nTrials/(nTrials*100*4), 999]; % larger c = less stochastic over trials (becomes det quite early on); smaller c = more stochastic over trials (still a bit stochastic by the end)
 % cVals = [nTrials/(nTrials*100), nTrials/(nTrials*100*2)]; 
-cVals = [nTrials/(nTrials*100*4), 999]; 
+% cVals = [nTrials/(nTrials*100*4), 999]; 
+cVals = [999]; 
 % cVals = [nTrials/(nTrials*100)];
 %%
 saveDat=1; %save simulations - cluster centres and tsse

@@ -156,8 +156,7 @@ for iterI = 1:nIter
             
             %or keep beta constant so always a bit stochastic
             if c == 999, %hack just to test this
-                c = 15; %2 k is deterministic
-                beta = c;
+                beta = 15;
             end
             
             dist2Clus2 = exp(-beta.*dist2Clus)./ sum(exp(-beta.*dist2Clus));
