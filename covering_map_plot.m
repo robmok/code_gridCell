@@ -1,7 +1,8 @@
 %% Plot (with/without load in data)
+clear all;
 
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 cd(wd);
 saveDir = [wd '/data_gridCell'];
 
@@ -180,39 +181,37 @@ colors = distinguishable_colors(nClus); %function for making distinguishable col
 %plot over average of final trials
 nTrlsToPlot = [3000, 2000, 1000, 500, 200, 100];
 
-nTrlsToPlot = 100;
+nTrlsToPlot = 10000;
 
 for iToPlot=1:length(nTrlsToPlot)
     figure;
     for iClus = 1:nClus
-        plot(mean(squeeze(muAll(iClus,1,nTrials-nTrlsToPlot(iToPlot):end,toPlot))),squeeze(mean(muAll(iClus,2,nTrials-nTrlsToPlot(iToPlot):end,toPlot))),'.','Color',colors(i,:),'MarkerSize',20); hold on;
-        
+        plot(mean(squeeze(muAll(iClus,1,nTrials-nTrlsToPlot(iToPlot):end,toPlot))),squeeze(mean(muAll(iClus,2,nTrials-nTrlsToPlot(iToPlot):end,toPlot))),'.','Color',colors(iClus,:),'MarkerSize',20); hold on;
     end
     if warpBox,
         xlim([-1.1,2.1]); ylim([-1.1,1.1]);
     else
         xlim([-1.1,1.1]); ylim([-1.1,1.1]);
     end
-    voronoi(squeeze(mean(muAll(:,1,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),squeeze(mean(muAll(:,2,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),'k');
+%     voronoi(squeeze(mean(muAll(:,1,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),squeeze(mean(muAll(:,2,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),'k');
 end
 
 %
 
-iter=1;
-
-avgTrlSSE = squeeze(mean(sseTrl(:,:,iter),1));
-
-for iClus=1:nClus,
-    devAvgSSE(iClus,:)=sseTrl(iClus,:,iter)-avgTrlSSE(:,:,iter);
+for iter=1:nIter
+    avgTrlSSE(:,iter) = squeeze(mean(sseTrl(:,:,iter),1));
+    
+    for iClus=1:nClus,
+        devAvgSSE(iClus,:,iter)=sseTrl(iClus,:,iter)-avgTrlSSE(:,iter)';
+    end
 end
 
-stdAcrossClus=std(devAvgSSE);
-varAcrossClus=var(devAvgSSE);
+stdAcrossClus=squeeze(std(devAvgSSE));
+varAcrossClus=squeeze(var(devAvgSSE));
 
-figure; plot(devAvgSSE');
+% figure; plot(devAvgSSE);
 figure; plot(varAcrossClus)
-% figure; plot(stdAcrossClus)
-
+figure; plot(stdAcrossClus)
 
 %% comparing parameters
 
@@ -243,9 +242,12 @@ end
 
 
 % plot these values over their timepoints above
-iter = 1;
-tsseTrls(iTrl,iter)
-stdAcrossClus(iTrl)
+% iter = 1;
+% tsseTrls(iTrl,iter)
+% stdAcrossClus(iTrl)
+
+
+
 
 
 %atm - tsseTrls and sseTrl are not orders by lowest SSE... I suppose this
@@ -255,6 +257,44 @@ stdAcrossClus(iTrl)
 % notable that i only save best/worst 3 from the LAST trial; might be worth
 % to save the AVERAGE SSE over last 1000 trials to make it more robust? or
 % average cluster positions then compute the sSE
+    % - need to do this in the sim script
+    % - also might be worth checking ranking by the spreaded-outness
+    % (stdAcrosClus)
+
+% code it in sim.m too, but for the ones already run, recompute
+tsseIter = mean(tsseTrls(end-10000:end,:)); %average over last x trials 
+[indVal, indSSE1] = sort(tsseIter);
+[y, indSSE2] = sort(indSSE1); %use indSSE2 to sort for plotting
+
+figure;
+plot(tsseTrls,'color',[.5 .5 .5]); hold on;
+plot(tsseTrls(:,indSSE2==1))
+
+figure;
+plot(stdAcrossClus,'color',[.5 .5 .5]); hold on;
+plot(stdAcrossClus(:,indSSE2==1)); %interesting - lowest spread here is diff to lowest SSE. prob corr, but
+%still
+
+
+%sort according to spread now
+tsseVarIter = mean(stdAcrossClus(end-10000:end,:)); %average over last x trials 
+[indVal, indSSEvar1] = sort(tsseVarIter);
+[y, indSSEvar2] = sort(indSSEvar1); %use indSSE2 to sort for plotting
+
+figure;
+plot(tsseTrls,'color',[.5 .5 .5]); hold on;
+plot(tsseTrls(:,indSSEvar2==1))
+
+figure;
+plot(stdAcrossClus,'color',[.5 .5 .5]); hold on;
+plot(stdAcrossClus(:,indSSEvar2==1));
+
+
+% some that do well at the last 10k were quite bad before that... need to
+% think about this a bit. Also the initial learning rate: need to look at
+% alpha = 1, but maybe also need to sim less than .75 and more than 1?
+
+
 
 
 
@@ -266,28 +306,24 @@ stdAcrossClus(iTrl)
 
 
 %plot over average of final trials - taken from above
-nTrlsToPlot = [1000, 500, 100, 1];
-nTrlsToPlot = fliplr([ 1000, 500, 100, 1]);
+% % need to add a loop for iterations? or plot more than just one?
 
-% need to add a loop for iterations? or plot more than just one?
-
-figure; hold on;
-
-for iToPlot=1:length(nTrlsToPlot)
-    subplot(2,2,iToPlot);
-    for iClus = 1:nClus
-        plot(mean(squeeze(muAll(iClus,1,nTrials-nTrlsToPlot(iToPlot):end,toPlot))),squeeze(mean(muAll(iClus,2,nTrials-nTrlsToPlot(iToPlot):end,toPlot))),'.','Color',colors(i,:),'MarkerSize',20); hold on;
-    end
-    title(sprintf('Avg over %d trials',nTrlsToPlot(iToPlot)));
-    if warpBox,
-        xlim([-1.1,2.1]); ylim([-1.1,1.1]);
-    else
-        xlim([-1.1,1.1]); ylim([-1.1,1.1]);
-    end
-    
-%     voronoi(squeeze(mean(muAll(:,1,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),squeeze(mean(muAll(:,2,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),'k');
-end
-
+% nTrlsToPlot = [1, 100, 500, 1000];
+% figure; hold on;
+% for iToPlot=1:length(nTrlsToPlot)
+%     subplot(2,2,iToPlot);
+%     for iClus = 1:nClus
+%         plot(mean(squeeze(muAll(iClus,1,nTrials-nTrlsToPlot(iToPlot):end,toPlot))),squeeze(mean(muAll(iClus,2,nTrials-nTrlsToPlot(iToPlot):end,toPlot))),'.','Color',colors(i,:),'MarkerSize',20); hold on;
+%     end
+%     title(sprintf('Avg over %d trials',nTrlsToPlot(iToPlot)));
+%     if warpBox,
+%         xlim([-1.1,2.1]); ylim([-1.1,1.1]);
+%     else
+%         xlim([-1.1,1.1]); ylim([-1.1,1.1]);
+%     end
+% %     voronoi(squeeze(mean(muAll(:,1,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),squeeze(mean(muAll(:,2,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),'k');
+% end
+% 
 
 
 

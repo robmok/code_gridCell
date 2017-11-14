@@ -248,7 +248,10 @@ for iterI = 1:nIter
 end
 
 %just save the best and worst 3 (since when nTrials are high, files get big)
-tsseIter = tsseTrls(end,:);
+% tsseIter = tsseTrls(end,:); %only use last trial
+
+xTrials = round(nTrials/3); %500;
+tsseIter = mean(tsseTrls(end-xTrials:end,:)); %average over last x trials 
 [indVal, indSSE1] = sort(tsseIter);
 [y, indSSE2] = sort(indSSE1); %use indSSE2 to sort for plotting
 
@@ -264,5 +267,20 @@ else
     muEndBest = muEnd;
     muAllBest = muAll;
 end
+
+% also get top3 bottom3 for the spread outness measure?
+
+%sort according to spread now
+tsseVarIter = mean(stdAcrossClus(end-xTrials:end,:)); %average over last x trials 
+[indVal, indSSEvar1] = sort(tsseVarIter);
+[y, indSSEvar2] = sort(indSSEvar1); %use indSSE2 to sort for plotting
+
+
+%... another muEndBest and muAllBest variable?
+
+
+
+
+
 
 end
