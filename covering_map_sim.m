@@ -1,4 +1,7 @@
-function [muEndBest, muAllBest, tsseTrls,sseTrl,epsMuAll,deltaMu] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,c)
+function [muEnd, muAll, tsseTrls,sseTrl,epsMuAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials)%,c)
+
+% if dont save all muAll and muEnd, function output is muEndBest and muAll
+% Best, and uncomment the bit at the end of the script
 
 spacing=linspace(-1,1,101); 
 stepSize=diff(spacing(1:2));
@@ -18,12 +21,15 @@ for iterI = 1:nIter
     fprintf('iter %d \n',iterI);
     epsMu = epsMuOrig; %revert learning rate back to original if reset
     
+    %%%
+    %atm putting datapoints - 'trials' - outside to keep it the same 
+    %%%
     switch box
         case 'square'
-            trials      = [randsample(spacing,nTrials,'true'); randsample(spacing,nTrials,'true')]';
+%             trials      = [randsample(spacing,nTrials,'true'); randsample(spacing,nTrials,'true')]';
             dataPtsTest = [randsample(linspace(-locRange,locRange,101),nTrialsTest,'true'); randsample(linspace(-locRange,locRange,101),nTrialsTest,'true')]'; % random points in a box
         case 'rect'
-            trials      = [randsample(-1:diff(spacing(1:2)):2,nTrials,'true'); randsample(spacing,nTrials,'true')]';
+%             trials      = [randsample(-1:diff(spacing(1:2)):2,nTrials,'true'); randsample(spacing,nTrials,'true')]';
             dataPtsTest = [randsample(-1:diff(spacing(1:2)):2,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
         case 'trapz'
             trapY=trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
@@ -122,9 +128,9 @@ for iterI = 1:nIter
     deltaMu  = zeros(nClus,2,nTrials);
     distTrl  = nan(nTrials,nClus);
     
-    clusUpdates = zeros(nClus,2)+.01; %acutally starting at 0 is OK, since there was no momentum from last trial
+    clusUpdates = zeros(nClus,2); %acutally starting at 0 is OK, since there was no momentum from last trial
     
-    clusUpdAll{nClus}=[];
+%     clusUpdAll{nClus}=[];
     
     
     for iTrl=1:length(trials)
@@ -137,33 +143,32 @@ for iterI = 1:nIter
             %compute distances
             dist2Clus = sqrt(sum([mu(:,1,iTrl)'-trials(iTrl,1); mu(:,2,iTrl)'-trials(iTrl,2)].^2)); % vectorising euclid dist - sqrt(sum((a-b).^2)), since can't use xval method
 
-%             %deterministic update
-%             closestC=find(min(dist2Clus)==dist2Clus);
-%             if numel(closestC)>1, %if more than 1, randomly choose one
-%                 closestC = randsample(closestC,1);
-%             end
+            %deterministic update
+            closestC=find(min(dist2Clus)==dist2Clus);
+            if numel(closestC)>1, %if more than 1, randomly choose one
+                closestC = randsample(closestC,1);
+            end
 
 
             %stochastic update - sel 1 of the closest clusters w random element - stochastic parameter c - large is deterministic, 0 - random            
-            
-%             c = .0025; %constant - the larger, the more deterministic            
-            % because this is trial by trial (not like k means), constant
-            % must be much smaller than their recommendation (2). need it
-            % to be much slower
-            
-%             beta=c*(iTrl-1); % so this gets bigger, and more deterministic with more trials
-            beta=c*(iTrl+nTrials/10); %new - maybe no need to be so stochatic at start -BUT should this AND c be determined by nTrials?
-            
-            %or keep beta constant so always a bit stochastic
-            if c == 999, %hack just to test this
-                beta = 15;
+            if 0
+                c = .0025; %constant - the larger, the more deterministic
+                % because this is trial by trial (not like k means), constant
+                % must be much smaller than their recommendation (2). need it
+                % to be much slower
+                
+                %             beta=c*(iTrl-1); % so this gets bigger, and more deterministic with more trials
+                beta=c*(iTrl+nTrials/10); %new - maybe no need to be so stochatic at start -BUT should this AND c be determined by nTrials?
+                
+                %or keep beta constant so always a bit stochastic
+                if c == 999, %hack just to test this
+                    beta = 15;
+                end
+                
+                dist2Clus2 = exp(-beta.*dist2Clus)./ sum(exp(-beta.*dist2Clus));
+                distClusPr = cumsum(dist2Clus2);
+                closestC=find(rand(1)<distClusPr,1);
             end
-            
-            dist2Clus2 = exp(-beta.*dist2Clus)./ sum(exp(-beta.*dist2Clus));
-            distClusPr = cumsum(dist2Clus2);
-            closestC=find(rand(1)<distClusPr,1);    
-            
-            
             
 % %             testing and plotting to see what's best - try to define c
 % %             according to nTrials
@@ -219,7 +224,6 @@ for iterI = 1:nIter
 %             clusUpdAll{closestC}(length(clusUpdAll{closestC})+1)=deltaMu(closestC,1,iTrl);
 %             %outputted this to check how each cluster updated
             
-            
             deltaMuVec = zeros(nClus,2);
             deltaMuVec(closestC,:) = deltaMu(closestC,:,iTrl); % only update winner
             
@@ -250,37 +254,46 @@ end
 %just save the best and worst 3 (since when nTrials are high, files get big)
 % tsseIter = tsseTrls(end,:); %only use last trial
 
-xTrials = round(nTrials/3); %500;
-tsseIter = mean(tsseTrls(end-xTrials:end,:)); %average over last x trials 
-[indVal, indSSE1] = sort(tsseIter);
-[y, indSSE2] = sort(indSSE1); %use indSSE2 to sort for plotting
-
-if size(muEnd,3) >= 6,
-    bestWorst3=[1,2,3,nIter-2,nIter-1,nIter];
-    muEndBest = nan(nClus,2,length(bestWorst3)); % save best.worse 3 clusters at end of learning
-    muAllBest = nan(nClus,2,nTrials,length(bestWorst3)); % save trials to plot over time
-    for iterI = 1:length(bestWorst3),
-        muEndBest(:,:,iterI) = muEnd(:,:,indSSE2==bestWorst3(iterI));
-        muAllBest(:,:,:,iterI) = muAll(:,:,:,indSSE2==bestWorst3(iterI));
-    end
-else
-    muEndBest = muEnd;
-    muAllBest = muAll;
-end
-
-% also get top3 bottom3 for the spread outness measure?
-
-%sort according to spread now
-tsseVarIter = mean(stdAcrossClus(end-xTrials:end,:)); %average over last x trials 
-[indVal, indSSEvar1] = sort(tsseVarIter);
-[y, indSSEvar2] = sort(indSSEvar1); %use indSSE2 to sort for plotting
+% xTrials = round(nTrials/3); %500;
+% tsseIter = mean(tsseTrls(end-xTrials:end,:)); %average over last x trials 
+% [indVal, indSSE1] = sort(tsseIter);
+% [y, indSSE2] = sort(indSSE1); %use indSSE2 to sort for plotting
+% 
+% if size(muEnd,3) >= 6,
+%     bestWorst3=[1,2,3,nIter-2,nIter-1,nIter];
+%     muEndBest = nan(nClus,2,length(bestWorst3)); % save best.worse 3 clusters at end of learning
+%     muAllBest = nan(nClus,2,nTrials,length(bestWorst3)); % save trials to plot over time
+%     for iterI = 1:length(bestWorst3),
+%         muEndBest(:,:,iterI) = muEnd(:,:,indSSE2==bestWorst3(iterI));
+%         muAllBest(:,:,:,iterI) = muAll(:,:,:,indSSE2==bestWorst3(iterI));
+%     end
+% else
+%     muEndBest = muEnd;
+%     muAllBest = muAll;
+% end
+% 
+% % also get top3 bottom3 for the spread outness measure?
+% 
+% %sort according to spread now
+% tsseVarIter = mean(stdAcrossClus(end-xTrials:end,:)); %average over last x trials 
+% [indVal, indSSEvar1] = sort(tsseVarIter);
+% [y, indSSEvar2] = sort(indSSEvar1); %use indSSE2 to sort for plotting
 
 
 %... another muEndBest and muAllBest variable?
 
 
+%few things to note when updating this bit
+% - if not saving all clusters maps, no need to save all sseTrl, etc.?
+% - better: save all the cluster maps (final cluster positions, averaged
+% over 1k, 5k, 10k, 15k, 20k, 25k. Also could save a 'downsampled' version;  with spacing of 100/500 trials. 
+% - in any case, still save all for top and bottom 3
 
 
+% to save:
+% - all iters, all cluster positions over time
 
+% - sort SSE according without averaging, last 1k, 5k, 10k, 15k, 20k, 25k 
+% AND their indices: indSSE1  and indSSE2
 
 end
