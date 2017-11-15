@@ -349,7 +349,7 @@ end
 
 %% make logical map of cluster positions, density plots
 
-nTrlsToAvg = 5000;
+nTrlsToAvg = 10000;
 
 spacing = linspace(locRange(1),locRange(2),locRange(2)+1);
 
