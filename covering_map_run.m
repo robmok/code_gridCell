@@ -1,8 +1,8 @@
 clear all;
 % close all;
 
-% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -12,7 +12,7 @@ addpath(codeDir); addpath(saveDir);
 % nClus   = 20;
 % clus2run = [20, 40, 60, 80]; %run multuple cluster numbers
 clus2run = 40;
-nTrials = 20000; %how many locations in the box / trials - 2.5k ; 5k if reset
+nTrials = 30000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 colgrey = [.5, .5, .5];
 
@@ -23,7 +23,7 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 
 % parameters
 epsMuOrig=.075;% %learning rate / starting learning rate %.075
-% epsMuOrig=.1;%
+epsMuOrig=.1;%
 
 % for saving simulations - multiple by values to save the files with params
 epsMuOrig1000=epsMuOrig*1000;
@@ -40,12 +40,12 @@ warpType = 'sq2rect';
 %mometum-like adaptive learning rate - define alpha (higher = weight
 %previous update (direction and magnitude) more; 0 = don't weight previous at all)
 % alphaVals = [0, .1, .2, .3,.4, .5, .6, .7, .8, .9];
-alphaVals = .9;
-% alphaVals = [ 0, .1];
-% alphaVals = [.2, .3];
-% alphaVals = [.4, .5];
-% alphaVals = [.6, .7];
-% alphaVals = [.8, .9];
+% alphaVals = .9;
+alphaVals = [ 0, .1];
+alphaVals = [.2, .3];
+alphaVals = [.4, .5];
+alphaVals = [.6, .7];
+alphaVals = [.8, .9];
 
 %%% things to understand
 
@@ -60,15 +60,15 @@ alphaVals = .9;
 % % Create / load in saved test data
 
 % trials = [randsample(linspace(-locRange,locRange,101),nTrials,'true'); randsample(linspace(-locRange,locRange,101),nTrials,'true')]'; % random points in a box
-trials = [randsample(linspace(locRange(1),locRange(2),nSteps),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),nSteps),nTrials,'true')]'; % random points in a box
+% trials = [randsample(linspace(locRange(1),locRange(2),nSteps),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),nSteps),nTrials,'true')]'; % random points in a box
 % save([saveDir '/randTrialsBox_10k'],'trials');
 
 %%
-saveDat=0; %save simulations - cluster centres and tsse
+saveDat=1; %save simulations - cluster centres and tsse
 
-% load([saveDir '/randTrialsBox_10k']); %load in same data with same trial sequence so same for each sim
+load([saveDir '/randTrialsBox_10k']); %load in same data with same trial sequence so same for each sim
 
-nIter=1; %how many iterations (starting points)
+nIter=10; %how many iterations (starting points)
 
 % tic
 % for iStochastic = 1:length(cVals) %
