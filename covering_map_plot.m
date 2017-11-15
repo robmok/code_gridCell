@@ -1,8 +1,8 @@
 %% Plot (with/without load in data)
 clear all;
 
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 cd(wd);
 saveDir = [wd '/data_gridCell'];
 
@@ -19,7 +19,7 @@ if 1
 %     nIter=5;
     nIter=20;
     warpBox=0;
-    alpha10=5; %0,2, 5, 9, 95 (95 looks like it goes really bad)
+    alpha10=9; %0,2, 5, 9, 95 (95 looks like it goes really bad)
     
 %     c10k=9990000; %25, 50, 100, 9990000
     
@@ -360,16 +360,38 @@ end
 
 nTrlsToAvg = 10000;
 
-clus = muAll(:,:,nTrials-nTrlsToAvg+1:end,1); %just get one for now
+for iter=1:6, 
+%     iter=1;%just get 1 iter, 1 of the param settings for now
+
+clusTmp = muAll(:,:,nTrials-nTrlsToAvg+1:end,iter); 
 nDecimals = 3; f = 10.^nDecimals; %round to 3 dec places
-clus2 = round(f.*clus)./f;
+clus = round(f.*clusTmp)./f;
+clus = (clus*1000)+1000; %add 1000 to make it into the range of 0-2001
 
-xInd=(-1:.001:1);
+spacing=-1:.001:1;
 
-gridTmp = zeros(length(xInd),length(xInd));
+densityPlot(:,:,iter) = zeros(length(spacing),length(spacing));
 
+% clus(:,:,1)
+% clus(1,:,1)
 
-% need to translate from -1:.001:1 to 1:2001 - need an index..
+for iTrls=1:nTrlsToAvg,
+    for i=1:nClus
+        densityPlot(clus(i,1,iTrls),clus(i,2,iTrls),iter)=1; % works, but better way / faster to vectorise?
+    end
+end
+
+densityPlot(:,:,iter) = imgaussfilt(densityPlot(:,:,iter),50);
+
+figure;
+imagesc(densityPlot(:,:,iter));
+% imagesc(densityPlot(:,:,iter)./mean(reshape(densityPlot(:,:,iter),1,numel(densityPlot(:,:,iter)))));
+
+end
+
+% figure;
+% imagesc(densityPlot(:,:,iter));
+
 
 
 % also should think about the best way to 'add' points to the map....
