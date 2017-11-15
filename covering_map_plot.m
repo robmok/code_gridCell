@@ -10,7 +10,7 @@ saveDir = [wd '/data_gridCell'];
 savePlots=0;
 
 %set to load in data (note divide by value in variable)
-if 1
+if 0
 %     epsMuOrig100 = 75;
     epsMuOrig1000 = 100;
 %     deltaEpsMu100 = 96; %96, 98
@@ -35,6 +35,9 @@ if 1
 end
 
 %%
+
+savePlots=0;
+
 colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
 
 figure; plot(tsseTrls);
@@ -58,11 +61,8 @@ for i = 1:iToPlot
     for iClus = 1:nClus
         plot(mean(muEnd(iClus,1,(i))),mean(muEnd(iClus,2,(i))),'.','Color',colors(iClus,:),'MarkerSize',25); hold on; %plot cluster final point
     end
-    if warpBox,
-        xlim([-1.1,2.1]); ylim([-1.1,1.1]);
-    else
-        xlim([-1.1,1.1]); ylim([-1.1,1.1]);
-    end 
+    xlim(locRange); ylim(locRange);
+
     hold on;
     if i==2,
         title(sprintf('Lowest 3 and Highest 3 SSE cluster locations (nClus=%d)',nClus));
@@ -96,11 +96,8 @@ for iTrl = 1:nTrials
         voronoi(muAll(:,1,iTrl,iter),muAll(:,2,iTrl,iter),'k'); %plot at the START showing the previous final positions
 
     end
-    if warpBox,
-        xlim([-1.1,2.1]); ylim([-1.1,1.1]);
-    else
-        xlim([-1.1,1.1]); ylim([-1.1,1.1]);
-    end
+    xlim(locRange); ylim(locRange);
+
     if mod(iTrl,50)==0, %plot centers after x trials
         for i=1:nClus
             plot(squeeze(muAll(i,1,iTrl,iter)),squeeze(muAll(i,2,iTrl,iter)),'.','Color',colors(i,:),'MarkerSize',20); hold on;
@@ -131,11 +128,8 @@ for iTrl = 1:nTrials
 %         iPlot=iPlot+1;
 %         voronoi(muAll(:,1,iTrl,toPlot),muAll(:,2,iTrl,toPlot),'k')
     end
-    if warpBox,
-        xlim([-1.1,2.1]); ylim([-1.1,1.1]);
-    else
-        xlim([-1.1,1.1]); ylim([-1.1,1.1]);
-    end
+    xlim(locRange); ylim(locRange);
+
     if mod(iTrl,50)==0, %plot centers after x trials
         for i=1:nClus
             plot(squeeze(muAll(i,1,iTrl,iter)),squeeze(muAll(i,2,iTrl,iter)),'.','Color',colors(i,:),'MarkerSize',10); hold on; %make marker size bigger - larger/smoother firing field!
@@ -165,18 +159,15 @@ colors = distinguishable_colors(nClus); %function for making distinguishable col
 %plot over average of final trials
 nTrlsToPlot = [3000, 2000, 1000, 500, 200, 100];
 
-nTrlsToPlot = 10000;
+nTrlsToPlot = 100;
 
 for iToPlot=1:length(nTrlsToPlot)
     figure;
     for iClus = 1:nClus
         plot(mean(squeeze(muAll(iClus,1,nTrials-nTrlsToPlot(iToPlot):end,iter))),squeeze(mean(muAll(iClus,2,nTrials-nTrlsToPlot(iToPlot):end,iter))),'.','Color',colors(iClus,:),'MarkerSize',20); hold on;
     end
-    if warpBox,
-        xlim([-1.1,2.1]); ylim([-1.1,1.1]);
-    else
-        xlim([-1.1,1.1]); ylim([-1.1,1.1]);
-    end
+    xlim(locRange); ylim(locRange);
+
 %     voronoi(squeeze(mean(muAll(:,1,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),squeeze(mean(muAll(:,2,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),'k');
 end
 
@@ -358,17 +349,18 @@ end
 
 %% make logical map of cluster positions, density plots
 
-nTrlsToAvg = 10000;
+nTrlsToAvg = 5000;
 
-for iter=1:6, 
+spacing = linspace(locRange(1),locRange(2),locRange(2)+1);
+
+for iter=1, 
 %     iter=1;%just get 1 iter, 1 of the param settings for now
 
-clusTmp = muAll(:,:,nTrials-nTrlsToAvg+1:end,iter); 
-nDecimals = 3; f = 10.^nDecimals; %round to 3 dec places
-clus = round(f.*clusTmp)./f;
-clus = (clus*1000)+1000; %add 1000 to make it into the range of 0-2001
+clus = round(muAll(:,:,nTrials-nTrlsToAvg+1:end,iter)); 
+% nDecimals = 3; f = 10.^nDecimals; %round to 3 dec places
+% clus = round(f.*clusTmp)./f;
+% clus = (clus*1000)+1000; %add 1000 to make it into the range of 0-2001
 
-spacing=-1:.001:1;
 
 densityPlot(:,:,iter) = zeros(length(spacing),length(spacing));
 
@@ -381,7 +373,7 @@ for iTrls=1:nTrlsToAvg,
     end
 end
 
-densityPlot(:,:,iter) = imgaussfilt(densityPlot(:,:,iter),50);
+densityPlot(:,:,iter) = imgaussfilt(densityPlot(:,:,iter),10);
 
 figure;
 imagesc(densityPlot(:,:,iter));

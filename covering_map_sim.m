@@ -3,7 +3,7 @@ function [muEnd, muAll, tsseTrls,sseTrl,epsMuAll] = covering_map_sim(nClus,locRa
 % if dont save all muAll and muEnd, function output is muEndBest and muAll
 % Best, and uncomment the bit at the end of the script
 
-spacing=linspace(-1,1,101); 
+spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
 stepSize=diff(spacing(1:2));
 
 %for crossvalidation - 
@@ -27,18 +27,18 @@ for iterI = 1:nIter
     switch box
         case 'square'
 %             trials      = [randsample(spacing,nTrials,'true'); randsample(spacing,nTrials,'true')]';
-            dataPtsTest = [randsample(linspace(-locRange,locRange,101),nTrialsTest,'true'); randsample(linspace(-locRange,locRange,101),nTrialsTest,'true')]'; % random points in a box
+            dataPtsTest = [randsample(linspace(locRange(1),locRange(2),locRange(2)+1),nTrialsTest,'true'); randsample(linspace(locRange(1),locRange(2),locRange(2)+1),nTrialsTest,'true')]'; % random points in a box
         case 'rect'
 %             trials      = [randsample(-1:diff(spacing(1:2)):2,nTrials,'true'); randsample(spacing,nTrials,'true')]';
-            dataPtsTest = [randsample(-1:diff(spacing(1:2)):2,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
+            dataPtsTest = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)*2,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
         case 'trapz'
-            trapY=trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
+            trapY=locRange(2).*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
             trapX=spacing;
             trapPts=[];
             for i=1:length(trapY),
                trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
             end
-            trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1            
+%             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1            
             % use this to select from the PAIR in trapPts
             trialInd     = randi(length(trapPts),nTrials,1);
             trials       = trapPts(:,trialInd)';
@@ -46,7 +46,8 @@ for iterI = 1:nIter
             dataPtsTest  = trapPts(:,trialIndTest)';
             
         case 'trapzSq' %probably need a more narrow trapezium!
-            trapY=trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
+            trapY=locRange(2)/2.*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
+            trapY=trapY+floor(length(trapY)./2);
             trapX=spacing;
             trapPts=[];
             for i=1:length(trapY),
@@ -56,9 +57,11 @@ for iterI = 1:nIter
             sqX=spacing;
             sqY=spacing(1:floor(length(spacing)/2));
             for i=1:length(sqX),
+                tic
                 for j=1:length(sqY),
-                trapPts = [trapPts, [sqX(i); sqY(j)]];
+                    trapPts = [trapPts, [sqX(i); sqY(j)]];
                 end
+                toc
             end
             % use this to select from the PAIR in trapPts
             trialInd=randi(length(trapPts),nTrials,1);
@@ -70,9 +73,9 @@ for iterI = 1:nIter
     % if expand box
     switch warpType
         case 'sq2rect'
-            trialsExpand = [randsample(-1:diff(spacing(1:2)):2,nTrials*.75,'true'); randsample(spacing,nTrials*.75,'true')]';
+            trialsExpand = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)*2,nTrials*.75,'true'); randsample(spacing,nTrials*.75,'true')]';
         case 'rect2sq'
-            trialsExpand = [randsample(spacing,nTrials/2,'true'); randsample(spacing,nTrials/2,'true')]'; %this doesn't work - actually, maybe this isn't a thing?
+            trialsExpand = [randsample(spacing,nTrials*.75,'true'); randsample(spacing,nTrials*.75,'true')]'; %this doesn't work - actually, maybe this isn't a thing?
     end
 
     
