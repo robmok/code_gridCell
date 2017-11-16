@@ -1,4 +1,4 @@
-function [muEnd, muAll, tsseTrls,sseTrl,epsMuAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials)%,c)
+function [muEnd, muAll, tsseTrls,sseTrl,epsMuAll,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
 
 % if dont save all muAll and muEnd, function output is muEndBest and muAll
 % Best, and uncomment the bit at the end of the script
@@ -146,52 +146,80 @@ for iterI = 1:nIter
             %compute distances
             dist2Clus = sqrt(sum([mu(:,1,iTrl)'-trials(iTrl,1); mu(:,2,iTrl)'-trials(iTrl,2)].^2)); % vectorising euclid dist - sqrt(sum((a-b).^2)), since can't use xval method
 
-            %deterministic update
-            closestC=find(min(dist2Clus)==dist2Clus);
-            if numel(closestC)>1, %if more than 1, randomly choose one
-                closestC = randsample(closestC,1);
-            end
+            
+%             %deterministic update
+%             closestC=find(min(dist2Clus)==dist2Clus);
+%             if numel(closestC)>1, %if more than 1, randomly choose one
+%                 closestC = randsample(closestC,1);
+%             end
 
 
             %stochastic update - sel 1 of the closest clusters w random element - stochastic parameter c - large is deterministic, 0 - random            
-            if 0
-                c = .0025; %constant - the larger, the more deterministic
-                % because this is trial by trial (not like k means), constant
-                % must be much smaller than their recommendation (2). need it
-                % to be much slower
-                
-                %             beta=c*(iTrl-1); % so this gets bigger, and more deterministic with more trials
-                beta=c*(iTrl+nTrials/10); %new - maybe no need to be so stochatic at start -BUT should this AND c be determined by nTrials?
-                
-                %or keep beta constant so always a bit stochastic
-                if c == 999, %hack just to test this
-                    beta = 15;
+
+            if stochasticType %stochastic update
+                if stochasticType==1
+%                     beta=c*(iTrl-1);         % so this gets bigger, and more deterministic with more trials
+                    beta=c*(iTrl+nTrials/50);  % maybe no need to be so stochatic at start
+                elseif stochasticType==2
+%                     beta=c*(iTrl-1);
+                    beta=c*(iTrl+nTrials/50);  % maybe no need to be so stochatic at start
+
+                    if beta >= .185, %it might be worth checking if this depends on nClusters - distances will change
+                        beta = .185;
+                    end
+                elseif stochasticType==3
+                    beta = .185; 
                 end
                 
                 dist2Clus2 = exp(-beta.*dist2Clus)./ sum(exp(-beta.*dist2Clus));
                 distClusPr = cumsum(dist2Clus2);
                 closestC=find(rand(1)<distClusPr,1);
+                
+            else %deterministic update
+                closestC=find(min(dist2Clus)==dist2Clus);
+                if numel(closestC)>1, %if more than 1, randomly choose one
+                    closestC = randsample(closestC,1);
+                end
             end
+            cParams.closestPr(iTrl)   = dist2Clus2(closestC); 
+            cParams.closestDist(iTrl) = dist2Clus(closestC);
+            cParams.betaAll(iTrl)=beta;
             
-% %             testing and plotting to see what's best - try to define c
-% %             according to nTrials
-%             for iTrl=1:10000,
-% %                 beta=c*(iTrl-1); % so this gets bigger, and more deterministic with more trials
-% %                 beta=c*(iTrl+nTrials/10); %new - no need to be so stochatic at start
+    
+%           testing and plotting to see what's best - try to define c according to nTrials
+%             stochasticType=2;
+%             cVals=[3.25/nTrials, 3.5/nTrials, 4/nTrials];
 % 
-%                 %constantly stochastic at some num
-% %                 c = 5; %2k = determinstic
-%                 beta = 15;
-%                 
-%                 dist2Clus2 = exp(-beta.*dist2Clus)./ sum(exp(-beta.*dist2Clus));
-%                 distClusPr = cumsum(dist2Clus2);
-%                 closestC=find(rand(1)<distClusPr,1);
-%                 
-%                 xx(iTrl) = dist2Clus2(closestC); % this allows us to plot if it selects the most probable ones or not, so slowly goes toward 1 = always choose the closest one - should be random initially then going to 1
-%                 yy(iTrl) = dist2Clus(closestC); 
+%             for i=1:length(cVals)
+%                 c = cVals(i);
+%                 for iTrl=1:10000,
+%                     if stochasticType==1
+%                         %                     beta=c*(iTrl-1);         % so this gets bigger, and more deterministic with more trials
+%                         beta=c*(iTrl+nTrials/100); % new - maybe no need to be so stochatic at start - NOTE This is bigger than stochType=2 now
+%                         betaAll(iTrl)=beta;
+%                     elseif stochasticType==2
+%                         %                     beta=c*(iTrl-1);
+%                         beta=c*(iTrl+nTrials/50); % new - maybe no need to be so stochatic at start
+%                         betaAll(iTrl)=beta;
+%                         if beta >= betaAll(1)*2.5;%%0.175;%c/.000019 %1.75, %it might be worth checking if this depends on nClusters - distances will change
+%                             beta = betaAll(1)*2.5;%0.175;%c/.000019;       %also good to scale in relation to sth.. like c? as here
+%                         end
+%                     elseif stochasticType==3
+%                         beta(1)=c*(iTrl+nTrials/50);
+%                         betaAll(iTrl)=beta;
+%                         beta = betaAll(1)*2.5;
+%                     end
+%                     dist2Clus2 = exp(-beta.*dist2Clus)./ sum(exp(-beta.*dist2Clus));
+%                     distClusPr = cumsum(dist2Clus2);
+%                     closestC=find(rand(1)<distClusPr,1);
+% 
+%                     xx(iTrl) = dist2Clus2(closestC); % this allows us to plot if it selects the most probable ones or not, so slowly goes toward 1 = always choose the closest one - should be random initially then going to 1
+%                     yy(iTrl) = dist2Clus(closestC);
+%                 end
+%                 figure; plot(xx);
+%                 % figure; plot(yy);
+%                 % figure; plot(betaAll);
 %             end
-%             figure; plot(xx);
-%             figure; plot(yy);             
 
 
             %log which cluster has been updated
@@ -203,20 +231,9 @@ for iterI = 1:nIter
                 
 %             new - adaptive learning rate (momentum-like)
 %             need to save each clusters'previous update and position
-%             
 %             momentumUpdate:
-%             alpha = 0.2% ? - if alpha is 0, then same as now, and move a good amount, not weightnig previous trials. if alpha is .99, then
+%             alpha = 0.2% - if alpha is 0, then same as now, and move a good amount, not weighting previous trials. if alpha is .99, then
 %             weighting the previous trial a lot and not moving much
-%             
-%             currUpd = epsMu*(currClusLoc-dataPts); % on current trial
-%             deltaMuCurrTrial = (1-alpha)*currUpd + alpha*prevUpd;
-            
-            
-            % - set alpha (e.g. 0.2)
-            % - update closest cluster
-            % - save each cluster's update (save for each update/trial, or
-            % just save the last update)
-            
             
             deltaMu(closestC,1,iTrl) = ((1-alpha)*(epsMu*(trials(iTrl,1)-mu(closestC,1,iTrl))))+(alpha*clusUpdates(closestC,1));
             deltaMu(closestC,2,iTrl) = ((1-alpha)*(epsMu*(trials(iTrl,2)-mu(closestC,2,iTrl))))+(alpha*clusUpdates(closestC,2));
