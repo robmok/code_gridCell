@@ -10,27 +10,29 @@ nSteps = 500;
 locRange = [0, nSteps-1]; 
 
 % save plots?
-savePlots=0;
+% savePlots=0;
 
 %set to load in data (note divide by value in variable)
 if 0
     epsMuOrig1000 = 75;
-%     epsMuOrig1000 = 100;
-%     deltaEpsMu100 = 96; %96, 98
     nClus = 40;
     nTrials = 30000;
-%     nIter=5;
     nIter=10;
     warpBox=0;
-    alpha10=2; %0,2, 5, 9, 95 (95 looks like it goes really bad)
+    alpha10=8; 
+
     
-    c1m = [3.25/nTrials, 3.5/nTrials, 4/nTrials].*100000;    
+    %atm have only 1 c value run for alpha=2/8, but all stypes
+    %also have 2 and 3 for alpha=5, can check those out too
+    stochasticType=3;
+    cVals = [2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials];
+    c=cVals(1);
     
 %     fname=[saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_deltaMu%d_%diters',nClus,nTrials,epsMuOrig10,deltaEpsMu100,nIter)];
-    fname=[saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_%diters',nClus,nTrials,epsMuOrig1000 ,alpha10,nIter)];
-    fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,c1m,nIter)];
+%     fname=[saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_%diters',nClus,nTrials,epsMuOrig1000 ,alpha10,nIter)];
+    fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,stochasticType,c,nIter)];
     
-    if warpBox,
+    if warpBox
         fname = [fname '_warpBox'];
     end
     load(fname);
@@ -44,10 +46,10 @@ colors = distinguishable_colors(nClus); %function for making distinguishable col
 
 figure; plot(tsseTrls);
 title(sprintf('SSE for each iteration (nClus=%d)',nClus));
-if savePlots,
+if savePlots
 %     fname=[saveDir, sprintf('/covering_map_%d_clus_tsseTrls_%d_trls_eps%d_alpha%d_%diters',nClus,nTrials,epsMuOrig100,alpha10,nIter)];
     fname=[saveDir, sprintf('/covering_map_%d_clus_tsseTrls_%d_trls_eps%d_alpha%d_cVal%d_%diters',nClus,nTrials,epsMuOrig100,alpha10,c10k,nIter)];
-    if warpBox,
+    if warpBox
         fname = [fname '_warpBox'];
     end
     saveas(gcf,fname,'png');
@@ -66,14 +68,14 @@ for i = 1:iToPlot
     xlim(locRange); ylim(locRange);
 
     hold on;
-    if i==2,
+    if i==2
         title(sprintf('Lowest 3 and Highest 3 SSE cluster locations (nClus=%d)',nClus));
     end
 end
-if savePlots,
+if savePlots
 %     fname=[saveDir, sprintf('/covering_map_%d_clus_locs_top_bottom_3_%d_trls_eps%d_alpha%d_%diters',nClus,nTrials,epsMuOrig100,alpha10,nIter)];
     fname=[saveDir, sprintf('/covering_map_%d_clus_locs_top_bottom_3_%d_trls_eps%d_alpha%d_cVal%d_%diters',nClus,nTrials,epsMuOrig100,alpha10,c10k,nIter)];
-    if warpBox,
+    if warpBox
         fname = [fname '_warpBox'];
     end
     saveas(gcf,fname,'png');
@@ -83,7 +85,7 @@ end
 
 savePlots=0;
 
-iter = 1; %1 to 3, lowest sse, 4:6, highest sse
+iterI = 1; %1 to 3, lowest sse, 4:6, highest sse
 
 colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
 
@@ -95,22 +97,22 @@ for iTrl = 1:nTrials
 %         voronoi(muAll(:,1,iTrl,toPlot),muAll(:,2,iTrl,toPlot),'k'); %plot at the END before starting new subplot
         iPlot=iPlot+1;
         subplot(3,4,iPlot); hold on;
-        voronoi(muAll(:,1,iTrl,iter),muAll(:,2,iTrl,iter),'k'); %plot at the START showing the previous final positions
+        voronoi(muAll(:,1,iTrl,iterI),muAll(:,2,iTrl,iterI),'k'); %plot at the START showing the previous final positions
 
     end
     xlim(locRange); ylim(locRange);
 
-    if mod(iTrl,50)==0, %plot centers after x trials
+    if mod(iTrl,50)==0 %plot centers after x trials
         for i=1:nClus
-            plot(squeeze(muAll(i,1,iTrl,iter)),squeeze(muAll(i,2,iTrl,iter)),'.','Color',colors(i,:),'MarkerSize',20); hold on;
+            plot(squeeze(muAll(i,1,iTrl,iterI)),squeeze(muAll(i,2,iTrl,iterI)),'.','Color',colors(i,:),'MarkerSize',20); hold on;
         end
         drawnow;
     end
 end
-voronoi(muAll(:,1,iTrl,iter),muAll(:,2,iTrl,iter),'k'); %final one - if plotting at END above
+voronoi(muAll(:,1,iTrl,iterI),muAll(:,2,iTrl,iterI),'k'); %final one - if plotting at END above
 % xlim([min(trials(:,1))-.1,max(trials(:,1))+.1]); ylim([min(trials(:,2))-.1,max(trials(:,2))+.1]);
 
-if savePlots,
+if savePlots
     fname=[saveDir, sprintf('/covering_map_%d_clus_locs_plotOverTime_top_%d_trls_eps%d_alpha%d_%diters',nClus,nTrials,epsMuOrig100,alpha10,nIter)];
     if warpBox
         fname = [fname sprintf('_warpBox_resetEps%d',resetEps)];
@@ -120,7 +122,7 @@ end
 
 %% over time - one plot
 
-iter = 1;
+iterI = 1;
 colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
 
 figure;
@@ -128,47 +130,45 @@ figure;
 for iTrl = 1:nTrials
     if mod(iTrl,250)==0
 %         iPlot=iPlot+1;
-%         voronoi(muAll(:,1,iTrl,toPlot),muAll(:,2,iTrl,toPlot),'k')
+        voronoi(muAll(:,1,iTrl,iterI),muAll(:,2,iTrl,iterI),'k')
     end
     xlim(locRange); ylim(locRange);
 
     if mod(iTrl,50)==0, %plot centers after x trials
         for i=1:nClus
-            plot(squeeze(muAll(i,1,iTrl,iter)),squeeze(muAll(i,2,iTrl,iter)),'.','Color',colors(i,:),'MarkerSize',10); hold on; %make marker size bigger - larger/smoother firing field!
+            plot(squeeze(muAll(i,1,iTrl,iterI)),squeeze(muAll(i,2,iTrl,iterI)),'.','Color',colors(i,:),'MarkerSize',10); hold on; %make marker size bigger - larger/smoother firing field!
         end
         drawnow;
     end
 end
 
 %% plot final centres 
-iter=1;
 colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
 
-%plot over average of final trials
-nTrlsToPlot = [3000, 2000, 1000, 500, 200, 100];
+iterI=1;
 
-nTrlsToPlot = 100;
+%plot over average of final trials
+% nTrlsToPlot = [3000, 2000, 1000, 500, 200, 100];
+nTrlsToPlot = 10000;
 
 for iToPlot=1:length(nTrlsToPlot)
     figure;
     for iClus = 1:nClus
-        plot(mean(squeeze(muAll(iClus,1,nTrials-nTrlsToPlot(iToPlot):nTrials,iter))),squeeze(mean(muAll(iClus,2,nTrials-nTrlsToPlot(iToPlot):nTrials,iter))),'.','Color',colors(iClus,:),'MarkerSize',20); hold on;
+        plot(mean(squeeze(muAll(iClus,1,nTrials-nTrlsToPlot(iToPlot):nTrials,iterI))),squeeze(mean(muAll(iClus,2,nTrials-nTrlsToPlot(iToPlot):nTrials,iterI))),'.','Color',colors(iClus,:),'MarkerSize',20); hold on;
     end
     xlim(locRange); ylim(locRange);
-
 %     voronoi(squeeze(mean(muAll(:,1,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),squeeze(mean(muAll(:,2,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),'k');
 end
 
-%
 
-for iter=1:nIter
-    avgTrlSSE(:,iter) = squeeze(mean(sseTrl(:,:,iter),1));
+%  spreadout-ness measure
+for iterI=1:nIter
+    avgTrlSSE(:,iterI) = squeeze(mean(sseTrl(:,:,iterI),1));
     
-    for iClus=1:nClus,
-        devAvgSSE(iClus,:,iter)=sseTrl(iClus,:,iter)-avgTrlSSE(:,iter)';
+    for iClus=1:nClus
+        devAvgSSE(iClus,:,iterI)=sseTrl(iClus,:,iterI)-avgTrlSSE(:,iterI)';
     end
 end
-
 stdAcrossClus=squeeze(std(devAvgSSE));
 varAcrossClus=squeeze(var(devAvgSSE));
 
@@ -177,50 +177,6 @@ figure; plot(varAcrossClus)
 figure; plot(stdAcrossClus)
 
 %% comparing parameters
-
-% at the moment I didn't save indSSE1 and 2 - so not immediately sure which
-% tsseTrls and sseTrls are the top3bottom 3. now i'm saving them.
-
-% more importantly, i didn't save all the cluster positions - i will do
-% this now (either downsampled or averaging over the last x trials). Also
-% order the clusters by SSE - after averaging cluster positions over 10k
-% trials
-
-
-%for now i will compute SSE on new datasets on cluster positions for top3
-%and bottom3 only. this probably is good enough for now
-
-
-
-
-%load in different versions
-
-%%%%
-% loop and plot different versions? or loop and load in variables with diff
-% names?
-%%%%
-
-% if 1
-%     epsMuOrig1000 = 75; %75, 100
-%     nClus = 40;
-%     colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
-%     nTrials = 30000;
-%     nIter=20;
-%     warpBox=0;
-%     alpha10=5; %0,2, 5, 9, 95 (95 looks like it goes really bad)
-% %     c10k=9990000; %25, 50, 100, 9990000
-%     
-%     fname=[saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_%diters',nClus,nTrials,epsMuOrig1000 ,alpha10,nIter)];
-% %     fname=[saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,c10k,nIter)];
-% %     if warpBox,
-% %         fname = [fname '_warpBox'];
-% %     end
-%     load(fname);
-% end
-
-
-
-
 
 %make test data - keep same for comparison
 nSteps = 500;
@@ -242,10 +198,6 @@ alphaVals = [0,2,4,6, 8];
 % cVals = cVals*10000;
 % testVals = cVals;
 
-
-%may want to test epsMu too later?
-
-
 testVals = alphaVals;
 
 nClus = 40; colors = distinguishable_colors(nClus);
@@ -257,12 +209,12 @@ clusMu=nan(nClus,2,nIter,length(testVals));
 sse=nan(1,nClus);
 tsse=nan(nIter,length(testVals));
 devAvgSSE=nan(nClus,nIter,length(testVals));
-for iDataSet = 1:length(testVals)
+for iTestVal = 1:length(testVals)
     
     %set params, load in data
     epsMuOrig1000 = 75; %75, 100
 
-    alpha10 = alphaVals(iDataSet);
+    alpha10 = alphaVals(iTestVal);
 %     alpha10 = alphaVals;
     
     fname=[saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,nIter)];
@@ -270,29 +222,29 @@ for iDataSet = 1:length(testVals)
 %     fname=[saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,c10k,nIter)];
     load(fname);
     
-    iter = 1:nIter; %which of top3/bottom3 to use. all?
-    for iterI = 1:nIter,
+    iterI = 1:nIter; %which of top3/bottom3 to use. all?
+    for iterI = 1:nIter
         
         nTrlsToAvg = 10000; % also check 5k, 15k, 20k - could make a loop to check all later
         
-        clusMu(:,:,iterI,iDataSet)=[mean(muAll(:,1,nTrials-nTrlsToAvg:end,iter(iterI)),3),mean(muAll(:,2,nTrials-nTrlsToAvg:end,iter(iterI)),3)];
+        clusMu(:,:,iterI,iTestVal)=[mean(muAll(:,1,nTrials-nTrlsToAvg:end,iterI(iterI)),3),mean(muAll(:,2,nTrials-nTrlsToAvg:end,iterI(iterI)),3)];
         
         % compute sse with respect to all test data points
         distTrl=[];
-        for iClus = 1:size(clusMu,1),
-            distTrl(:,iClus)=sum([clusMu(iClus,1,iterI,iDataSet)-dataPtsTest(:,1), clusMu(iClus,2,iterI,iDataSet)-dataPtsTest(:,2)].^2,2);
+        for iClus = 1:size(clusMu,1)
+            distTrl(:,iClus)=sum([clusMu(iClus,1,iterI,iTestVal)-dataPtsTest(:,1), clusMu(iClus,2,iterI,iTestVal)-dataPtsTest(:,2)].^2,2);
         end
         [indValsTrl, indTmp]=min(distTrl,[],2); % find which clusters are points closest to
-        for iClus = 1:size(clusMu,1),
-            sse(iClus)=sum(sum([clusMu(iClus,1,iterI,iDataSet)-dataPtsTest(indTmp==iClus,1), clusMu(iClus,2,iterI,iDataSet)-dataPtsTest(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
+        for iClus = 1:size(clusMu,1)
+            sse(iClus)=sum(sum([clusMu(iClus,1,iterI,iTestVal)-dataPtsTest(indTmp==iClus,1), clusMu(iClus,2,iterI,iTestVal)-dataPtsTest(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
         end
-        tsse(iterI,iDataSet)=sum(sse);
+        tsse(iterI,iTestVal)=sum(sse);
         
         %compute 'spreaded-ness' - variance of SE across clusters is a measure
         %of this, assuing uniform data points
-        devAvgSSE(:,iterI,iDataSet)   = sse-mean(sse);
-        stdAcrossClus(iterI,iDataSet) = std(devAvgSSE(:,iterI,iDataSet));
-        varAcrossClus(iterI,iDataSet) = var(devAvgSSE(:,iterI,iDataSet));
+        devAvgSSE(:,iterI,iTestVal)   = sse-mean(sse);
+        stdAcrossClus(iterI,iTestVal) = std(devAvgSSE(:,iterI,iTestVal));
+        varAcrossClus(iterI,iTestVal) = var(devAvgSSE(:,iterI,iTestVal));
     end
 end
 
@@ -309,77 +261,170 @@ end
 
 
 % plot cluster centres, print their sse and stdAcrossClus
-
-
 for iterI=1:nIter
     % figure('units','normalized','outerposition',[0 0 1 1]); hold on; iPlot=0;
     figure; hold on; iPlot=0;
-    for iDataSet = 1:length(testVals)
+    for iTestVal = 1:length(testVals)
         iPlot = iPlot+1;
         subplot(2,2,iPlot);
-        scatter(clusMu(:,1,iterI,iDataSet),clusMu(:,2,iterI,iDataSet),20e+2,colors,'.')
+        scatter(clusMu(:,1,iterI,iTestVal),clusMu(:,2,iterI,iTestVal),20e+2,colors,'.')
         xlim(locRange); ylim(locRange);
-        title(sprintf('%d alpha, %.1f tsse, %.2f. spreadedness', testVals(iDataSet), tsse(iterI,iDataSet), stdAcrossClus(iterI,iDataSet)))
+        title(sprintf('%d alpha, %.1f tsse, %.2f. spreadedness', testVals(iTestVal), tsse(iterI,iTestVal), stdAcrossClus(iterI,iTestVal)))
 %         title(sprintf('%d cVal, %.1f tsse, %.2f. spreadedness', testVals(iDataSet), tsse(iterI,iDataSet), stdAcrossClus(iterI,iDataSet)))
     end
 end
 %% make logical map of cluster positions, density plots
 
 nTrlsToUse = 10000;
-
 spacing = linspace(locRange(1),locRange(2),locRange(2)+1);
+densityPlot = zeros(length(spacing),length(spacing),nIter);
+for iterI=1:10
+    clus = round(muAll(:,:,nTrials-nTrlsToUse+1:nTrials,iterI));
+    for iTrl=1:nTrlsToUse
+        for i=1:nClus
+            densityPlot(clus(i,1,iTrl),clus(i,2,iTrl),iterI)=densityPlot(clus(i,1,iTrl),clus(i,2,iTrl),iterI)+1; % works, but better way / faster to vectorise?
+        end
+    end
+    densityPlot(:,:,iterI) = imgaussfilt(densityPlot(:,:,iterI),12); %smooth
+    figure;
+    imagesc(densityPlot(:,:,iterI));
+    % imagesc(densityPlot(:,:,iter),[100 800]);
+end
 
-for iter=1:10, 
-%     iter=1;%just get 1 iter, 1 of the param settings for now
 
-clus = round(muAll(:,:,nTrials-nTrlsToUse+1:nTrials,iter)); 
-% nDecimals = 3; f = 10.^nDecimals; %round to 3 dec places
-% clus = round(f.*clusTmp)./f;
-% clus = (clus*1000)+1000; %add 1000 to make it into the range of 0-2001
+%% Plot / check stochastic update params...
+
+%    figure; plot(cParams.closestChosen);
+%    propClosestC = nnz(cParams.closestChosen)/nTrials
+%    figure; plot(cParams.betaAll);
 
 
-densityPlot(:,:,iter) = zeros(length(spacing),length(spacing));
+   % stochasticType=1;
+% 
+% cVals = round([3.25/nTrials, 3.5/nTrials, 4/nTrials].*1000000);
+% for iTestVal = 2:length(cVals)
+% 
+%     epsMuOrig1000 = 75;
+%     nClus = 40;
+%     nTrials = 30000;
+%     nIter=10;
+%     warpBox=0;
+%     alpha10=5;
+% 
+%     %atm have only 1 c value run for alpha=2/8, but all stypes
+%     %also have 2 and 3 for alpha=5, can check those out too
+%     
+%     c =cVals(iTestVal);
+%     fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,stochasticType,c,nIter)];
+%     
+%     load(fname);
+%     
+%     figure; plot(cParams.closestPr); %probably most useful    
+%     
+%     propClosestC(iTestVal) = nnz(cParams.closestPr==1)/nTrials; % proportion of times the closesst cluster was chosen
+%     
+%     
+% end
 
-% clus(:,:,1)
-% clus(1,:,1)
+%% Compute the cluster centres from the desnity map, then compute SSE and rank them
 
-for iTrls=1:nTrlsToUse,
-    for i=1:nClus
-        densityPlot(clus(i,1,iTrls),clus(i,2,iTrls),iter)=densityPlot(clus(i,1,iTrls),clus(i,2,iTrls),iter)+1; % works, but better way / faster to vectorise?
+gaussSmooth=9; %smooth maps by x value
+
+%define which parmeters to test (if not testing, keep at 1 value)
+%%%%%%%
+%how to test several; or should test one at a time?
+%%%%%%%
+alphaVals = [0,2,4,6,8]; 
+
+stochasticType = 1; %1, 2, 3; % stochasticVals=[1,2,3] - later
+
+cVals = round([3.25/nTrials, 3.5/nTrials, 4/nTrials].*1000000);
+%%%%%%%
+%set which one to test
+%%%%%%
+testVals = alphaVals; %alphaVals, cVals, stochasticVals
+nTestVals = length(testVals);
+
+nClus = 40; colors = distinguishable_colors(nClus);
+nTrials = 30000;
+nIter = size(muAll,4);
+%warpBox=0;
+
+clusMu=nan(nClus,2,nIter,length(testVals));
+sse=nan(1,nClus);
+tsse=nan(nIter,length(testVals));
+devAvgSSE=nan(nClus,nIter,length(testVals));
+
+for iTestVal = 1:nTestVals
+    %set params, load in data
+    epsMuOrig1000 = 75; %75, 100
+    
+    %alpha
+    alpha10 = alphaVals(iTestVal);
+%     alpha10 = alphaVals;
+%     fname=[saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,nIter)];
+    
+    %stochastic parameters
+    c =cVals(iTestVal);    
+    fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,stochasticType,c,nIter)];
+    
+    load(fname);
+        
+%         nTrlsToAvg = 10000; % also check 5k, 15k, 20k - could make a loop to check all later
+    
+    nTrlsToUse = 10000; % - for computing density map
+    
+    spacing = linspace(locRange(1),locRange(2),locRange(2)+1);
+    densityPlot = zeros(length(spacing),length(spacing),nIter,nTestVals);
+    for iterI = 1:nIter
+        
+        %new - here compute the smoothed density map - find the peaks,
+        %treat those as the cluster centres, compute SSE
+        
+        %compute density map
+        clus = round(muAll(:,:,nTrials-nTrlsToUse+1:nTrials,iterI));
+        for iTrl=1:nTrlsToUse
+            for i=1:nClus
+                densityPlot(clus(i,1,iTrl),clus(i,2,iTrl),iterI,iTestVal)=densityPlot(clus(i,1,iTrl),clus(i,2,iTrl),iterI,iTestVal)+1; % works, but better way / faster to vectorise?
+            end
+        end
+        densityPlot(:,:,iterI,iTestVal) = imgaussfilt(densityPlot(:,:,iterI,iTestVal),gaussSmooth); %smooth
+        
+        %find peaks - how to just get one centre value per peak? each
+        %centre might have diff number of counts...
+        
+        
+        
+        
+        
+%         clusMu(:,:,iterI,iDataSet)=[mean(muAll(:,1,nTrials-nTrlsToAvg:end,iter(iterI)),3),mean(muAll(:,2,nTrials-nTrlsToAvg:end,iter(iterI)),3)];
+        
+        
+        
+        % compute sse with respect to all test data points
+        distTrl=[];
+        for iClus = 1:size(clusMu,1)
+            distTrl(:,iClus)=sum([clusMu(iClus,1,iterI,iTestVal)-dataPtsTest(:,1), clusMu(iClus,2,iterI,iTestVal)-dataPtsTest(:,2)].^2,2);
+        end
+        [indValsTrl, indTmp]=min(distTrl,[],2); % find which clusters are points closest to
+        for iClus = 1:size(clusMu,1)
+            sse(iClus)=sum(sum([clusMu(iClus,1,iterI,iTestVal)-dataPtsTest(indTmp==iClus,1), clusMu(iClus,2,iterI,iTestVal)-dataPtsTest(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
+        end
+        tsse(iterI,iTestVal)=sum(sse);
+        
+        %compute 'spreaded-ness' - variance of SE across clusters is a measure
+        %of this, assuing uniform data points
+        devAvgSSE(:,iterI,iTestVal)   = sse-mean(sse);
+        stdAcrossClus(iterI,iTestVal) = std(devAvgSSE(:,iterI,iTestVal));
+        varAcrossClus(iterI,iTestVal) = var(devAvgSSE(:,iterI,iTestVal));
     end
 end
-
-% %smooth
-% densityPlot(:,:,iter) = imgaussfilt(densityPlot(:,:,iter),10);
-
-figure;
-imagesc(densityPlot(:,:,iter));
-% imagesc(densityPlot(:,:,iter),[100 800]);
-
-% imagesc(densityPlot(:,:,iter)./mean(reshape(densityPlot(:,:,iter),1,numel(densityPlot(:,:,iter)))));
-
-end
-
-% figure;
-% imagesc(densityPlot(:,:,iter));
-
-
-
-% also should think about the best way to 'add' points to the map....
-% logging each point as a 1 (or +1) seems very slow...
-
-
-%% should compute the cluster centres from the above map, then compute SSE and rank them
-
-
-
-
 
 
 
 
 %%
-% %plot clusters at certain times of learning
+% %plot clusters at certain times of learning?
 % snapShots = [1500, 10000, 15000, 20000, 25000]; %first one is at learning, others are already more stable but want to check how stable and compare across parameters used
 % trls2Plot = [];
 % for iShots = 1:length(snapShots)
@@ -394,104 +439,3 @@ end
 %         plot(squeeze(muAll(i,1,iTrl,toPlot)),squeeze(muAll(i,2,iTrl,toPlot)),'.','Color',colors(i,:),'MarkerSize',10); hold on; %make marker size bigger - larger/smoother firing field!
 %     end
 % end
-
-
-
-
-
-
-
-% plot these values over their timepoints above
-% iter = 1;
-% tsseTrls(iTrl,iter)
-% stdAcrossClus(iTrl)
-
-
-
-%atm - tsseTrls and sseTrl are not orders by lowest SSE... I suppose this
-%is not hard to check. BUT if want to plot top3/bottom 3, should have this
-%info at hand...
-
-% notable that i only save best/worst 3 from the LAST trial; might be worth
-% to save the AVERAGE SSE over last 1000 trials to make it more robust? or
-% average cluster positions then compute the sSE
-    % - need to do this in the sim script
-    % - also might be worth checking ranking by the spreaded-outness
-    % (stdAcrosClus)
-
-% code it in sim.m too, but for the ones already run, recompute
-tsseIter = mean(tsseTrls(end-10000:end,:)); %average over last x trials 
-[indVal, indSSE1] = sort(tsseIter);
-[y, indSSE2] = sort(indSSE1); %use indSSE2 to sort for plotting
-
-figure;
-plot(tsseTrls,'color',[.5 .5 .5]); hold on;
-plot(tsseTrls(:,indSSE2==1))
-
-figure;
-plot(stdAcrossClus,'color',[.5 .5 .5]); hold on;
-plot(stdAcrossClus(:,indSSE2==1)); %interesting - lowest spread here is diff to lowest SSE. prob corr, but
-%still
-
-
-%sort according to spread now
-tsseVarIter = mean(stdAcrossClus(end-10000:end,:)); %average over last x trials 
-[indVal, indSSEvar1] = sort(tsseVarIter);
-[y, indSSEvar2] = sort(indSSEvar1); %use indSSE2 to sort for plotting
-
-figure;
-plot(tsseTrls,'color',[.5 .5 .5]); hold on;
-plot(tsseTrls(:,indSSEvar2==1))
-
-figure;
-plot(stdAcrossClus,'color',[.5 .5 .5]); hold on;
-plot(stdAcrossClus(:,indSSEvar2==1));
-
-
-% some that do well at the last 10k were quite bad before that... need to
-% think about this a bit. Also the initial learning rate: need to look at
-% alpha = 1, but maybe also need to sim less than .75 and more than 1?
-
-
-
-
-
-
-
-
-
-
-
-
-%plot over average of final trials - taken from above
-% % need to add a loop for iterations? or plot more than just one?
-
-% nTrlsToPlot = [1, 100, 500, 1000];
-% figure; hold on;
-% for iToPlot=1:length(nTrlsToPlot)
-%     subplot(2,2,iToPlot);
-%     for iClus = 1:nClus
-%         plot(mean(squeeze(muAll(iClus,1,nTrials-nTrlsToPlot(iToPlot):end,toPlot))),squeeze(mean(muAll(iClus,2,nTrials-nTrlsToPlot(iToPlot):end,toPlot))),'.','Color',colors(i,:),'MarkerSize',20); hold on;
-%     end
-%     title(sprintf('Avg over %d trials',nTrlsToPlot(iToPlot)));
-%     if warpBox,
-%         xlim([-1.1,2.1]); ylim([-1.1,1.1]);
-%     else
-%         xlim([-1.1,1.1]); ylim([-1.1,1.1]);
-%     end
-% %     voronoi(squeeze(mean(muAll(:,1,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),squeeze(mean(muAll(:,2,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),'k');
-% end
-% 
-
-
-
-
-
-
-
-
-
-
-
-
-

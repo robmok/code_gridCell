@@ -35,7 +35,7 @@ for iterI = 1:nIter
             trapY=locRange(2).*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
             trapX=spacing;
             trapPts=[];
-            for i=1:length(trapY),
+            for i=1:length(trapY)
                trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
             end
 %             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1            
@@ -50,15 +50,15 @@ for iterI = 1:nIter
             trapY=trapY+floor(length(trapY)./2);
             trapX=spacing;
             trapPts=[];
-            for i=1:length(trapY),
+            for i=1:length(trapY)
                trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
             end
             %make square box attached to it
             sqX=spacing;
             sqY=spacing(1:floor(length(spacing)/2));
-            for i=1:length(sqX),
+            for i=1:length(sqX)
                 tic
-                for j=1:length(sqY),
+                for j=1:length(sqY)
                     trapPts = [trapPts, [sqX(i); sqY(j)]];
                 end
                 toc
@@ -90,18 +90,18 @@ for iterI = 1:nIter
         % but this way it's just any random points in the box
         %%%%%%
         
-        if clusterI==1,% random datapoint as 1st cluster
+        if clusterI==1% random datapoint as 1st cluster
             mu(clusterI,:,1) = dataPtsTest(randi(length(dataPtsTest)),:); 
         end
-        if clusterI~=nClus, % no need update k+1
+        if clusterI~=nClus % no need update k+1
             clear distInit
-            for iClus = 1:clusterI,% loop over clusters that exist now
+            for iClus = 1:clusterI% loop over clusters that exist now
                 distInit(:,iClus)=sum([mu(iClus,1,1)-dataPtsTest(:,1),  mu(iClus,2,1)-dataPtsTest(:,2)].^2,2); %squared euclid for k means
             end
             [indValsInit, indInit]=min(distInit,[],2); % find which clusters are points closest to
             
             distClus=[];
-            for iClus = 1:clusterI,
+            for iClus = 1:clusterI
                 indOrig(:,clusterI) = indInit==iClus;
                 distClusTmp = sum([(mu(iClus,1,1)-dataPtsTest(indOrig(:,clusterI),1)), (mu(iClus,2,1)-dataPtsTest(indOrig(:,clusterI),2))].^2,2);
                 distClus = [distClus; [distClusTmp, repmat(iClus,length(distClusTmp),1)]];
@@ -118,7 +118,7 @@ for iterI = 1:nIter
             clusInd = distClus(ind,2); %find which is the closest cluster
             indDat = find(distInit(:,clusInd)==distClus(ind,1)); %find where the datapoint is in the original vector
             
-            if size(indDat,1)>1,
+            if size(indDat,1)>1
                 indDat=indDat(randi(size(indDat,1),1));
             end
             mu(clusterI+1,:,1) = dataPtsTest(indDat,:);
@@ -134,25 +134,15 @@ for iterI = 1:nIter
     clusUpdates = zeros(nClus,2); %acutally starting at 0 is OK, since there was no momentum from last trial
     
 %     clusUpdAll{nClus}=[];
-    
-    
-    for iTrl=1:length(trials)
+    for iTrl=1:nTrials
             
             %if change size of box half way
-            if iTrl == nTrials*.75 && warpBox,
+            if iTrl == nTrials*.75 && warpBox
                 trials(nTrials*.75+1:end,:) = trialsExpand;
             end
             
             %compute distances
             dist2Clus = sqrt(sum([mu(:,1,iTrl)'-trials(iTrl,1); mu(:,2,iTrl)'-trials(iTrl,2)].^2)); % vectorising euclid dist - sqrt(sum((a-b).^2)), since can't use xval method
-
-            
-%             %deterministic update
-%             closestC=find(min(dist2Clus)==dist2Clus);
-%             if numel(closestC)>1, %if more than 1, randomly choose one
-%                 closestC = randsample(closestC,1);
-%             end
-
 
             %stochastic update - sel 1 of the closest clusters w random element - stochastic parameter c - large is deterministic, 0 - random            
 
@@ -163,29 +153,34 @@ for iterI = 1:nIter
                 elseif stochasticType==2
 %                     beta=c*(iTrl-1);
                     beta=c*(iTrl+nTrials/50);  % maybe no need to be so stochatic at start
-
-                    if beta >= .185, %it might be worth checking if this depends on nClusters - distances will change
-                        beta = .185;
+                    if beta >= c*500 %it might be worth checking if this depends on nClusters - distances will change
+                        beta = c*500;
                     end
                 elseif stochasticType==3
-                    beta = .185; 
+                    beta = c*500; % as a function of c %prev:.185; 
                 end
-                
                 dist2Clus2 = exp(-beta.*dist2Clus)./ sum(exp(-beta.*dist2Clus));
                 distClusPr = cumsum(dist2Clus2);
                 closestC=find(rand(1)<distClusPr,1);
-                
+                if isempty(closestC)  %if beta is too big, just do deterministic update (already will be near deterministic anyway)
+                    closestC=find(min(dist2Clus)==dist2Clus);
+                    if numel(closestC)>1 %if more than 1, randomly choose one
+                        closestC = randsample(closestC,1);
+                    end
+                end
             else %deterministic update
                 closestC=find(min(dist2Clus)==dist2Clus);
-                if numel(closestC)>1, %if more than 1, randomly choose one
+                if numel(closestC)>1 %if more than 1, randomly choose one
                     closestC = randsample(closestC,1);
                 end
             end
-            cParams.closestPr(iTrl)   = dist2Clus2(closestC); 
-            cParams.closestDist(iTrl) = dist2Clus(closestC);
-            cParams.betaAll(iTrl)=beta;
             
+            cParams.closestDist(iTrl)=dist2Clus(closestC);
+            cParams.betaAll(iTrl)=beta;
+            cParams.closestChosen(iTrl) = find(min(dist2Clus)==dist2Clus) == closestC; %was the closest cluster selected?
     
+           
+            
 %           testing and plotting to see what's best - try to define c according to nTrials
 %             stochasticType=2;
 %             cVals=[3.25/nTrials, 3.5/nTrials, 4/nTrials];
@@ -248,19 +243,19 @@ for iterI = 1:nIter
             deltaMuVec(closestC,:) = deltaMu(closestC,:,iTrl); % only update winner
             
             % update mean estimates
-            if iTrl~=length(trials) %no need to update for last trial +1)
+            if iTrl~=nTrials %no need to update for last trial +1)
                 mu(:,1,iTrl+1) = mu(:,1,iTrl) + deltaMuVec(:,1);
                 mu(:,2,iTrl+1) = mu(:,2,iTrl) + deltaMuVec(:,2);
             end        
         
         
         % compute sse on each trial with respect to 'all trials' - independent data - looks similar if you change 'dataPtsTest' to 'trials'; also useful if want to test less vs more trials on training so that you equate SSE by number of test points
-        for iClus = 1:size(mu,1),
+        for iClus = 1:size(mu,1)
             distTrl(:,iClus)=sum([mu(iClus,1,iTrl)-dataPtsTest(:,1), mu(iClus,2,iTrl)-dataPtsTest(:,2)].^2,2);
         end
         [indValsTrl, indTrl]=min(distTrl,[],2); % find which clusters are points closest to
         
-        for iClus = 1:size(mu,1),
+        for iClus = 1:size(mu,1)
             sseTrl(iClus,iTrl,iterI)=sum(sum([mu(iClus,1,iTrl)-dataPtsTest(indTrl==iClus,1), mu(iClus,2,iTrl)-dataPtsTest(indTrl==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
         end
         tsseTrls(iTrl,iterI)=sum(sseTrl(:,iTrl,iterI));
