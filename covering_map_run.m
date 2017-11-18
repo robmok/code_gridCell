@@ -11,7 +11,6 @@ addpath(codeDir); addpath(saveDir);
 
 % nClus   = 20;
 % clus2run = [20, 40, 60, 80]; %run multuple cluster numbers
-% clus2run = 20;
 clus2run = [20 40];
 nTrials = 30000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
@@ -24,7 +23,8 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 
 % parameters
 epsMuOrig=.075;% %learning rate / starting learning rate %.075
-% epsMuOrig=.1;%
+epsMuOrig=.1;
+% epsMuOrig=.05;
 
 % for saving simulations - multiple by values to save the files with params
 epsMuOrig1000=epsMuOrig*1000;
@@ -41,7 +41,7 @@ warpType = 'sq2rect';
 %mometum-like adaptive learning rate - define alpha (higher = weight
 %previous update (direction and magnitude) more; 0 = don't weight previous at all)
 % alphaVals = [0, .1, .2, .3,.4, .5, .6, .7, .8, .9];
-alphaVals = .2;
+alphaVals = [.2, .5, .8];
 % alphaVals = [ 0, .1];
 % alphaVals = [.2, .3];
 % alphaVals = [.4, .5];
