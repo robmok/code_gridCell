@@ -11,7 +11,7 @@ addpath(codeDir); addpath(saveDir);
 
 % nClus   = 20;
 % clus2run = [20, 40, 60, 80]; %run multuple cluster numbers
-clus2run = [20 40];
+clus2run = 20; %[20 40];
 nTrials = 30000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 colgrey = [.5, .5, .5];
@@ -23,7 +23,7 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 
 % parameters
 epsMuOrig=.075;% %learning rate / starting learning rate %.075
-epsMuOrig=.1;
+% epsMuOrig=.1;
 % epsMuOrig=.05;
 
 % for saving simulations - multiple by values to save the files with params
@@ -47,6 +47,7 @@ alphaVals = [.2, .5, .8];
 % alphaVals = [.4, .5];
 % alphaVals = [.6, .7];
 % alphaVals = [.8, .9];
+% alphaVals = .2 ;
 
 stochasticType = 3; %0, 1 ,2, 3
 % 0. none
@@ -57,7 +58,9 @@ stochasticType = 3; %0, 1 ,2, 3
 % 3. constant stochasticity - keep very low
 
 %  larger c = less stochastic over trials (becomes det quite early on); smaller c = more stochastic over trials (still a bit stochastic by the end)
-cVals = [2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials];
+% cVals = [2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials];
+cVals = [.1/nTrials, .25/nTrials];
+cVals = [.5/nTrials, 20/nTrials];
 
 % % Create / load in saved test data
 % trials = [randsample(linspace(-locRange,locRange,101),nTrials,'true'); randsample(linspace(-locRange,locRange,101),nTrials,'true')]'; % random points in a box
@@ -85,7 +88,7 @@ for iStochastic = 1:length(cVals) %
         for iClus2run = 1:length(clus2run) %nClus conditions to run
             nClus = clus2run(iClus2run);
             %         [muEnd, muAll, tsseTrls,sseTrl,epsMuAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials); %,c);
-            [muEnd, muAll, tsseTrls,sseTrl,epsMuAll,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
+            [muEnd, muAll, tsseTrls,sseTrl,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
             
             if saveDat
                 % save simulations - might not need all tsseTrls if not viewing
@@ -103,3 +106,6 @@ for iStochastic = 1:length(cVals) %
     toc
 end
 toc
+
+% figure; plot(cParams.closestChosen)
+% propClosestC = nnz(cParams.closestChosen)/nTrials
