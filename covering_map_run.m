@@ -11,7 +11,7 @@ addpath(codeDir); addpath(saveDir);
 
 % nClus   = 20;
 % clus2run = [20, 40, 60, 80]; %run multuple cluster numbers
-clus2run = 20; %[20 40];
+clus2run = [20];
 nTrials = 30000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 colgrey = [.5, .5, .5];
@@ -22,8 +22,8 @@ locRange = [0, nSteps-1]; %[-1, 1]; % from locRange(1) to locRange(2)
 stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %smallest diff between locs
 
 % parameters
-epsMuOrig=.075;% %learning rate / starting learning rate %.075
-% epsMuOrig=.1;
+% epsMuOrig=.075;% %learning rate / starting learning rate %.075
+epsMuOrig=.1;
 % epsMuOrig=.05;
 
 % for saving simulations - multiple by values to save the files with params
@@ -49,7 +49,8 @@ alphaVals = [.2, .5, .8];
 % alphaVals = [.8, .9];
 % alphaVals = .2 ;
 
-stochasticType = 3; %0, 1 ,2, 3
+stochasticType = 1; 
+%0, 1 ,2, 3
 % 0. none
 % 1. standard stochastic update - becomes more det over time; becomes
 % basically deterministic at some point
@@ -59,8 +60,8 @@ stochasticType = 3; %0, 1 ,2, 3
 
 %  larger c = less stochastic over trials (becomes det quite early on); smaller c = more stochastic over trials (still a bit stochastic by the end)
 % cVals = [2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials];
-cVals = [.1/nTrials, .25/nTrials];
-cVals = [.5/nTrials, 20/nTrials];
+cVals = [.1/nTrials, .25/nTrials, .5/nTrials, 20/nTrials];
+
 
 % % Create / load in saved test data
 % trials = [randsample(linspace(-locRange,locRange,101),nTrials,'true'); randsample(linspace(-locRange,locRange,101),nTrials,'true')]'; % random points in a box
