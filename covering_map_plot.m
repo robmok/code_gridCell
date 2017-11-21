@@ -2,7 +2,7 @@
 clear all;
 
 wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 cd(wd);
 saveDir = [wd '/data_gridCell'];
 
@@ -132,7 +132,7 @@ figure;
 for iTrl = 1:nTrials
     if mod(iTrl,250)==0
 %         iPlot=iPlot+1;
-        voronoi(muAll(:,1,iTrl,iterI),muAll(:,2,iTrl,iterI),'k')
+%         voronoi(muAll(:,1,iTrl,iterI),muAll(:,2,iTrl,iterI),'k')
     end
     xlim(locRange); ylim(locRange);
 
