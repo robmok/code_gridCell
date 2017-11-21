@@ -1,10 +1,12 @@
 %% Plot (with/without load in data)
 clear all;
 
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 cd(wd);
 saveDir = [wd '/data_gridCell'];
+
+addpath(genpath([wd '/gridSCORE_packed']));
 
 nSteps = 500;
 locRange = [0, nSteps-1]; 

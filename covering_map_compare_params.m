@@ -1,12 +1,14 @@
 
 clear all;
 
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 cd(wd);
+
+codeDir = [wd '/code_gridCell'];
 saveDir = [wd '/data_gridCell'];
-
-
+addpath(codeDir); addpath(saveDir);
+addpath(genpath([wd '/gridSCORE_packed']));
 
 %% comparing parameters
 
@@ -71,18 +73,26 @@ end
 
 
 gaussSmooth=8; %smooth maps by x value
+dsFactor=5; %downsample the map so faster computing autocorr map
+
 
 %define which parmeters to test (if not testing, keep at 1 value)
 
 %how to test several; or should test one at a time?
 %%%%%%%
-alphaVals = 2;
+alphaVals = 5;
 %[0,2,4,6,8]; 
 
 stochasticType = 1; %1, 2, 3; % stochasticVals=[1,2,3] - later
+nTrials = 30000;
 
-cVals = round([2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials].*1000000);
+
+cVals = ([.1/nTrials, .25/nTrials, .5/nTrials, 2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]);
+% cVals = [.1/nTrials, .25/nTrials, .5/nTrials, 20/nTrials];
+cVals = round(cVals.*1000000);
+
 % cVals = cVals(1);
+cVals = [8 667];
 
 
 %%%%%%%
@@ -94,7 +104,8 @@ nTestVals = length(testVals);
 nClus = 20; %20, 40
 colors = distinguishable_colors(nClus);
 nTrials = 30000;
-nIter = size(muAll,4);
+nIter = 3;
+
 %warpBox=0;
 
 clusMu=nan(nClus,2,nIter,length(testVals));
@@ -147,7 +158,7 @@ for iTestVal = 1:nTestVals
             densityPlot(:,:,iterI,iTestVal) = imgaussfilt(densityPlot(:,:,iterI,iTestVal),gaussSmooth); %smooth
         end
 
-        
+  
         
         
         % compute sse with respect to all test data points
@@ -168,7 +179,6 @@ for iTestVal = 1:nTestVals
         varAcrossClus(iterI,iTestVal) = var(devAvgSSE(:,iterI,iTestVal));
         
         %compute autocorrelation map
-        dsFactor=5;
         dPlotTmp=densityPlot(:,:,iterI,iTestVal);
         ind=1:dsFactor:size(dPlotTmp,1);
         clear dPlotTmpDS
@@ -184,7 +194,7 @@ for iTestVal = 1:nTestVals
         iPlot=iPlot+1;
         subplot(2,2,iPlot); hold on;
         [g,gdata] = gridSCORE(aCorrMap(:,:,iterI,iTestVal),'allen'); %allen or wills
-        %     [g,gdata] = gridSCORE(im,'wills'); %allen or wills
+%         [g,gdata] = gridSCORE(aCorrMap(:,:,iterI,iTestVal),'wills'); %allen or wills
         
         
         %compute SSE on autocorr map? find peaks, etc.
