@@ -172,78 +172,46 @@ for iterI = 1:nIter
             if numel(closestC)>1 %if more than 1, randomly choose one
                 closestC = randsample(closestC,1);
             end
-           
-
-            actualClosestC = find(min(dist2Clus)==dist2Clus); %if stochastic, closestC might not be
-            %if more than 1 actual closest, have to check if stoch update
-            %chose one of them
+            
+            %if stochastic, closestC might not be if more than 1 actual
+            %closest, have to check if stoch update chose one of them
+            actualClosestC = find(min(dist2Clus)==dist2Clus); 
             closestMatch = zeros(1,length(actualClosestC));
             for iC = 1:length(actualClosestC)
                 closestMatch(iC) = actualClosestC(iC) == closestC;
             end
             cParams.closestChosen(iTrl) = any(closestMatch); %was (one of) the closest cluster selected?
             cParams.closestDist(iTrl)   = dist2Clus(closestC);
-            
-%           testing and plotting to see what's best - try to define c according to nTrials
-%             stochasticType=2;
-%             cVals=[3.25/nTrials, 3.5/nTrials, 4/nTrials];
-% 
-%             for i=1:length(cVals)
-%                 c = cVals(i);
-%                 for iTrl=1:10000,
-%                     if stochasticType==1
-%                         %                     beta=c*(iTrl-1);         % so this gets bigger, and more deterministic with more trials
-%                         beta=c*(iTrl+nTrials/100); % new - maybe no need to be so stochatic at start - NOTE This is bigger than stochType=2 now
-%                         betaAll(iTrl)=beta;
-%                     elseif stochasticType==2
-%                         %                     beta=c*(iTrl-1);
-%                         beta=c*(iTrl+nTrials/50); % new - maybe no need to be so stochatic at start
-%                         betaAll(iTrl)=beta;
-%                         if beta >= betaAll(1)*2.5;%%0.175;%c/.000019 %1.75, %it might be worth checking if this depends on nClusters - distances will change
-%                             beta = betaAll(1)*2.5;%0.175;%c/.000019;       %also good to scale in relation to sth.. like c? as here
-%                         end
-%                     elseif stochasticType==3
-%                         beta(1)=c*(iTrl+nTrials/50);
-%                         betaAll(iTrl)=beta;
-%                         beta = betaAll(1)*2.5;
-%                     end
-%                     dist2Clus2 = exp(-beta.*dist2Clus)./ sum(exp(-beta.*dist2Clus));
-%                     distClusPr = cumsum(dist2Clus2);
-%                     closestC=find(rand(1)<distClusPr,1);
-% 
-%                     xx(iTrl) = dist2Clus2(closestC); % this allows us to plot if it selects the most probable ones or not, so slowly goes toward 1 = always choose the closest one - should be random initially then going to 1
-%                     yy(iTrl) = dist2Clus(closestC);
-%                 end
-%                 figure; plot(xx);
-%                 % figure; plot(yy);
-%                 % figure; plot(betaAll);
-%             end
-
 
             %log which cluster has been updated
             updatedC(iTrl) = closestC;
 
             epsMu = epsMuOrig;
-            epsMuAll(iTrl,:) = [epsMu,closestC];
+            epsMuAll(iTrl,:) = [epsMu,closestC]; 
 
-                
-%             new - adaptive learning rate (momentum-like)
-%             need to save each clusters'previous update and position
-%             momentumUpdate:
-%             alpha = 0.2% - if alpha is 0, then same as now, and move a good amount, not weighting previous trials. if alpha is .99, then
-%             weighting the previous trial a lot and not moving much
-            
+            %update (with momemtum-like parameter)
             deltaMu(closestC,1,iTrl) = ((1-alpha)*(epsMu*(trials(iTrl,1)-mu(closestC,1,iTrl))))+(alpha*clusUpdates(closestC,1));
             deltaMu(closestC,2,iTrl) = ((1-alpha)*(epsMu*(trials(iTrl,2)-mu(closestC,2,iTrl))))+(alpha*clusUpdates(closestC,2));
             
             clusUpdates(closestC,1)=deltaMu(closestC,1,iTrl);
             clusUpdates(closestC,2)=deltaMu(closestC,2,iTrl);
-            
-%             clusUpdAll{closestC}(length(clusUpdAll{closestC})+1)=deltaMu(closestC,1,iTrl);
-%             %outputted this to check how each cluster updated
-            
+
             deltaMuVec = zeros(nClus,2);
             deltaMuVec(closestC,:) = deltaMu(closestC,:,iTrl); % only update winner
+            
+            %weighted neighbour update
+            % - need to change deltaMu to also compute changes from last
+            % trial, not just closest cluster
+            % - amount neighbors update should be proportion to distance;
+            % use a beta value to make the neighbours update less; can try
+            % a few of these; cumsum like above?
+            % - note that this will interact with the momentum thing; if no
+            % momentum, then fine, but if not, the neighbors will move less
+            % esp if they didn't move much in the last few trials. this
+            % interaction might be problematic since previously only takes
+            % into account previous actual proper sized updates, not
+            % neighbourhood ones... should the neighbourhood updates ignore
+            % the momentum param..??? or only run without momentum?
             
             % update mean estimates
             if iTrl~=nTrials %no need to update for last trial +1)

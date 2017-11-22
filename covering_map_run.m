@@ -3,6 +3,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -12,7 +13,7 @@ addpath(codeDir); addpath(saveDir);
 % nClus   = 20;
 % clus2run = [20, 40, 60, 80]; %run multuple cluster numbers
 clus2run = 30;
-nTrials = 15000; %how many locations in the box / trials - 2.5k ; 5k if reset
+nTrials = 30000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 %box
 nSteps = 100;%1001;%50; %to define spacing beween each loc in box
@@ -21,9 +22,9 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 
 % parameters
 epsMuOrig=.075;% %learning rate / starting learning rate %.075
-epsMuOrig=.1;
+% epsMuOrig=.1;
 % epsMuOrig=.05;
-epsMuOrig=.025;
+% epsMuOrig=.125; %could do this as well
 
 % for saving simulations - multiple by values to save the files with params
 epsMuOrig1000=epsMuOrig*1000;
@@ -76,40 +77,38 @@ load([saveDir '/randTrialsBox_30k']); %load in same data with same trial sequenc
 nIter=3; %how many iterations (starting points)
 
 % tic
-
 for iStype = 1:length(sTypes)
     stochasticType = sTypes(iStype);
-    
-for iStochastic = 1:length(cVals) %
-    c = cVals(iStochastic);
-    c1m=round(c.*1000000); % for saving file name
-    fprintf('Running cVal %d\n',c1m)
-    if ~stochasticType, c=0; end
-    tic
-    for iAlpha = 1:length(alphaVals) %
-        alpha = alphaVals(iAlpha);
-        alpha10 = alpha*10; %for saving simulations
+    for iStochastic = 1:length(cVals) %
+        c = cVals(iStochastic);
+        c1m=round(c.*1000000); % for saving file name
+        fprintf('Running cVal %d\n',c1m)
+        if ~stochasticType, c=0; end
+        tic
+        for iAlpha = 1:length(alphaVals) %
+            alpha = alphaVals(iAlpha);
+            alpha10 = alpha*10; %for saving simulations
             fprintf('Running alphaVal %0.2f\n',alpha);
-        for iClus2run = 1:length(clus2run) %nClus conditions to run
-            nClus = clus2run(iClus2run);
-            %         [muEnd, muAll, tsseTrls,sseTrl,epsMuAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials); %,c);
-            [muEnd, muAll, tsseTrls,sseTrl,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
-            
-            if saveDat
-                % save simulations - might not need all tsseTrls if not viewing
-                % them or epsMuAll?
-%                 fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,nIter)];
-                fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,stochasticType,c1m,nIter)];
-                if warpBox
-                    fname = [fname '_warpBox'];
+            for iClus2run = 1:length(clus2run) %nClus conditions to run
+                nClus = clus2run(iClus2run);
+                %         [muEnd, muAll, tsseTrls,sseTrl,epsMuAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials); %,c);
+                [muEnd, muAll, tsseTrls,sseTrl,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
+                
+                if saveDat
+                    % save simulations - might not need all tsseTrls if not viewing
+                    % them or epsMuAll?
+                    %                 fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,nIter)];
+                    fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,stochasticType,c1m,nIter)];
+                    if warpBox
+                        fname = [fname '_warpBox'];
+                    end
+                    save(fname,'muEnd','muAll','sseTrl','tsseTrls','nIter','cParams');
+                    %             save(fname,'muEnd','muAll','sseTrl','tsseTrls','nIter','indSSE1','indSSE2');
                 end
-                save(fname,'muEnd','muAll','sseTrl','tsseTrls','nIter','cParams');
-                %             save(fname,'muEnd','muAll','sseTrl','tsseTrls','nIter','indSSE1','indSSE2');
             end
         end
+        toc
     end
-    toc
-end
 end
 toc
 
