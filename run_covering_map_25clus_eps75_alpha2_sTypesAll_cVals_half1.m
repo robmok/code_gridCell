@@ -9,10 +9,8 @@ codeDir = [wd '/code_gridCell'];
 saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 
-% nClus   = 20;
-% clus2run = [20, 40, 60, 80]; %run multuple cluster numbers
-clus2run = 30;
-nTrials = 15000; %how many locations in the box / trials - 2.5k ; 5k if reset
+clus2run = 35;
+nTrials = 30000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 %box
 nSteps = 100;%1001;%50; %to define spacing beween each loc in box
@@ -21,9 +19,8 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 
 % parameters
 epsMuOrig=.075;% %learning rate / starting learning rate %.075
-epsMuOrig=.1;
+% epsMuOrig=.1;
 % epsMuOrig=.05;
-epsMuOrig=.025;
 
 % for saving simulations - multiple by values to save the files with params
 epsMuOrig1000=epsMuOrig*1000;
@@ -49,31 +46,23 @@ warpType = 'sq2rect';
 alphaVals = .5 ;
 
 sTypes = 0:3;
-sTypes = 1;
-%0, 1 ,2, 3
-% 0. none
-% 1. standard stochastic update - becomes more det over time; becomes
-% basically deterministic at some point
-% 2. stochastic update with a limit - becomes more det over time, but keeps
-%some (very low) stochasticity at the end
-% 3. constant stochasticity - keep very low
+% sTypes = 0;
 
 %  larger c = less stochastic over trials (becomes det quite early on); smaller c = more stochastic over trials (still a bit stochastic by the end)
 % cVals = [2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials];
 % cVals = [.1/nTrials, .25/nTrials, .5/nTrials, 20/nTrials];
-cVals = 10/nTrials;
+% cVals = 10/nTrials;
 
-% % Create / load in saved test data
-% trials = [randsample(linspace(-locRange,locRange,101),nTrials,'true'); randsample(linspace(-locRange,locRange,101),nTrials,'true')]'; % random points in a box
-% trials = [randsample(linspace(locRange(1),locRange(2),nSteps),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),nSteps),nTrials,'true')]'; % random points in a box
-% save([saveDir '/randTrialsBox_30k'],'trials');
+cVals = [.1/nTrials, .25/nTrials, .5/nTrials, 2/nTrials];
+cVals = [3/nTrials, 5/nTrials, 10/nTrials, 20/nTrials];
+
 
 %%
 saveDat=0; %save simulations - cluster centres and tsse
 
 load([saveDir '/randTrialsBox_30k']); %load in same data with same trial sequence so same for each sim
 
-nIter=3; %how many iterations (starting points)
+nIter=1; %how many iterations (starting points)
 
 % tic
 

@@ -67,7 +67,7 @@ for i = 1:iToPlot
     for iClus = 1:nClus
         plot(mean(muEnd(iClus,1,(i))),mean(muEnd(iClus,2,(i))),'.','Color',colors(iClus,:),'MarkerSize',25); hold on; %plot cluster final point
     end
-    xlim(locRange); ylim(locRange);
+%     xlim(locRange); ylim(locRange);
 
     hold on;
     if i==2

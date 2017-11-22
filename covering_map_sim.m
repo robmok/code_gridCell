@@ -164,22 +164,25 @@ for iterI = 1:nIter
                 closestC=find(rand(1)<distClusPr,1);
                 if isempty(closestC)  %if beta is too big, just do deterministic update (already will be near deterministic anyway)
                     closestC=find(min(dist2Clus)==dist2Clus);
-                    if numel(closestC)>1 %if more than 1, randomly choose one
-                        closestC = randsample(closestC,1);
-                    end
                 end
+                cParams.betaAll(iTrl)       = beta;
             else %deterministic update
                 closestC=find(min(dist2Clus)==dist2Clus);
-                if numel(closestC)>1 %if more than 1, randomly choose one
-                    closestC = randsample(closestC,1);
-                end
             end
-            
-            cParams.closestDist(iTrl)=dist2Clus(closestC);
-            cParams.betaAll(iTrl)=beta;
-            cParams.closestChosen(iTrl) = find(min(dist2Clus)==dist2Clus) == closestC; %was the closest cluster selected?
-    
+            if numel(closestC)>1 %if more than 1, randomly choose one
+                closestC = randsample(closestC,1);
+            end
            
+
+            actualClosestC = find(min(dist2Clus)==dist2Clus); %if stochastic, closestC might not be
+            %if more than 1 actual closest, have to check if stoch update
+            %chose one of them
+            closestMatch = zeros(1,length(actualClosestC));
+            for iC = 1:length(actualClosestC)
+                closestMatch(iC) = actualClosestC(iC) == closestC;
+            end
+            cParams.closestChosen(iTrl) = any(closestMatch); %was (one of) the closest cluster selected?
+            cParams.closestDist(iTrl)   = dist2Clus(closestC);
             
 %           testing and plotting to see what's best - try to define c according to nTrials
 %             stochasticType=2;
