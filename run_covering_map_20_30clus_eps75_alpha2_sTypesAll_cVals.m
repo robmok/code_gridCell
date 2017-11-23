@@ -40,7 +40,7 @@ warpType = 'sq2rect';
 %mometum-like adaptive learning rate - define alpha (higher = weight
 %previous update (direction and magnitude) more; 0 = don't weight previous at all)
 % alphaVals = [.2, .5, .8];
-alphaVals = .5 ; %.2 .5 .8
+alphaVals = .2 ; %.2 .5 .8
 
 sTypes = 0:3; %0, 1 ,2, 3
 % 0. none
@@ -51,16 +51,14 @@ sTypes = 0:3; %0, 1 ,2, 3
 % 3. constant stochasticity - keep very low
 
 %  larger c = less stochastic over trials (becomes det quite early on); smaller c = more stochastic over trials (still a bit stochastic by the end)
-cVals = [2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials]; %half1
-% cVals = [.1/nTrials, .25/nTrials, .5/nTrials, 20/nTrials]; %half2
-% cVals = 10/nTrials;
+cVals = [.1/nTrials, .25/nTrials, .5/nTrials, 2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials, 20/nTrials];
 
 % % Create / load in saved test data
 % trials = [randsample(linspace(-locRange,locRange,101),nTrials,'true'); randsample(linspace(-locRange,locRange,101),nTrials,'true')]'; % random points in a box
 % trials = [randsample(linspace(locRange(1),locRange(2),nSteps),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),nSteps),nTrials,'true')]'; % random points in a box
 % save([saveDir '/randTrialsBox_30k'],'trials');
 
-%new - tile the whole space rather than sample
+% %new - tile the whole space rather than sample
 % sq=linspace(locRange(1),locRange(2),nSteps);
 % allPts=[];
 % for i=1:length(sq)
@@ -70,7 +68,7 @@ cVals = [2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials]; %half1
 % end
 % trials=repmat(allPts,nTrials/length(allPts),1); %note, numel of allPts must be divisble by nTrials atm
 % trials=trials(randperm(length(trials)),:);
-% save([saveDir '/randTrialsBox_40k'],'trials');
+% save([saveDir '/randTrialsBox_30k'],'trials');
 
 %%
 saveDat=1; %save simulations
@@ -93,8 +91,10 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                 alpha = alphaVals(iAlpha);
                 alpha10 = alpha*10; %for saving simulations
                 fprintf('Running alphaVal %0.2f\n',alpha);
+                
+                %         [muEnd, muAll, tsseTrls,sseTrl,epsMuAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials); %,c);
                 tic
-                [muAll,cParams] = covering_map_sim_neigh(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
+                [muAll,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
                 timeTaken=toc;
                 if saveDat
                     %                 fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,nIter)];
@@ -110,6 +110,3 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
     end
 end
 toc
-
-% figure; plot(cParams.closestChosen)
-% propClosestC = nnz(cParams.closestChosen)/nTrials

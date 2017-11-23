@@ -42,6 +42,7 @@ stochasticType = 1; %1, 2, 3; % stochasticVals=[1,2,3] - later
 
 cVals = ([.1/nTrials, .25/nTrials, .5/nTrials, 2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]);
 % cVals = [2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials];
+% cVals = [3/nTrials];
 cVals = round(cVals.*1000000);
 
 % cVals = cVals(end-1);

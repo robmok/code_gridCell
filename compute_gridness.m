@@ -14,7 +14,7 @@ im=amap;
 nTrials=size(muAll,3);
 nIter = size(muAll,4);
 
-nTrlsToUse = 10000; 
+nTrlsToUse = 30000; 
 spacing = linspace(locRange(1),locRange(2),locRange(2)+1);
 densityPlot = zeros(length(spacing),length(spacing),nIter);
 for iterI=1:nIter
@@ -24,7 +24,7 @@ for iterI=1:nIter
             densityPlot(clus(i,1,iTrl),clus(i,2,iTrl),iterI)=densityPlot(clus(i,1,iTrl),clus(i,2,iTrl),iterI)+1; % works, but better way / faster to vectorise?
         end
     end
-    densityPlot(:,:,iterI) = imgaussfilt(densityPlot(:,:,iterI),1.5); %smooth
+%     densityPlot(:,:,iterI) = imgaussfilt(densityPlot(:,:,iterI),1); %smooth
     aCorrMap(:,:,iterI) = ndautoCORR(densityPlot(:,:,iterI));
 
     figure;
@@ -38,7 +38,8 @@ figure;
 iPlot=0;
 for iter=1:nIter
     iPlot=iPlot+1;
-    subplot(2,2,iPlot);
+%     subplot(2,2,iPlot);
+figure;
     im=aCorrMap(:,:,iter);
     [g,gdata] = gridSCORE(im,'allen'); %allen or wills
 %     [g,gdata] = gridSCORE(im,'wills'); %allen or wills
