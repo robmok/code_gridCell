@@ -14,7 +14,7 @@ im=amap;
 nTrials=size(muAll,3);
 nIter = size(muAll,4);
 
-nTrlsToUse = 30000; 
+nTrlsToUse = 10000; 
 spacing = linspace(locRange(1),locRange(2),locRange(2)+1);
 densityPlot = zeros(length(spacing),length(spacing),nIter);
 for iterI=1:nIter
@@ -24,15 +24,16 @@ for iterI=1:nIter
             densityPlot(clus(i,1,iTrl),clus(i,2,iTrl),iterI)=densityPlot(clus(i,1,iTrl),clus(i,2,iTrl),iterI)+1; % works, but better way / faster to vectorise?
         end
     end
-%     densityPlot(:,:,iterI) = imgaussfilt(densityPlot(:,:,iterI),1); %smooth
-    aCorrMap(:,:,iterI) = ndautoCORR(densityPlot(:,:,iterI));
+    densityPlot(:,:,iterI) = imgaussfilt(densityPlot(:,:,iterI),1); %smooth
+%     aCorrMap(:,:,iterI) = ndautoCORR(densityPlot(:,:,iterI));
 
     figure;
     imagesc(densityPlot(:,:,iterI));
-    % imagesc(densityPlot(:,:,iter),[100 800]);
+%     imagesc(densityPlot(:,:,iterI),[1000 4000]);
 end
 
 
+%%
 
 figure;
 iPlot=0;

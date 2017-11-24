@@ -132,13 +132,13 @@ colors = distinguishable_colors(nClus); %function for making distinguishable col
 figure;
 % figure('units','normalized','outerposition',[0 0 1 1]);
 for iTrl = 1:nTrials
-    if mod(iTrl,250)==0
+    if mod(iTrl,500)==0
 %         iPlot=iPlot+1;
 %         voronoi(muAll(:,1,iTrl,iterI),muAll(:,2,iTrl,iterI),'k')
     end
-    xlim(locRange); ylim(locRange);
+%     xlim(locRange); ylim(locRange);
 
-    if mod(iTrl,50)==0, %plot centers after x trials
+    if mod(iTrl,100)==0, %plot centers after x trials
         for i=1:nClus
             plot(squeeze(muAll(i,1,iTrl,iterI)),squeeze(muAll(i,2,iTrl,iterI)),'.','Color',colors(i,:),'MarkerSize',10); hold on; %make marker size bigger - larger/smoother firing field!
         end
@@ -153,7 +153,8 @@ iterI=1;
 
 %plot over average of final trials
 % nTrlsToPlot = [3000, 2000, 1000, 500, 200, 100];
-nTrlsToPlot = 10000;
+nTrlsToPlot = [20000, 15000, 10000, 5000, 2000, 1000];
+% nTrlsToPlot = 20000;
 
 for iToPlot=1:length(nTrlsToPlot)
     figure;
@@ -161,24 +162,24 @@ for iToPlot=1:length(nTrlsToPlot)
         plot(mean(squeeze(muAll(iClus,1,nTrials-nTrlsToPlot(iToPlot):nTrials,iterI))),squeeze(mean(muAll(iClus,2,nTrials-nTrlsToPlot(iToPlot):nTrials,iterI))),'.','Color',colors(iClus,:),'MarkerSize',20); hold on;
     end
     xlim(locRange); ylim(locRange);
-%     voronoi(squeeze(mean(muAll(:,1,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),squeeze(mean(muAll(:,2,nTrials-nTrlsToPlot(iToPlot):end,toPlot),3)),'k');
+%     voronoi(squeeze(mean(muAll(:,1,nTrials-nTrlsToPlot(iToPlot):end,iterI),3)),squeeze(mean(muAll(:,2,nTrials-nTrlsToPlot(iToPlot):end,iterI),3)),'k');
 end
 
 
-%  spreadout-ness measure
-for iterI=1:nIter
-    avgTrlSSE(:,iterI) = squeeze(mean(sseTrl(:,:,iterI),1));
-    
-    for iClus=1:nClus
-        devAvgSSE(iClus,:,iterI)=sseTrl(iClus,:,iterI)-avgTrlSSE(:,iterI)';
-    end
-end
-stdAcrossClus=squeeze(std(devAvgSSE));
-varAcrossClus=squeeze(var(devAvgSSE));
-
-% figure; plot(devAvgSSE);
-figure; plot(varAcrossClus)
-figure; plot(stdAcrossClus)
+% %  spreadout-ness measure
+% for iterI=1:nIter
+%     avgTrlSSE(:,iterI) = squeeze(mean(sseTrl(:,:,iterI),1));
+%     
+%     for iClus=1:nClus
+%         devAvgSSE(iClus,:,iterI)=sseTrl(iClus,:,iterI)-avgTrlSSE(:,iterI)';
+%     end
+% end
+% stdAcrossClus=squeeze(std(devAvgSSE));
+% varAcrossClus=squeeze(var(devAvgSSE));
+% 
+% % figure; plot(devAvgSSE);
+% figure; plot(varAcrossClus)
+% figure; plot(stdAcrossClus)
 
 %% Plot / check stochastic update vals
 

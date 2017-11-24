@@ -143,18 +143,44 @@ for iterI = 1:nIter
             updatedC(iTrl) = closestC;
 
             epsMu = epsMuOrig;
-            epsMuAll(iTrl,:) = [epsMu,closestC]; 
+%             epsMuAll(iTrl,:) = [epsMu,closestC]; 
 
-            %update (no momemtum-like parameter)
-            deltaMu(closestC,1,iTrl) = (1-alpha)*(epsMu*(trials(iTrl,1)-mu(closestC,1,iTrl)));
-            deltaMu(closestC,2,iTrl) = (1-alpha)*(epsMu*(trials(iTrl,2)-mu(closestC,2,iTrl)));
+%             c = .0005/nTrials;
+%             beta = c*500;
+%             updW = exp(-beta.*dist2Clus)./ sum(exp(-beta.*dist2Clus));
+
+%             updW = 0./dist2Clus; %last few do look a bit like this - need
+%             to compare gridness
+
+%             updW = .00001./dist2Clus;
+%             updW = .00005./dist2Clus; % possibly starting to look like no weight?
+%             updW = .0001./dist2Clus; % possibly starting to look like no weight?
+%             updW = .0005./dist2Clus; %works well
+            updW = .001./dist2Clus; %works well
+%             updW = .005./dist2Clus; %works well - maybe a bit for a lower learning rate from .075?
+%             updW = .01./dist2Clus; %works well - tiny bit toward centr
+
+%              updW = .015./dist2Clus; %tiny bit of gravity toward centre
+%             updW = .025./dist2Clus; %some gravity towards the centre
+%             updW = .05./dist2Clus; %starts going into the centre
             
-            % no momentum - need this?
-            clusUpdates(closestC,1)=deltaMu(closestC,1,iTrl);
-            clusUpdates(closestC,2)=deltaMu(closestC,2,iTrl);
+%             updW = 1-max(distW)+distW; % so that closest clus weight = 1
+            updW(closestC) = 1;
+            
+            %update (no momemtum-like parameter)
+%             deltaMu(closestC,1,iTrl) = (1-alpha)*(epsMu*(trials(iTrl,1)-mu(closestC,1,iTrl)));
+%             deltaMu(closestC,2,iTrl) = (1-alpha)*(epsMu*(trials(iTrl,2)-mu(closestC,2,iTrl)));
+            
+            deltaMu(:,1,iTrl) = updW'.*(epsMu.*(trials(iTrl,1)-mu(:,1,iTrl)));
+            deltaMu(:,2,iTrl) = updW'.*(epsMu.*(trials(iTrl,2)-mu(:,2,iTrl)));
+            
+%             % %checking
+%             delta_w=updW'.*(epsMu.*(trials(iTrl,1)-mu(:,1,iTrl)));
+%             delta_orig=(epsMu.*(trials(iTrl,1)-mu(:,1,iTrl)));
+%             figure; scatter(delta_orig,delta_w);
 
-            deltaMuVec = zeros(nClus,2);
-            deltaMuVec(closestC,:) = deltaMu(closestC,:,iTrl); % only update winner
+%             deltaMuVec = zeros(nClus,2);
+            deltaMuVec = deltaMu(:,:,iTrl);
             
             %weighted neighbour update
             % - need to change deltaMu to also compute changes from last

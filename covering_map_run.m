@@ -1,8 +1,8 @@
 clear all;
 % close all;
 
-wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -11,7 +11,7 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 
 % clus2run = [20, 40, 60, 80]; %run multuple cluster numbers
-clus2run = [20, 30]; %20, 30
+clus2run = [40]; %20, 30
 nTrials = 40000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 %box
@@ -22,8 +22,9 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 % parameters
 epsMuOrig=.075;% %learning rate / starting learning rate %.075
 % epsMuOrig=.1;
-% epsMuOrig=.05;
+epsMuOrig=.05;
 % epsMuOrig=.125; %could do this as well
+% epsMuOrig = .01;
 
 % for saving simulations - multiple by values to save the files with params
 epsMuOrig1000=epsMuOrig*1000;
@@ -40,9 +41,9 @@ warpType = 'sq2rect';
 %mometum-like adaptive learning rate - define alpha (higher = weight
 %previous update (direction and magnitude) more; 0 = don't weight previous at all)
 % alphaVals = [.2, .5, .8];
-alphaVals = .5 ; %.2 .5 .8
+alphaVals = .2 ; %.2 .5 .8
 
-sTypes = 0:3; %0, 1 ,2, 3
+sTypes = 0;%:3; %0, 1 ,2, 3
 % 0. none
 % 1. standard stochastic update - becomes more det over time; becomes
 % basically deterministic at some point
@@ -53,7 +54,7 @@ sTypes = 0:3; %0, 1 ,2, 3
 %  larger c = less stochastic over trials (becomes det quite early on); smaller c = more stochastic over trials (still a bit stochastic by the end)
 cVals = [2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials]; %half1
 % cVals = [.1/nTrials, .25/nTrials, .5/nTrials, 20/nTrials]; %half2
-% cVals = 10/nTrials;
+cVals = 10/nTrials;
 
 % % Create / load in saved test data
 % trials = [randsample(linspace(-locRange,locRange,101),nTrials,'true'); randsample(linspace(-locRange,locRange,101),nTrials,'true')]'; % random points in a box
@@ -73,11 +74,11 @@ cVals = [2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials]; %half1
 % save([saveDir '/randTrialsBox_40k'],'trials');
 
 %%
-saveDat=1; %save simulations
+saveDat=0; %save simulations
 
 load([saveDir '/randTrialsBox_40k']); %load in same data with same trial sequence so same for each sim
 
-nIter=10; %how many iterations (starting points)
+nIter=1; %how many iterations (starting points)
 
 tic
 for iClus2run = 1:length(clus2run) %nClus conditions to run
@@ -89,12 +90,13 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
             c1m=round(c.*1000000); % for saving file name
             fprintf('Running cVal %d\n',c1m)
             if ~stochasticType, c=0; end
-            for iAlpha = 1:length(alphaVals) %
+            for iAlpha  = 1:length(alphaVals) %
                 alpha = alphaVals(iAlpha);
                 alpha10 = alpha*10; %for saving simulations
                 fprintf('Running alphaVal %0.2f\n',alpha);
                 tic
-                [muAll,cParams] = covering_map_sim_neigh(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
+%                 [muAll,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
+                muAll = covering_map_sim_neigh(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
                 timeTaken=toc;
                 if saveDat
                     %                 fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,nIter)];
