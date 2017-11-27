@@ -195,20 +195,6 @@ for iterI = 1:nIter
             deltaMuVec = zeros(nClus,2);
             deltaMuVec(closestC,:) = deltaMu(closestC,:,iTrl); % only update winner
             
-            %weighted neighbour update
-            % - need to change deltaMu to also compute changes from last
-            % trial, not just closest cluster
-            % - amount neighbors update should be proportion to distance;
-            % use a beta value to make the neighbours update less; can try
-            % a few of these; cumsum like above?
-            % - note that this will interact with the momentum thing; if no
-            % momentum, then fine, but if not, the neighbors will move less
-            % esp if they didn't move much in the last few trials. this
-            % interaction might be problematic since previously only takes
-            % into account previous actual proper sized updates, not
-            % neighbourhood ones... should the neighbourhood updates ignore
-            % the momentum param..??? or only run without momentum?
-            
             % update mean estimates
             if iTrl~=nTrials %no need to update for last trial +1)
                 mu(:,1,iTrl+1) = mu(:,1,iTrl) + deltaMuVec(:,1);
