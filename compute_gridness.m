@@ -1,12 +1,12 @@
 wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 
 cd(wd);
 addpath(genpath([wd '/gridSCORE_packed']));
 
 load('ex_amap.mat')
 im=amap;
-[g,gdata] = gridSCORE(im,'allen'); %allen or wills
+[g,gdata] = gridSCORE(im,'allen',1); %allen or wills
 
 
 

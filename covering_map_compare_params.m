@@ -21,7 +21,7 @@ dataPtsTest = [randsample(linspace(locRange(1),locRange(2),nSteps),nTrialsTest,'
 
 %% Compute the cluster centres from the desnity map, then compute SSE and rank them
 
-doPlot = 0; %plot - note if loading in many value, this will make too many plots, can crash
+doPlot = 1; %plot - note if loading in many value, this will make too many plots, can crash
 
 gaussSmooth=1; %smooth maps by x value
 % dsFactor=5; %downsample the map so faster computing autocorr map
@@ -42,8 +42,8 @@ alphaVals = 2;
 stochasticType = 1; %1, 2, 3; % stochasticVals=[1,2,3] - later
 
 cVals = ([.1/nTrials, .25/nTrials, .5/nTrials, 2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]);
-cVals = [2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials];
-% cVals = [3/nTrials];
+% cVals = [2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials];
+cVals = [3/nTrials];
 cVals = round(cVals.*1000000);
 
 % cVals = cVals(end-1);
