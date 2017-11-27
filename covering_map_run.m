@@ -11,7 +11,7 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 
 % clus2run = [20, 40, 60, 80]; %run multuple cluster numbers
-clus2run = [40]; %20, 30
+clus2run = [30]; %20, 30
 nTrials = 40000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 %box
@@ -22,7 +22,7 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 % parameters
 epsMuOrig=.075;% %learning rate / starting learning rate %.075
 % epsMuOrig=.1;
-epsMuOrig=.05;
+% epsMuOrig=.05;
 % epsMuOrig=.125; %could do this as well
 % epsMuOrig = .01;
 

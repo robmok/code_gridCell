@@ -1,4 +1,5 @@
-wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 
 cd(wd);
 addpath(genpath([wd '/gridSCORE_packed']));
