@@ -21,7 +21,7 @@ dataPtsTest = [randsample(linspace(locRange(1),locRange(2),nSteps),nTrialsTest,'
 
 %% Compute the cluster centres from the desnity map, then compute SSE and rank them
 
-doPlot = 1; %plot - note if loading in many value, this will make too many plots, can crash
+doPlot = 0; %plot - note if loading in many value, this will make too many plots, can crash
 
 gaussSmooth=1; %smooth maps by x value
 % dsFactor=5; %downsample the map so faster computing autocorr map
@@ -41,12 +41,10 @@ alphaVals = 2;
 
 stochasticType = 1; %1, 2, 3; % stochasticVals=[1,2,3] - later
 
-cVals = ([.1/nTrials, .25/nTrials, .5/nTrials, 2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]);
+cVals = ([.1/nTrials, .25/nTrials, .5/nTrials, 2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]); %.1 and stoch = towards middle
 % cVals = [2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials];
-cVals = [3/nTrials];
+% cVals = [3/nTrials];
 cVals = round(cVals.*1000000);
-
-% cVals = cVals(end-1);
 
 %%%%%%%
 %set which one to test
@@ -71,13 +69,6 @@ densityPlot = zeros(length(spacing),length(spacing),nIter,nTestVals);
 aCorrMap = nan(length(spacing)*2-1,length(spacing)*2-1,nIter,nTestVals);
 
 
-%get file names
-%%%%%%%
-% can probably load in all variables wanted like this
-% still to add - calc how many files to load then set up size of fnames
-%%%%%%
-
-fnames={};
 for iTestVal = 1:nTestVals
 %     iPlot=0; %for subplot below
     
@@ -94,17 +85,23 @@ for iTestVal = 1:nTestVals
     
     %if ran more than 1 set of iters, hv multiple files w diff end bit;load
     f = dir(fname); filesToLoad = cell(1,length(f));
+    muAllTmp={};
+    nIterCount=0;
     for iF = 1:length(f)
-        filesToLoad{iF} = f(iF).name;
-        fnames = [fnames filesToLoad{iF}];
+%         filesToLoad{iF} = f(iF).name;
+%         fnames = [fnames filesToLoad{iF}];
+        load(f(iF).name);
+        muAllTmp{iF}=muAll;
+        nIterCount = [nIterCount, nIter+nIterCount(end)]; %count number of iters to index below when merging
     end
-end
-
-
-for iF = 1:length(fnames)
-    load(fnames{iF});
-
-    for iterI = 1:nIter
+    %merge
+    clear muAll
+    for iF = 1:length(f)
+        muAll(:,:,:,nIterCount(iF)+1:nIterCount(iF+1)) = muAllTmp{iF};
+    end
+   
+    %calculate
+    for iterI = 1:size(muAll,4) %nIter
         %compute density map
         clus = round(muAll(:,:,fromTrlI:toTrlN,iterI));
         densityPlotClus     = zeros(length(spacing),length(spacing),nClus);
@@ -120,8 +117,8 @@ for iF = 1:length(fnames)
             clusMu(iClus,:,iterI) = [peakX, peakY];
             
             %make combined (grid cell) plot
-            densityPlot(:,:,iterI) = sum(densityPlotClus,3);
-            densityPlot(:,:,iterI) = imgaussfilt(densityPlot(:,:,iterI),gaussSmooth); %smooth
+            densityPlot(:,:,iterI,iTestVal) = sum(densityPlotClus,3);
+            densityPlot(:,:,iterI,iTestVal) = imgaussfilt(densityPlot(:,:,iterI,iTestVal),gaussSmooth); %smooth
         end
         
         
@@ -135,13 +132,13 @@ for iF = 1:length(fnames)
         for iClus = 1:size(clusMu,1)
             sse(iClus)=sum(sum([clusMu(iClus,1,iterI)-dataPtsTest(indTmp==iClus,1), clusMu(iClus,2,iterI)-dataPtsTest(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
         end
-        tsse(iterI)=sum(sse);
+        tsse(iterI,iTestVal)=sum(sse);
         
         %compute 'spreaded-ness' - variance of SE across clusters is a measure
         %of this, assuing uniform data points
-        devAvgSSE(:,iterI)   = sse-mean(sse);
-        stdAcrossClus(iterI) = std(devAvgSSE(:,iterI));
-        varAcrossClus(iterI) = var(devAvgSSE(:,iterI));
+        devAvgSSE            = sse-mean(sse);
+        stdAcrossClus(iterI,iTestVal) = std(devAvgSSE);
+        varAcrossClus(iterI,iTestVal) = var(devAvgSSE);
         
         %compute autocorrelation map
         
@@ -156,28 +153,28 @@ for iF = 1:length(fnames)
 %         end
 %         densityPlotDS(:,:,iterI,iTestVal) =imgaussfilt(dPlotTmpDS,gaussSmooth);
 
-        aCorrMap(:,:,iterI) = ndautoCORR(densityPlot(:,:,iterI));
+        aCorrMap(:,:,iterI,iTestVal) = ndautoCORR(densityPlot(:,:,iterI,iTestVal));
         
         %plot
         if doPlot
             figure;
             subplot(2,2,1);
-            imagesc(densityPlot(:,:,iterI));
+            imagesc(densityPlot(:,:,iterI,iTestVal));
             subplot(2,2,2);
         end
-        [g,gdataA] = gridSCORE(aCorrMap(:,:,iterI),'allen',doPlot);
+        [g,gdataA] = gridSCORE(aCorrMap(:,:,iterI,iTestVal),'allen',doPlot);
         if doPlot, subplot(2,2,3); end
-        [g,gdataW] = gridSCORE(aCorrMap(:,:,iterI),'wills',doPlot);
+        [g,gdataW] = gridSCORE(aCorrMap(:,:,iterI,iTestVal),'wills',doPlot);
         
         
-        gA_g(iF,iterI)   = gdataA.g_score;
-        gA_o(iF,iterI)   = gdataA.orientation;
-        gA_wav(iF,iterI) = gdataA.wavelength;
-        gA_rad(iF,iterI) = gdataA.radius;
+        gA_g(iterI,iTestVal)   = gdataA.g_score;
+        gA_o(iterI,iTestVal)   = gdataA.orientation;
+        gA_wav(iterI,iTestVal) = gdataA.wavelength;
+        gA_rad(iterI,iTestVal) = gdataA.radius;
         
     end
-    gA{iF}=gdataA;
-    gW{iF}=gdataW;
+    gA{iTestVal}=gdataA;
+    gW{iTestVal}=gdataW;
 end
 
 
@@ -198,9 +195,48 @@ end
 % however can recover it by using the same loops when loading in the param
 % names? e.g. make a variable with the param names, then plot them
 
-
+barpos = .25:.5:.5*nTestVals;
+barw   = .25;
 
 %compare with bar plots, etc.
+
+dat=gA_g;
+
+figure; hold on;
+mu=mean(dat,1);
+sm=std(dat)./sqrt(size(dat,1));
+ci=sm.*tinv(.025,size(dat,1)-1); %compute conf intervals
+for i=1:length(mu)
+    h(i) = bar(barpos(i),mu(i),barw);
+end
+% he = errorbar(barpos,mu,sm,-sm,'k.');
+he = errorbar(barpos,mu,ci,'k.');
+xlim([barpos(1)-.5, barpos(end)+.5]);
+
+% [h p c s] = ttest(gA_g(:,2),gA_g(:,4))
+
+
+
+
+dat=gA_o;
+
+figure; hold on;
+mu=mean(dat,1);
+sm=std(dat)./sqrt(size(dat,1));
+ci=sm.*tinv(.025,size(dat,1)-1);
+for i=1:length(mu)
+    h(i) = bar(barpos(i),mu(i),barw);
+end
+% he = errorbar(barpos,mu,sm,-sm,'k.');
+he = errorbar(barpos,mu,ci,'k.');
+xlim([barpos(1)-.5, barpos(end)+.5]);
+
+
+
+%univariate scatter?
+
+
+
 
 
 % plot actual data

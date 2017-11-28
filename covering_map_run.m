@@ -43,7 +43,7 @@ warpType = 'sq2rect';
 % alphaVals = [.2, .5, .8];
 alphaVals = .2 ; %.2 .5 .8
 
-sTypes = 0;%:3; %0, 1 ,2, 3
+sTypes = 1;%:3; %0, 1 ,2, 3
 % 0. none
 % 1. standard stochastic update - becomes more det over time; becomes
 % basically deterministic at some point
@@ -54,7 +54,7 @@ sTypes = 0;%:3; %0, 1 ,2, 3
 %  larger c = less stochastic over trials (becomes det quite early on); smaller c = more stochastic over trials (still a bit stochastic by the end)
 cVals = [2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials]; %half1
 % cVals = [.1/nTrials, .25/nTrials, .5/nTrials, 20/nTrials]; %half2
-cVals = 10/nTrials;
+cVals = .1/nTrials;
 
 % % Create / load in saved test data
 % trials = [randsample(linspace(-locRange,locRange,101),nTrials,'true'); randsample(linspace(-locRange,locRange,101),nTrials,'true')]'; % random points in a box
@@ -95,8 +95,8 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                 alpha10 = alpha*10; %for saving simulations
                 fprintf('Running alphaVal %0.2f\n',alpha);
                 tic
-%                 [muAll,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
-                muAll = covering_map_sim_neigh(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
+                [muAll,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
+%                 muAll = covering_map_sim_neigh(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
                 timeTaken=toc;
                 if saveDat
                     %                 fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,nIter)];
