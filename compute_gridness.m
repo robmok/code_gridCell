@@ -26,7 +26,7 @@ for iterI=1:nIter
             densityPlot(clus(i,1,iTrl),clus(i,2,iTrl),iterI)=densityPlot(clus(i,1,iTrl),clus(i,2,iTrl),iterI)+1; % works, but better way / faster to vectorise?
         end
     end
-    densityPlot(:,:,iterI) = imgaussfilt(densityPlot(:,:,iterI),10); %smooth
+    densityPlot(:,:,iterI) = imgaussfilt(densityPlot(:,:,iterI),1); %smooth
     aCorrMap(:,:,iterI) = ndautoCORR(densityPlot(:,:,iterI));
 
     figure;
@@ -36,6 +36,7 @@ end
 
 
 %%
+doPlot=1;
 
 figure;
 iPlot=0;
@@ -44,6 +45,6 @@ for iter=1:nIter
 %     subplot(2,2,iPlot);
 figure;
     im=aCorrMap(:,:,iter);
-    [g,gdata] = gridSCORE(im,'allen'); %allen or wills
-%     [g,gdata] = gridSCORE(im,'wills'); %allen or wills
+    [g,gdata] = gridSCORE(im,'allen',doPlot); %allen or wills
+%     [g,gdata] = gridSCORE(im,'wills',doPlot); %allen or wills
 end

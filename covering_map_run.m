@@ -1,8 +1,8 @@
 clear all;
 % close all;
 
-wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -54,7 +54,7 @@ sTypes = 1;%:3; %0, 1 ,2, 3
 %  larger c = less stochastic over trials (becomes det quite early on); smaller c = more stochastic over trials (still a bit stochastic by the end)
 cVals = [2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials]; %half1
 % cVals = [.1/nTrials, .25/nTrials, .5/nTrials, 20/nTrials]; %half2
-cVals = .1/nTrials;
+cVals = 10/nTrials;
 
 % % Create / load in saved test data
 % trials = [randsample(linspace(-locRange,locRange,101),nTrials,'true'); randsample(linspace(-locRange,locRange,101),nTrials,'true')]'; % random points in a box
