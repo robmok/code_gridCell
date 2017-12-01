@@ -182,7 +182,7 @@ end
 % names? e.g. make a variable with the param names, then plot them
 
 barw   = .25;
-colgrey = [.25 .25 .25]
+colgrey = [.25 .25 .25];
 
 gridMeasure = 'grid'; % grid, angle (orientation), rad (radius), wav (wavelength)
 gridMsrType = 'a'; % a/w - allen or willis
@@ -207,18 +207,16 @@ end
 % end
 % if length(barpos)==length(ind); barpos(ind)=[]; colors(ind,:)=[]; end %this is reset at top..
 
-
-%%
 % compare alpha and c for each learning rate
-% for iAlpha = 1:nAlpha %comparing cVals
-%     figure; hold on;    
-%     for iC=1:nC
-%         subplot(1,7,iC);
-for iC=1:nC %comparing alpha vals
-    figure; hold on;
-    for iAlpha = 1:nAlpha
-        subplot(1,3,iAlpha);
-        
+for iAlpha = 1:nAlpha %comparing cVals
+    figure; hold on;    
+    for iC=1:nC
+        subplot(1,7,iC);
+% for iC=1:nC %comparing alpha vals
+%     figure; hold on;
+%     for iAlpha = 1:nAlpha
+%         subplot(1,3,iAlpha);
+%         
         switch gridMeasure
             case 'grid'
                 datTmp=gA_g;
