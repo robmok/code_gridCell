@@ -1,4 +1,4 @@
-function [muAll,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
+function [densityPlotClus,muAvg, cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
 
 % if dont save all muAll and muEnd, function output is muEndBest and muAll
 % Best, and uncomment the bit at the end of the script
@@ -10,15 +10,24 @@ stepSize=diff(spacing(1:2));
 nTrialsTest = nTrials;
 % nTrialsTest = 5000; %keep it constant if want to compare with nTrials above
 
-muAll    = nan(nClus,2,nTrials,nIter);
+% muAll    = nan(nClus,2,nTrials,nIter);
 % tsseTrls = nan(nTrials,nIter);
 % muEnd    = nan(nClus,2,nIter);
 % sseTrl = zeros(nClus,nTrials,nIter);
 
-
+% averaging over trials to compute density map
+% 5k - 20k:25k, 25k:30k, 30k:35k, 35k:40k
+% 10k - 20k:30k, 25:35k, 30k:40k,
+% 15k - 20k:35k; 25k:40k
+% 20k - 20k:40k
+fromTrlI = [2.0e+4, 2.5e+4, 3.0e+4, 3.5e+4, 2.0e+4, 2.5e+4, 3.0e+4, 2.0e+4, 2.5e+4, 3.0e+4];
+toTrlN   = [2.5e+4, 3.0e+4, 3.5e+4, 4.0e+4, 3.0e+4, 3.5e+4, 4.0e+4, 3.5e+4, 4.0e+4, 4.0e+4];
+nSets = length(fromTrlI);
+densityPlotClus  = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
+muAvg            = nan(nClus,2,nSets,nIter);
 for iterI = 1:nIter
     
-    fprintf('iter %d \n',iterI);
+%     fprintf('iter %d \n',iterI);
     epsMu = epsMuOrig; %revert learning rate back to original if reset
     
     switch box
@@ -200,70 +209,27 @@ for iterI = 1:nIter
                 mu(:,1,iTrl+1) = mu(:,1,iTrl) + deltaMuVec(:,1);
                 mu(:,2,iTrl+1) = mu(:,2,iTrl) + deltaMuVec(:,2);
             end        
-        
-        
-            %move this to analysis /plotting - may be already there
-            
-%         % compute sse on each trial with respect to 'all trials' - independent data - looks similar if you change 'dataPtsTest' to 'trials'; also useful if want to test less vs more trials on training so that you equate SSE by number of test points
-%         for iClus = 1:size(mu,1)
-%             distTrl(:,iClus)=sum([mu(iClus,1,iTrl)-dataPtsTest(:,1), mu(iClus,2,iTrl)-dataPtsTest(:,2)].^2,2);
-%         end
-%         [indValsTrl, indTrl]=min(distTrl,[],2); % find which clusters are points closest to
-%         
-%         for iClus = 1:size(mu,1)
-%             sseTrl(iClus,iTrl,iterI)=sum(sum([mu(iClus,1,iTrl)-dataPtsTest(indTrl==iClus,1), mu(iClus,2,iTrl)-dataPtsTest(indTrl==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
-%         end
-%         tsseTrls(iTrl,iterI)=sum(sseTrl(:,iTrl,iterI));
-
-        
     end
 %     muEnd(:,:,iterI)=mu(:,:,end);
-    muAll(:,:,:,iterI) = mu;
+%     muAll(:,:,:,iterI) = mu;
+    
+
+    % densityPlotClus - density plot with each cluster in dim 3 - more like
+    % a place cell map - use to find clusMu (clus centres) - leave it out
+    % here so can use diff smoothing values outside . also then use to make
+    % it a gridcell map: densityPlot=sum(densityPlotClus,3); - to compute autocorrelogram
+    % muAvg - also save cluster positions averaged over to plot average cluster
+    %positions
+    for iSet = 1:nSets
+        %compute density map
+        clus = round(mu(:,:,fromTrlI(iSet):toTrlN(iSet)));
+        for iClus=1:nClus
+            for iTrl=1:size(clus,3)
+                densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus,iSet,iterI) = densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus,iSet, iterI)+1;
+            end
+        end
+        %save average cluster positions (to compare with above)
+        muAvg(:,:,iSet,iterI) = mean(mu(:,:,fromTrlI(iSet):toTrlN(iSet)),3);
+    end    
 end
-
-%just save the best and worst 3 (since when nTrials are high, files get big)
-% tsseIter = tsseTrls(end,:); %only use last trial
-
-% xTrials = round(nTrials/3); %500;
-% tsseIter = mean(tsseTrls(end-xTrials:end,:)); %average over last x trials 
-% [indVal, indSSE1] = sort(tsseIter);
-% [y, indSSE2] = sort(indSSE1); %use indSSE2 to sort for plotting
-% 
-% if size(muEnd,3) >= 6,
-%     bestWorst3=[1,2,3,nIter-2,nIter-1,nIter];
-%     muEndBest = nan(nClus,2,length(bestWorst3)); % save best.worse 3 clusters at end of learning
-%     muAllBest = nan(nClus,2,nTrials,length(bestWorst3)); % save trials to plot over time
-%     for iterI = 1:length(bestWorst3),
-%         muEndBest(:,:,iterI) = muEnd(:,:,indSSE2==bestWorst3(iterI));
-%         muAllBest(:,:,:,iterI) = muAll(:,:,:,indSSE2==bestWorst3(iterI));
-%     end
-% else
-%     muEndBest = muEnd;
-%     muAllBest = muAll;
-% end
-% 
-% % also get top3 bottom3 for the spread outness measure?
-% 
-% %sort according to spread now
-% tsseVarIter = mean(stdAcrossClus(end-xTrials:end,:)); %average over last x trials 
-% [indVal, indSSEvar1] = sort(tsseVarIter);
-% [y, indSSEvar2] = sort(indSSEvar1); %use indSSE2 to sort for plotting
-
-
-%... another muEndBest and muAllBest variable?
-
-
-%few things to note when updating this bit
-% - if not saving all clusters maps, no need to save all sseTrl, etc.?
-% - better: save all the cluster maps (final cluster positions, averaged
-% over 1k, 5k, 10k, 15k, 20k, 25k. Also could save a 'downsampled' version;  with spacing of 100/500 trials. 
-% - in any case, still save all for top and bottom 3
-
-
-% to save:
-% - all iters, all cluster positions over time
-
-% - sort SSE according without averaging, last 1k, 5k, 10k, 15k, 20k, 25k 
-% AND their indices: indSSE1  and indSSE2
-
 end

@@ -25,11 +25,10 @@ doPlot = 0; %plot - note if loading in many value, this will make too many plots
 
 gaussSmooth=1; %smooth maps by x value
 
-%for computing density map
-nTrlsToUse = 10000; %
-toTrlN     = nTrials; %-10000; %nTrials if from nTrlstoUse to end,
-fromTrlI   = toTrlN-nTrlsToUse+1;
-
+% %for computing density map
+% nTrlsToUse = 10000; %
+% toTrlN     = nTrials; %-10000; %nTrials if from nTrlstoUse to end,
+% fromTrlI   = toTrlN-nTrlsToUse+1;
 
 %params to compare
 epsMuVals = [50, 75, 100]; %atm, lowest learning rate looks best
@@ -40,6 +39,7 @@ alphaVals = [2, 5, 8];
 stochasticType = 1; %1, 2, 3; % stochasticVals=[1,2,3] - later
 cVals = ([.25/nTrials, .5/nTrials, 2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]); %.1 and stoch = towards middle % cVals = [20/nTrials];
 cVals = round(cVals.*1000000);
+if ~stochasticType, cVals = 0; end
 
 nEps   = length(epsMuVals);
 nAlpha = length(alphaVals);
@@ -63,7 +63,6 @@ for iEps = 1:nEps
         for iC = 1:nC
             %     iPlot=0; %for subplot below
             
-            
             %set params, load in data
             
             %learning rate
@@ -77,89 +76,96 @@ for iEps = 1:nEps
             
             fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters*',nClus,nTrials,epsMuOrig1000,alpha10,stochasticType,c,nIter)];
             
-            %if ran more than 1 set of iters, hv multiple files w diff end bit;load
+%             %if ran more than 1 set of iters, hv multiple files w diff end bit;load
             f = dir(fname); filesToLoad = cell(1,length(f));
-            muAllTmp={};
-            nIterCount=0;
+%             muAllTmp={};
+%             nIterCount=0;
             for iF = 1:length(f)
-                %         filesToLoad{iF} = f(iF).name;
-                %         fnames = [fnames filesToLoad{iF}];
+                        filesToLoad{iF} = f(iF).name;
+%                         fnames = [fnames filesToLoad{iF}];
                 load(f(iF).name);
-                muAllTmp{iF}=muAll;
-                nIterCount = [nIterCount, nIter+nIterCount(end)]; %count number of iters to index below when merging
+%                 muAllTmp{iF}=muAll;
+%                 nIterCount = [nIterCount, nIter+nIterCount(end)]; %count number of iters to index below when merging
             end
-            %merge
-            clear muAll
-            for iF = 1:length(f)
-                muAll(:,:,:,nIterCount(iF)+1:nIterCount(iF+1)) = muAllTmp{iF};
-            end
+%             %merge
+%             clear muAll
+%             for iF = 1:length(f)
+%                 muAll(:,:,:,nIterCount(iF)+1:nIterCount(iF+1)) = muAllTmp{iF};
+%             end
             
             %calculate
+
+            
+            %load in densityPlotClus 
+%             load(fname);
+            
             clusMu=nan(nClus,2,nIter);
-            for iterI = 1:size(muAll,4) %nIter
-                %compute density map
-                clus = round(muAll(:,:,fromTrlI:toTrlN,iterI));
-                densityPlotClus     = zeros(length(spacing),length(spacing),nClus);
-                densityPlotClusSmth = zeros(length(spacing),length(spacing),nClus);
-                for iClus=1:nClus
-                    for iTrl=1:size(clus,3)
-                        %                 densityPlot(clus(i,1,iTrl),clus(i,2,iTrl),iterI,iTestVal)=densityPlot(clus(i,1,iTrl),clus(i,2,iTrl),iterI,iTestVal)+1; % works, but better way / faster to vectorise?
-                        densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus) = densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus)+1;
+            for iterI = 1:nIter
+                for iSet=1%:10
+                    %                 %compute density map
+                    %                 clus = round(muAll(:,:,fromTrlI:toTrlN,iterI));
+                    %                 densityPlotClus     = zeros(length(spacing),length(spacing),nClus);
+                    densityPlotClusSmth = zeros(length(spacing),length(spacing),nClus);
+                    for iClus=1:nClus
+                        %                     for iTrl=1:size(clus,3)
+                        %                         densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus) = densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus)+1;
+                        %                     end
+                        %find peaks
+                        densityPlotClusSmth(:,:,iClus)=imgaussfilt(densityPlotClus(:,:,iClus,iSet,iterI),gaussSmooth);
+                        [peakX, peakY] = find(densityPlotClusSmth(:,:,iClus)==max(max((densityPlotClusSmth(:,:,iClus)))));
+                        clusMu(iClus,:,iSet,iterI) = [peakX, peakY];
+                        
+                        %make combined (grid cell) plot
+                        densityPlot(:,:,iSet,iterI,iEps,iAlpha,iC) = sum(densityPlotClus(:,:,:,iSet,iterI),3);
+                        densityPlot(:,:,iSet,iterI,iEps,iAlpha,iC) = imgaussfilt(densityPlot(:,:,iSet,iterI,iEps,iAlpha,iC),gaussSmooth); %smooth
                     end
-                    %find peaks
-                    densityPlotClusSmth(:,:,iClus)=imgaussfilt(densityPlotClus(:,:,iClus),gaussSmooth);
-                    [peakX, peakY] = find(densityPlotClusSmth(:,:,iClus)==max(max((densityPlotClusSmth(:,:,iClus)))));
-                    clusMu(iClus,:,iterI) = [peakX, peakY];
                     
-                    %make combined (grid cell) plot
-                    densityPlot(:,:,iterI,iEps,iAlpha,iC) = sum(densityPlotClus,3);
-                    densityPlot(:,:,iterI,iEps,iAlpha,iC) = imgaussfilt(densityPlot(:,:,iterI,iEps,iAlpha,iC),gaussSmooth); %smooth
+                    % compute sse with respect to all test data points
+                    distTrl=[];
+                    sse=nan(1,nClus);
+                    for iClus = 1:size(clusMu,1)
+                        distTrl(:,iClus)=sum([clusMu(iClus,1,iSet,iterI)-dataPtsTest(:,1), clusMu(iClus,2,iSet,iterI)-dataPtsTest(:,2)].^2,2);
+                    end
+                    [indValsTrl, indTmp]=min(distTrl,[],2); % find which clusters are points closest to
+                    for iClus = 1:size(clusMu,1)
+                        sse(iClus)=sum(sum([clusMu(iClus,1,iSet,iterI)-dataPtsTest(indTmp==iClus,1), clusMu(iClus,2,iSet,iterI)-dataPtsTest(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
+                    end
+                    tsse(iSet,iterI,iEps,iAlpha,iC)=sum(sse);
+                    
+                    %compute 'spreaded-ness' - variance of SE across clusters is a measure
+                    %of this, assuing uniform data points
+                    devAvgSSE            = sse-mean(sse);
+                    stdAcrossClus(iSet,iterI,iEps,iAlpha,iC) = std(devAvgSSE);
+                    varAcrossClus(iSet,iterI,iEps,iAlpha,iC) = var(devAvgSSE);
+                    
+                    %compute autocorrelation map
+                    aCorrMap(:,:,iSet,iterI,iEps,iAlpha,iC) = ndautoCORR(densityPlot(:,:,iSet,iterI,iEps,iAlpha,iC));
+                    
+                    %                 %plot
+                    %                 if doPlot
+                    %                     figure;
+                    %                     subplot(2,2,1);
+                    %                     imagesc(densityPlot(:,:,iSet,iterI,iEps,iAlpha,iC));
+                    %                     subplot(2,2,2);
+                    %                 end
+                    
+                    [g,gdataA] = gridSCORE(aCorrMap(:,:,iSet,iterI,iEps,iAlpha,iC),'allen',doPlot);
+                    %                 if doPlot, subplot(2,2,3); end
+                    [g,gdataW] = gridSCORE(aCorrMap(:,:,iSet,iterI,iEps,iAlpha,iC),'wills',doPlot);
+                    
+                    gA_gA(iSet,iterI,iEps,iAlpha,iC)   = gdataA.g_score;
+                    gA_oA(iSet,iterI,iEps,iAlpha,iC)   = gdataA.orientation;
+                    gA_wavA(iSet,iterI,iEps,iAlpha,iC) = gdataA.wavelength;
+                    gA_radA(iSet,iterI,iEps,iAlpha,iC) = gdataA.radius;
+                    
+                    gA_gW(iSet,iterI,iEps,iAlpha,iC)   = gdataW.g_score;
+                    gA_oW(iSet,iterI,iEps,iAlpha,iC)   = gdataW.orientation;
+                    gA_wavW(iSet,iterI,iEps,iAlpha,iC) = gdataW.wavelength;
+                    gA_radW(iSet,iterI,iEps,iAlpha,iC) = gdataW.radius;
                 end
-                                
-                % compute sse with respect to all test data points
-                distTrl=[];
-                sse=nan(1,nClus);
-                for iClus = 1:size(clusMu,1)
-                    distTrl(:,iClus)=sum([clusMu(iClus,1,iterI)-dataPtsTest(:,1), clusMu(iClus,2,iterI)-dataPtsTest(:,2)].^2,2);
-                end
-                [indValsTrl, indTmp]=min(distTrl,[],2); % find which clusters are points closest to
-                for iClus = 1:size(clusMu,1)
-                    sse(iClus)=sum(sum([clusMu(iClus,1,iterI)-dataPtsTest(indTmp==iClus,1), clusMu(iClus,2,iterI)-dataPtsTest(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
-                end
-                tsse(iterI,iEps,iAlpha,iC)=sum(sse);
-                
-                %compute 'spreaded-ness' - variance of SE across clusters is a measure
-                %of this, assuing uniform data points
-                devAvgSSE            = sse-mean(sse);
-                stdAcrossClus(iterI,iEps,iAlpha,iC) = std(devAvgSSE);
-                varAcrossClus(iterI,iEps,iAlpha,iC) = var(devAvgSSE);
-                
-                %compute autocorrelation map
-                aCorrMap(:,:,iterI,iEps,iAlpha,iC) = ndautoCORR(densityPlot(:,:,iterI,iEps,iAlpha,iC));
-                
-                %plot
-                if doPlot
-                    figure;
-                    subplot(2,2,1);
-                    imagesc(densityPlot(:,:,iterI,iEps,iAlpha,iC));
-                    subplot(2,2,2);
-                end
-                [g,gdataA] = gridSCORE(aCorrMap(:,:,iterI,iEps,iAlpha,iC),'allen',doPlot);
-                if doPlot, subplot(2,2,3); end
-                [g,gdataW] = gridSCORE(aCorrMap(:,:,iterI,iEps,iAlpha,iC),'wills',doPlot);
-                
-                gA_gA(iterI,iEps,iAlpha,iC)   = gdataA.g_score;
-                gA_oA(iterI,iEps,iAlpha,iC)   = gdataA.orientation;
-                gA_wavA(iterI,iEps,iAlpha,iC) = gdataA.wavelength;
-                gA_radA(iterI,iEps,iAlpha,iC) = gdataA.radius;
-                
-                gA_gW(iterI,iEps,iAlpha,iC)   = gdataW.g_score;
-                gA_oW(iterI,iEps,iAlpha,iC)   = gdataW.orientation;
-                gA_wavW(iterI,iEps,iAlpha,iC) = gdataW.wavelength;
-                gA_radW(iterI,iEps,iAlpha,iC) = gdataW.radius;
+                gA{iEps,iAlpha,iC}=gdataA;
+                gW{iEps,iAlpha,iC}=gdataW;
             end
-            gA{iEps,iAlpha,iC}=gdataA;
-            gW{iEps,iAlpha,iC}=gdataW;
         end
     end
 end
@@ -189,10 +195,17 @@ gridMsrType = 'a'; % a/w - allen or willis
 
 switch gridMsrType
     case 'a'
-        gA_g = gA_gA;
-        gA_o = gA_oA;
-        gA_rad = gA_radA;
-        gA_wav = gA_wavA;
+        %temp - inspect how average over trials one at a time; or loop?
+        iSet=1;
+        
+        gA_g = gA_gA(iSet,:,:,:);
+        gA_o = gA_oA(iSet,:,:,:);
+        gA_rad = gA_radA(iSet,:,:,:);
+        gA_wav = gA_wavA(iSet,:,:,:);
+%         gA_g = gA_gA;
+%         gA_o = gA_oA;
+%         gA_rad = gA_radA;
+%         gA_wav = gA_wavA;
     case 'w'
         gA_g = gA_gW;
         gA_o = gA_oW;

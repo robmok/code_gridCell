@@ -1,4 +1,4 @@
-function muAll = covering_map_sim_neigh(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
+function [densityPlotClus,muAvg]  = covering_map_sim_neigh(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
 
 %neighbour-weighted update 
 % - no momentum, no stochastic update
@@ -10,8 +10,17 @@ stepSize=diff(spacing(1:2));
 nTrialsTest = nTrials;
 % nTrialsTest = 5000; %keep it constant if want to compare with nTrials above
 
-muAll    = nan(nClus,2,nTrials,nIter);
-
+% muAll    = nan(nClus,2,nTrials,nIter);
+% averaging over trials to compute density map
+% 5k - 20k:25k, 25k:30k, 30k:35k, 35k:40k
+% 10k - 20k:30k, 25:35k, 30k:40k,
+% 15k - 20k:35k; 25k:40k
+% 20k - 20k:40k
+fromTrlI = [2.0e+4, 2.5e+4, 3.0e+4, 3.5e+4, 2.0e+4, 2.5e+4, 3.0e+4, 2.0e+4, 2.5e+4, 3.0e+4];
+toTrlN   = [2.5e+4, 3.0e+4, 3.5e+4, 4.0e+4, 3.0e+4, 3.5e+4, 4.0e+4, 3.5e+4, 4.0e+4, 4.0e+4];
+nSets = length(fromTrlI);
+densityPlotClus  = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
+muAvg            = nan(nClus,2,nSets,nIter);
 for iterI = 1:nIter
     
     fprintf('iter %d \n',iterI);
@@ -202,7 +211,18 @@ for iterI = 1:nIter
                 mu(:,2,iTrl+1) = mu(:,2,iTrl) + deltaMuVec(:,2);
             end        
     end
-    muAll(:,:,:,iterI) = mu;
+%     muAll(:,:,:,iterI) = mu;
+    for iSet = 1:nSets
+        %compute density map
+        clus = round(mu(:,:,fromTrlI(iSet):toTrlN(iSet)));
+        for iClus=1:nClus
+            for iTrl=1:size(clus,3)
+                densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus,iSet,iterI) = densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus,iSet, iterI)+1;
+            end
+        end
+        %save average cluster positions (to compare with above)
+        muAvg(:,:,iSet,iterI) = mean(mu(:,:,fromTrlI(iSet):toTrlN(iSet)),3);
+    end    
 end
 
 end
