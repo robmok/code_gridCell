@@ -24,6 +24,7 @@ epsMuVals=[.05 .075 .1];% %learning rate / starting learning rate
 % epsMuVals=.1;
 % epsMuOrig=.125; %could do this as well
 % epsMuOrig = .01;
+% epsMuVals=.75;
 
 %define box / environement - random points in a box
 box = 'square'; %square, rect, trapz, trapzSq (trapz and a square box attached)
@@ -37,7 +38,7 @@ warpType = 'sq2rect';
 %previous update (direction and magnitude) more; 0 = don't weight previous at all)
 alphaVals = [.2, .5, .8];
 
-sTypes = 0;%:1;%:3; %0, 1 ,2, 3
+sTypes = 0:1;%:3; %0, 1 ,2, 3
 % 0. none
 % 1. standard stochastic update - becomes more det over time; becomes
 % basically deterministic at some point
@@ -74,11 +75,11 @@ end
 % save([saveDir '/randTrialsBox_40k'],'trials');
 
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
 load([saveDir '/randTrialsBox_40k']); %load in same data with same trial sequence so same for each sim
 
-nIter=1; %how many iterations (starting points)
+nIter=1000; %how many iterations (starting points)
 
 tic
 if ~neigh %separating neigh and stoch/momentum params

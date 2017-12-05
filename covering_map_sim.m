@@ -27,7 +27,7 @@ densityPlotClus  = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
 muAvg            = nan(nClus,2,nSets,nIter);
 for iterI = 1:nIter
     
-%     fprintf('iter %d \n',iterI);
+    fprintf('iter %d \n',iterI);
     epsMu = epsMuOrig; %revert learning rate back to original if reset
     
     switch box
@@ -223,6 +223,7 @@ for iterI = 1:nIter
     for iSet = 1:nSets
         %compute density map
         clus = round(mu(:,:,fromTrlI(iSet):toTrlN(iSet)));
+        ind=clus<=0; clus(ind)=1; %indices <= 0 make to 1
         for iClus=1:nClus
             for iTrl=1:size(clus,3)
                 densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus,iSet,iterI) = densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus,iSet, iterI)+1;
