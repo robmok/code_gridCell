@@ -101,7 +101,7 @@ for iEps = 1:nEps
             
             clusMu=nan(nClus,2,nIter);
             for iterI = 1:nIter
-                for iSet=1%:10
+                for iSet=1:10
                     %                 %compute density map
                     %                 clus = round(muAll(:,:,fromTrlI:toTrlN,iterI));
                     %                 densityPlotClus     = zeros(length(spacing),length(spacing),nClus);
@@ -198,10 +198,10 @@ switch gridMsrType
         %temp - inspect how average over trials one at a time; or loop?
         iSet=1;
         
-        gA_g = gA_gA(iSet,:,:,:);
-        gA_o = gA_oA(iSet,:,:,:);
-        gA_rad = gA_radA(iSet,:,:,:);
-        gA_wav = gA_wavA(iSet,:,:,:);
+        gA_g = squeeze(gA_gA(iSet,:,:,:,:));
+        gA_o = squeeze(gA_oA(iSet,:,:,:,:));
+        gA_rad = squeeze(gA_radA(iSet,:,:,:,:));
+        gA_wav = squeeze(gA_wavA(iSet,:,:,:,:));
 %         gA_g = gA_gA;
 %         gA_o = gA_oA;
 %         gA_rad = gA_radA;
