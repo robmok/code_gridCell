@@ -75,11 +75,11 @@ end
 % save([saveDir '/randTrialsBox_40k'],'trials');
 
 %%
-saveDat=1; %save simulations
+saveDat=0; %save simulations
 
 load([saveDir '/randTrialsBox_40k']); %load in same data with same trial sequence so same for each sim
 
-nIter=1000; %how many iterations (starting points)
+nIter=1; %how many iterations (starting points)
 
 tic
 if ~neigh %separating neigh and stoch/momentum params

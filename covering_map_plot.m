@@ -89,7 +89,6 @@ end
 
 savePlots=0;
 
-
 iterI = 1; %1 to 3, lowest sse, 4:6, highest sse
 
 nClus = size(muAll,1);
