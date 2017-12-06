@@ -51,7 +51,7 @@ cValsOrig = [.25/nTrials, .5/nTrials, 2/nTrials, 3/nTrials, 5/nTrials, 10/nTrial
 % cValsOrig = 20/nTrials;
 
 %neighbour-weighted update
-neigh = 0; %if neigh = 0, no stoch, no alpha
+neigh = 1; %if neigh = 0, no stoch, no alpha
 betaVals  = [.3 .5 .7]; %softmax param - higher = less neighbour update; from .25 going toward middle; .3 start OK
 if neigh
    sTypes=0;
@@ -75,11 +75,11 @@ end
 % save([saveDir '/randTrialsBox_40k'],'trials');
 
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
 load([saveDir '/randTrialsBox_40k']); %load in same data with same trial sequence so same for each sim
 
-nIter=1; %how many iterations (starting points)
+nIter=500; %how many iterations (starting points)
 
 tic
 if ~neigh %separating neigh and stoch/momentum params
@@ -115,7 +115,7 @@ if ~neigh %separating neigh and stoch/momentum params
                             end
                             cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
                             save(fname,'densityPlotClus','muAvg','nIter','cParams','timeTaken');
-                            clear densityPlotClus muAvg
+%                             clear densityPlotClus muAvg
                         end
                     end
                 end
@@ -143,7 +143,7 @@ elseif neigh %testing neigh/eps
                     end
                     cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
                     save(fname,'densityPlotClus','muAvg','nIter','timeTaken');
-                    clear densityPlotClus muAvg
+%                     clear densityPlotClus muAvg
                 end
             end
         end
