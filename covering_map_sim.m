@@ -1,4 +1,4 @@
-function [densityPlotClus,muAvg, cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
+function [densityPlot,clusMu,muAvg,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
 
 % if dont save all muAll and muEnd, function output is muEndBest and muAll
 % Best, and uncomment the bit at the end of the script
@@ -15,15 +15,27 @@ nTrialsTest = nTrials;
 % muEnd    = nan(nClus,2,nIter);
 % sseTrl = zeros(nClus,nTrials,nIter);
 
+gaussSmooth=1; %smoothing for density map
+
 % averaging over trials to compute density map
 % 5k - 20k:25k, 25k:30k, 30k:35k, 35k:40k
 % 10k - 20k:30k, 25:35k, 30k:40k,
 % 15k - 20k:35k; 25k:40k
 % 20k - 20k:40k
-fromTrlI = [2.0e+4, 2.5e+4, 3.0e+4, 3.5e+4, 2.0e+4, 2.5e+4, 3.0e+4, 2.0e+4, 2.5e+4, 3.0e+4];
-toTrlN   = [2.5e+4, 3.0e+4, 3.5e+4, 4.0e+4, 3.0e+4, 3.5e+4, 4.0e+4, 3.5e+4, 4.0e+4, 4.0e+4];
+% fromTrlI = [2.0e+4, 2.5e+4, 3.0e+4, 3.5e+4, 2.0e+4, 2.5e+4, 3.0e+4, 2.0e+4, 2.5e+4, 3.0e+4];
+% toTrlN   = [2.5e+4, 3.0e+4, 3.5e+4, 4.0e+4, 3.0e+4, 3.5e+4, 4.0e+4, 3.5e+4, 4.0e+4, 4.0e+4];
+
+%new
+% 5k  - 10k:15k, 20k:25k 35k:40k
+% 10k - 10k:20k, 15:25k, 30k:40k,
+% 15k - 10k:25k, 15k:30k; 25k:40k
+% 20k - 10k:30k, 20k:40k
+fromTrlI = [1.0e+4, 2.0e+4, 3.5e+4, 1.0e+4, 1.5e+4, 3.0e+4, 1.0e+4,  1.5e+4, 2.5e+4, 1.0e+4, 2.0e+4];
+toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4];
 nSets = length(fromTrlI);
 densityPlotClus  = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
+densityPlot      = zeros(length(spacing),length(spacing),nSets,nIter);
+clusMu           = nan(nClus,2,nSets,nIter);
 muAvg            = nan(nClus,2,nSets,nIter);
 for iterI = 1:nIter
     
@@ -229,8 +241,40 @@ for iterI = 1:nIter
                 densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus,iSet,iterI) = densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus,iSet, iterI)+1;
             end
         end
+        %now also compute clus means
+        densityPlotClusSmth = zeros(length(spacing),length(spacing),nClus);
+        for iClus=1:nClus
+            %find peaks
+            densityPlotClusSmth(:,:,iClus)=imgaussfilt(densityPlotClus(:,:,iClus,iSet,iterI),gaussSmooth);
+            [peakX, peakY] = find(densityPlotClusSmth(:,:,iClus)==max(max((densityPlotClusSmth(:,:,iClus)))));
+            if length(peakX)>1 || length(peakY)>1 %if more than one peak rand sel one; normally next to each other
+                randInd=randi(length(peakX));
+                peakX=peakX(randInd);
+                peakY=peakY(randInd);
+            end
+            clusMu(iClus,:,iSet,iterI) = [peakX, peakY];
+            
+            %make combined (grid cell) plot, smooth
+            densityPlot(:,:,iSet,iterI) = sum(densityPlotClus(:,:,:,iSet,iterI),3); %save this
+            densityPlotSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
+        end
+        %compute autocorrmap, no need to save
+        aCorrMap = ndautoCORR(densityPlotSm);
+        %compute gridness
+        [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+        [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+        gA_g(iSet,iterI)   = gdataA.g_score;
+        gA_o(iSet,iterI)   = gdataA.orientation;
+        gA_wav(iSet,iterI) = gdataA.wavelength;
+        gA_rad(iSet,iterI) = gdataA.radius;
+        gW_g(iSet,iterI)   = gdataW.g_score;
+        gW_o(iSet,iterI)   = gdataW.orientation;
+        gW_wav(iSet,iterI) = gdataW.wavelength;
+        gW_rad(iSet,iterI) = gdataW.radius;
+        
         %save average cluster positions (to compare with above)
         muAvg(:,:,iSet,iterI) = mean(mu(:,:,fromTrlI(iSet):toTrlN(iSet)),3);
     end    
 end
 end
+

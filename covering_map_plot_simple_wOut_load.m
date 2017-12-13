@@ -12,7 +12,7 @@ iterI=1;
 %%%%
 
 
-for iSet=1:size(muAvg,3) %plot - diff averaging over nTrials
+for iSet=1:5 %size(muAvg,3) %plot - diff averaging over nTrials
     figure; hold on;
     scatter(muAvg(:,1,iSet,iterI),muAvg(:,2,iSet,iterI),20e+2,colors,'.');
     xlim(locRange); ylim(locRange);
@@ -26,12 +26,12 @@ gaussSmooth=1;
 
 for iSet=1:size(muAvg,3) %plot - diff averaging over nTrials
 
-    densityPlot = sum(densityPlotClus(:,:,:,iSet,iterI),3);
-    densityPlot = imgaussfilt(densityPlot,gaussSmooth);
-    aCorrMap=ndautoCORR(densityPlot); %autocorrelogram
+%     densityPlot = sum(densityPlotClus(:,:,:,iSet,iterI),3);
+    densityPlotSm = imgaussfilt(densityPlot(:,:,iSet),gaussSmooth);
+    aCorrMap=ndautoCORR(densityPlotSm); %autocorrelogram
 
     figure; hold on;
-    subplot(1,2,1); imagesc(densityPlot);
+    subplot(1,2,1); imagesc(densityPlotSm);
     subplot(1,2,2); imagesc(aCorrMap);
 
 end

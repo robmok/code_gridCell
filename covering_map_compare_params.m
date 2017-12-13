@@ -36,7 +36,7 @@ epsMuVals = [50, 75, 100]; %atm, lowest learning rate looks best
 
 alphaVals = [2, 5, 8];
 
-stochasticType = 1; %1, 2, 3; % stochasticVals=[1,2,3] - later
+stochasticType = 0; %1, 2, 3; % stochasticVals=[1,2,3] - later
 cVals = ([.25/nTrials, .5/nTrials, 2/nTrials, 3/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]); %.1 and stoch = towards middle % cVals = [20/nTrials];
 cVals = round(cVals.*1000000);
 if ~stochasticType, cVals = 0; end
@@ -48,19 +48,28 @@ nC     = length(cVals);
 nClus = 20; %20, 30
 
 nTrials = 40000;
-nIter = 10;
+nIter = 500;
 %warpBox=0;
+
+nSet=10;
 
 spacing = linspace(locRange(1),locRange(2),locRange(2)+1);
 tsse=nan(nIter,nC);
 devAvgSSE=nan(nClus,nIter,nEps,nAlpha,nC);
-densityPlot = zeros(length(spacing),length(spacing),nIter,nEps,nAlpha,nC);
-aCorrMap = nan(length(spacing)*2-1,length(spacing)*2-1,nIter,nEps,nAlpha,nC);
+densityPlot = zeros(length(spacing),length(spacing),nSet,nIter,nEps,nAlpha,nC);
+aCorrMap = nan(length(spacing)*2-1,length(spacing)*2-1,nSet,nIter,nEps,nAlpha,nC);
+
+%- atm takes about 18s per condition (500 iters- compute density plot, cluster cetres, sse, acorr+gridness)
+%- need to merge files, or merge the iterations from separate files
+
+% better to compute de
 
 for iEps = 1:nEps
     for iAlpha = 1:nAlpha
-        
+        fprintf('iEps = %d, iAlpha = %d\n',iEps, iAlpha);
         for iC = 1:nC
+%             fprintf('iC = %d',iC);
+
             %     iPlot=0; %for subplot below
             
             %set params, load in data
@@ -80,7 +89,7 @@ for iEps = 1:nEps
             f = dir(fname); filesToLoad = cell(1,length(f));
 %             muAllTmp={};
 %             nIterCount=0;
-            for iF = 1:length(f)
+            for iF = 1%:length(f)
                         filesToLoad{iF} = f(iF).name;
 %                         fnames = [fnames filesToLoad{iF}];
                 load(f(iF).name);
@@ -93,33 +102,33 @@ for iEps = 1:nEps
 %                 muAll(:,:,:,nIterCount(iF)+1:nIterCount(iF+1)) = muAllTmp{iF};
 %             end
             
-            %calculate
-
-            
+            %calculate            
             %load in densityPlotClus 
 %             load(fname);
             
             clusMu=nan(nClus,2,nIter);
             for iterI = 1:nIter
                 for iSet=1:10
+                    
+%                     fprintf('iter %d, set %d\n',iterI,iSet);
                     %                 %compute density map
                     %                 clus = round(muAll(:,:,fromTrlI:toTrlN,iterI));
                     %                 densityPlotClus     = zeros(length(spacing),length(spacing),nClus);
-                    densityPlotClusSmth = zeros(length(spacing),length(spacing),nClus);
-                    for iClus=1:nClus
-                        %                     for iTrl=1:size(clus,3)
-                        %                         densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus) = densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus)+1;
-                        %                     end
-                        %find peaks
-                        densityPlotClusSmth(:,:,iClus)=imgaussfilt(densityPlotClus(:,:,iClus,iSet,iterI),gaussSmooth);
-                        [peakX, peakY] = find(densityPlotClusSmth(:,:,iClus)==max(max((densityPlotClusSmth(:,:,iClus)))));
-                        clusMu(iClus,:,iSet,iterI) = [peakX, peakY];
-                        
-                        %make combined (grid cell) plot
-                        densityPlot(:,:,iSet,iterI,iEps,iAlpha,iC) = sum(densityPlotClus(:,:,:,iSet,iterI),3);
-                        densityPlot(:,:,iSet,iterI,iEps,iAlpha,iC) = imgaussfilt(densityPlot(:,:,iSet,iterI,iEps,iAlpha,iC),gaussSmooth); %smooth
-                    end
                     
+%                     densityPlotClusSmth = zeros(length(spacing),length(spacing),nClus);
+%                     for iClus=1:nClus
+%                         %                     for iTrl=1:size(clus,3)
+%                         %                         densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus) = densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus)+1;
+%                         %                     end
+%                         %find peaks
+%                         densityPlotClusSmth(:,:,iClus)=imgaussfilt(densityPlotClus(:,:,iClus,iSet,iterI),gaussSmooth);
+%                         [peakX, peakY] = find(densityPlotClusSmth(:,:,iClus)==max(max((densityPlotClusSmth(:,:,iClus)))));
+%                         clusMu(iClus,:,iSet,iterI) = [peakX, peakY];
+%                         
+%                         %make combined (grid cell) plot, smooth
+%                         densityPlot(:,:,iSet,iterI,iEps,iAlpha,iC) = imgaussfilt(sum(densityPlotClus(:,:,:,iSet,iterI),3),gaussSmooth);
+%                     end
+
                     % compute sse with respect to all test data points
                     distTrl=[];
                     sse=nan(1,nClus);
@@ -138,20 +147,13 @@ for iEps = 1:nEps
                     stdAcrossClus(iSet,iterI,iEps,iAlpha,iC) = std(devAvgSSE);
                     varAcrossClus(iSet,iterI,iEps,iAlpha,iC) = var(devAvgSSE);
                     
-                    %compute autocorrelation map
-                    aCorrMap(:,:,iSet,iterI,iEps,iAlpha,iC) = ndautoCORR(densityPlot(:,:,iSet,iterI,iEps,iAlpha,iC));
+                    %compute autocorrelation map - compute it at sim for
+                    %gridness, but here compute again to visualise (not
+                    %save for size)
+%                     aCorrMap(:,:,iSet,iterI,iEps,iAlpha,iC) = ndautoCORR(densityPlot(:,:,iSet,iterI,iEps,iAlpha,iC));
                     
-                    %                 %plot
-                    %                 if doPlot
-                    %                     figure;
-                    %                     subplot(2,2,1);
-                    %                     imagesc(densityPlot(:,:,iSet,iterI,iEps,iAlpha,iC));
-                    %                     subplot(2,2,2);
-                    %                 end
-                    
-                    [g,gdataA] = gridSCORE(aCorrMap(:,:,iSet,iterI,iEps,iAlpha,iC),'allen',doPlot);
-                    %                 if doPlot, subplot(2,2,3); end
-                    [g,gdataW] = gridSCORE(aCorrMap(:,:,iSet,iterI,iEps,iAlpha,iC),'wills',doPlot);
+%                     [g,gdataA] = gridSCORE(aCorrMap(:,:,iSet,iterI,iEps,iAlpha,iC),'allen',0);
+%                     [g,gdataW] = gridSCORE(aCorrMap(:,:,iSet,iterI,iEps,iAlpha,iC),'wills',0);
                     
                     gA_gA(iSet,iterI,iEps,iAlpha,iC)   = gdataA.g_score;
                     gA_oA(iSet,iterI,iEps,iAlpha,iC)   = gdataA.orientation;
@@ -193,10 +195,24 @@ colgrey = [.25 .25 .25];
 gridMeasure = 'grid'; % grid, angle (orientation), rad (radius), wav (wavelength)
 gridMsrType = 'a'; % a/w - allen or willis
 
+%sets 
+% 5k - 20k:25k, 25k:30k, 30k:35k, 35k:40k
+% 10k - 20k:30k, 25:35k, 30k:40k,
+% 15k - 20k:35k; 25k:40k
+% 20k - 20k:40k
+
+%in general, low learning rate best, 0.1 is bad; could do even slower
+
+%- for some reason, the first ones are best..? averages are same, but much
+%more at the top of the distribution around1... could be that theres more
+%movement in early trials so average is more spread out?
+
+for iSet = 1
+    
 switch gridMsrType
     case 'a'
         %temp - inspect how average over trials one at a time; or loop?
-        iSet=1;
+%         iSet=1;
         
         gA_g = squeeze(gA_gA(iSet,:,:,:,:));
         gA_o = squeeze(gA_oA(iSet,:,:,:,:));
@@ -224,7 +240,7 @@ end
 for iAlpha = 1:nAlpha %comparing cVals
     figure; hold on;    
     for iC=1:nC
-        subplot(1,7,iC);
+%         subplot(1,7,iC);
 % for iC=1:nC %comparing alpha vals
 %     figure; hold on;
 %     for iAlpha = 1:nAlpha
@@ -258,39 +274,40 @@ for iAlpha = 1:nAlpha %comparing cVals
     end
 end
 
-
-
-for iEps=1:nEps
-    figure; hold on;
-    for iAlpha = 1:nAlpha
-        subplot(1,3,iAlpha);
-        
-        switch gridMeasure
-            case 'grid'
-                datTmp=gA_g;
-            case 'angle'
-                datTmp=gA_o;
-            case 'rad'
-                datTmp=gA_rad;
-            case 'wav'
-                datTmp=gA_wav;
-        end
-        dat=squeeze(datTmp(:,iEps,iAlpha,:));
-        barpos = .25:.5:.5*size(dat,2);
-        colors = distinguishable_colors(size(dat,2));
-        
-        mu=mean(dat,1);
-        sm=std(dat)./sqrt(size(dat,1));
-        ci=sm.*tinv(.025,size(dat,1)-1); %compute conf intervals
-        % figure; hold on;
-        plotSpread(dat,'xValues',barpos,'distributionColors',colors);
-        errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-        scatter(barpos,mu,750,colors,'.');
-        xlim([barpos(1)-.5, barpos(end)+.5]);
-        if strcmp(gridMeasure,'grid'), ylim([-.5, 1]); end
-        title(sprintf('%s - eps=%d, alpha=%d',gridMeasure,epsMuVals(iEps),alphaVals(iAlpha)))
-    end
 end
+
+
+% for iEps=1:nEps
+%     figure; hold on;
+%     for iAlpha = 1:nAlpha
+%         subplot(1,3,iAlpha);
+%         
+%         switch gridMeasure
+%             case 'grid'
+%                 datTmp=gA_g;
+%             case 'angle'
+%                 datTmp=gA_o;
+%             case 'rad'
+%                 datTmp=gA_rad;
+%             case 'wav'
+%                 datTmp=gA_wav;
+%         end
+%         dat=squeeze(datTmp(:,iEps,iAlpha,:));
+%         barpos = .25:.5:.5*size(dat,2);
+%         colors = distinguishable_colors(size(dat,2));
+%         
+%         mu=mean(dat,1);
+%         sm=std(dat)./sqrt(size(dat,1));
+%         ci=sm.*tinv(.025,size(dat,1)-1); %compute conf intervals
+%         % figure; hold on;
+%         plotSpread(dat,'xValues',barpos,'distributionColors',colors);
+%         errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+%         scatter(barpos,mu,750,colors,'.');
+%         xlim([barpos(1)-.5, barpos(end)+.5]);
+%         if strcmp(gridMeasure,'grid'), ylim([-.5, 1]); end
+%         title(sprintf('%s - eps=%d, alpha=%d',gridMeasure,epsMuVals(iEps),alphaVals(iAlpha)))
+%     end
+% end
 
 %%%%%%%%%%%%
 % ++ more ways of plotting / comparing? maybe add the mean gridness score
