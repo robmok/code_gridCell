@@ -21,12 +21,12 @@ locRange = [0, nSteps-1]; %[-1, 1]; % from locRange(1) to locRange(2)
 stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %smallest diff between locs
 
 % parameters
-% epsMuVals=[.05 .075 .1];% %learning rate / starting learning rate 
-epsMuVals=[.005, .0075, .05]; %turns out slower is better for gridness (?) - .05 was best for above (but not for neigh) - checcking again, slow is no good - less than 0.005 is bad
+epsMuVals=[.05 .075 .1];% %learning rate / starting learning rate 
+% epsMuVals=[.005, .0075, .05]; %turns out slower is better for gridness (?) - .05 was best for above (but not for neigh) - checcking again, slow is no good - less than 0.005 is bad
 % epsMuVals=[.005, .0075, .05];
 %for neigh use this;
-% epsMuVals=[.05 .075 .1];
-% epsMuVals=.1;
+epsMuVals=.05;
+epsMuVals=[.075 .1];
 
 %define box / environement - random points in a box
 box = 'square'; %square, rect, trapz, trapzSq (trapz and a square box attached)
@@ -39,8 +39,9 @@ warpType = 'sq2rect';
 %mometum-like adaptive learning rate - define alpha (higher = weight
 %previous update (direction and magnitude) more; 0 = don't weight previous at all)
 alphaVals = [0, .2, .5, .8];
-alphaVals = [0, .2,];
+alphaVals = [0, .2];
 alphaVals = [.5, .8];
+% alphaVals=0;
 
 sTypes = 0:1;%:3; %0, 1 ,2, 3
 % 0. none
@@ -51,8 +52,8 @@ sTypes = 0:1;%:3; %0, 1 ,2, 3
 % 3. constant stochasticity - keep very low
 
 %  larger c = less stochastic over trials (becomes det quite early on); smaller c = more stochastic over trials (still a bit stochastic by the end)
-cValsOrig = [.5/nTrials, 2/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]; %removed .1/nTrials and .25/nTrials, too stochastic. also 3/ntrials
-% cValsOrig = 20/nTrials;
+cValsOrig = [2/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]; %removed .1/nTrials and .25/nTrials,  too stochastic. also 3/ntrials, .5/nTrials
+% cValsOrig = 20/nTrials; 
 
 %neighbour-weighted update
 neigh = 0; %if neigh = 0, no stoch, no alpha
@@ -92,7 +93,7 @@ if ~neigh %separating neigh and stoch/momentum params
     %testing stoch/momentum/eps
     for iEps = 1:length(epsMuVals)
         epsMuOrig=epsMuVals(iEps);
-        epsMuOrig1000=epsMuOrig*10000; %for saving - changed from 1000 to 100000 for slower l rates
+        epsMuOrig1000=epsMuOrig*1000; %for saving - changed from 1000 to 100000 for slower l rates - changed back now
         for iClus2run = 1:length(clus2run) %nClus conditions to run
             nClus = clus2run(iClus2run);
             for iStype = 1:length(sTypes)
@@ -111,7 +112,7 @@ if ~neigh %separating neigh and stoch/momentum params
                         alpha10 = alpha*10; %for saving simulations
                         fprintf('Running alphaVal %0.2f\n',alpha);
                         tic
-                        [densityPlot,clusMu,muAvg,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
+                        [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
                         fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,stochasticType,c1m,nIter)];
                         timeTaken=toc;
                         if saveDat

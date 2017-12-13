@@ -137,6 +137,8 @@ for iterI = 1:nIter
             mu(clusterI+1,:,1) = dataPtsTest(indDat,:);
         end
     end
+    muUpd = mu;  %variable that only logs updated clusters mean value % - get initialised locs
+
     %%
 
     updatedC = nan(nTrials,1);
@@ -219,18 +221,31 @@ for iterI = 1:nIter
             if iTrl~=nTrials %no need to update for last trial +1)
                 mu(:,1,iTrl+1) = mu(:,1,iTrl) + deltaMuVec(:,1);
                 mu(:,2,iTrl+1) = mu(:,2,iTrl) + deltaMuVec(:,2);
+                %log updated value only
+                muUpd(closestC,1,iTrl+1)=mu(closestC,1,iTrl+1);
+                muUpd(closestC,2,iTrl+1)=mu(closestC,2,iTrl+1);
             end        
     end
 %     muAll(:,:,:,iterI) = mu;
     for iSet = 1:nSets
         %compute density map
-        clus = round(mu(:,:,fromTrlI(iSet):toTrlN(iSet)));
+%         clus = round(mu(:,:,fromTrlI(iSet):toTrlN(iSet)));
+%         ind=clus<=0; clus(ind)=1; %indices <= 0 make to 1
+%         for iClus=1:nClus
+%             for iTrl=1:size(clus,3)
+%                 densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus,iSet,iterI) = densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus,iSet, iterI)+1;
+%             end
+%         end
+        clus = round(muUpd(:,:,fromTrlI(iSet):toTrlN(iSet)));
         ind=clus<=0; clus(ind)=1; %indices <= 0 make to 1
         for iClus=1:nClus
-            for iTrl=1:size(clus,3)
-                densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus,iSet,iterI) = densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus,iSet, iterI)+1;
+            ntNanInd = squeeze(~isnan(clus(iClus,1,:)));
+            clusTmp  = squeeze(clus(iClus,:,ntNanInd));
+            nTrlsUpd(iClus,iSet,iterI)=nnz(ntNanInd);
+            for iTrlUpd=1:size(clusTmp,2)
+                densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet,iterI) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet, iterI)+1;
             end
-        end
+        end     
         %now also compute clus means
         densityPlotClusSmth = zeros(length(spacing),length(spacing),nClus);
         for iClus=1:nClus

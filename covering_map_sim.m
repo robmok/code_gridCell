@@ -1,4 +1,4 @@
-function [densityPlot,clusMu,muAvg,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
+function [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
 
 % if dont save all muAll and muEnd, function output is muEndBest and muAll
 % Best, and uncomment the bit at the end of the script
@@ -32,6 +32,10 @@ gaussSmooth=1; %smoothing for density map
 % 20k - 10k:30k, 20k:40k
 fromTrlI = [1.0e+4, 2.0e+4, 3.5e+4, 1.0e+4, 1.5e+4, 3.0e+4, 1.0e+4,  1.5e+4, 2.5e+4, 1.0e+4, 2.0e+4];
 toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4];
+
+%fewer - last 5 from above, testing when just looking at cluster updates
+% fromTrlI = [1.0e+4,  1.5e+4, 2.5e+4, 1.0e+4, 2.0e+4];
+% toTrlN   = [2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4];
 nSets = length(fromTrlI);
 densityPlotClus  = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
 densityPlot      = zeros(length(spacing),length(spacing),nSets,nIter);
@@ -97,8 +101,8 @@ for iterI = 1:nIter
     end
 
     
-    %initialise each cluster location
-    mu = nan(nClus,2,nTrials);
+    %initialise each cluster location  
+    mu = nan(nClus,2,nTrials); %also note variable muUpd below - %variable that only logs updated clusters mean value
     for clusterI = 1:nClus
         %     mu(clusterI,:,1) = -locRange + locRange.*2.*rand(1,2);  %random location in box - uniform distr from -1 to 1 (see help rand)
         %     mu(clusterI,:,1) = trials(randi(length(trials)),:);   %intiate each cluster with one data point - Forgy method
@@ -142,6 +146,7 @@ for iterI = 1:nIter
             mu(clusterI+1,:,1) = dataPtsTest(indDat,:);
         end
     end
+    muUpd = mu;  %variable that only logs updated clusters mean value % - get initialised locs
     %%
 
     updatedC = nan(nTrials,1);
@@ -220,7 +225,16 @@ for iterI = 1:nIter
             if iTrl~=nTrials %no need to update for last trial +1)
                 mu(:,1,iTrl+1) = mu(:,1,iTrl) + deltaMuVec(:,1);
                 mu(:,2,iTrl+1) = mu(:,2,iTrl) + deltaMuVec(:,2);
-            end        
+                %log updated value only
+                % don't want to save the cluster positions when they don't move
+                % but need to keep track of the last cluster position
+                % - have two variables, one with all, one without
+                % - the one without; this is with nans just remove
+                % all the nans then put into densityPlotClus).
+                muUpd(closestC,1,iTrl+1)=mu(closestC,1,iTrl+1);
+                muUpd(closestC,2,iTrl+1)=mu(closestC,2,iTrl+1);
+            end
+
     end
 %     muEnd(:,:,iterI)=mu(:,:,end);
 %     muAll(:,:,:,iterI) = mu;
@@ -234,13 +248,24 @@ for iterI = 1:nIter
     %positions
     for iSet = 1:nSets
         %compute density map
-        clus = round(mu(:,:,fromTrlI(iSet):toTrlN(iSet)));
+%         clus = round(mu(:,:,fromTrlI(iSet):toTrlN(iSet)));
+%         ind=clus<=0; clus(ind)=1; %indices <= 0 make to 1
+%         for iClus=1:nClus
+%             for iTrl=1:size(clus,3)
+%                 densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus,iSet,iterI) = densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus,iSet, iterI)+1;
+%             end
+%         end
+        clus = round(muUpd(:,:,fromTrlI(iSet):toTrlN(iSet)));
         ind=clus<=0; clus(ind)=1; %indices <= 0 make to 1
         for iClus=1:nClus
-            for iTrl=1:size(clus,3)
-                densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus,iSet,iterI) = densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus,iSet, iterI)+1;
+            ntNanInd = squeeze(~isnan(clus(iClus,1,:)));
+            clusTmp  = squeeze(clus(iClus,:,ntNanInd));
+            nTrlsUpd(iClus,iSet,iterI)=nnz(ntNanInd);
+            for iTrlUpd=1:size(clusTmp,2)
+                densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet,iterI) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet, iterI)+1;
             end
-        end
+        end        
+                
         %now also compute clus means
         densityPlotClusSmth = zeros(length(spacing),length(spacing),nClus);
         for iClus=1:nClus
