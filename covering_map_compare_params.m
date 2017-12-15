@@ -31,10 +31,10 @@ gaussSmooth=1; %smooth maps by x value
 % fromTrlI   = toTrlN-nTrlsToUse+1;
 
 %params to compare
-epsMuVals = [50, 75, 100]; %atm, lowest learning rate looks best
+epsMuVals = [15, 25, 50, 75, 100]; %atm, lowest learning rate looks best
 % epsMuOrig1000 = 75; %50, 75, 100 - atm, lowest learning rate looks best
 
-alphaVals = [2, 5, 8];
+alphaVals = [0, 2, 5, 8];
 
 stochasticType = 1; %1, 2, 3; % stochasticVals=[1,2,3] - later
 cVals = ([2/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]); %.1 and stoch = towards middle % cVals = [20/nTrials];
@@ -213,7 +213,7 @@ end
 for iEps=1:nEps
     figure; hold on;
     for iAlpha = 1:nAlpha
-        subplot(1,3,iAlpha);
+        subplot(1,4,iAlpha);
         
         switch gridMeasure
             case 'grid'

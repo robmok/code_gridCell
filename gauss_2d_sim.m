@@ -2,12 +2,22 @@ function [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW
 
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
 stepSize=diff(spacing(1:2));
+epsMu = epsMuOrig;
 
 %for crossvalidation - 
 nTrialsTest = nTrials;
 % nTrialsTest = 5000; %keep it constant if want to compare with nTrials above
 
 gaussSmooth=1; %smoothing for density map
+
+% 2d gaussian gradient descent based update
+sigmaGauss = stepSize/2; %need to check what's appropriate - link to stepsize?
+fitDeltaMuX=@(epsMuVec,x,y,fdbck,act)(epsMuVec.*(fdbck-act).*exp(-(x.^2+y.^2)./2.*sigmaGauss.^2).*(x./(2.*pi.*sigmaGauss.^4)));
+fitDeltaMuY=@(epsMuVec,x,y,fdbck,act)(epsMuVec.*(fdbck-act).*exp(-(x.^2+y.^2)./2.*sigmaGauss.^2).*(y./(2.*pi.*sigmaGauss.^4)));
+
+
+
+
 
 % averaging over trials to compute density map
 % 5k  - 10k:15k, 20k:25k 35k:40k
@@ -31,9 +41,7 @@ clusMu           = nan(nClus,2,nSets,nIter);
 muAvg            = nan(nClus,2,nSets,nIter);
 for iterI = 1:nIter
     
-    fprintf('iter %d \n',iterI);
-    epsMu = epsMuOrig; %revert learning rate back to original if reset
-    
+    fprintf('iter %d \n',iterI);    
     switch box
         case 'square'
 %             trials      = [randsample(spacing,nTrials,'true'); randsample(spacing,nTrials,'true')]';
@@ -138,11 +146,10 @@ for iterI = 1:nIter
     %%
 
     updatedC = nan(nTrials,1);
-    epsMuAll = nan(nTrials,2);
     deltaMu  = zeros(nClus,2,nTrials);    
     clusUpdates = zeros(nClus,2); %acutally starting at 0 is OK, since there was no momentum from last trial
     for iTrl=1:nTrials
-            
+            epsMuVec = zeros(nClus,1);
             %if change size of box half way
             if iTrl == nTrials*.75 && warpBox
                 trials(nTrials*.75+1:end,:) = trialsExpand;
@@ -193,22 +200,25 @@ for iterI = 1:nIter
             %log which cluster has been updated
             updatedC(iTrl) = closestC;
 
-            epsMu = epsMuOrig;
-            epsMuAll(iTrl,:) = [epsMu,closestC]; 
-
+            epsMuVec(closestC)=epsMuOrig;
+      
+            act(:,iTrl)=mvnpdf(trials(iTrl,:),mu(:,:,iTrl),eye(2)*sigmaGauss);
+            fbk=zeros(nClus,1); %put above later
+            fbk(closestC)=1;
             
-            
+            deltaMu(:,1,iTrl)=fitDeltaMuX(epsMuVec,trials(iTrl,1)-mu(:,1,iTrl),trials(iTrl,2)-mu(:,2,iTrl),fbk,act(:,iTrl));
+            deltaMu(:,2,iTrl)=fitDeltaMuY(epsMuVec,trials(iTrl,1)-mu(:,1,iTrl),trials(iTrl,2)-mu(:,2,iTrl),fbk,act(:,iTrl));
             
             
             
             
             
             %update (with momemtum-like parameter)
-            deltaMu(closestC,1,iTrl) = ((1-alpha)*(epsMu*(trials(iTrl,1)-mu(closestC,1,iTrl))))+(alpha*clusUpdates(closestC,1));
-            deltaMu(closestC,2,iTrl) = ((1-alpha)*(epsMu*(trials(iTrl,2)-mu(closestC,2,iTrl))))+(alpha*clusUpdates(closestC,2));
+%             deltaMu(closestC,1,iTrl) = ((1-alpha)*(epsMu*(trials(iTrl,1)-mu(closestC,1,iTrl))))+(alpha*clusUpdates(closestC,1));
+%             deltaMu(closestC,2,iTrl) = ((1-alpha)*(epsMu*(trials(iTrl,2)-mu(closestC,2,iTrl))))+(alpha*clusUpdates(closestC,2));
             
-            clusUpdates(closestC,1)=deltaMu(closestC,1,iTrl);
-            clusUpdates(closestC,2)=deltaMu(closestC,2,iTrl);
+%             clusUpdates(closestC,1)=deltaMu(closestC,1,iTrl);
+%             clusUpdates(closestC,2)=deltaMu(closestC,2,iTrl);
 
             deltaMuVec = zeros(nClus,2);
             deltaMuVec(closestC,:) = deltaMu(closestC,:,iTrl); % only update winner
@@ -242,6 +252,7 @@ for iterI = 1:nIter
 %         end
         clus = round(muUpd(:,:,fromTrlI(iSet):toTrlN(iSet)));
         ind=clus<=0; clus(ind)=1; %indices <= 0 make to 1
+        ind=clus>50; clus(ind)=50; % if overshoot out of the box, make it 50
         for iClus=1:nClus
             ntNanInd = squeeze(~isnan(clus(iClus,1,:)));
             clusTmp  = squeeze(clus(iClus,:,ntNanInd));
