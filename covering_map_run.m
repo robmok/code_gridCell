@@ -25,8 +25,8 @@ epsMuVals=[.05 .075 .1];% %learning rate / starting learning rate
 % epsMuVals=[.005, .0075, .05]; %turns out slower is better for gridness (?) - .05 was best for above (but not for neigh) - checcking again, slow is no good - less than 0.005 is bad
 % epsMuVals=[.005, .0075, .05];
 %for neigh use this;
-epsMuVals=.05;
-epsMuVals=[.075 .1];
+epsMuVals = [.015, .025, .05 .075 .1]; %.015 should be too slow 
+% epsMuVals = .05; 
 
 %define box / environement - random points in a box
 box = 'square'; %square, rect, trapz, trapzSq (trapz and a square box attached)
@@ -39,11 +39,11 @@ warpType = 'sq2rect';
 %mometum-like adaptive learning rate - define alpha (higher = weight
 %previous update (direction and magnitude) more; 0 = don't weight previous at all)
 alphaVals = [0, .2, .5, .8];
-alphaVals = [0, .2];
-alphaVals = [.5, .8];
-% alphaVals=0;
+% alphaVals = [0, .2];
+% alphaVals = [.5, .8];
+% alphaVals=.5;
 
-sTypes = 0:1;%:3; %0, 1 ,2, 3
+sTypes = 0:1;% :3; %0, 1 ,2, 3
 % 0. none
 % 1. standard stochastic update - becomes more det over time; becomes
 % basically deterministic at some point
@@ -53,10 +53,11 @@ sTypes = 0:1;%:3; %0, 1 ,2, 3
 
 %  larger c = less stochastic over trials (becomes det quite early on); smaller c = more stochastic over trials (still a bit stochastic by the end)
 cValsOrig = [2/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]; %removed .1/nTrials and .25/nTrials,  too stochastic. also 3/ntrials, .5/nTrials
-% cValsOrig = 20/nTrials; 
+% cValsOrig = [2/(nTrials/2), 5/nTrials, 10/(nTrials/2), 20/(nTrials/2)];% if 80k trials...
+% cValsOrig = 20/nTrials;
 
 %neighbour-weighted update
-neigh = 0; %if neigh = 0, no stoch, no alpha
+neigh = 1; %if neigh = 0, no stoch, no alpha
 betaVals  = [.3 .5 .7]; %softmax param - higher = less neighbour update; from .25 going toward middle; .3 start OK
 if neigh
    sTypes=0;
@@ -68,7 +69,7 @@ end
 % trials = [randsample(linspace(locRange(1),locRange(2),nSteps),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),nSteps),nTrials,'true')]'; % random points in a box
 % save([saveDir '/randTrialsBox_30k'],'trials');
 
-%new - tile the whole space rather than sample
+% %new - tile the whole space rather than sample
 % sq=linspace(locRange(1),locRange(2),nSteps);
 % allPts=[];
 % for i=1:length(sq)
@@ -78,14 +79,19 @@ end
 % end
 % trials=repmat(allPts,nTrials/length(allPts),1); %note, numel of allPts must be divisble by nTrials atm
 % trials=trials(randperm(length(trials)),:);
-% save([saveDir '/randTrialsBox_40k'],'trials');
+% % save([saveDir '/randTrialsBox_40k'],'trials');
+% save([saveDir '/randTrialsBox_80k'],'trials');
 
 %%
 saveDat=1; %save simulations
 
-load([saveDir '/randTrialsBox_40k']); %load in same data with same trial sequence so same for each sim
-
 nIter=500; %how many iterations (starting points)
+
+if nTrials==40000
+    load([saveDir '/randTrialsBox_40k']); %load in same data with same trial sequence so same for each sim
+elseif nTrials==80000
+    load([saveDir '/randTrialsBox_80k']);
+end
 
 tic
 if ~neigh %separating neigh and stoch/momentum params

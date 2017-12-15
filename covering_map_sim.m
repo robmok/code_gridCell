@@ -30,12 +30,17 @@ gaussSmooth=1; %smoothing for density map
 % 10k - 10k:20k, 15:25k, 30k:40k,
 % 15k - 10k:25k, 15k:30k; 25k:40k
 % 20k - 10k:30k, 20k:40k
-fromTrlI = [1.0e+4, 2.0e+4, 3.5e+4, 1.0e+4, 1.5e+4, 3.0e+4, 1.0e+4,  1.5e+4, 2.5e+4, 1.0e+4, 2.0e+4];
-toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4];
-
-%fewer - last 5 from above, testing when just looking at cluster updates
-% fromTrlI = [1.0e+4,  1.5e+4, 2.5e+4, 1.0e+4, 2.0e+4];
-% toTrlN   = [2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4];
+if nTrials==40000
+    fromTrlI = [1.0e+4, 2.0e+4, 3.5e+4, 1.0e+4, 1.5e+4, 3.0e+4, 1.0e+4,  1.5e+4, 2.5e+4, 1.0e+4, 2.0e+4];
+    toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4];
+elseif nTrials==80000
+    % with double nTrials 
+    fromTrlI = [2.5e+4, 3.5e+4, 7.5e+4, 3.0e+4, 4.0e+4, 7.0e+4, 3.5e+4,  4.5e+4, 5.5e+4, 4.0e+4, 6.0e+4]; %this makes avg over same trials as above
+    toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4].*2;    
+    fromTrlI = [1.0e+4, 2.0e+4, 3.5e+4, 1.0e+4, 1.5e+4, 3.0e+4, 1.0e+4,  1.5e+4, 2.5e+4, 1.0e+4, 2.0e+4].*2; %this doubles the trials averaged over
+    toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4].*2;
+    
+end
 nSets = length(fromTrlI);
 densityPlotClus  = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
 densityPlot      = zeros(length(spacing),length(spacing),nSets,nIter);

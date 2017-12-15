@@ -22,12 +22,14 @@ end
 
 %% density map, autocorrelogram
 
+iterI=1; 
+
 gaussSmooth=1;
 
 for iSet=1:size(muAvg,3) %plot - diff averaging over nTrials
 
 %     densityPlot = sum(densityPlotClus(:,:,:,iSet,iterI),3);
-    densityPlotSm = imgaussfilt(densityPlot(:,:,iSet),gaussSmooth);
+    densityPlotSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
     aCorrMap=ndautoCORR(densityPlotSm); %autocorrelogram
 
     figure; hold on;
