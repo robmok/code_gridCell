@@ -1,4 +1,4 @@
-function [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
+function [muAll, densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
 
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
 stepSize=diff(spacing(1:2));
@@ -11,7 +11,8 @@ nTrialsTest = nTrials;
 gaussSmooth=1; %smoothing for density map
 
 % 2d gaussian gradient descent based update
-sigmaGauss = stepSize/2; %need to check what's appropriate - link to stepsize?
+% sigmaGauss = stepSize/2; %need to check what's appropriate - link to stepsize?
+sigmaGauss = stepSize/3;
 fitDeltaMuX=@(epsMuVec,x,y,fdbck,act)(epsMuVec.*(fdbck-act).*exp(-(x.^2+y.^2)./2.*sigmaGauss.^2).*(x./(2.*pi.*sigmaGauss.^4)));
 fitDeltaMuY=@(epsMuVec,x,y,fdbck,act)(epsMuVec.*(fdbck-act).*exp(-(x.^2+y.^2)./2.*sigmaGauss.^2).*(y./(2.*pi.*sigmaGauss.^4)));
 
@@ -206,22 +207,21 @@ for iterI = 1:nIter
             fbk=zeros(nClus,1); %put above later
             fbk(closestC)=1;
             
-            deltaMu(:,1,iTrl)=fitDeltaMuX(epsMuVec,trials(iTrl,1)-mu(:,1,iTrl),trials(iTrl,2)-mu(:,2,iTrl),fbk,act(:,iTrl));
-            deltaMu(:,2,iTrl)=fitDeltaMuY(epsMuVec,trials(iTrl,1)-mu(:,1,iTrl),trials(iTrl,2)-mu(:,2,iTrl),fbk,act(:,iTrl));
-            
-            
-            
-            
+            % compute deltaMu first, then add the momentum value
+            deltaMuX=fitDeltaMuX(epsMuVec,trials(iTrl,1)-mu(:,1,iTrl),trials(iTrl,2)-mu(:,2,iTrl),fbk,act(:,iTrl));
+            deltaMuY=fitDeltaMuY(epsMuVec,trials(iTrl,1)-mu(:,1,iTrl),trials(iTrl,2)-mu(:,2,iTrl),fbk,act(:,iTrl));
             
             %update (with momemtum-like parameter)
-%             deltaMu(closestC,1,iTrl) = ((1-alpha)*(epsMu*(trials(iTrl,1)-mu(closestC,1,iTrl))))+(alpha*clusUpdates(closestC,1));
-%             deltaMu(closestC,2,iTrl) = ((1-alpha)*(epsMu*(trials(iTrl,2)-mu(closestC,2,iTrl))))+(alpha*clusUpdates(closestC,2));
+            deltaMu(closestC,1,iTrl) = ((1-alpha)*deltaMuX)+(alpha*clusUpdates(closestC,1));
+            deltaMu(closestC,2,iTrl) = ((1-alpha)*deltaMuY)+(alpha*clusUpdates(closestC,2));
             
-%             clusUpdates(closestC,1)=deltaMu(closestC,1,iTrl);
-%             clusUpdates(closestC,2)=deltaMu(closestC,2,iTrl);
+            clusUpdates(closestC,1)=deltaMu(closestC,1,iTrl);
+            clusUpdates(closestC,2)=deltaMu(closestC,2,iTrl);
 
             deltaMuVec = zeros(nClus,2);
             deltaMuVec(closestC,:) = deltaMu(closestC,:,iTrl); % only update winner
+            
+            
             
             % update mean estimates
             if iTrl~=nTrials %no need to update for last trial +1)
@@ -239,7 +239,7 @@ for iterI = 1:nIter
 
     end
 %     muEnd(:,:,iterI)=mu(:,:,end);
-%     muAll(:,:,:,iterI) = mu;
+    muAll(:,:,:,iterI) = mu;
     
     for iSet = 1:nSets
         %compute density map

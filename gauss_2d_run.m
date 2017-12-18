@@ -21,8 +21,8 @@ locRange = [0, nSteps-1]; %[-1, 1]; % from locRange(1) to locRange(2)
 stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %smallest diff between locs
 
 % parameters
-epsMuVals=[.05 .075 .1];% %learning rate / starting learning rate 
-% epsMuVals = [.015, .025, .05 .075 .1]; %.015 should be too slow 
+% epsMuVals=[.05 .075 .1];% %learning rate / starting learning rate 
+epsMuVals = .009; %only 0.009/0.01 looks gd now..
 
 %define box / environement - random points in a box
 box = 'square'; %square, rect, trapz, trapzSq (trapz and a square box attached)
@@ -37,9 +37,9 @@ warpType = 'sq2rect';
 alphaVals = [0, .2, .5, .8];
 % alphaVals = [0, .2];
 % alphaVals = [.5, .8];
-% alphaVals=.5;
+alphaVals=0;
 
-sTypes = 0:1;% :3; %0, 1 ,2, 3
+sTypes = 0;%:1;% :3; %0, 1 ,2, 3
 cValsOrig = [2/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]; %removed .1/nTrials and .25/nTrials,  too stochastic. also 3/ntrials, .5/nTrials
 % cValsOrig = [2/(nTrials/2), 5/nTrials, 10/(nTrials/2), 20/(nTrials/2)];% if 80k trials...
 % cValsOrig = 20/nTrials;
@@ -106,7 +106,9 @@ if ~neigh %separating neigh and stoch/momentum params
                         alpha10 = alpha*10; %for saving simulations
                         fprintf('Running alphaVal %0.2f\n',alpha);
                         tic
-                        [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
+%                         [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
+                        [muAll, densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
+
                         fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,stochasticType,c1m,nIter)];
                         timeTaken=toc;
                         if saveDat
