@@ -1,4 +1,13 @@
-function [muAll, densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
+% function [muAll,actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
+function [muAll,actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
+
+% if nargin > 
+% end
+
+
+% if nargout <  
+% end
+
 
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
 stepSize=diff(spacing(1:2));
@@ -35,12 +44,16 @@ elseif nTrials==80000
     fromTrlI = [1.0e+4, 2.0e+4, 3.5e+4, 1.0e+4, 1.5e+4, 3.0e+4, 1.0e+4,  1.5e+4, 2.5e+4, 1.0e+4, 2.0e+4].*2; %this doubles the trials averaged over
     toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4].*2;
 end
-nSets = length(fromTrlI);
-densityPlotClus  = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
+nSets                = length(fromTrlI);
+densityPlotClus      = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
 densityPlotClusAct   = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
-densityPlot      = zeros(length(spacing),length(spacing),nSets,nIter);
-clusMu           = nan(nClus,2,nSets,nIter);
-muAvg            = nan(nClus,2,nSets,nIter);
+densityPlot          = zeros(length(spacing),length(spacing),nSets,nIter);
+densityPlotAct       = zeros(length(spacing),length(spacing),nSets,nIter);
+clusMu               = nan(nClus,2,nSets,nIter);
+muAvg                = nan(nClus,2,nSets,nIter);
+muAll                = nan(nClus,2,nTrials,nIter);
+actAll               = nan(nClus,nTrials,nIter);
+nTrlsUpd             = nan(nClus,nSets,nIter);
 for iterI = 1:nIter
     
     fprintf('iter %d \n',iterI);    
@@ -98,7 +111,6 @@ for iterI = 1:nIter
             trialsExpand = [randsample(spacing,nTrials*.75,'true'); randsample(spacing,nTrials*.75,'true')]'; %this doesn't work - actually, maybe this isn't a thing?
     end
 
-    
     %initialise each cluster location  
     mu     = nan(nClus,2,nTrials); %also note variable muUpd below - %variable that only logs updated clusters mean value
     actUpd = zeros(nClus,nTrials);
@@ -148,9 +160,10 @@ for iterI = 1:nIter
     muUpd = mu;  %variable that only logs updated clusters mean value % - get initialised locs
     %%
 
-    updatedC = nan(nTrials,1);
-    deltaMu  = zeros(nClus,2,nTrials);    
-    clusUpdates = zeros(nClus,2); %acutally starting at 0 is OK, since there was no momentum from last trial
+    updatedC    =   nan(nTrials,1);
+    deltaMu     =    zeros(nClus,2,nTrials);    
+    clusUpdates =   zeros(nClus,2); %acutally starting at 0 is OK, since there was no momentum from last trial
+    act         =   nan(nClus,nTrials);
     for iTrl=1:nTrials
             epsMuVec = zeros(nClus,1);
             %if change size of box half way
@@ -222,9 +235,7 @@ for iterI = 1:nIter
             clusUpdates(closestC,2)=deltaMu(closestC,2,iTrl);
 
             deltaMuVec = zeros(nClus,2);
-            deltaMuVec(closestC,:) = deltaMu(closestC,:,iTrl); % only update winner
-            
-            
+            deltaMuVec(closestC,:) = deltaMu(closestC,:,iTrl); % only update winner            
             
             % update mean estimates
             if iTrl~=nTrials %no need to update for last trial +1)
@@ -241,19 +252,11 @@ for iterI = 1:nIter
             end
 
     end
-%     muEnd(:,:,iterI)=mu(:,:,end);
     muAll(:,:,:,iterI) = mu;
     actAll(:,:,iterI)  = actUpd;
     
     for iSet = 1:nSets
         %compute density map
-%         clus = round(mu(:,:,fromTrlI(iSet):toTrlN(iSet)));
-%         ind=clus<=0; clus(ind)=1; %indices <= 0 make to 1
-%         for iClus=1:nClus
-%             for iTrl=1:size(clus,3)
-%                 densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus,iSet,iterI) = densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus,iSet, iterI)+1;
-%             end
-%         end
         clus = round(muUpd(:,:,fromTrlI(iSet):toTrlN(iSet)));
         actClus = actAll(:,fromTrlI(iSet)-1:toTrlN(iSet)-1); % NB: -1 trial - this is to match up with the 'updated' location on the next trial indexed by clus - if just use act, might want to match simply to mu itself
         ind=clus<=0; clus(ind)=1;  % indices <= 0 make to 1
@@ -268,7 +271,6 @@ for iterI = 1:nIter
                 densityPlotClusAct(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet,iterI)  = densityPlotClusAct(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet,iterI)+actTmp(iTrlUpd);
             end
         end
-        
                 
         %now also compute clus means
         densityPlotClusSmth = zeros(length(spacing),length(spacing),nClus);
@@ -283,6 +285,14 @@ for iterI = 1:nIter
             end
             clusMu(iClus,:,iSet,iterI) = [peakX, peakY];
         end
+        
+        %need to compute clus mean if the activation map? might get sth
+        %diff
+        
+        
+        
+        
+        
         
         %make combined (grid cell) plot, smooth
         densityPlot(:,:,iSet,iterI) = sum(densityPlotClus(:,:,:,iSet,iterI),3); %save this
@@ -354,5 +364,10 @@ for iterI = 1:nIter
         muAvg(:,:,iSet,iterI) = mean(mu(:,:,fromTrlI(iSet):toTrlN(iSet)),3);
     end    
 end
+
+% g = {gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad}
+gA = {gA_g,gA_o,gA_wav,gA_rad};
+gW = {gW_g,gW_o,gW_wav,gW_rad};
+
 end
 
