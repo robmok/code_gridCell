@@ -37,6 +37,7 @@ elseif nTrials==80000
 end
 nSets = length(fromTrlI);
 densityPlotClus  = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
+densityPlotClusAct   = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
 densityPlot      = zeros(length(spacing),length(spacing),nSets,nIter);
 clusMu           = nan(nClus,2,nSets,nIter);
 muAvg            = nan(nClus,2,nSets,nIter);
@@ -99,7 +100,8 @@ for iterI = 1:nIter
 
     
     %initialise each cluster location  
-    mu = nan(nClus,2,nTrials); %also note variable muUpd below - %variable that only logs updated clusters mean value
+    mu     = nan(nClus,2,nTrials); %also note variable muUpd below - %variable that only logs updated clusters mean value
+    actUpd = zeros(nClus,nTrials);
     for clusterI = 1:nClus
         %     mu(clusterI,:,1) = -locRange + locRange.*2.*rand(1,2);  %random location in box - uniform distr from -1 to 1 (see help rand)
         %     mu(clusterI,:,1) = trials(randi(length(trials)),:);   %intiate each cluster with one data point - Forgy method
@@ -204,6 +206,7 @@ for iterI = 1:nIter
             epsMuVec(closestC)=epsMuOrig;
       
             act(:,iTrl)=mvnpdf(trials(iTrl,:),mu(:,:,iTrl),eye(2)*sigmaGauss);
+            actUpd(closestC,iTrl) =act(closestC,iTrl); % save only the winner
             fbk=zeros(nClus,1); %put above later
             fbk(closestC)=1;
             
@@ -212,8 +215,8 @@ for iterI = 1:nIter
             deltaMuY=fitDeltaMuY(epsMuVec,trials(iTrl,1)-mu(:,1,iTrl),trials(iTrl,2)-mu(:,2,iTrl),fbk,act(:,iTrl));
             
             %update (with momemtum-like parameter)
-            deltaMu(closestC,1,iTrl) = ((1-alpha)*deltaMuX)+(alpha*clusUpdates(closestC,1));
-            deltaMu(closestC,2,iTrl) = ((1-alpha)*deltaMuY)+(alpha*clusUpdates(closestC,2));
+            deltaMu(:,1,iTrl) = ((1-alpha)*deltaMuX)+(alpha*clusUpdates(closestC,1));
+            deltaMu(:,2,iTrl) = ((1-alpha)*deltaMuY)+(alpha*clusUpdates(closestC,2));
             
             clusUpdates(closestC,1)=deltaMu(closestC,1,iTrl);
             clusUpdates(closestC,2)=deltaMu(closestC,2,iTrl);
@@ -240,6 +243,7 @@ for iterI = 1:nIter
     end
 %     muEnd(:,:,iterI)=mu(:,:,end);
     muAll(:,:,:,iterI) = mu;
+    actAll(:,:,iterI)  = actUpd;
     
     for iSet = 1:nSets
         %compute density map
@@ -251,16 +255,20 @@ for iterI = 1:nIter
 %             end
 %         end
         clus = round(muUpd(:,:,fromTrlI(iSet):toTrlN(iSet)));
-        ind=clus<=0; clus(ind)=1; %indices <= 0 make to 1
+        actClus = actAll(:,fromTrlI(iSet)-1:toTrlN(iSet)-1); % NB: -1 trial - this is to match up with the 'updated' location on the next trial indexed by clus - if just use act, might want to match simply to mu itself
+        ind=clus<=0; clus(ind)=1;  % indices <= 0 make to 1
         ind=clus>50; clus(ind)=50; % if overshoot out of the box, make it 50
         for iClus=1:nClus
             ntNanInd = squeeze(~isnan(clus(iClus,1,:)));
             clusTmp  = squeeze(clus(iClus,:,ntNanInd));
             nTrlsUpd(iClus,iSet,iterI)=nnz(ntNanInd);
+            actTmp   = squeeze(actClus(iClus,ntNanInd));
             for iTrlUpd=1:size(clusTmp,2)
                 densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet,iterI) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet, iterI)+1;
+                densityPlotClusAct(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet,iterI)  = densityPlotClusAct(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet,iterI)+actTmp(iTrlUpd);
             end
-        end        
+        end
+        
                 
         %now also compute clus means
         densityPlotClusSmth = zeros(length(spacing),length(spacing),nClus);
@@ -274,11 +282,22 @@ for iterI = 1:nIter
                 peakY=peakY(randInd);
             end
             clusMu(iClus,:,iSet,iterI) = [peakX, peakY];
-            
-            %make combined (grid cell) plot, smooth
-            densityPlot(:,:,iSet,iterI) = sum(densityPlotClus(:,:,:,iSet,iterI),3); %save this
-            densityPlotSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
         end
+        
+        %make combined (grid cell) plot, smooth
+        densityPlot(:,:,iSet,iterI) = sum(densityPlotClus(:,:,:,iSet,iterI),3); %save this
+        densityPlotSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
+        
+        %make activation plot
+        densityPlotAct(:,:,iSet,iterI) = sum(densityPlotClusAct(:,:,:,iSet,iterI),3); % or average activation? normalise by number of updates? (indexed in densityPlot)
+        densityPlotActSm = imgaussfilt(densityPlotAct(:,:,iSet,iterI),gaussSmooth);
+        
+        %make normalised activation plot (normalised by number of updates
+        %at that location)
+        densityPlotActNormTmp=densityPlotAct(:,:,iSet,iterI)./densityPlot(:,:,iSet,iterI); %this creates nans at where desnityPlot is zero, so replace nans with zeros
+        ind=isnan(densityPlotActNormTmp); densityPlotActNormTmp(ind)=0;
+        densityPlotActNormSm = imgaussfilt(densityPlotActNormTmp,gaussSmooth);
+       
         %compute autocorrmap, no need to save
         aCorrMap = ndautoCORR(densityPlotSm);
         %compute gridness
@@ -292,6 +311,44 @@ for iterI = 1:nIter
         gW_o(iSet,iterI)   = gdataW.orientation;
         gW_wav(iSet,iterI) = gdataW.wavelength;
         gW_rad(iSet,iterI) = gdataW.radius;
+        
+        %compute gridness for act
+        aCorrMap = ndautoCORR(densityPlotActSm);
+        [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+        [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+        gA_g_act(iSet,iterI)   = gdataA.g_score;
+        gA_o_act(iSet,iterI)   = gdataA.orientation;
+        gA_wav_act(iSet,iterI) = gdataA.wavelength;
+        gA_rad_act(iSet,iterI) = gdataA.radius;
+        gW_g_act(iSet,iterI)   = gdataW.g_score;
+        gW_o_act(iSet,iterI)   = gdataW.orientation;
+        gW_wav_act(iSet,iterI) = gdataW.wavelength;
+        gW_rad_act(iSet,iterI) = gdataW.radius;
+        
+        %compute gridness for normalised act
+        aCorrMap = ndautoCORR(densityPlotActNormSm);
+        [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+        [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+        gA_g_actNorm(iSet,iterI)   = gdataA.g_score;
+        gA_o_actNorm(iSet,iterI)   = gdataA.orientation;
+        gA_wav_actNorm(iSet,iterI) = gdataA.wavelength;
+        gA_rad_actNorm(iSet,iterI) = gdataA.radius;
+        gW_g_actNorm(iSet,iterI)   = gdataW.g_score;
+        gW_o_actNorm(iSet,iterI)   = gdataW.orientation;
+        gW_wav_actNorm(iSet,iterI) = gdataW.wavelength;
+        gW_rad_actNorm(iSet,iterI) = gdataW.radius;
+
+        %%%%
+        %plan to reduce number of variables... without increasing size much
+%         could consider making a cell array 1x4 - e.g.
+%         {gA_g,gA_o,gA_wav_gA_rad} - but be sure to check if this makes it
+%         way too big again...
+
+
+
+
+
+        
         
         %save average cluster positions (to compare with above)
         muAvg(:,:,iSet,iterI) = mean(mu(:,:,fromTrlI(iSet):toTrlN(iSet)),3);
