@@ -1,5 +1,5 @@
-% function [muAll,actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
 function [muAll,actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
+% function [muAll,actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
 
 % if nargin > 
 % end
@@ -348,26 +348,18 @@ for iterI = 1:nIter
         gW_wav_actNorm(iSet,iterI) = gdataW.wavelength;
         gW_rad_actNorm(iSet,iterI) = gdataW.radius;
 
-        %%%%
-        %plan to reduce number of variables... without increasing size much
-%         could consider making a cell array 1x4 - e.g.
-%         {gA_g,gA_o,gA_wav_gA_rad} - but be sure to check if this makes it
-%         way too big again...
-
-
-
-
-
-        
-        
         %save average cluster positions (to compare with above)
         muAvg(:,:,iSet,iterI) = mean(mu(:,:,fromTrlI(iSet):toTrlN(iSet)),3);
     end    
 end
 
-% g = {gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad}
-gA = {gA_g,gA_o,gA_wav,gA_rad};
-gW = {gW_g,gW_o,gW_wav,gW_rad};
+%save 
+% gA = {gA_g,gA_o,gA_wav,gA_rad};
+% gW = {gW_g,gW_o,gW_wav,gW_rad};
+
+gA = cat(3,gA_g,gA_o,gA_wav,gA_rad);
+gW = cat(3,gW_g,gW_o,gW_wav,gW_rad);
+
 
 end
 

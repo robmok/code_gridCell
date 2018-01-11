@@ -1,8 +1,8 @@
 clear all;
 % close all;
 
-wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -73,7 +73,7 @@ end
 %%
 saveDat=1; %save simulations
 
-nIter=200; %how many iterations (starting points)
+nIter=50; %how many iterations (starting points)
 
 if nTrials==40000
     load([saveDir '/randTrialsBox_40k']); %load in same data with same trial sequence so same for each sim
@@ -118,6 +118,7 @@ if ~neigh %separating neigh and stoch/momentum params
                             end
                             cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
                             save(fname,'densityPlot','clusMu','gA_g','gA_o','gA_wav','gA_rad','gW_g','gW_o','gW_wav','gW_rad','muAvg','nIter','cParams','timeTaken');
+%                             save(fname,'densityPlot','clusMu','gA','gW','muAvg','nIter','cParams','timeTaken');
                         end
                     end
                 end
