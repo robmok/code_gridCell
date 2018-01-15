@@ -21,11 +21,13 @@ locRange = [0, nSteps-1]; %[-1, 1]; % from locRange(1) to locRange(2)
 stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %smallest diff between locs
 
 % parameters
-epsMuVals=[.05 .075 .1];% %learning rate / starting learning rate 
+% epsMuVals=[.05 .075 .1];% %learning rate / starting learning rate 
 % epsMuVals=[.005, .0075, .05]; %turns out slower is better for gridness (?) - .05 was best for above (but not for neigh) - checcking again, slow is no good - less than 0.005 is bad
 % epsMuVals=[.005, .0075, .05];
 %for neigh use this;
-epsMuVals = [.015, .025, .05 .075 .1]; %.015 should be too slow 
+% epsMuVals = [.015, .025, .05 .075 .1]; %.015 should be too slow 
+epsMuVals = [.025, .05]; 
+epsMuVals = [.075 .1]; 
 % epsMuVals = .05; 
 
 %define box / environement - random points in a box
@@ -38,9 +40,9 @@ warpType = 'sq2rect';
 
 %mometum-like adaptive learning rate - define alpha (higher = weight
 %previous update (direction and magnitude) more; 0 = don't weight previous at all)
-alphaVals = [0, .2, .5, .8];
-% alphaVals = [0, .2];
-% alphaVals = [.5, .8];
+% alphaVals = [0, .2, .5, .8];
+alphaVals = [0, .2];
+alphaVals = [.5, .8];
 % alphaVals=.5;
 
 sTypes = 0:1;% :3; %0, 1 ,2, 3
@@ -83,9 +85,9 @@ end
 % save([saveDir '/randTrialsBox_80k'],'trials');
 
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
-nIter=5; %how many iterations (starting points)
+nIter=200; %how many iterations (starting points)
 
 if nTrials==40000
     load([saveDir '/randTrialsBox_40k']); %load in same data with same trial sequence so same for each sim

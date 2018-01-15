@@ -42,11 +42,18 @@ elseif nTrials==80000
     toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4].*2;
     
 end
-nSets = length(fromTrlI);
-densityPlotClus  = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
-densityPlot      = zeros(length(spacing),length(spacing),nSets,nIter);
-clusMu           = nan(nClus,2,nSets,nIter);
-muAvg            = nan(nClus,2,nSets,nIter);
+nSets                = length(fromTrlI);
+densityPlotClus      = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
+densityPlotClusAct   = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
+densityPlot          = zeros(length(spacing),length(spacing),nSets,nIter);
+densityPlotAct       = zeros(length(spacing),length(spacing),nSets,nIter);
+clusMu               = nan(nClus,2,nSets,nIter);
+muAvg                = nan(nClus,2,nSets,nIter);
+muAll                = nan(nClus,2,nTrials,nIter);
+actAll               = nan(nClus,nTrials,nIter);
+nTrlsUpd             = nan(nClus,nSets,nIter);
+
+
 for iterI = 1:nIter
     
     fprintf('iter %d \n',iterI);
@@ -158,8 +165,6 @@ for iterI = 1:nIter
     updatedC = nan(nTrials,1);
     epsMuAll = nan(nTrials,2);
     deltaMu  = zeros(nClus,2,nTrials);
-    distTrl  = nan(nTrials,nClus);
-    
     clusUpdates = zeros(nClus,2); %acutally starting at 0 is OK, since there was no momentum from last trial
     
     for iTrl=1:nTrials
@@ -243,7 +248,7 @@ for iterI = 1:nIter
 
     end
 %     muEnd(:,:,iterI)=mu(:,:,end);
-%     muAll(:,:,:,iterI) = mu;
+    muAll(:,:,:,iterI) = mu;
     
 
     % densityPlotClus - density plot with each cluster in dim 3 - more like
@@ -254,13 +259,6 @@ for iterI = 1:nIter
     %positions
     for iSet = 1:nSets
         %compute density map
-%         clus = round(mu(:,:,fromTrlI(iSet):toTrlN(iSet)));
-%         ind=clus<=0; clus(ind)=1; %indices <= 0 make to 1
-%         for iClus=1:nClus
-%             for iTrl=1:size(clus,3)
-%                 densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus,iSet,iterI) = densityPlotClus(clus(iClus,1,iTrl),clus(iClus,2,iTrl),iClus,iSet, iterI)+1;
-%             end
-%         end
         clus = round(muUpd(:,:,fromTrlI(iSet):toTrlN(iSet)));
         ind=clus<=0; clus(ind)=1; %indices <= 0 make to 1
         for iClus=1:nClus

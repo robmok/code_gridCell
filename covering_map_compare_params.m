@@ -32,7 +32,10 @@ gaussSmooth=1; %smooth maps by x value
 
 %params to compare
 epsMuVals = [15, 25, 50, 75, 100]; %atm, lowest learning rate looks best
-% epsMuOrig1000 = 75; %50, 75, 100 - atm, lowest learning rate looks best
+% epsMuOrig1000 = 75; %50, 75, 100 - atm, lowest learning rate looks best -
+% i think 15 was too slow... 
+
+
 
 alphaVals = [0, 2, 5, 8];
 
