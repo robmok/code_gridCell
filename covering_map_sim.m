@@ -1,5 +1,5 @@
 % function [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
-function [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
+function [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,cParams,muAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
 
 % if dont save all muAll and muEnd, function output is muEndBest and muAll
 % Best, and uncomment the bit at the end of the script
