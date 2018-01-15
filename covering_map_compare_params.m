@@ -100,15 +100,29 @@ for iEps = 1:nEps
                     densityPlotAll(:,:,iSet,iterI,iEps,iAlpha,iC) = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
                 end
 
-                gA_gAll(:,:,iEps,iAlpha,iC) = gA_g;
-                gA_oAll(:,:,iEps,iAlpha,iC) = gA_o;
-                gA_radAll(:,:,iEps,iAlpha,iC) = gA_rad;
-                gA_wavAll(:,:,iEps,iAlpha,iC) = gA_wav;
+%                 gA_gAll(:,:,iEps,iAlpha,iC) = gA_g;
+%                 gA_oAll(:,:,iEps,iAlpha,iC) = gA_o;
+%                 gA_radAll(:,:,iEps,iAlpha,iC) = gA_rad;
+%                 gA_wavAll(:,:,iEps,iAlpha,iC) = gA_wav;
+%                 
+%                 gW_gAll(:,:,iEps,iAlpha,iC) = gW_g;
+%                 gW_oAll(:,:,iEps,iAlpha,iC) = gW_o;
+%                 gW_radAll(:,:,iEps,iAlpha,iC) = gW_rad;
+%                 gW_wavAll(:,:,iEps,iAlpha,iC) = gW_wav;
                 
-                gW_gAll(:,:,iEps,iAlpha,iC) = gW_g;
-                gW_oAll(:,:,iEps,iAlpha,iC) = gW_o;
-                gW_radAll(:,:,iEps,iAlpha,iC) = gW_rad;
-                gW_wavAll(:,:,iEps,iAlpha,iC) = gW_wav;
+                %%%
+                %need to check if this works
+                %%%
+                gA_gAll(:,:,iEps,iAlpha,iC)   = gA(:,:,1);
+                gA_oAll(:,:,iEps,iAlpha,iC)   = gA(:,:,2);
+                gA_radAll(:,:,iEps,iAlpha,iC) = gA(:,:,3);
+                gA_wavAll(:,:,iEps,iAlpha,iC) = gA(:,:,4);
+                
+                gW_gAll(:,:,iEps,iAlpha,iC) = gW(:,:,1);
+                gW_oAll(:,:,iEps,iAlpha,iC) = gW(:,:,2);
+                gW_radAll(:,:,iEps,iAlpha,iC) = gW(:,:,3);
+                gW_wavAll(:,:,iEps,iAlpha,iC) = gW(:,:,4);              
+                
             end
         end
     end

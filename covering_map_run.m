@@ -57,7 +57,7 @@ cValsOrig = [2/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]; %removed .1/nTrials 
 % cValsOrig = 20/nTrials;
 
 %neighbour-weighted update
-neigh = 1; %if neigh = 0, no stoch, no alpha
+neigh = 0; %if neigh = 0, no stoch, no alpha
 betaVals  = [.3 .5 .7]; %softmax param - higher = less neighbour update; from .25 going toward middle; .3 start OK
 if neigh
    sTypes=0;
@@ -83,9 +83,9 @@ end
 % save([saveDir '/randTrialsBox_80k'],'trials');
 
 %%
-saveDat=1; %save simulations
+saveDat=0; %save simulations
 
-nIter=500; %how many iterations (starting points)
+nIter=5; %how many iterations (starting points)
 
 if nTrials==40000
     load([saveDir '/randTrialsBox_40k']); %load in same data with same trial sequence so same for each sim
@@ -118,7 +118,8 @@ if ~neigh %separating neigh and stoch/momentum params
                         alpha10 = alpha*10; %for saving simulations
                         fprintf('Running alphaVal %0.2f\n',alpha);
                         tic
-                        [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
+%                         [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
+                        [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
                         fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,stochasticType,c1m,nIter)];
                         timeTaken=toc;
                         if saveDat
@@ -127,7 +128,7 @@ if ~neigh %separating neigh and stoch/momentum params
                             end
                             cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
 %                             save(fname,'densityPlot','clusMu','gdataA','gdataW','muAvg','nIter','cParams','timeTaken');
-                            save(fname,'densityPlot','clusMu','gA_g','gA_o','gA_wav','gA_rad','gW_g','gW_o','gW_wav','gW_rad','muAvg','nIter','cParams','timeTaken');
+                            save(fname,'densityPlot','clusMu','gA','gW','muAvg','nIter','cParams','timeTaken');
 %                             clear densityPlotClus muAvg
                         end
                     end

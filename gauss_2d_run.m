@@ -1,8 +1,8 @@
 clear all;
 % close all;
 
-% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -22,7 +22,12 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 
 % parameters
 % epsMuVals=[.05 .075 .1];% %learning rate / starting learning rate 
-epsMuVals = .009; %only 0.009/0.01 looks gd now..
+% epsMuVals = .009; %only 0.009/0.01 looks gd now..
+% epsMuVals = .01;
+% epsMuVals = .015; %getting worse
+% epsMuVals = .02; % worsee..
+% epsMuVals = .005; %already bad
+epsMuVals=[.005, .008, .001 .0015];
 
 %define box / environement - random points in a box
 box = 'square'; %square, rect, trapz, trapzSq (trapz and a square box attached)
@@ -34,12 +39,12 @@ warpType = 'sq2rect';
 
 %mometum-like adaptive learning rate - define alpha (higher = weight
 %previous update (direction and magnitude) more; 0 = don't weight previous at all)
-alphaVals = [0, .2, .5, .8];
-% alphaVals = [0, .2];
+% alphaVals = [0, .2, .5, .8];
+alphaVals = [0, .2];
 % alphaVals = [.5, .8];
-alphaVals=0;
+% alphaVals=0.8;
 
-sTypes = 0;%:1;% :3; %0, 1 ,2, 3
+sTypes = 0:1;% :3; %0, 1 ,2, 3
 cValsOrig = [2/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]; %removed .1/nTrials and .25/nTrials,  too stochastic. also 3/ntrials, .5/nTrials
 % cValsOrig = [2/(nTrials/2), 5/nTrials, 10/(nTrials/2), 20/(nTrials/2)];% if 80k trials...
 % cValsOrig = 20/nTrials;
@@ -73,7 +78,7 @@ end
 %%
 saveDat=1; %save simulations
 
-nIter=50; %how many iterations (starting points)
+nIter=200; %how many iterations (starting points)
 
 if nTrials==40000
     load([saveDir '/randTrialsBox_40k']); %load in same data with same trial sequence so same for each sim
@@ -108,7 +113,7 @@ if ~neigh %separating neigh and stoch/momentum params
                         tic
 %                         [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
 %                         [muAll,actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
-                        [muAll,actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
+                        [muAll,actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
 
                         fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,stochasticType,c1m,nIter)];
                         timeTaken=toc;
@@ -117,8 +122,8 @@ if ~neigh %separating neigh and stoch/momentum params
                                 fname = [fname '_warpBox'];
                             end
                             cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
-                            save(fname,'densityPlot','clusMu','gA_g','gA_o','gA_wav','gA_rad','gW_g','gW_o','gW_wav','gW_rad','muAvg','nIter','cParams','timeTaken');
-%                             save(fname,'densityPlot','clusMu','gA','gW','muAvg','nIter','cParams','timeTaken');
+%                             save(fname,'densityPlot','clusMu','gA_g','gA_o','gA_wav','gA_rad','gW_g','gW_o','gW_wav','gW_rad','muAvg','nIter','cParams','timeTaken');
+                            save(fname,'densityPlot','densityPlotAct','clusMu','gA','gW','gA_act','gW_act','gA_actNorm','gW_actNorm','muAvg','nIter','cParams','timeTaken');
                         end
                     end
                 end
@@ -128,28 +133,28 @@ if ~neigh %separating neigh and stoch/momentum params
     
 elseif neigh %testing neigh/eps
     
-    for iEps = 1:length(epsMuVals)
-        epsMuOrig=epsMuVals(iEps);
-        epsMuOrig1000=epsMuOrig*1000;
-        for iClus2run = 1:length(clus2run)
-            nClus = clus2run(iClus2run);
-            for iBeta=1:length(betaVals)
-                beta = betaVals(iBeta);
-                beta100 = beta*100; %for save filename
-                tic
-                [densityPlot,clusMu,muAvg,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad]  = covering_map_sim_neigh(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,trials,beta);
-                fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_neigh_beta%d_%diters',nClus,nTrials,epsMuOrig1000,beta100,nIter)];
-                timeTaken=toc;
-                if saveDat
-                    if warpBox
-                        fname = [fname '_warpBox'];
-                    end
-                    cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
-%                     save(fname,'densityPlot','clusMu','gA_g','gA_o','gA_wav','gA_rad','gW_g','gW_o','gW_wav','gW_rad','muAvg','nIter','timeTaken');
-                end
-            end
-        end
-    end
+%     for iEps = 1:length(epsMuVals)
+%         epsMuOrig=epsMuVals(iEps);
+%         epsMuOrig1000=epsMuOrig*1000;
+%         for iClus2run = 1:length(clus2run)
+%             nClus = clus2run(iClus2run);
+%             for iBeta=1:length(betaVals)
+%                 beta = betaVals(iBeta);
+%                 beta100 = beta*100; %for save filename
+%                 tic
+%                 [densityPlot,clusMu,muAvg,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad]  = covering_map_sim_neigh(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,trials,beta);
+%                 fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_neigh_beta%d_%diters',nClus,nTrials,epsMuOrig1000,beta100,nIter)];
+%                 timeTaken=toc;
+%                 if saveDat
+%                     if warpBox
+%                         fname = [fname '_warpBox'];
+%                     end
+%                     cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
+% %                     save(fname,'densityPlot','clusMu','gA_g','gA_o','gA_wav','gA_rad','gW_g','gW_o','gW_wav','gW_rad','muAvg','nIter','timeTaken');
+%                 end
+%             end
+%         end
+%     end
 end
 
 toc

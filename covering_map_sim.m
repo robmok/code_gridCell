@@ -1,4 +1,5 @@
-function [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
+% function [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
+function [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
 
 % if dont save all muAll and muEnd, function output is muEndBest and muAll
 % Best, and uncomment the bit at the end of the script
@@ -293,14 +294,18 @@ for iterI = 1:nIter
         %compute gridness
         [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
         [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
-        gA_g(iSet,iterI)   = gdataA.g_score;
-        gA_o(iSet,iterI)   = gdataA.orientation;
-        gA_wav(iSet,iterI) = gdataA.wavelength;
-        gA_rad(iSet,iterI) = gdataA.radius;
-        gW_g(iSet,iterI)   = gdataW.g_score;
-        gW_o(iSet,iterI)   = gdataW.orientation;
-        gW_wav(iSet,iterI) = gdataW.wavelength;
-        gW_rad(iSet,iterI) = gdataW.radius;
+%         gA_g(iSet,iterI)   = gdataA.g_score;
+%         gA_o(iSet,iterI)   = gdataA.orientation;
+%         gA_wav(iSet,iterI) = gdataA.wavelength;
+%         gA_rad(iSet,iterI) = gdataA.radius;
+%         gW_g(iSet,iterI)   = gdataW.g_score;
+%         gW_o(iSet,iterI)   = gdataW.orientation;
+%         gW_wav(iSet,iterI) = gdataW.wavelength;
+%         gW_rad(iSet,iterI) = gdataW.radius;
+        
+        gA(iSet,iterI,:) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
+        gW(iSet,iterI,:) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
+        
         
         %save average cluster positions (to compare with above)
         muAvg(:,:,iSet,iterI) = mean(mu(:,:,fromTrlI(iSet):toTrlN(iSet)),3);
