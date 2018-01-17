@@ -16,6 +16,9 @@ gaussSmooth=1; %smoothing for density map
 % 2d gaussian gradient descent based update
 % sigmaGauss = stepSize/2; %need to check what's appropriate - link to stepsize?
 sigmaGauss = stepSize/3;
+% sigmaGauss = stepSize/3.5;
+% sigmaGauss = stepSize/4; % becomes square map
+
 fitDeltaMuX=@(epsMuVec,x,y,fdbck,act)(epsMuVec.*(fdbck-act).*exp(-(x.^2+y.^2)./2.*sigmaGauss.^2).*(x./(2.*pi.*sigmaGauss.^4)));
 fitDeltaMuY=@(epsMuVec,x,y,fdbck,act)(epsMuVec.*(fdbck-act).*exp(-(x.^2+y.^2)./2.*sigmaGauss.^2).*(y./(2.*pi.*sigmaGauss.^4)));
 
@@ -25,14 +28,25 @@ fitDeltaMuY=@(epsMuVec,x,y,fdbck,act)(epsMuVec.*(fdbck-act).*exp(-(x.^2+y.^2)./2
 % 15k - 10k:25k, 15k:30k; 25k:40k
 % 20k - 10k:30k, 20k:40k
 if nTrials==40000
-    fromTrlI = [1.0e+4, 2.0e+4, 3.5e+4, 1.0e+4, 1.5e+4, 3.0e+4, 1.0e+4,  1.5e+4, 2.5e+4, 1.0e+4, 2.0e+4];
-    toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4];
+%     fromTrlI = [1.0e+4, 2.0e+4, 3.5e+4, 1.0e+4, 1.5e+4, 3.0e+4, 1.0e+4,  1.5e+4, 2.5e+4, 1.0e+4, 2.0e+4];
+%     toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4];
+    %fewer for now - took away all starting with 10k except last - one 'early' one 'late'
+%     fromTrlI = [2.0e+4, 3.5e+4, 1.5e+4, 3.0e+4, 1.5e+4, 2.5e+4, 1.0e+4,2.0e+4];
+%     toTrlN   = [2.5e+4, 4.0e+4, 2.5e+4, 4.0e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4];
+    %even fewer just to test
+    fromTrlI = [2.5e+4, 2.0e+4];
+    toTrlN   = [4.0e+4, 4.0e+4];
 elseif nTrials==80000
     % with double nTrials 
 %     fromTrlI = [2.5e+4, 3.5e+4, 7.5e+4, 3.0e+4, 4.0e+4, 7.0e+4, 3.5e+4,  4.5e+4, 5.5e+4, 4.0e+4, 6.0e+4]; %this makes avg over same trials as above
 %     toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4].*2;    
     fromTrlI = [1.0e+4, 2.0e+4, 3.5e+4, 1.0e+4, 1.5e+4, 3.0e+4, 1.0e+4,  1.5e+4, 2.5e+4, 1.0e+4, 2.0e+4].*2; %this doubles the trials averaged over
     toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4].*2;
+    %
+%     fromTrlI = [1.5e+4, 2.0e+4].*2;
+%     toTrlN   = [3.0e+4, 4.0e+4].*2;
+    fromTrlI = [2.0e+4, 3.0e+4].*2;
+    toTrlN   = [3.0e+4, 4.0e+4].*2;
 end
 nSets                = length(fromTrlI);
 densityPlotClus      = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
@@ -301,13 +315,13 @@ for iterI = 1:nIter
         %compute autocorrmap, no need to save
         aCorrMap = ndautoCORR(densityPlotSm);
         %compute gridness
-%         figure; hold on;
-%         subplot(3,3,1);
-%         imagesc(densityPlotSm);
-%         subplot(3,3,2);
-%         imagesc(aCorrMap);
-%         subplot(3,3,3);
-        [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+        figure; hold on;
+        subplot(3,3,1);
+        imagesc(densityPlotSm);
+        subplot(3,3,2);
+        imagesc(aCorrMap);
+        subplot(3,3,3);
+        [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
         [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
 %         gA_g(iSet,iterI)   = gdataA.g_score;
 %         gA_o(iSet,iterI)   = gdataA.orientation;
@@ -323,12 +337,12 @@ for iterI = 1:nIter
         
         %compute gridness for act
         aCorrMap = ndautoCORR(densityPlotActSm); 
-%         subplot(3,3,4);
-%         imagesc(densityPlotActSm);
-%         subplot(3,3,5);
-%         imagesc(aCorrMap);
-%         subplot(3,3,6);
-        [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+        subplot(3,3,4);
+        imagesc(densityPlotActSm);
+        subplot(3,3,5);
+        imagesc(aCorrMap);
+        subplot(3,3,6);
+        [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
         [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
 %         gA_g_act(iSet,iterI)   = gdataA.g_score;
 %         gA_o_act(iSet,iterI)   = gdataA.orientation;
@@ -344,12 +358,12 @@ for iterI = 1:nIter
         
         %compute gridness for normalised act
         aCorrMap = ndautoCORR(densityPlotActNormSm);
-%         subplot(3,3,7);
-%         imagesc(densityPlotActNormSm);
-%         subplot(3,3,8);
-%         imagesc(aCorrMap);
-%         subplot(3,3,9);
-        [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+        subplot(3,3,7);
+        imagesc(densityPlotActNormSm);
+        subplot(3,3,8);
+        imagesc(aCorrMap);
+        subplot(3,3,9);
+        [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
         [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
 %         gA_g_actNorm(iSet,iterI)   = gdataA.g_score;
 %         gA_o_actNorm(iSet,iterI)   = gdataA.orientation;
