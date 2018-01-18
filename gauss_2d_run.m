@@ -12,7 +12,7 @@ addpath(codeDir); addpath(saveDir);
 addpath(genpath([wd '/gridSCORE_packed']));
 
 %run multuple cluster numbers
-clus2run = 10; %20, 30
+clus2run = 7; %20, 30
 nTrials = 40000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 %box
@@ -21,47 +21,24 @@ locRange = [0, nSteps-1]; %[-1, 1]; % from locRange(1) to locRange(2)
 stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %smallest diff between locs
 
 % parameters
+
+% learning rate - 
+% basically, increase eps, activations move more; too much, map becomes fuzzy. Decrease eps - activation move less, too small, map doesn't move much
 % epsMuVals=[.05 .075 .1];% %learning rate / starting learning rate 
-% epsMuVals = .009; %only 0.009/0.01 looks gd now..
+
+% clus=20
+% epsMuVals = .009; %only 0.009/0.01 looks gd now.. 
 % epsMuVals = .01;
 % epsMuVals = .015; %getting worse
 % epsMuVals = .02; % worsee..
 % epsMuVals = .005; %already bad
-epsMuVals=[.005, .008, .001 .0015];
+% epsMuVals=[.005, .008, .001 .0015];
 
-%.005 ran thorough already
-epsMuVals=[.008, .001 .0015];
+% clus = 10, sigmaGauss=stepSize/3.5- best 0.0035; range from 0.003-0.0045; might test
+%[.001, .003, .0035, .004, .005. 0.007]
 
-epsMuVals= .0035;% clus = 10; %best 0.035 with sigmaGauss=stepSize/3.5  - increase eps, activations move
-%around more
-%decrease eps - activation move less; at 0.0015, moving v little, around 1-2 values max; 0.002 moving a
-%2-3 values,  0.0025 - 6 values; 0.003 - up to 8-10, but also 2-5 fluctuating up-down; %0.0035 - moving ~10 values
-%0.004 - some up ot 10, some moving up and down more; less stable? can get
-%some good values too. 
-%looks like borders ones stay in place; more clusters prob wont do this.
-%only one cluster in centre that moves a lot with high eps
-
-% epsMuVals = 0.001; %with sigmaGauss = stepSize/3;
-
-%NEED TO REDO ABOVE (NOTING HOW MUCH IT MOVES BY) - because plotted across
-%iterations before; probably similar but need double check. the big jumps i
-%got in stepSize/3 or /4 probably was because of this.
-
-
-
-epsMuVals = 0.0035;%with sigmaGauss = stepSize/4;
-
-
-% test movement of clusters with sth like:
-% figure; plot(squeeze(muAll(1,2,:,1)))
-% figure; plot(squeeze(actAll(1,:,1)))
-% figure; plot(squeeze(muAll(5,2,:,1)))
-% figure; plot(squeeze(actAll(5,:,1)))
-
-
-
-
-
+epsMuVals = 0.003; 
+%sigmaGauss = stepSize/3;
 
 
 % looks like gauss is v sensitive to learning rate, - just a bit low then
@@ -75,7 +52,8 @@ epsMuVals = 0.0035;%with sigmaGauss = stepSize/4;
 
 %looks like optimizing the std is also important - stepSize/3.5 is pretty good
 
-
+% sigmaGaussVals = [stepSize/3, stepSize/3.5, stepSize/4];
+sigmaGaussVals = stepSize/3.5;
 
 
 
@@ -137,6 +115,8 @@ saveDat=0; %save simulations
 
 nIter=1; %how many iterations (starting points)
 
+plotGrids = 1; %plot to test? if nIter > 8, then won't plot
+
 if nTrials==40000
     load([saveDir '/randTrialsBox_40k']); %load in same data with same trial sequence so same for each sim
 elseif nTrials==80000
@@ -152,35 +132,40 @@ if ~neigh %separating neigh and stoch/momentum params
         epsMuOrig1000=epsMuOrig*1000; %for saving - changed from 1000 to 100000 for slower l rates - changed back now
         for iClus2run = 1:length(clus2run) %nClus conditions to run
             nClus = clus2run(iClus2run);
-            for iStype = 1:length(sTypes)
-                stochasticType = sTypes(iStype);
-                if ~stochasticType
-                    cVals = 0;
-                else
-                    cVals = cValsOrig;
-                end
-                for iStochastic = 1:length(cVals) %
-                    c = cVals(iStochastic);
-                    c1m=round(c.*1000000); % for saving file name
-                    fprintf('Running cVal %d\n',c1m)
-                    for iAlpha  = 1:length(alphaVals) %
-                        alpha = alphaVals(iAlpha);
-                        alpha10 = alpha*10; %for saving simulations
-                        fprintf('Running alphaVal %0.2f\n',alpha);
-                        tic
-%                         [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
-%                         [muAll,actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
-                        [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,cParams,muAll] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
-
-                        fname = [saveDir, sprintf('/covering_map_dat_gauss_%dclus_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,stochasticType,c1m,nIter)];
-                        timeTaken=toc;
-                        if saveDat
-                            if warpBox
-                                fname = [fname '_warpBox'];
+            
+            for iSigma = 1:length(sigmaGaussVals)
+                sigmaGauss = sigmaGaussVals(iSigma);
+                fprintf('Running sigmaGauss %0.2f\n',sigmaGauss)
+                for iStype = 1:length(sTypes)
+                    stochasticType = sTypes(iStype);
+                    if ~stochasticType
+                        cVals = 0;
+                    else
+                        cVals = cValsOrig;
+                    end
+                    for iStochastic = 1:length(cVals) %
+                        c = cVals(iStochastic);
+                        c1m=round(c.*1000000); % for saving file name
+                        fprintf('Running cVal %d\n',c1m)
+                        for iAlpha  = 1:length(alphaVals) %
+                            alpha = alphaVals(iAlpha);
+                            alpha10 = alpha*10; %for saving simulations
+                            fprintf('Running alphaVal %0.2f\n',alpha);
+                            tic
+                            %                         [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
+                            %                         [muAll,actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
+                            [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,cParams,muAll] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids);
+                            
+                            fname = [saveDir, sprintf('/covering_map_dat_gauss_%dclus_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,stochasticType,c1m,nIter)];
+                            timeTaken=toc;
+                            if saveDat
+                                if warpBox
+                                    fname = [fname '_warpBox'];
+                                end
+                                cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
+                                %                             save(fname,'densityPlot','clusMu','gA_g','gA_o','gA_wav','gA_rad','gW_g','gW_o','gW_wav','gW_rad','muAvg','nIter','cParams','timeTaken');
+                                save(fname,'densityPlot','densityPlotAct','clusMu','gA','gW','gA_act','gW_act','gA_actNorm','gW_actNorm','muAvg','nIter','cParams','timeTaken');
                             end
-                            cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
-%                             save(fname,'densityPlot','clusMu','gA_g','gA_o','gA_wav','gA_rad','gW_g','gW_o','gW_wav','gW_rad','muAvg','nIter','cParams','timeTaken');
-                            save(fname,'densityPlot','densityPlotAct','clusMu','gA','gW','gA_act','gW_act','gA_actNorm','gW_actNorm','muAvg','nIter','cParams','timeTaken');
                         end
                     end
                 end
@@ -215,3 +200,10 @@ elseif neigh %testing neigh/eps
 end
 
 toc
+
+% test movement/activation of clusters with sth like:
+% figure; plot(squeeze(actAll(1,:,1)))
+% figure; plot(squeeze(actAll(5,:,1)))
+figure; plot(squeeze(muAll(1,2,:,1)))
+figure; plot(squeeze(muAll(5,2,:,1)))
+figure; plot(squeeze(muAll(6,2,:,1)))
