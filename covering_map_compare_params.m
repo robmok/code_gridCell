@@ -9,14 +9,11 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([wd '/gridSCORE_packed']));
 
-% comparing parameters
-
 %make test data - keep same for comparison
 nSteps = 50;
 locRange = [0, nSteps-1]; 
 nTrials = 40000;
-nTrialsTest = nTrials;
-% nTrialsTest = 50000;
+nTrialsTest = nTrials; % nTrialsTest = 50000;
 dataPtsTest = [randsample(linspace(locRange(1),locRange(2),nSteps),nTrialsTest,'true'); randsample(linspace(locRange(1),locRange(2),nSteps),nTrialsTest,'true')]'; % random points in a box
 
 %% Compute the cluster centres from the desnity map, then compute SSE and rank them
@@ -31,15 +28,11 @@ gaussSmooth=1; %smooth maps by x value
 % fromTrlI   = toTrlN-nTrlsToUse+1;
 
 %params to compare
-epsMuVals = [15, 25, 50, 75, 100]; %atm, lowest learning rate looks best
-% epsMuOrig1000 = 75; %50, 75, 100 - atm, lowest learning rate looks best -
-% i think 15 was too slow... 
-
-
+epsMuVals = [25, 50 75 100];
 
 alphaVals = [0, 2, 5, 8];
 
-stochasticType = 1; %1, 2, 3; % stochasticVals=[1,2,3] - later
+stochasticType = 1; %1, 2, 3; % 0, 1 - 2 and 3 are too stoch
 cVals = ([2/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]); %.1 and stoch = towards middle % cVals = [20/nTrials];
 % cVals = 20/nTrials;
 cVals = round(cVals.*1000000);
@@ -49,24 +42,19 @@ nEps   = length(epsMuVals);
 nAlpha = length(alphaVals);
 nC     = length(cVals);
 
-nClus = 20; %20, 30
+nClus = 20; %10, 20
 
 nTrials = 40000;
-nIter = 500;
+nIter = 200;
 %warpBox=0;
 
-nSet=10;
+nSet=11;
 
 spacing = linspace(locRange(1),locRange(2),locRange(2)+1);
 tsse=nan(nIter,nC);
 devAvgSSE=nan(nClus,nIter,nEps,nAlpha,nC);
 densityPlotAll = zeros(length(spacing),length(spacing),nSet,nIter,nEps,nAlpha,nC);
 aCorrMap = nan(length(spacing)*2-1,length(spacing)*2-1,nSet,nIter,nEps,nAlpha,nC);
-
-%- atm takes about 18s per condition (500 iters- compute density plot, cluster cetres, sse, acorr+gridness)
-%- need to merge files, or merge the iterations from separate files
-
-% better to compute de
 
 for iEps = 1:nEps
     for iAlpha = 1:nAlpha
@@ -82,55 +70,39 @@ for iEps = 1:nEps
             %stochastic parameters
             c =cVals(iC);
             
+            %load
             fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters*',nClus,nTrials,epsMuOrig1000,alpha10,stochasticType,c,nIter)];
-            
-%           %if ran more than 1 set of iters, hv multiple files w diff end bit;load
+            %if ran more than 1 set of iters, hv multiple files w diff end bit
+            %for now, only load 1st file
             f = dir(fname); filesToLoad = cell(1,length(f));
-%             muAllTmp={};
-%             nIterCount=0;
+%             muAllTmp={}; nIterCount=0;
             for iF = 1%:length(f)
-                        filesToLoad{iF} = f(iF).name;
-%                         fnames = [fnames filesToLoad{iF}];
+                filesToLoad{iF} = f(iF).name;
+                % fnames = [fnames filesToLoad{iF}];
                 load(f(iF).name);
-%                 muAllTmp{iF}=muAll;
-%                 nIterCount = [nIterCount, nIter+nIterCount(end)]; %count number of iters to index below when merging
+                % muAllTmp{iF}=muAll;
+                % nIterCount = [nIterCount, nIter+nIterCount(end)]; %count number of iters to index below when merging
             end
-            
-%           %merge % if want to do more iters and merge
+%           %merge... % if want to do more iters and merge
 
             for iterI = 1:nIter
-                for iSet=1:11
+                for iSet=1:nSet
                     densityPlotAll(:,:,iSet,iterI,iEps,iAlpha,iC) = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
                 end
-
-%                 gA_gAll(:,:,iEps,iAlpha,iC) = gA_g;
-%                 gA_oAll(:,:,iEps,iAlpha,iC) = gA_o;
-%                 gA_radAll(:,:,iEps,iAlpha,iC) = gA_rad;
-%                 gA_wavAll(:,:,iEps,iAlpha,iC) = gA_wav;
-%                 
-%                 gW_gAll(:,:,iEps,iAlpha,iC) = gW_g;
-%                 gW_oAll(:,:,iEps,iAlpha,iC) = gW_o;
-%                 gW_radAll(:,:,iEps,iAlpha,iC) = gW_rad;
-%                 gW_wavAll(:,:,iEps,iAlpha,iC) = gW_wav;
-                
-                %%%
-                %need to check if this works
-                %%%
-                gA_gAll(:,:,iEps,iAlpha,iC)   = gA(:,:,1);
-                gA_oAll(:,:,iEps,iAlpha,iC)   = gA(:,:,2);
-                gA_radAll(:,:,iEps,iAlpha,iC) = gA(:,:,3);
-                gA_wavAll(:,:,iEps,iAlpha,iC) = gA(:,:,4);
-                
-                gW_gAll(:,:,iEps,iAlpha,iC) = gW(:,:,1);
-                gW_oAll(:,:,iEps,iAlpha,iC) = gW(:,:,2);
-                gW_radAll(:,:,iEps,iAlpha,iC) = gW(:,:,3);
-                gW_wavAll(:,:,iEps,iAlpha,iC) = gW(:,:,4);              
-                
             end
+            %organise gridness values (allen vs willis method)
+            gA_gAll(:,:,iEps,iAlpha,iC)   = gA(:,:,1);
+            gA_oAll(:,:,iEps,iAlpha,iC)   = gA(:,:,2);
+            gA_radAll(:,:,iEps,iAlpha,iC) = gA(:,:,3);
+            gA_wavAll(:,:,iEps,iAlpha,iC) = gA(:,:,4);
+
+            gW_gAll(:,:,iEps,iAlpha,iC) = gW(:,:,1);
+            gW_oAll(:,:,iEps,iAlpha,iC) = gW(:,:,2);
+            gW_radAll(:,:,iEps,iAlpha,iC) = gW(:,:,3);
+            gW_wavAll(:,:,iEps,iAlpha,iC) = gW(:,:,4);
         end
     end
 end
-
 %% plot to compare
 % the way the files are set up & loaded in loses info about which params.
 % however can recover it by using the same loops when loading in the param
@@ -142,78 +114,51 @@ colgrey = [.25 .25 .25];
 gridMeasure = 'grid'; % grid, angle (orientation), rad (radius), wav (wavelength)
 gridMsrType = 'a'; % a/w - allen or willis
 
-%sets 
-% 5k  - 10k:15k, 20k:25k 35k:40k
-% 10k - 10k:20k, 15:25k, 30k:40k,
-% 15k - 10k:25k, 15k:30k; 25k:40k
-% 20k - 10k:30k, 20k:40k
 
-%in general, low learning rate best, 0.1 is bad; could do even slower...
-%should get worse?
-
-
-for iSet = 5
-    
 switch gridMsrType
     case 'a'
-        %temp - inspect how average over trials one at a time; or loop?
-%         iSet=1;
-        
-        gridness = squeeze(gA_gAll(iSet,:,:,:,:));
-        orientation = squeeze(gA_oAll(iSet,:,:,:,:));
-        rad = squeeze(gA_radAll(iSet,:,:,:,:));
-        wav = squeeze(gA_wavAll(iSet,:,:,:,:));
-%         gA_g = gA_gA;
-%         gA_o = gA_oA;
-%         gA_rad = gA_radA;
-%         gA_wav = gA_wavA;
-    
+        gridness    = gA_gAll;
+        orientation = gA_oAll;
+        rad         = gA_radAll;
+        wav         = gA_wavAll;
     case 'w'
-        gridness = squeeze(gW_gAll(iSet,:,:,:,:));
-        orientation = squeeze(gW_oAll(iSet,:,:,:,:));
-        rad = squeeze(gW_radAll(iSet,:,:,:,:));
-        wav = squeeze(gW_wavAll(iSet,:,:,:,:));
-%         gA_g = gA_gW;
-%         gA_o = gA_oW;
-%         gA_rad = gA_radW;
-%         gA_wav = gA_wavW;        
+        gridness    = gW_gAll;
+        orientation = gW_oAll;
+        rad         = gW_radAll;
+        wav         = gW_wavAll;
 end
 
+switch gridMeasure
+    case 'grid'
+        datTmp=gridness;
+    case 'angle'
+        datTmp=orientation;
+    case 'rad'
+        datTmp=rad;
+    case 'wav'
+        datTmp=wav;
+end
+        
+for iSet = 5
 
-% %remove nans - this is a bit hacky now...
+% %remove nans - this is a bit hacky ...
 % if any(isnan(gA_g(1,:)))
 %     ind=isnan(dat(1,:)); gA_g(:,ind)=[]; gA_o(:,ind)=[];gA_rad(:,ind)=[];gA_wav(:,ind)=[]; barpos(ind)=[]; colors(ind,:)=[];
 % end
 % if length(barpos)==length(ind); barpos(ind)=[]; colors(ind,:)=[]; end %this is reset at top..
 
-% compare alpha and c for each learning rate
-for iAlpha = 1:nAlpha %comparing cVals
+
+% comparing learning rate, with stochastic cVals in subplots, with alpha vals per fig
+for iAlpha = 1:nAlpha
     figure; hold on;    
     for iC=1:nC
         subplot(1,4,iC);
-% for iC=1:nC %comparing alpha vals
-%     figure; hold on;
-%     for iAlpha = 1:nAlpha
-%         subplot(1,3,iAlpha);
-%         
-        switch gridMeasure
-            case 'grid'
-                datTmp=gridness;
-            case 'angle'
-                datTmp=orientation;
-            case 'rad'
-                datTmp=rad;
-            case 'wav'
-                datTmp=wav;
-        end
-        dat=datTmp(:,:,iAlpha,iC);
+        dat=squeeze(datTmp(iSet,:,:,iAlpha,iC));
         barpos = .25:.5:.5*size(dat,2);
         colors = distinguishable_colors(size(dat,2));
-        
         mu=mean(dat,1);
         sm=std(dat)./sqrt(size(dat,1));
         ci=sm.*tinv(.025,size(dat,1)-1); %compute conf intervals
-        % figure; hold on;
         plotSpread(dat,'xValues',barpos,'distributionColors',colors);
         errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
         scatter(barpos,mu,750,colors,'.');
@@ -224,28 +169,15 @@ for iAlpha = 1:nAlpha %comparing cVals
     end
 end
 
-end
 
-
-for iEps=1:nEps
+% comparing stochastic cVals, with learning rate in subplots, with alpha vals per fig
+for iAlpha = 1:nAlpha
     figure; hold on;
-    for iAlpha = 1:nAlpha
-        subplot(1,4,iAlpha);
-        
-        switch gridMeasure
-            case 'grid'
-                datTmp=gridness;
-            case 'angle'
-                datTmp=orientation;
-            case 'rad'
-                datTmp=rad;
-            case 'wav'
-                datTmp=wav;
-        end
-        dat=squeeze(datTmp(:,iEps,iAlpha,:));
+    for iEps=1:nEps
+        subplot(1,4,iEps);
+        dat=squeeze(datTmp(iSet,:,:,iAlpha,iC));
         barpos = .25:.5:.5*size(dat,2);
         colors = distinguishable_colors(size(dat,2));
-        
         mu=mean(dat,1);
         sm=std(dat)./sqrt(size(dat,1));
         ci=sm.*tinv(.025,size(dat,1)-1); %compute conf intervals
@@ -259,6 +191,45 @@ for iEps=1:nEps
     end
 end
 
+
+% % comparing stochastic cVals, with alpha in subplots, with learning rate vals per fig
+% for iEps=1:nEps
+%     figure; hold on;
+%     for iAlpha = 1:nAlpha
+%         subplot(1,4,iAlpha);
+%         
+%         switch gridMeasure
+%             case 'grid'
+%                 datTmp=gridness;
+%             case 'angle'
+%                 datTmp=orientation;
+%             case 'rad'
+%                 datTmp=rad;
+%             case 'wav'
+%                 datTmp=wav;
+%         end
+%         dat=squeeze(datTmp(iSet,:,:,iAlpha,iC));
+%         barpos = .25:.5:.5*size(dat,2);
+%         colors = distinguishable_colors(size(dat,2));
+%         
+%         mu=mean(dat,1);
+%         sm=std(dat)./sqrt(size(dat,1));
+%         ci=sm.*tinv(.025,size(dat,1)-1); %compute conf intervals
+%         % figure; hold on;
+%         plotSpread(dat,'xValues',barpos,'distributionColors',colors);
+%         errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+%         scatter(barpos,mu,750,colors,'.');
+%         xlim([barpos(1)-.5, barpos(end)+.5]);
+%         if strcmp(gridMeasure,'grid'), ylim([-.5, 1]); end
+%         title(sprintf('%s - eps=%d, alpha=%d',gridMeasure,epsMuVals(iEps),alphaVals(iAlpha)))
+%     end
+% end
+
+
+
+
+
+end
 %%%%%%%%%%%%
 % ++ more ways of plotting / comparing? maybe add the mean gridness score
 % to the plot?
@@ -327,7 +298,6 @@ for iEps = 1:nEps
             
             for iterI = 1:nIter
                 for iSet=1:11
-                    
                     
                     distTrl=[];
                     sse=nan(1,nClus);
