@@ -3,7 +3,6 @@ function [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,g
 % if nargin > 
 % end
 
-
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
 stepSize=diff(spacing(1:2));
 epsMu = epsMuOrig;
@@ -30,24 +29,27 @@ if nTrials==40000
 %     fromTrlI = [1.0e+4, 2.0e+4, 3.5e+4, 1.0e+4, 1.5e+4, 3.0e+4, 1.0e+4,  1.5e+4, 2.5e+4, 1.0e+4, 2.0e+4];
 %     toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4];
     %fewer for now - took away all starting with 10k except last - one 'early' one 'late'
-%     fromTrlI = [2.0e+4, 3.5e+4, 1.5e+4, 3.0e+4, 1.5e+4, 2.5e+4, 1.0e+4,2.0e+4];
-%     toTrlN   = [2.5e+4, 4.0e+4, 2.5e+4, 4.0e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4];
+    fromTrlI = [2.0e+4, 3.5e+4, 1.5e+4, 3.0e+4, 1.5e+4, 2.5e+4, 1.0e+4, 2.0e+4];
+    toTrlN   = [2.5e+4, 4.0e+4, 2.5e+4, 4.0e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4];
     %even fewer just to test
-    fromTrlI = [2.5e+4, 2.0e+4];
-    toTrlN   = [4.0e+4, 4.0e+4];
+%     fromTrlI = [2.5e+4, 2.0e+4];
+%     toTrlN   = [4.0e+4, 4.0e+4];
 elseif nTrials==80000
     % with double nTrials 
 %     fromTrlI = [2.5e+4, 3.5e+4, 7.5e+4, 3.0e+4, 4.0e+4, 7.0e+4, 3.5e+4,  4.5e+4, 5.5e+4, 4.0e+4, 6.0e+4]; %this makes avg over same trials as above
 %     toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4].*2;    
     fromTrlI = [1.0e+4, 2.0e+4, 3.5e+4, 1.0e+4, 1.5e+4, 3.0e+4, 1.0e+4,  1.5e+4, 2.5e+4, 1.0e+4, 2.0e+4].*2; %this doubles the trials averaged over
     toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4].*2;
-    %
+    
 %     fromTrlI = [1.5e+4, 2.0e+4].*2;
 %     toTrlN   = [3.0e+4, 4.0e+4].*2;
     fromTrlI = [2.0e+4, 3.0e+4].*2;
     toTrlN   = [3.0e+4, 4.0e+4].*2;
 end
 nSets                = length(fromTrlI);
+% if plotGrids 
+%     nSets=2; %so doesn't make too many plots
+% end
 densityPlotClus      = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
 densityPlotClusAct   = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
 densityPlot          = zeros(length(spacing),length(spacing),nSets,nIter);

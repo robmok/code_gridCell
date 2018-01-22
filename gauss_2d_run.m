@@ -12,7 +12,7 @@ addpath(codeDir); addpath(saveDir);
 addpath(genpath([wd '/gridSCORE_packed']));
 
 %run multuple cluster numbers
-clus2run = [10 20]; %20, 30
+clus2run = 10; %[10 20]; %20, 30
 nTrials = 40000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 %box
@@ -51,7 +51,10 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 % [0.001, 0.0015, 0.002, .003, .0035, .004]
 
 epsMuVals = [0.001, 0.0015, 0.002, .003, .0035, .004]; 
+% epsMuVals = 0.002;
+
 sigmaGaussVals = [stepSize/3.5, stepSize/4];
+% sigmaGaussVals = stepSize/3.5;
 
 % looks like gauss is v sensitive to learning rate, - just a bit low then
 % don't move much (need to check this from plotting muAll), and a bit high
@@ -82,14 +85,17 @@ warpType = 'sq2rect';
 % alphaVals = [0, .2];
 % alphaVals = [.5, .8];
 alphaVals  = 0;
-% alphaVals=.2;
-% alphaVals=.5;
-% alphaVals=.8;
+alphaVals=.2;
+alphaVals=.5;
+alphaVals=.8;
 
 sTypes = 0:1;% :3; %0, 1 ,2, 3
-cValsOrig = [2/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]; %removed .1/nTrials and .25/nTrials,  too stochastic. also 3/ntrials, .5/nTrials
+cValsOrig = [1/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]; %just edited 2/nTrials --> 1/nTrials
 % cValsOrig = [2/(nTrials/2), 5/nTrials, 10/(nTrials/2), 20/(nTrials/2)];% if 80k trials...
 % cValsOrig = 20/nTrials;
+
+%could add one stoch lower? 1/nTrials?
+
 
 %neighbour-weighted update
 neigh = 0; %if neigh = 0, no stoch, no alpha
@@ -161,8 +167,8 @@ if ~neigh %separating neigh and stoch/momentum params
                             tic
                             %                         [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
                             %                         [muAll,actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
-                            [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,cParams,~] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss100,nTrials,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids);
-                            fname = [saveDir, sprintf('/covering_map_dat_gauss_%dclus%dsigma_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,sigmaGauss100,nTrials,epsMuOrig10000,alpha10,stochasticType,c1m,nIter)];
+                            [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,cParams,muAll] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids);
+                            fname = [saveDir, sprintf('/covering_map_dat_gauss_%dclus_%dsigma_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,sigmaGauss100,nTrials,epsMuOrig10000,alpha10,stochasticType,c1m,nIter)];
                             timeTaken=toc;
                             if saveDat
                                 if warpBox
