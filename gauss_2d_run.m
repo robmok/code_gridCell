@@ -51,6 +51,7 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 % [0.001, 0.0015, 0.002, .003, .0035, .004]
 
 epsMuVals = [0.001, 0.0015, 0.002, .003, .0035, .004]; 
+epsMuVals = [0.002, .003, .0035, .004]; 
 % epsMuVals = 0.002;
 
 sigmaGaussVals = [stepSize/3.5, stepSize/4];
