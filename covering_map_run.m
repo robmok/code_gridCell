@@ -12,7 +12,7 @@ addpath(codeDir); addpath(saveDir);
 addpath(genpath([wd '/gridSCORE_packed']));
 
 %run multuple cluster numbers
-clus2run = 20; %20, 30
+clus2run = [10, 20]; %20, 30
 nTrials = 40000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 %box
@@ -26,8 +26,8 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 % epsMuVals=[.005, .0075, .05];
 %for neigh use this;
 % epsMuVals = [.015, .025, .05 .075 .1]; %.015 should be too slow 
-epsMuVals = [.025, .05]; 
-epsMuVals = [.075 .1]; 
+epsMuVals = [.025, .05, .075 .1]; 
+% epsMuVals = [.075 .1]; 
 % epsMuVals = .05; 
 
 %define box / environement - random points in a box
@@ -45,7 +45,7 @@ alphaVals = [0, .2];
 alphaVals = [.5, .8];
 % alphaVals=.5;
 
-sTypes = 0:1;% :3; %0, 1 ,2, 3
+sTypes = 0;%:1;% :3; %0, 1 ,2, 3
 % 0. none
 % 1. standard stochastic update - becomes more det over time; becomes
 % basically deterministic at some point
@@ -87,7 +87,7 @@ end
 %%
 saveDat=1; %save simulations
 
-nIter=500; %how many iterations (starting points)
+nIter=200; %how many iterations (starting points)
 
 if nTrials==40000
     load([saveDir '/randTrialsBox_40k']); %load in same data with same trial sequence so same for each sim
@@ -99,11 +99,12 @@ tic
 if ~neigh %separating neigh and stoch/momentum params
     
     %testing stoch/momentum/eps
-    for iEps = 1:length(epsMuVals)
-        epsMuOrig=epsMuVals(iEps);
-        epsMuOrig1000=epsMuOrig*1000; %for saving - changed from 1000 to 100000 for slower l rates - changed back now
-        for iClus2run = 1:length(clus2run) %nClus conditions to run
-            nClus = clus2run(iClus2run);
+    for iClus2run = 1:length(clus2run) %nClus conditions to run
+        nClus = clus2run(iClus2run);
+        for iEps = 1:length(epsMuVals)
+            epsMuOrig=epsMuVals(iEps);
+            epsMuOrig1000=epsMuOrig*1000; %for saving - changed from 1000 to 100000 for slower l rates - changed back now
+            
             for iStype = 1:length(sTypes)
                 stochasticType = sTypes(iStype);
                 if ~stochasticType
@@ -120,7 +121,7 @@ if ~neigh %separating neigh and stoch/momentum params
                         alpha10 = alpha*10; %for saving simulations
                         fprintf('Running alphaVal %0.2f\n',alpha);
                         tic
-%                         [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
+                        %                         [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
                         [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,cParams,~] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
                         fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,stochasticType,c1m,nIter)];
                         timeTaken=toc;
@@ -129,9 +130,9 @@ if ~neigh %separating neigh and stoch/momentum params
                                 fname = [fname '_warpBox'];
                             end
                             cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
-%                             save(fname,'densityPlot','clusMu','gdataA','gdataW','muAvg','nIter','cParams','timeTaken');
+                            %                             save(fname,'densityPlot','clusMu','gdataA','gdataW','muAvg','nIter','cParams','timeTaken');
                             save(fname,'densityPlot','clusMu','gA','gW','muAvg','nIter','cParams','timeTaken');
-%                             clear densityPlotClus muAvg
+                            %                             clear densityPlotClus muAvg
                         end
                     end
                 end

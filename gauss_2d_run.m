@@ -36,26 +36,17 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 
 % clus = 10, sigmaGauss=stepSize/3.5- best 0.0035; range from 0.003-0.0045; might test
 
-
-%need to adjust values of epsMu with sigmaGausss. harder with stepSize/3..
-%values too diff. could do 3.5 and 4 for now..
-
-
 % sigmaGauss=stepSize/3.5
 %[.001, .003, .0035, .004, .005. 0.007]
-
 % sigmaGauss=stepSize/4
 % [0.0005, 0.001, 0.0015, 0.002, 0.0025, 0.003]
-
 %compromise:
 % [0.001, 0.0015, 0.002, .003, .0035, .004]
 
 epsMuVals = [0.001, 0.0015, 0.002, .003, .0035, .004]; 
-epsMuVals = [0.002, .003, .0035, .004]; 
-% epsMuVals = 0.002;
+epsMuVals = [0.0005, 0.0008]; 
 
-sigmaGaussVals = [stepSize/3.5, stepSize/4];
-% sigmaGaussVals = stepSize/3.5;
+sigmaGaussVals = [stepSize/3, stepSize/3.5, stepSize/4];
 
 % looks like gauss is v sensitive to learning rate, - just a bit low then
 % don't move much (need to check this from plotting muAll), and a bit high
@@ -85,18 +76,15 @@ warpType = 'sq2rect';
 % alphaVals = [0, .2, .5, .8];
 % alphaVals = [0, .2];
 % alphaVals = [.5, .8];
-alphaVals  = 0;
-alphaVals=.2;
-alphaVals=.5;
-alphaVals=.8;
+alphaVals = 0;
+alphaVals = .2;
+alphaVals = .5;
+alphaVals = .8;
 
-sTypes = 0:1;% :3; %0, 1 ,2, 3
+sTypes = 0;%:1;% :3; %0, 1 ,2, 3
 cValsOrig = [1/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]; %just edited 2/nTrials --> 1/nTrials
 % cValsOrig = [2/(nTrials/2), 5/nTrials, 10/(nTrials/2), 20/(nTrials/2)];% if 80k trials...
 % cValsOrig = 20/nTrials;
-
-%could add one stoch lower? 1/nTrials?
-
 
 %neighbour-weighted update
 neigh = 0; %if neigh = 0, no stoch, no alpha
