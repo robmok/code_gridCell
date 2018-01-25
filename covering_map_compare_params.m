@@ -140,54 +140,48 @@ switch gridMeasure
 end
 
 
-
-
-for iSet = 5
-
-
-% comparing learning rate, with stochastic cVals in subplots, with alpha vals per fig
-for iAlpha = 1:nAlpha
-    figure; hold on;    
-    for iC=1:nC
-        subplot(1,4,iAlpha);
-        dat=squeeze(datTmp(iSet,:,:,iAlpha,iC));
-        barpos = .25:.5:.5*size(dat,2);
-        colors = distinguishable_colors(size(dat,2));
-        mu=mean(dat,1);
-        sm=std(dat)./sqrt(size(dat,1));
-        ci=sm.*tinv(.025,size(dat,1)-1); %compute conf intervals
-        plotSpread(dat,'xValues',barpos,'distributionColors',colors);
-        errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-        scatter(barpos,mu,750,colors,'.');
-        xlim([barpos(1)-.5, barpos(end)+.5]);
-        if strcmp(gridMeasure,'grid'), ylim([-.5, 1]); end
-        %         title(sprintf('%s - eps=%d, alpha=%d, c=%d',gridMeasure,epsMuVals(iEps),alphaVals(iAlpha),cVals(iC)))
-        title(sprintf('%s - alpha=%d, c=%d',gridMeasure,alphaVals(iAlpha),cVals(iC)))
-    end
-end
-
-
-% comparing stochastic cVals, with learning rate in subplots, with alpha vals per fig
-for iAlpha = 1:nAlpha
+for iSet = 3
+    % comparing learning rate, with alpha vals in subplots
     figure; hold on;
-    for iEps=1:nEps
-        subplot(1,4,iEps);
-        dat=squeeze(datTmp(iSet,:,:,iAlpha,iC));
-        barpos = .25:.5:.5*size(dat,2);
-        colors = distinguishable_colors(size(dat,2));
-        mu=mean(dat,1);
-        sm=std(dat)./sqrt(size(dat,1));
-        ci=sm.*tinv(.025,size(dat,1)-1); %compute conf intervals
-        % figure; hold on;
-        plotSpread(dat,'xValues',barpos,'distributionColors',colors);
-        errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-        scatter(barpos,mu,750,colors,'.');
-        xlim([barpos(1)-.5, barpos(end)+.5]);
-        if strcmp(gridMeasure,'grid'), ylim([-.5, 1]); end
-        title(sprintf('%s - eps=%d, alpha=%d',gridMeasure,epsMuVals(iEps),alphaVals(iAlpha)))
+    for iAlpha = 1:nAlpha
+        for iC=1:nC
+            subplot(1,4,iAlpha);
+            dat=squeeze(datTmp(iSet,:,:,iAlpha,iC));
+            barpos = .25:.5:.5*size(dat,2);
+            colors = distinguishable_colors(size(dat,2));
+            mu=mean(dat,1);
+            sm=std(dat)./sqrt(size(dat,1));
+            ci=sm.*tinv(.025,size(dat,1)-1); %compute conf intervals
+            plotSpread(dat,'xValues',barpos,'distributionColors',colors);
+            errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+            scatter(barpos,mu,750,colors,'.');
+            xlim([barpos(1)-.5, barpos(end)+.5]);
+            if strcmp(gridMeasure,'grid'), ylim([-.5, 1]); end
+            %         title(sprintf('%s - eps=%d, alpha=%d, c=%d',gridMeasure,epsMuVals(iEps),alphaVals(iAlpha),cVals(iC)))
+            title(sprintf('%s - alpha=%d, c=%d',gridMeasure,alphaVals(iAlpha),cVals(iC)))
+        end
     end
-end
-
+    
+    % comparing alpha vals, with learning rate in subplots
+    figure; hold on;
+    for iAlpha = 1:nAlpha
+        for iEps=1:nEps
+            subplot(1,4,iEps);
+            dat=squeeze(datTmp(iSet,:,iEps,:,iC));
+            barpos = .25:.5:.5*size(dat,2);
+            colors = distinguishable_colors(size(dat,2));
+            mu=mean(dat,1);
+            sm=std(dat)./sqrt(size(dat,1));
+            ci=sm.*tinv(.025,size(dat,1)-1); %compute conf intervals
+            % figure; hold on;
+            plotSpread(dat,'xValues',barpos,'distributionColors',colors);
+            errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+            scatter(barpos,mu,750,colors,'.');
+            xlim([barpos(1)-.5, barpos(end)+.5]);
+            if strcmp(gridMeasure,'grid'), ylim([-.5, 1]); end
+            title(sprintf('%s - eps=%d',gridMeasure,epsMuVals(iEps)))
+        end
+    end
 end
 
 

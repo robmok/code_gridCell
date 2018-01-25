@@ -12,7 +12,7 @@ addpath(codeDir); addpath(saveDir);
 addpath(genpath([wd '/gridSCORE_packed']));
 
 %run multuple cluster numbers
-clus2run = [10, 20]; %20, 30
+clus2run = [20]; %20, 30
 nTrials = 40000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 %box
@@ -28,7 +28,7 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 % epsMuVals = [.015, .025, .05 .075 .1]; %.015 should be too slow 
 epsMuVals = [.025, .05, .075 .1]; 
 % epsMuVals = [.075 .1]; 
-% epsMuVals = .05; 
+epsMuVals = .05; 
 
 %define box / environement - random points in a box
 box = 'square'; %square, rect, trapz, trapzSq (trapz and a square box attached)
@@ -43,7 +43,7 @@ warpType = 'sq2rect';
 % alphaVals = [0, .2, .5, .8];
 alphaVals = [0, .2];
 alphaVals = [.5, .8];
-% alphaVals=.5;
+alphaVals=0;
 
 sTypes = 0;%:1;% :3; %0, 1 ,2, 3
 % 0. none
@@ -85,9 +85,9 @@ end
 % save([saveDir '/randTrialsBox_80k'],'trials');
 
 %%
-saveDat=1; %save simulations
+saveDat=0; %save simulations
 
-nIter=200; %how many iterations (starting points)
+nIter=1; %how many iterations (starting points)
 
 if nTrials==40000
     load([saveDir '/randTrialsBox_40k']); %load in same data with same trial sequence so same for each sim
@@ -122,7 +122,7 @@ if ~neigh %separating neigh and stoch/momentum params
                         fprintf('Running alphaVal %0.2f\n',alpha);
                         tic
                         %                         [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
-                        [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,cParams,~] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
+                        [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,cParams,muAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
                         fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,stochasticType,c1m,nIter)];
                         timeTaken=toc;
                         if saveDat
