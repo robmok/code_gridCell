@@ -12,12 +12,15 @@ end
 sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 
+
 for iCat = 1:nCats
-    clus = round(repmat(mu(iCat,:),nPoints,1) + randn(nPoints,2)*R);
+    datPtsGauss = round(repmat(mu(iCat,:),nPoints,1) + randn(nPoints,2)*R); % key - these are the coordinates of the points
     for iPts=1:nPoints
-        densityPlot(clus(iPts,1),clus(iPts,2)) = densityPlot(clus(iPts,1),clus(iPts,2))+1;
+        densityPlot(datPtsGauss(iPts,1),datPtsGauss(iPts,2)) = densityPlot(datPtsGauss(iPts,1),datPtsGauss(iPts,2))+1;
     end
 end
 
-imagesc(densityPlot)
+figure;
+imagesc(densityPlot); %% visualise the points on a density plot
+
 
