@@ -36,21 +36,18 @@ if nTrials==40000
     toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4];
 elseif nTrials==80000
     % with double nTrials 
-    fromTrlI = [2.5e+4, 3.5e+4, 7.5e+4, 3.0e+4, 4.0e+4, 7.0e+4, 3.5e+4,  4.5e+4, 5.5e+4, 4.0e+4, 6.0e+4]; %this makes avg over same trials as above
-    toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4].*2;    
+%     fromTrlI = [2.5e+4, 3.5e+4, 7.5e+4, 3.0e+4, 4.0e+4, 7.0e+4, 3.5e+4,  4.5e+4, 5.5e+4, 4.0e+4, 6.0e+4]; %this makes avg over same trials as above
+%     toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4].*2;    
     fromTrlI = [1.0e+4, 2.0e+4, 3.5e+4, 1.0e+4, 1.5e+4, 3.0e+4, 1.0e+4,  1.5e+4, 2.5e+4, 1.0e+4, 2.0e+4].*2; %this doubles the trials averaged over
     toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4].*2;
     
 end
 nSets                = length(fromTrlI);
 densityPlotClus      = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
-densityPlotClusAct   = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
 densityPlot          = zeros(length(spacing),length(spacing),nSets,nIter);
-densityPlotAct       = zeros(length(spacing),length(spacing),nSets,nIter);
 clusMu               = nan(nClus,2,nSets,nIter);
 muAvg                = nan(nClus,2,nSets,nIter);
 muAll                = nan(nClus,2,nTrials,nIter);
-actAll               = nan(nClus,nTrials,nIter);
 nTrlsUpd             = nan(nClus,nSets,nIter);
 
 

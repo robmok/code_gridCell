@@ -1,4 +1,4 @@
-function [densityPlot,clusMu,muAvg,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad]  = covering_map_sim_neigh(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,trials,beta)
+function [densityPlot,clusMu,muAvg,gA,gW,muAll]  = covering_map_sim_neigh(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,trials,beta)
 
 %neighbour-weighted update 
 % - no momentum, no stochastic update
@@ -226,7 +226,8 @@ for iterI = 1:nIter
                 muUpd(closestC,2,iTrl+1)=mu(closestC,2,iTrl+1);
             end        
     end
-%     muAll(:,:,:,iterI) = mu;
+    muAll(:,:,:,iterI) = mu;
+    
     for iSet = 1:nSets
         %compute density map
 %         clus = round(mu(:,:,fromTrlI(iSet):toTrlN(iSet)));
@@ -268,18 +269,13 @@ for iterI = 1:nIter
         %compute gridness
         [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
         [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
-        gA_g(iSet,iterI)   = gdataA.g_score;
-        gA_o(iSet,iterI)   = gdataA.orientation;
-        gA_wav(iSet,iterI) = gdataA.wavelength;
-        gA_rad(iSet,iterI) = gdataA.radius;
-        gW_g(iSet,iterI)   = gdataW.g_score;
-        gW_o(iSet,iterI)   = gdataW.orientation;
-        gW_wav(iSet,iterI) = gdataW.wavelength;
-        gW_rad(iSet,iterI) = gdataW.radius;
+
+        gA(iSet,iterI,:) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
+        gW(iSet,iterI,:) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
+        
         
         %save average cluster positions (to compare with above)
         muAvg(:,:,iSet,iterI) = mean(mu(:,:,fromTrlI(iSet):toTrlN(iSet)),3);
     end    
 end
-
 end

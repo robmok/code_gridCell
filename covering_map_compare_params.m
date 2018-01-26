@@ -22,11 +22,6 @@ doPlot = 0; %plot - note if loading in many value, this will make too many plots
 
 gaussSmooth=1; %smooth maps by x value
 
-% %for computing density map
-% nTrlsToUse = 10000; %
-% toTrlN     = nTrials; %-10000; %nTrials if from nTrlstoUse to end,
-% fromTrlI   = toTrlN-nTrlsToUse+1;
-
 %params to compare
 epsMuVals = [25, 50 75 100];
 
