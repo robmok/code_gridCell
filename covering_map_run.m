@@ -11,6 +11,14 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([wd '/gridSCORE_packed']));
 
+dat = 'cat'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
+
+% if cat learning specify number of categories (cluster centres) and sigma
+% of the gaussan
+nCats   = 2; %2 categories
+sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
+% sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
+
 %run multuple cluster numbers
 clus2run = 20; %20, 30
 nTrials = 40000; %how many locations in the box / trials - 2.5k ; 5k if reset
@@ -91,11 +99,25 @@ saveDat=0; %save simulations
 
 nIter=1; %how many iterations (starting points)
 
-if nTrials==40000
-    load([saveDir '/randTrialsBox_40k']); %load in same data with same trial sequence so same for each sim
-elseif nTrials==80000
-    load([saveDir '/randTrialsBox_80k']);
+switch dat
+    case 'rand'
+        if nTrials==40000
+            load([saveDir '/randTrialsBox_40k']); %load in same data with same trial sequence so same for each sim
+        elseif nTrials==80000
+            load([saveDir '/randTrialsBox_80k']);
+        end
+
+    case 'cat'
+        % draw points from 2 categories (gaussian) from a 2D feature space
+        nPoints = floor(nTrials/nCats); % points to sample
+        for iCat = 1:nCats
+            mu(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % ±10 so category centres are not on the edge
+            datPtsGauss(:,:,iCat) = round(repmat(mu(iCat,:),nPoints,1) + randn(nPoints,2)*R); % key - these are the coordinates of the points
+        end
+        trials = reshape(datPtsGauss,nTrials,2);
+        trials = trials(randperm(length(trials)),:);
 end
+    
 
 tic
 if ~neigh %separating neigh and stoch/momentum params

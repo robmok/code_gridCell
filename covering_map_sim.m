@@ -260,10 +260,20 @@ for iterI = 1:nIter
         ind=clus<=0; clus(ind)=1; %indices <= 0 make to 1
         for iClus=1:nClus
             ntNanInd = squeeze(~isnan(clus(iClus,1,:)));
-            clusTmp  = squeeze(clus(iClus,:,ntNanInd));
+            clusTmp = squeeze(clus(iClus,:,ntNanInd)); %added a ' but then only activations on diag??
             nTrlsUpd(iClus,iSet,iterI)=nnz(ntNanInd);
             for iTrlUpd=1:size(clusTmp,2)
-                densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet,iterI) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet, iterI)+1;
+%                 if length(clusTmp(:,iTrlUpd))<2
+%                     a=1;
+%                 end
+%                 if isempty(clusTmp)
+%                    b=1; 
+%                 end
+                if ~isempty(clusTmp) % when cat learning, some clusters don't move
+                    for iTrlUpd=1:size(clusTmp,2)
+                        densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet,iterI) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet, iterI)+1;
+                    end
+                end
             end
         end        
                 
