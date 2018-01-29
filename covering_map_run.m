@@ -146,7 +146,7 @@ if ~neigh %separating neigh and stoch/momentum params
                         fprintf('Running alphaVal %0.2f\n',alpha);
                         tic
                         %                         [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
-                        [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,cParams,muAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
+                        [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,cParams,muAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c,dat);
                         fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,stochasticType,c1m,nIter)];
                         timeTaken=toc;
                         if saveDat

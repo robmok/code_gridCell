@@ -30,6 +30,13 @@ for iSet=1:size(muAvg,3) %plot - diff averaging over nTrials
     subplot(1,2,1); imagesc(densityPlotSm);
     subplot(1,2,2); imagesc(aCorrMap);
 end
+for iSet=1:size(muAvg,3) %plot - diff averaging over nTrials
+
+   figure; hold on;
+    subplot(1,2,1); imagesc(densityPlot(:,:,iSet,iterI));
+        densityPlotSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
+    subplot(1,2,2); imagesc(densityPlotSm);
+end
 
 %%
 gaussSmooth=1;

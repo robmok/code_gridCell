@@ -1,5 +1,5 @@
 % function [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
-function [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,cParams,muAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
+function [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,cParams,muAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c,dat)
 
 % if dont save all muAll and muEnd, function output is muEndBest and muAll
 % Best, and uncomment the bit at the end of the script
@@ -50,6 +50,8 @@ muAvg                = nan(nClus,2,nSets,nIter);
 muAll                = nan(nClus,2,nTrials,nIter);
 nTrlsUpd             = nan(nClus,nSets,nIter);
 
+gA = nan(nSets,nIter,4);
+gW = nan(nSets,nIter,4);
 
 for iterI = 1:nIter
     
@@ -260,23 +262,16 @@ for iterI = 1:nIter
         ind=clus<=0; clus(ind)=1; %indices <= 0 make to 1
         for iClus=1:nClus
             ntNanInd = squeeze(~isnan(clus(iClus,1,:)));
-            clusTmp = squeeze(clus(iClus,:,ntNanInd)); %added a ' but then only activations on diag??
+            clusTmp = []; %clear else dimensions change over clus/sets
+            clusTmp(1,:) = squeeze(clus(iClus,1,ntNanInd)); %split into two to keep array dim constant - when only 1 location, the array flips.
+            clusTmp(2,:) = squeeze(clus(iClus,2,ntNanInd));
+            %             clusTmp = squeeze(clus(iClus,:,ntNanInd));
             nTrlsUpd(iClus,iSet,iterI)=nnz(ntNanInd);
             for iTrlUpd=1:size(clusTmp,2)
-%                 if length(clusTmp(:,iTrlUpd))<2
-%                     a=1;
-%                 end
-%                 if isempty(clusTmp)
-%                    b=1; 
-%                 end
-                if ~isempty(clusTmp) % when cat learning, some clusters don't move
-                    for iTrlUpd=1:size(clusTmp,2)
-                        densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet,iterI) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet, iterI)+1;
-                    end
-                end
+                densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet,iterI) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet, iterI)+1;
             end
-        end        
-                
+        end
+        
         %now also compute clus means
         densityPlotClusSmth = zeros(length(spacing),length(spacing),nClus);
         for iClus=1:nClus
@@ -291,30 +286,24 @@ for iterI = 1:nIter
             clusMu(iClus,:,iSet,iterI) = [peakX, peakY];
             
             %make combined (grid cell) plot, smooth
-            densityPlot(:,:,iSet,iterI) = sum(densityPlotClus(:,:,:,iSet,iterI),3); %save this
+            densityPlot(:,:,iSet,iterI) = nansum(densityPlotClus(:,:,:,iSet,iterI),3); %save this
             densityPlotSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
         end
-        %compute autocorrmap, no need to save
-        aCorrMap = ndautoCORR(densityPlotSm);
-        %compute gridness
-        [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-        [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
-%         gA_g(iSet,iterI)   = gdataA.g_score;
-%         gA_o(iSet,iterI)   = gdataA.orientation;
-%         gA_wav(iSet,iterI) = gdataA.wavelength;
-%         gA_rad(iSet,iterI) = gdataA.radius;
-%         gW_g(iSet,iterI)   = gdataW.g_score;
-%         gW_o(iSet,iterI)   = gdataW.orientation;
-%         gW_wav(iSet,iterI) = gdataW.wavelength;
-%         gW_rad(iSet,iterI) = gdataW.radius;
         
-        gA(iSet,iterI,:) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
-        gW(iSet,iterI,:) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
-        
+        if strcmp(dat,'rand') %if finding cats, won't be gridlike
+            %compute autocorrmap, no need to save
+            aCorrMap = ndautoCORR(densityPlotSm);
+            %compute gridness
+            [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+            [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+            gA(iSet,iterI,:) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
+            gW(iSet,iterI,:) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
+        end
         
         %save average cluster positions (to compare with above)
-        muAvg(:,:,iSet,iterI) = mean(mu(:,:,fromTrlI(iSet):toTrlN(iSet)),3);
-    end    
+        muAvg(:,:,iSet,iterI) = nanmean(mu(:,:,fromTrlI(iSet):toTrlN(iSet)),3);
+    end
 end
 end
+
 

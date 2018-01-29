@@ -59,6 +59,14 @@ muAvg                = nan(nClus,2,nSets,nIter);
 muAll                = nan(nClus,2,nTrials,nIter);
 actAll               = nan(nClus,nTrials,nIter);
 nTrlsUpd             = nan(nClus,nSets,nIter);
+
+gA = nan(nSets,nIter,4);
+gW = nan(nSets,nIter,4);
+gA_act = nan(nSets,nIter,4);
+gW_act = nan(nSets,nIter,4);
+gA_actNorm = nan(nSets,nIter,4);
+gW_actNorm = nan(nSets,nIter,4);
+
 for iterI = 1:nIter
     
     fprintf('iter %d \n',iterI);    
