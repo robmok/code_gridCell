@@ -19,7 +19,6 @@ voronoi(muAll(:,1,end),muAll(:,2,end),'k');
 %% density map, autocorrelogram
 
 iterI=1; 
-
 gaussSmooth=1;
 
 for iSet=1:size(muAvg,3) %plot - diff averaging over nTrials
@@ -30,11 +29,17 @@ for iSet=1:size(muAvg,3) %plot - diff averaging over nTrials
     subplot(1,2,1); imagesc(densityPlotSm);
     subplot(1,2,2); imagesc(aCorrMap);
 end
-for iSet=1:size(muAvg,3) %plot - diff averaging over nTrials
+
+%% density map, unsmoothed, smoothed
+
+iterI=1; 
+gaussSmooth=1;
+
+for iSet=1:4%size(muAvg,3) 
 
    figure; hold on;
     subplot(1,2,1); imagesc(densityPlot(:,:,iSet,iterI));
-        densityPlotSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
+    densityPlotSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
     subplot(1,2,2); imagesc(densityPlotSm);
 end
 
@@ -155,7 +160,7 @@ colors = distinguishable_colors(nClus); %function for making distinguishable col
 
 figure;
 % figure('units','normalized','outerposition',[0 0 1 1]);
-for iTrl = nTrials/2:nTrials
+for iTrl = 1:nTrials
     if mod(iTrl,500)==0
 %         iPlot=iPlot+1;
 %         voronoi(muAll(:,1,iTrl,iterI),muAll(:,2,iTrl,iterI),'k')

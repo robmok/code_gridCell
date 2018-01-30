@@ -11,8 +11,16 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([wd '/gridSCORE_packed']));
 
+dat = 'cat'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
+
+% if cat learning specify number of categories (cluster centres) and sigma
+% of the gaussan
+nCats   = 2; %2 categories
+sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
+% sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
+
 %run multuple cluster numbers
-clus2run = 10; %[10 20]; %20, 30
+clus2run = 20; %[10 20]; %20, 30
 nTrials = 40000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 %box
@@ -45,6 +53,7 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 
 epsMuVals = [0.001, 0.0015, 0.002, .003, .0035, .004]; 
 epsMuVals = [0.0005, 0.0008]; 
+epsMuVals = [0.01]; 
 
 sigmaGaussVals = [stepSize/3, stepSize/3.5, stepSize/4];
 
@@ -60,7 +69,7 @@ sigmaGaussVals = [stepSize/3, stepSize/3.5, stepSize/4];
 %looks like optimizing the std is also important - stepSize/3.5 is pretty good
 
 % sigmaGaussVals = [stepSize/3, stepSize/3.5, stepSize/4];
-% sigmaGaussVals = stepSize/3.5;
+sigmaGaussVals = stepSize/3.5;
 
 
 %define box / environement - random points in a box
@@ -77,14 +86,14 @@ warpType = 'sq2rect';
 % alphaVals = [0, .2];
 % alphaVals = [.5, .8];
 alphaVals = 0;
-alphaVals = .2;
-alphaVals = .5;
-alphaVals = .8;
+% alphaVals = .2;
+% alphaVals = .5;
+% alphaVals = .8;
 
 sTypes = 0;%:1;% :3; %0, 1 ,2, 3
 cValsOrig = [1/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]; %just edited 2/nTrials --> 1/nTrials
 % cValsOrig = [2/(nTrials/2), 5/nTrials, 10/(nTrials/2), 20/(nTrials/2)];% if 80k trials...
-% cValsOrig = 20/nTrials;
+cValsOrig = 2/nTrials;
 
 %neighbour-weighted update
 neigh = 0; %if neigh = 0, no stoch, no alpha
@@ -113,17 +122,30 @@ end
 % save([saveDir '/randTrialsBox_80k'],'trials');
 
 %%
-saveDat=1; %save simulations
+saveDat=0; %save simulations
 
-nIter=200; %how many iterations (starting points)
+nIter=1; %how many iterations (starting points)
 
 plotGrids = 0; %plot to test? if nIter > 8, then won't plot
 
-if nTrials==40000
-    load([saveDir '/randTrialsBox_40k']); %load in same data with same trial sequence so same for each sim
-elseif nTrials==80000
-    load([saveDir '/randTrialsBox_80k']);
+switch dat
+    case 'rand'
+        if nTrials==40000
+            load([saveDir '/randTrialsBox_40k']); %load in same data with same trial sequence so same for each sim
+        elseif nTrials==80000
+            load([saveDir '/randTrialsBox_80k']);
+        end
+    case 'cat'
+        % draw points from 2 categories (gaussian) from a 2D feature space
+        nPoints = floor(nTrials/nCats); % points to sample
+        for iCat = 1:nCats
+            mu(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % ±10 so category centres are not on the edge
+            datPtsGauss(:,:,iCat) = round(repmat(mu(iCat,:),nPoints,1) + randn(nPoints,2)*R); % key - these are the coordinates of the points
+        end
+        trials = reshape(datPtsGauss,nTrials,2);
+        trials = trials(randperm(length(trials)),:);
 end
+    
 
 tic
 if ~neigh %separating neigh and stoch/momentum params
@@ -156,7 +178,7 @@ if ~neigh %separating neigh and stoch/momentum params
                             tic
                             %                         [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
                             %                         [muAll,actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
-                            [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,cParams,muAll] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids);
+                            [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,cParams,muAll] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat);
                             fname = [saveDir, sprintf('/covering_map_dat_gauss_%dclus_%dsigma_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,sigmaGauss100,nTrials,epsMuOrig10000,alpha10,stochasticType,c1m,nIter)];
                             timeTaken=toc;
                             if saveDat
@@ -185,7 +207,7 @@ elseif neigh %testing neigh/eps
 %                 beta = betaVals(iBeta);
 %                 beta100 = beta*100; %for save filename
 %                 tic
-%                 [densityPlot,clusMu,muAvg,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad]  = covering_map_sim_neigh(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,trials,beta);
+%                 [densityPlot,clusMu,muAvg,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad]  = covering_map_sim_neigh(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,trials,beta,dat);
 %                 fname = [saveDir, sprintf('/covering_map_dat_gauss_%dclus_%dtrls_eps%d_neigh_beta%d_%diters',nClus,nTrials,epsMuOrig1000,beta100,nIter)];
 %                 timeTaken=toc;
 %                 if saveDat

@@ -49,10 +49,8 @@ clusMu               = nan(nClus,2,nSets,nIter);
 muAvg                = nan(nClus,2,nSets,nIter);
 muAll                = nan(nClus,2,nTrials,nIter);
 nTrlsUpd             = nan(nClus,nSets,nIter);
-
 gA = nan(nSets,nIter,4);
 gW = nan(nSets,nIter,4);
-
 for iterI = 1:nIter
     
     fprintf('iter %d \n',iterI);

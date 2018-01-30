@@ -64,17 +64,17 @@ sTypes = 0;%:1;% :3; %0, 1 ,2, 3
 %  larger c = less stochastic over trials (becomes det quite early on); smaller c = more stochastic over trials (still a bit stochastic by the end)
 cValsOrig = [2/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]; %removed .1/nTrials and .25/nTrials,  too stochastic. also 3/ntrials, .5/nTrials
 % cValsOrig = [2/(nTrials/2), 5/nTrials, 10/(nTrials/2), 20/(nTrials/2)];% if 80k trials...
-% cValsOrig = 10/nTrials;
+cValsOrig = 10/nTrials;
 
 %neighbour-weighted update
-neigh = 0; %if neigh = 0, no stoch, no alpha
+neigh = 1; %if neigh = 0, no stoch, no alpha
 betaVals  = [.3 .5 .7]; %softmax param - higher = less neighbour update; from .25 going toward middle; .3 start OK
-% betaVals  = .5;
+betaVals  = .3;
 if neigh
    sTypes=0;
    alphaVals=0;
    epsMuVals=[.05 .075 .1];
-%    epsMuVals=[.05];
+   epsMuVals=[.01];
 end
 % % Create / load in saved test data
 % trials = [randsample(linspace(-locRange,locRange,101),nTrials,'true'); randsample(linspace(-locRange,locRange,101),nTrials,'true')]'; % random points in a box
@@ -106,7 +106,6 @@ switch dat
         elseif nTrials==80000
             load([saveDir '/randTrialsBox_80k']);
         end
-
     case 'cat'
         % draw points from 2 categories (gaussian) from a 2D feature space
         nPoints = floor(nTrials/nCats); % points to sample
@@ -174,7 +173,7 @@ elseif neigh %testing neigh/eps
                 beta = betaVals(iBeta);
                 beta100 = beta*100; %for save filename
                 tic
-                [densityPlot,clusMu,muAvg,gA,gW,muAll]  = covering_map_sim_neigh(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,trials,beta);
+                [densityPlot,clusMu,muAvg,gA,gW,muAll]  = covering_map_sim_neigh(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,trials,beta,dat);
                 fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_neigh_beta%d_%diters',nClus,nTrials,epsMuOrig1000,beta100,nIter)];
                 timeTaken=toc;
                 if saveDat

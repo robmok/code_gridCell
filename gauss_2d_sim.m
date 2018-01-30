@@ -1,4 +1,4 @@
-function [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,cParams,muAll] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids)
+function [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,cParams,muAll] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat)
 
 % if nargin > 
 % end
@@ -59,7 +59,6 @@ muAvg                = nan(nClus,2,nSets,nIter);
 muAll                = nan(nClus,2,nTrials,nIter);
 actAll               = nan(nClus,nTrials,nIter);
 nTrlsUpd             = nan(nClus,nSets,nIter);
-
 gA = nan(nSets,nIter,4);
 gW = nan(nSets,nIter,4);
 gA_act = nan(nSets,nIter,4);
@@ -276,7 +275,9 @@ for iterI = 1:nIter
         ind=clus>50; clus(ind)=50; % if overshoot out of the box, make it 50
         for iClus=1:nClus
             ntNanInd = squeeze(~isnan(clus(iClus,1,:)));
-            clusTmp  = squeeze(clus(iClus,:,ntNanInd));
+            clusTmp = []; %clear else dimensions change over clus/sets
+            clusTmp(1,:) = squeeze(clus(iClus,1,ntNanInd)); %split into two to keep array dim constant - when only 1 location, the array flips.
+            clusTmp(2,:) = squeeze(clus(iClus,2,ntNanInd));
             nTrlsUpd(iClus,iSet,iterI) = nnz(ntNanInd);
             actTmp   = squeeze(actClus(iClus,ntNanInd));
             for iTrlUpd=1:size(clusTmp,2)
@@ -321,68 +322,68 @@ for iterI = 1:nIter
         ind=isnan(densityPlotActNormTmp); densityPlotActNormTmp(ind)=0;
         densityPlotActNormSm = imgaussfilt(densityPlotActNormTmp,gaussSmooth);
        
-        
-        if plotGrids && nIter < 8
-            %compute autocorrmap, no need to save
-            aCorrMap = ndautoCORR(densityPlotSm);
-            %compute gridness
-            figure; hold on;
-            subplot(3,3,1);
-            imagesc(densityPlotSm);
-            subplot(3,3,2);
-            imagesc(aCorrMap);
-            subplot(3,3,3);
-            [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
-            [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
-            gA(iSet,iterI,:) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
-            gW(iSet,iterI,:) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
-            
-            %compute gridness for act
-            aCorrMap = ndautoCORR(densityPlotActSm);
-            subplot(3,3,4);
-            imagesc(densityPlotActSm);
-            subplot(3,3,5);
-            imagesc(aCorrMap);
-            subplot(3,3,6);
-            [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
-            [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
-            gA_act(iSet,iterI,:) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
-            gW_act(iSet,iterI,:) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
-            
-            %compute gridness for normalised act
-            aCorrMap = ndautoCORR(densityPlotActNormSm);
-            subplot(3,3,7);
-            imagesc(densityPlotActNormSm);
-            subplot(3,3,8);
-            imagesc(aCorrMap);
-            subplot(3,3,9);
-            [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
-            [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
-            gA_actNorm(iSet,iterI,:) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
-            gW_actNorm(iSet,iterI,:) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
-        else
-            aCorrMap = ndautoCORR(densityPlotSm);
-            %compute gridness
-            [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-            [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
-            gA(iSet,iterI,:) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
-            gW(iSet,iterI,:) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
-            
-            %compute gridness for act
-            aCorrMap = ndautoCORR(densityPlotActSm);
-            [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-            [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
-            gA_act(iSet,iterI,:) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
-            gW_act(iSet,iterI,:) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
-            
-            %compute gridness for normalised act
-            aCorrMap = ndautoCORR(densityPlotActNormSm);
-            [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-            [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
-            gA_actNorm(iSet,iterI,:) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
-            gW_actNorm(iSet,iterI,:) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
+        if strcmp(dat,'rand') %if finding cats, won't be gridlike
+            if plotGrids && nIter < 8
+                %compute autocorrmap, no need to save
+                aCorrMap = ndautoCORR(densityPlotSm);
+                %compute gridness
+                figure; hold on;
+                subplot(3,3,1);
+                imagesc(densityPlotSm);
+                subplot(3,3,2);
+                imagesc(aCorrMap);
+                subplot(3,3,3);
+                [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
+                [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+                gA(iSet,iterI,:) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
+                gW(iSet,iterI,:) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
+                
+                %compute gridness for act
+                aCorrMap = ndautoCORR(densityPlotActSm);
+                subplot(3,3,4);
+                imagesc(densityPlotActSm);
+                subplot(3,3,5);
+                imagesc(aCorrMap);
+                subplot(3,3,6);
+                [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
+                [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+                gA_act(iSet,iterI,:) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
+                gW_act(iSet,iterI,:) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
+                
+                %compute gridness for normalised act
+                aCorrMap = ndautoCORR(densityPlotActNormSm);
+                subplot(3,3,7);
+                imagesc(densityPlotActNormSm);
+                subplot(3,3,8);
+                imagesc(aCorrMap);
+                subplot(3,3,9);
+                [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
+                [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+                gA_actNorm(iSet,iterI,:) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
+                gW_actNorm(iSet,iterI,:) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
+            else
+                aCorrMap = ndautoCORR(densityPlotSm);
+                %compute gridness
+                [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+                [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+                gA(iSet,iterI,:) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
+                gW(iSet,iterI,:) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
+                
+                %compute gridness for act
+                aCorrMap = ndautoCORR(densityPlotActSm);
+                [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+                [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+                gA_act(iSet,iterI,:) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
+                gW_act(iSet,iterI,:) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
+                
+                %compute gridness for normalised act
+                aCorrMap = ndautoCORR(densityPlotActNormSm);
+                [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+                [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+                gA_actNorm(iSet,iterI,:) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
+                gW_actNorm(iSet,iterI,:) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
+            end
         end
-        
         
 
         %save average cluster positions (to compare with above)
