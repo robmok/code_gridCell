@@ -9,13 +9,13 @@ for iSet=1:5 %size(muAvg,3) %plot - diff averaging over nTrials
     figure; hold on;
     scatter(muAvg(:,1,iSet,iterI),muAvg(:,2,iSet,iterI),20e+2,colors,'.');
     xlim(locRange); ylim(locRange);
-    voronoi(muAvg(:,1,iSet,iterI),muAvg(:,2,iSet,iterI),'k');
+%     voronoi(muAvg(:,1,iSet,iterI),muAvg(:,2,iSet,iterI),'k');
 end
-
-figure; hold on;
-scatter(muAll(:,1,end),muAll(:,2,end),20e+2,colors,'.');
-xlim(locRange); ylim(locRange);
-voronoi(muAll(:,1,end),muAll(:,2,end),'k');
+% 
+% figure; hold on;
+% scatter(muAll(:,1,end),muAll(:,2,end),20e+2,colors,'.');
+% xlim(locRange); ylim(locRange);
+% voronoi(muAll(:,1,end),muAll(:,2,end),'k');
 %% density map, autocorrelogram
 
 iterI=1; 
@@ -27,7 +27,7 @@ for iSet=1:size(muAvg,3) %plot - diff averaging over nTrials
 
     figure; hold on;
     subplot(1,2,1); imagesc(densityPlotSm);
-    subplot(1,2,2); imagesc(aCorrMap);
+    subplot(1,2,2); imagesc(aCorrMap,[-.5 .5]);
 end
 
 %% density map, unsmoothed, smoothed

@@ -6,7 +6,7 @@ wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 cd(wd);
 
 nClus   = 40;
-nTrials = 5000; %how many locations in the box / trials - 2.5k ; 5k if reset
+nTrials = 5000; %how many locations in the box / trials - 2.5k ; 5k if rxeset
 
 colgrey = [.5, .5, .5];
 colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting

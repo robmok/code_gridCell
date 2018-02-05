@@ -11,7 +11,7 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([wd '/gridSCORE_packed']));
 
-dat = 'cat'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
+dat = 'rand'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
 
 % if cat learning specify number of categories (cluster centres) and sigma
 % of the gaussan
@@ -20,7 +20,7 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 
 %run multuple cluster numbers
-clus2run = 20; %20, 30
+clus2run = 30; %20, 30
 nTrials = 40000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 %box
@@ -67,7 +67,7 @@ cValsOrig = [2/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]; %removed .1/nTrials 
 cValsOrig = 10/nTrials;
 
 %neighbour-weighted update
-neigh = 1; %if neigh = 0, no stoch, no alpha
+neigh = 0; %if neigh = 0, no stoch, no alpha
 betaVals  = [.3 .5 .7]; %softmax param - higher = less neighbour update; from .25 going toward middle; .3 start OK
 betaVals  = .3;
 if neigh

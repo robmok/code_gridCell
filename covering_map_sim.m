@@ -242,6 +242,39 @@ for iterI = 1:nIter
                 muUpd(closestC,1,iTrl+1)=mu(closestC,1,iTrl+1);
                 muUpd(closestC,2,iTrl+1)=mu(closestC,2,iTrl+1);
             end
+            
+            
+%             % compute sse on each trial with respect to 'all trials' - independent data - looks similar if you change 'dataPtsTest' to 'trials'; also useful if want to test less vs more trials on training so that you equate SSE by number of test points
+
+
+%trials - since values are all points in the box, no need to use a
+%trialsTest, juse use all unique locations (unique pairs of xy) from trials
+
+% trialsUnique = ...
+
+
+
+
+                    distTrl=[];
+                    sse=nan(1,nClus);
+                    for iClus = 1:size(clusMu,1)
+                        distTrl(:,iClus)=sum([mu(iClus,1,iTrl)-trialsUnique(:,1), mu(iClus,2,iTrl)-trialsUnique(:,2)].^2,2);
+%                         distTrl(:,iClus)=sum([clusMu(iClus,1,iSet,iterI)-dataPtsTest(:,1), clusMu(iClus,2,iSet,iterI)-dataPtsTest(:,2)].^2,2);
+                    end
+                    [indValsTrl, indTmp]=min(distTrl,[],2); % find which clusters are points closest to
+                    for iClus = 1:size(clusMu,1)
+                        sse(iClus)=sum(sum([mu(iClus,1,iTrl)-trialsUnique(indTmp==iClus,1), mu(iClus,2,iTrl)-trialsUnique(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
+%                         sse(iClus)=sum(sum([clusMu(iClus,1,iSet,iterI)-dataPtsTest(indTmp==iClus,1), clusMu(iClus,2,iSet,iterI)-dataPtsTest(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
+                    end
+                    tsse=sum(sse);
+                    
+                    %compute 'spreaded-ness' - variance of SE across clusters is a measure
+                    %of this, assuing uniform data points
+                    devAvgSSE            = sse-mean(sse);
+                    stdAcrossClus = std(devAvgSSE);
+                    varAcrossClus = var(devAvgSSE);
+
+
 
     end
 %     muEnd(:,:,iterI)=mu(:,:,end);
