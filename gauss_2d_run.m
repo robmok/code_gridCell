@@ -11,7 +11,7 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([wd '/gridSCORE_packed']));
 
-dat = 'cat'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
+dat = 'rand'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
 
 % if cat learning specify number of categories (cluster centres) and sigma
 % of the gaussan
@@ -135,6 +135,8 @@ switch dat
         elseif nTrials==80000
             load([saveDir '/randTrialsBox_80k']);
         end
+        %for computing sse over trials
+        load([saveDir '/randTrialsBox_trialsUnique']);
     case 'cat'
         % draw points from 2 categories (gaussian) from a 2D feature space
         nPoints = floor(nTrials/nCats); % points to sample
@@ -144,6 +146,7 @@ switch dat
         end
         trials = reshape(datPtsGauss,nTrials,2);
         trials = trials(randperm(length(trials)),:);
+        trialsUnique=[];
 end
     
 
@@ -178,7 +181,7 @@ if ~neigh %separating neigh and stoch/momentum params
                             tic
                             %                         [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
                             %                         [muAll,actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
-                            [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,cParams,muAll] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat);
+                            [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,cParams,muAll] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,plotGrids,dat);
                             fname = [saveDir, sprintf('/covering_map_dat_gauss_%dclus_%dsigma_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,sigmaGauss100,nTrials,epsMuOrig10000,alpha10,stochasticType,c1m,nIter)];
                             timeTaken=toc;
                             if saveDat

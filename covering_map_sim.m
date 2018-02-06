@@ -169,12 +169,15 @@ for iterI = 1:nIter
     deltaMu  = zeros(nClus,2,nTrials);
     clusUpdates = zeros(nClus,2); %acutally starting at 0 is OK, since there was no momentum from last trial
     
-    sseW       = nan(nTrials,1);
-    sseW(1)    = 1;
-    spreadW    = nan(nTrials,1);
-    spreadW(1) = 1;
-%     spreadVarW = nan(nTrials,1);
-%     spreadVarW(1) = 1;
+    tsse            = nan(nTrials,1);
+    stdAcrossClus   = nan(nTrials,1);
+    varAcrossClus   = nan(nTrials,1);
+    sseW            = nan(nTrials,1);
+    sseW(1)         = 1;
+    spreadW         = nan(nTrials,1);
+    spreadW(1)      = 1;
+    spreadVarW = nan(nTrials,1);
+    spreadVarW(1) = 1;
     
     for iTrl=1:nTrials
             
@@ -228,11 +231,12 @@ for iterI = 1:nIter
             updatedC(iTrl) = closestC;
 
 %             epsMu = epsMuOrig;
-%             epsMu = epsMuOrig*sseW(iTrl); %weight learning rate by prop SSE reduce from start
-            epsMu = epsMuOrig*spreadW(iTrl); %weight learning rate by prop spreadout-ness reduced from start
+            epsMu = epsMuOrig*sseW(iTrl); %weight learning rate by prop SSE reduce from start
+%             epsMu = epsMuOrig*spreadW(iTrl); %weight learning rate by prop spreadout-ness reduced from start
 %             epsMu = epsMuOrig*spreadVarW(iTrl); %weight learning rate by prop spreadout-ness reduced from start
             
-            epsMu = epsMuOrig*sseW(iTrl)*spreadW(iTrl); %weight learning rate by both the above
+%             epsMu = epsMuOrig*sseW(iTrl)*spreadW(iTrl); %weight learning rate by both the above
+            epsMu = epsMuOrig*mean([sseW(iTrl),spreadW(iTrl)]); %weight learning rate by average of both the above
 
             epsMuAll(iTrl,:) = [epsMu,closestC]; 
 
@@ -270,7 +274,7 @@ for iterI = 1:nIter
             for iClus = 1:nClus
                 distTrl(:,iClus)=sum([mu(iClus,1,iTrl)-trialsUnique(:,1), mu(iClus,2,iTrl)-trialsUnique(:,2)].^2,2);
             end
-            %                     distTrl=[mu(:,1,iTrl)'-trialsUnique(:,1), mu(:,2,iTrl)'-trialsUnique(:,2)].^2; %trying to vectorise..
+            % distTrl=[mu(:,1,iTrl)'-trialsUnique(:,1), mu(:,2,iTrl)'-trialsUnique(:,2)].^2; %trying to vectorise..
             [indValsTrl, indTmp]=min(distTrl,[],2); % find which clusters are points closest to
             for iClus = 1:size(clusMu,1)
                 sse(iClus)=sum(sum([mu(iClus,1,iTrl)-trialsUnique(indTmp==iClus,1), mu(iClus,2,iTrl)-trialsUnique(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
@@ -285,17 +289,8 @@ for iterI = 1:nIter
             varAcrossClus(iTrl) = var(devAvgSSE);
 
             sseW(iTrl+1) = tsse(iTrl)./tsse(1);% weight next learning rate by prop of sse from the start
-            
-            spreadW(iTrl+1) = stdAcrossClus(iTrl)./stdAcrossClus(1);
-            spreadW(iTrl+1) = (stdAcrossClus(iTrl)./stdAcrossClus(1)).^0.5; %make it smaller
-%             spreadW(iTrl+1) = (stdAcrossClus(iTrl)./stdAcrossClus(1)).^0.75; %make it smaller
-            
-%             if iTrl<=500 %looks like if use prop spreadoutness, learning rate goes down too much /fast (more useful here average
-%                 spreadW(iTrl+1) = 1;
-%             else
-%                 spreadW(iTrl+1) = stdAcrossClus(iTrl)./mean(stdAcrossClus(100));
-%             end
-
+%             spreadW(iTrl+1) = stdAcrossClus(iTrl)./stdAcrossClus(1);
+%             spreadW(iTrl+1) = (stdAcrossClus(iTrl)./stdAcrossClus(1)).^0.5; %0.75 %make it smaller
 %             spreadVarW(iTrl+1) = varAcrossClus(iTrl)./varAcrossClus(1);
 
     end

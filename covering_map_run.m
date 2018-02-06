@@ -37,7 +37,6 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 epsMuVals = [.025, .05, .075 .1]; 
 % epsMuVals = [.075 .1]; 
 epsMuVals = .05; 
-epsMuVals = .05; 
 
 %define box / environement - random points in a box
 box = 'square'; %square, rect, trapz, trapzSq (trapz and a square box attached)
@@ -83,13 +82,13 @@ end
 % save([saveDir '/randTrialsBox_30k'],'trials');
 
 % %new - tile the whole space rather than sample
-sq=linspace(locRange(1),locRange(2),nSteps);
-allPts=[];
-for i=1:length(sq)
-    for j=1:length(sq)
-        allPts = [allPts; [sq(i), sq(j)]];
-    end
-end
+% sq=linspace(locRange(1),locRange(2),nSteps);
+% allPts=[];
+% for i=1:length(sq)
+%     for j=1:length(sq)
+%         allPts = [allPts; [sq(i), sq(j)]];
+%     end
+% end
 % trials=repmat(allPts,nTrials/length(allPts),1); %note, numel of allPts must be divisble by nTrials atm
 % trials=trials(randperm(length(trials)),:);
 % % save([saveDir '/randTrialsBox_40k'],'trials');
