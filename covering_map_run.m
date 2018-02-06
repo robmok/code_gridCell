@@ -20,7 +20,7 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 
 %run multuple cluster numbers
-clus2run = 20; %20, 30
+clus2run = [20, 30]; %20, 30
 nTrials = 40000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 %box
@@ -34,9 +34,17 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 % epsMuVals=[.005, .0075, .05];
 %for neigh use this;
 % epsMuVals = [.015, .025, .05 .075 .1]; %.015 should be too slow 
-epsMuVals = [.025, .05, .075 .1]; 
+% epsMuVals = [.025, .05, .075 .1]; 
 % epsMuVals = [.075 .1]; 
-epsMuVals = .05; 
+
+%to test with sseW
+epsMuVals = [.015, .025, .05, .075, .1, .2];  %.01 too slow? - .015 at edge, still getting some good patterns.. .075 is gd! %.3 is too fast, .25 on edge
+epsMuVals = .075; 
+epsMuVals = [.015, .025, .05];
+% epsMuVals = [.075, .1, .2]; 
+
+%weight learning rate by SSE 
+weightEpsSSE = 0; %1 or 0
 
 %define box / environement - random points in a box
 box = 'square'; %square, rect, trapz, trapzSq (trapz and a square box attached)
@@ -96,9 +104,9 @@ end
 % trialsUnique=allPts;
 % save([saveDir '/randTrialsBox_trialsUnique'],'trialsUnique');
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
-nIter=1; %how many iterations (starting points)
+nIter=100; %how many iterations (starting points)
 
 switch dat
     case 'rand'
@@ -149,8 +157,9 @@ if ~neigh %separating neigh and stoch/momentum params
                         fprintf('Running alphaVal %0.2f\n',alpha);
                         tic
                         %                         [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
-                        [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,cParams,muAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat);
-                        fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,stochasticType,c1m,nIter)];
+                        [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,cParams,muAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE);
+%                         fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,stochasticType,c1m,nIter)];
+                        fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_stype%d_cVal%d_sseW%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,stochasticType,c1m,weightEpsSSE,nIter)];
                         timeTaken=toc;
                         if saveDat
                             if warpBox
@@ -177,7 +186,7 @@ elseif neigh %testing neigh/eps
                 beta = betaVals(iBeta);
                 beta100 = beta*100; %for save filename
                 tic
-                [densityPlot,clusMu,muAvg,gA,gW,muAll]  = covering_map_sim_neigh(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,trials,trialsUnique,beta,dat);
+                [densityPlot,clusMu,muAvg,gA,gW,muAll]  = covering_map_sim_neigh(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,trials,trialsUnique,beta,dat,weightEpsSSE);
                 fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_neigh_beta%d_%diters',nClus,nTrials,epsMuOrig1000,beta100,nIter)];
                 timeTaken=toc;
                 if saveDat

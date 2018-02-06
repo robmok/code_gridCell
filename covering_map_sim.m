@@ -1,5 +1,5 @@
 % function [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
-function [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,cParams,muAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat)
+function [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,cParams,muAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE)
 
 % if dont save all muAll and muEnd, function output is muEndBest and muAll
 % Best, and uncomment the bit at the end of the script
@@ -170,14 +170,11 @@ for iterI = 1:nIter
     clusUpdates = zeros(nClus,2); %acutally starting at 0 is OK, since there was no momentum from last trial
     
     tsse            = nan(nTrials,1);
-    stdAcrossClus   = nan(nTrials,1);
-    varAcrossClus   = nan(nTrials,1);
-    sseW            = nan(nTrials,1);
-    sseW(1)         = 1;
-    spreadW         = nan(nTrials,1);
-    spreadW(1)      = 1;
-    spreadVarW = nan(nTrials,1);
-    spreadVarW(1) = 1;
+%     stdAcrossClus   = nan(nTrials,1);
+%     varAcrossClus   = nan(nTrials,1);
+    sseW            = ones(nTrials,1);
+%     spreadW         = ones(nTrials,1);
+%     spreadVarW      = ones(nTrials,1);
     
     for iTrl=1:nTrials
             
@@ -236,7 +233,7 @@ for iterI = 1:nIter
 %             epsMu = epsMuOrig*spreadVarW(iTrl); %weight learning rate by prop spreadout-ness reduced from start
             
 %             epsMu = epsMuOrig*sseW(iTrl)*spreadW(iTrl); %weight learning rate by both the above
-            epsMu = epsMuOrig*mean([sseW(iTrl),spreadW(iTrl)]); %weight learning rate by average of both the above
+%             epsMu = epsMuOrig*mean([sseW(iTrl),spreadW(iTrl)]); %weight learning rate by average of both the above
 
             epsMuAll(iTrl,:) = [epsMu,closestC]; 
 
@@ -269,26 +266,33 @@ for iterI = 1:nIter
             % trials - since values are all points in the box, no need to use a
             % trialsTest, juse use all unique locations (unique pairs of xy) from trials
             
-            distTrl=[];
+%             distTrl=[];
             sse=nan(1,nClus);
-            for iClus = 1:nClus
-                distTrl(:,iClus)=sum([mu(iClus,1,iTrl)-trialsUnique(:,1), mu(iClus,2,iTrl)-trialsUnique(:,2)].^2,2);
-            end
-            % distTrl=[mu(:,1,iTrl)'-trialsUnique(:,1), mu(:,2,iTrl)'-trialsUnique(:,2)].^2; %trying to vectorise..
+%             for iClus = 1:nClus
+%                 distTrl(:,iClus)=sum([mu(iClus,1,iTrl)-trialsUnique(:,1), mu(iClus,2,iTrl)-trialsUnique(:,2)].^2,2);
+%             end
+            %vectorised
+            distTrl=(mu(:,1,iTrl)'-trialsUnique(:,1)).^2+(mu(:,2,iTrl)'-trialsUnique(:,2)).^2; %trying to vectorise..
+
+            
             [indValsTrl, indTmp]=min(distTrl,[],2); % find which clusters are points closest to
+            
+            %any way to vectorize this?
             for iClus = 1:size(clusMu,1)
                 sse(iClus)=sum(sum([mu(iClus,1,iTrl)-trialsUnique(indTmp==iClus,1), mu(iClus,2,iTrl)-trialsUnique(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
                 %                         sse(iClus)=sum(sum([clusMu(iClus,1,iSet,iterI)-dataPtsTest(indTmp==iClus,1), clusMu(iClus,2,iSet,iterI)-dataPtsTest(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
             end
             tsse(iTrl)=sum(sse);
             
-            %compute 'spreaded-ness' - variance of SE across clusters is a measure
-            %of this, assuming uniform data points
-            devAvgSSE           = sse-mean(sse);
-            stdAcrossClus(iTrl) = std(devAvgSSE); % may be better since normalises by nClus?
-            varAcrossClus(iTrl) = var(devAvgSSE);
+%             %compute 'spreaded-ness' - variance of SE across clusters is a measure
+%             %of this, assuming uniform data points
+%             devAvgSSE           = sse-mean(sse);
+%             stdAcrossClus(iTrl) = std(devAvgSSE); % may be better since normalises by nClus?
+%             varAcrossClus(iTrl) = var(devAvgSSE);
 
-            sseW(iTrl+1) = tsse(iTrl)./tsse(1);% weight next learning rate by prop of sse from the start
+            if weightEpsSSE
+                sseW(iTrl+1) = tsse(iTrl)./tsse(1);% weight next learning rate by prop of sse from the start
+            end
 %             spreadW(iTrl+1) = stdAcrossClus(iTrl)./stdAcrossClus(1);
 %             spreadW(iTrl+1) = (stdAcrossClus(iTrl)./stdAcrossClus(1)).^0.5; %0.75 %make it smaller
 %             spreadVarW(iTrl+1) = varAcrossClus(iTrl)./varAcrossClus(1);

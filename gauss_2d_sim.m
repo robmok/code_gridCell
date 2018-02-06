@@ -1,11 +1,11 @@
-function [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,cParams,muAll] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,plotGrids,dat)
+function [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,cParams,muAll] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,plotGrids,dat,weightEpsSSE)
 
 % if nargin > 
 % end
 
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
 stepSize=diff(spacing(1:2));
-epsMu = epsMuOrig;
+% epsMu = epsMuOrig;
 
 %for crossvalidation - 
 nTrialsTest = nTrials;% nTrialsTest = 5000; %keep it constant if want to compare with nTrials above
@@ -28,12 +28,13 @@ fitDeltaMuY=@(epsMuVec,x,y,fdbck,act)(epsMuVec.*(fdbck-act).*exp(-(x.^2+y.^2)./2
 if nTrials==40000
 %     fromTrlI = [1.0e+4, 2.0e+4, 3.5e+4, 1.0e+4, 1.5e+4, 3.0e+4, 1.0e+4,  1.5e+4, 2.5e+4, 1.0e+4, 2.0e+4];
 %     toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4];
-    %fewer for now - took away all starting with 10k except last - one 'early' one 'late'
-    fromTrlI = [2.0e+4, 3.5e+4, 1.5e+4, 3.0e+4, 1.5e+4, 2.5e+4, 1.0e+4, 2.0e+4];
-    toTrlN   = [2.5e+4, 4.0e+4, 2.5e+4, 4.0e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4];
-    %even fewer just to test
-%     fromTrlI = [2.5e+4, 2.0e+4];
-%     toTrlN   = [4.0e+4, 4.0e+4];
+     %fewer for now - took away all starting with 10k except last - one 'early' one 'late'
+%     fromTrlI = [2.0e+4, 3.5e+4, 1.5e+4, 3.0e+4, 1.5e+4, 2.5e+4, 1.0e+4, 2.0e+4];
+%     toTrlN   = [2.5e+4, 4.0e+4, 2.5e+4, 4.0e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4];
+    %even fewer
+    fromTrlI = [3.5e+4, 3.0e+4, 2.5e+4, 2.0e+4];
+    toTrlN   = [4.0e+4, 4.0e+4, 4.0e+4, 4.0e+4];
+    
 elseif nTrials==80000
     % with double nTrials 
 %     fromTrlI = [2.5e+4, 3.5e+4, 7.5e+4, 3.0e+4, 4.0e+4, 7.0e+4, 3.5e+4,  4.5e+4, 5.5e+4, 4.0e+4, 6.0e+4]; %this makes avg over same trials as above
@@ -43,8 +44,8 @@ elseif nTrials==80000
     
 %     fromTrlI = [1.5e+4, 2.0e+4].*2;
 %     toTrlN   = [3.0e+4, 4.0e+4].*2;
-    fromTrlI = [2.0e+4, 3.0e+4].*2;
-    toTrlN   = [3.0e+4, 4.0e+4].*2;
+%     fromTrlI = [2.0e+4, 3.0e+4].*2;
+%     toTrlN   = [3.0e+4, 4.0e+4].*2;
 end
 nSets                = length(fromTrlI);
 % if plotGrids 
@@ -178,14 +179,11 @@ for iterI = 1:nIter
     act         =   nan(nClus,nTrials);
     
     tsse            = nan(nTrials,1);
-    stdAcrossClus   = nan(nTrials,1);
-    varAcrossClus   = nan(nTrials,1);
-    sseW            = nan(nTrials,1);
-    sseW(1)         = 1;
-    spreadW         = nan(nTrials,1);
-    spreadW(1)      = 1;
-    spreadVarW = nan(nTrials,1);
-    spreadVarW(1) = 1;
+%     stdAcrossClus   = nan(nTrials,1);
+%     varAcrossClus   = nan(nTrials,1);
+    sseW            = ones(nTrials,1);
+%     spreadW         = ones(nTrials,1);
+%     spreadVarW      = ones(nTrials,1);
     
     for iTrl=1:nTrials
             epsMuVec = zeros(nClus,1);
@@ -239,7 +237,7 @@ for iterI = 1:nIter
             %log which cluster has been updated
             updatedC(iTrl) = closestC;
 
-            epsMuVec(closestC)=epsMuOrig;
+%             epsMuVec(closestC)=epsMuOrig;
             
             %weight learning rate by sse
             epsMuVec(closestC) = epsMuOrig*sseW(iTrl); %weight learning rate by prop SSE reduce from start
@@ -288,12 +286,14 @@ for iterI = 1:nIter
             % trials - since values are all points in the box, no need to use a
             % trialsTest, juse use all unique locations (unique pairs of xy) from trials
             
-            distTrl=[];
+%             distTrl=[];
             sse=nan(1,nClus);
-            for iClus = 1:nClus
-                distTrl(:,iClus)=sum([mu(iClus,1,iTrl)-trialsUnique(:,1), mu(iClus,2,iTrl)-trialsUnique(:,2)].^2,2);
-            end
-            % distTrl=[mu(:,1,iTrl)'-trialsUnique(:,1), mu(:,2,iTrl)'-trialsUnique(:,2)].^2; %trying to vectorise..
+%             for iClus = 1:nClus
+%                 distTrl(:,iClus)=sum([mu(iClus,1,iTrl)-trialsUnique(:,1), mu(iClus,2,iTrl)-trialsUnique(:,2)].^2,2);
+%             end
+            %vectorised
+            distTrl=(mu(:,1,iTrl)'-trialsUnique(:,1)).^2+(mu(:,2,iTrl)'-trialsUnique(:,2)).^2; 
+            
             [indValsTrl, indTmp]=min(distTrl,[],2); % find which clusters are points closest to
             for iClus = 1:size(clusMu,1)
                 sse(iClus)=sum(sum([mu(iClus,1,iTrl)-trialsUnique(indTmp==iClus,1), mu(iClus,2,iTrl)-trialsUnique(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
@@ -301,14 +301,18 @@ for iterI = 1:nIter
             end
             tsse(iTrl)=sum(sse);
             
-            %compute 'spreaded-ness' - variance of SE across clusters is a measure
-            %of this, assuming uniform data points
-            devAvgSSE           = sse-mean(sse);
-            stdAcrossClus(iTrl) = std(devAvgSSE); % may be better since normalises by nClus?
-            varAcrossClus(iTrl) = var(devAvgSSE);
-
-            sseW(iTrl+1) = tsse(iTrl)./tsse(1);% weight next learning rate by prop of sse from the start
-            spreadW(iTrl+1) = stdAcrossClus(iTrl)./stdAcrossClus(1);
+%             %compute 'spreaded-ness' - variance of SE across clusters is a measure
+%             %of this, assuming uniform data points
+%             devAvgSSE           = sse-mean(sse);
+%             stdAcrossClus(iTrl) = std(devAvgSSE); % may be better since normalises by nClus?
+%             varAcrossClus(iTrl) = var(devAvgSSE);
+            if weightEpsSSE
+                sseW(iTrl+1) = tsse(iTrl)./tsse(1);% weight next learning rate by prop of sse from the start
+%                 if iTrl>100
+%                     sseW(iTrl+1) = tsse(iTrl)./mean(tsse(1:100));
+%                 end
+            end
+%             spreadW(iTrl+1) = stdAcrossClus(iTrl)./stdAcrossClus(1);
 %             spreadW(iTrl+1) = (stdAcrossClus(iTrl)./stdAcrossClus(1)).^0.5; %0.75 %make it smaller
 %             spreadVarW(iTrl+1) = varAcrossClus(iTrl)./varAcrossClus(1);
             

@@ -20,7 +20,7 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 
 %run multuple cluster numbers
-clus2run = 20; %[10 20]; %20, 30
+clus2run = [20 30]; %[10 20]; %20, 30
 nTrials = 40000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 %box
@@ -50,10 +50,23 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 % [0.0005, 0.001, 0.0015, 0.002, 0.0025, 0.003]
 %compromise:
 % [0.001, 0.0015, 0.002, .003, .0035, .004]
-
 epsMuVals = [0.001, 0.0015, 0.002, .003, .0035, .004]; 
 epsMuVals = [0.0005, 0.0008]; 
 epsMuVals = [0.01]; 
+
+% with weighting learning rate by SSE, 0.01, 0.0075, 0.006, 0.005, .0025,
+% work.. - slower works even better?? (.0025) - maybe need to reduce
+% learning rate at a slower rate? 0.015 is sometimes ok, sometimes too slow
+% (depends on starting point then)
+% - .001 is too slow
+
+%.05 is too fast .02, .025, 0.35 too fast but can test
+epsMuVals = [0.0025, 0.005, .01, .02, .025]; 
+epsMuVals = [0.0025, 0.005]; 
+% epsMuVals = [.01, .02]; 
+
+%weight learning rate by SSE 
+weightEpsSSE = 1; %1 or 0
 
 sigmaGaussVals = [stepSize/3, stepSize/3.5, stepSize/4];
 
@@ -122,9 +135,9 @@ end
 % save([saveDir '/randTrialsBox_80k'],'trials');
 
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
-nIter=1; %how many iterations (starting points)
+nIter=100; %how many iterations (starting points)
 
 plotGrids = 0; %plot to test? if nIter > 8, then won't plot
 
@@ -181,8 +194,9 @@ if ~neigh %separating neigh and stoch/momentum params
                             tic
                             %                         [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
                             %                         [muAll,actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
-                            [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,cParams,muAll] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,plotGrids,dat);
-                            fname = [saveDir, sprintf('/covering_map_dat_gauss_%dclus_%dsigma_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,sigmaGauss100,nTrials,epsMuOrig10000,alpha10,stochasticType,c1m,nIter)];
+                            [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,cParams,muAll] = gauss_2d_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,plotGrids,dat,weightEpsSSE);
+%                             fname = [saveDir, sprintf('/covering_map_dat_gauss_%dclus_%dsigma_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,sigmaGauss100,nTrials,epsMuOrig10000,alpha10,stochasticType,c1m,nIter)];
+                            fname = [saveDir, sprintf('/covering_map_dat_gauss_%dclus_%dsigma_%dtrls_eps%d_alpha%d_stype%d_cVal%d_sseW%d_%diters',nClus,sigmaGauss100,nTrials,epsMuOrig10000,alpha10,stochasticType,c1m,weightEpsSSE,nIter)];
                             timeTaken=toc;
                             if saveDat
                                 if warpBox

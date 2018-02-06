@@ -5,7 +5,7 @@ colors = distinguishable_colors(nClus); %function for making distinguishable col
 
 iterI=1; 
 
-for iSet=1:5 %size(muAvg,3) %plot - diff averaging over nTrials
+for iSet=1:4 %size(muAvg,3) %plot - diff averaging over nTrials
     figure; hold on;
     scatter(muAvg(:,1,iSet,iterI),muAvg(:,2,iSet,iterI),20e+2,colors,'.');
     xlim(locRange); ylim(locRange);
@@ -51,7 +51,7 @@ spacing=linspace(locRange(1),locRange(2),locRange(2)+1);
 % densityPlotClus      = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
 densityPlotClus      = zeros(length(spacing),length(spacing),nClus,nSets);
 
-for iSet=1:11%:nSets
+for iSet=1:4%:nSets
 
 for iClus=1:nClus
     clusTmp  = squeeze(round(muAvg(iClus,:,iSet)))';
