@@ -20,7 +20,7 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 
 %run multuple cluster numbers
-clus2run = 30; %20, 30
+clus2run = 20; %20, 30
 nTrials = 40000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 %box
@@ -36,6 +36,7 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 % epsMuVals = [.015, .025, .05 .075 .1]; %.015 should be too slow 
 epsMuVals = [.025, .05, .075 .1]; 
 % epsMuVals = [.075 .1]; 
+epsMuVals = .05; 
 epsMuVals = .05; 
 
 %define box / environement - random points in a box
@@ -82,18 +83,19 @@ end
 % save([saveDir '/randTrialsBox_30k'],'trials');
 
 % %new - tile the whole space rather than sample
-% sq=linspace(locRange(1),locRange(2),nSteps);
-% allPts=[];
-% for i=1:length(sq)
-%     for j=1:length(sq)
-%         allPts = [allPts; [sq(i), sq(j)]];
-%     end
-% end
+sq=linspace(locRange(1),locRange(2),nSteps);
+allPts=[];
+for i=1:length(sq)
+    for j=1:length(sq)
+        allPts = [allPts; [sq(i), sq(j)]];
+    end
+end
 % trials=repmat(allPts,nTrials/length(allPts),1); %note, numel of allPts must be divisble by nTrials atm
 % trials=trials(randperm(length(trials)),:);
 % % save([saveDir '/randTrialsBox_40k'],'trials');
 % save([saveDir '/randTrialsBox_80k'],'trials');
-
+% trialsUnique=allPts;
+% save([saveDir '/randTrialsBox_trialsUnique'],'trialsUnique');
 %%
 saveDat=0; %save simulations
 
@@ -106,6 +108,8 @@ switch dat
         elseif nTrials==80000
             load([saveDir '/randTrialsBox_80k']);
         end
+        %for computing sse over trials
+        load([saveDir '/randTrialsBox_trialsUnique']);
     case 'cat'
         % draw points from 2 categories (gaussian) from a 2D feature space
         nPoints = floor(nTrials/nCats); % points to sample
@@ -115,6 +119,7 @@ switch dat
         end
         trials = reshape(datPtsGauss,nTrials,2);
         trials = trials(randperm(length(trials)),:);
+        trialsUnique=[];
 end
     
 
@@ -145,7 +150,7 @@ if ~neigh %separating neigh and stoch/momentum params
                         fprintf('Running alphaVal %0.2f\n',alpha);
                         tic
                         %                         [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c);
-                        [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,cParams,muAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c,dat);
+                        [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,cParams,muAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat);
                         fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_alpha%d_stype%d_cVal%d_%diters',nClus,nTrials,epsMuOrig1000,alpha10,stochasticType,c1m,nIter)];
                         timeTaken=toc;
                         if saveDat
@@ -173,7 +178,7 @@ elseif neigh %testing neigh/eps
                 beta = betaVals(iBeta);
                 beta100 = beta*100; %for save filename
                 tic
-                [densityPlot,clusMu,muAvg,gA,gW,muAll]  = covering_map_sim_neigh(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,trials,beta,dat);
+                [densityPlot,clusMu,muAvg,gA,gW,muAll]  = covering_map_sim_neigh(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,trials,trialsUnique,beta,dat);
                 fname = [saveDir, sprintf('/covering_map_dat_%dclus_%dtrls_eps%d_neigh_beta%d_%diters',nClus,nTrials,epsMuOrig1000,beta100,nIter)];
                 timeTaken=toc;
                 if saveDat

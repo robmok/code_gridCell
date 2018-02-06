@@ -1,5 +1,5 @@
 % function [densityPlot,clusMu,muAvg,nTrlsUpd,gA_g,gA_o,gA_wav,gA_rad,gW_g,gW_o,gW_wav,gW_rad,cParams] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c)
-function [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,cParams,muAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,stochasticType,c,dat)
+function [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,cParams,muAll] = covering_map_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat)
 
 % if dont save all muAll and muEnd, function output is muEndBest and muAll
 % Best, and uncomment the bit at the end of the script
@@ -34,6 +34,11 @@ gaussSmooth=1; %smoothing for density map
 if nTrials==40000
     fromTrlI = [1.0e+4, 2.0e+4, 3.5e+4, 1.0e+4, 1.5e+4, 3.0e+4, 1.0e+4,  1.5e+4, 2.5e+4, 1.0e+4, 2.0e+4];
     toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4];
+
+    fromTrlI = [3.5e+4, 3.0e+4, 2.5e+4, 2.0e+4];
+    toTrlN   = [4.0e+4, 4.0e+4, 4.0e+4, 4.0e+4];
+    
+    
 elseif nTrials==80000
     % with double nTrials 
 %     fromTrlI = [2.5e+4, 3.5e+4, 7.5e+4, 3.0e+4, 4.0e+4, 7.0e+4, 3.5e+4,  4.5e+4, 5.5e+4, 4.0e+4, 6.0e+4]; %this makes avg over same trials as above
@@ -145,7 +150,7 @@ for iterI = 1:nIter
             distClusPr   = cumsum(distClusNorm(:,1)); %get cumsum, then generate rand val from 0 to 1 and choose smallest val - the larger the dis, the more likely the rand value will lie between it and its previous value in a cumsum plot
             ind=find(rand(1)<distClusPr,1);% %find smallest value that is larger than the random value (0 to 1 uniform distr)
             
-            %                     tmp(i)=distClus(ind,1); %testing if getting the right values; if plot, see that it should be lower pr for closer values, higher for larger. note if very few high distances, this hist will look normally distributed
+            % tmp(i)=distClus(ind,1); %testing if getting the right values; if plot, see that it should be lower pr for closer values, higher for larger. note if very few high distances, this hist will look normally distributed
             
             clusInd = distClus(ind,2); %find which is the closest cluster
             indDat = find(distInit(:,clusInd)==distClus(ind,1)); %find where the datapoint is in the original vector
@@ -164,6 +169,13 @@ for iterI = 1:nIter
     deltaMu  = zeros(nClus,2,nTrials);
     clusUpdates = zeros(nClus,2); %acutally starting at 0 is OK, since there was no momentum from last trial
     
+    sseW       = nan(nTrials,1);
+    sseW(1)    = 1;
+    spreadW    = nan(nTrials,1);
+    spreadW(1) = 1;
+%     spreadVarW = nan(nTrials,1);
+%     spreadVarW(1) = 1;
+    
     for iTrl=1:nTrials
             
             %if change size of box half way
@@ -181,7 +193,6 @@ for iterI = 1:nIter
 %                     beta=c*(iTrl-1);         % so this gets bigger, and more deterministic with more trials
                     beta=c*(iTrl+nTrials/50);  % maybe no need to be so stochatic at start
                 elseif stochasticType==2
-%                     beta=c*(iTrl-1);
                     beta=c*(iTrl+nTrials/50);  % maybe no need to be so stochatic at start
                     if beta >= c*500 %it might be worth checking if this depends on nClusters - distances will change
                         beta = c*500;
@@ -216,7 +227,13 @@ for iterI = 1:nIter
             %log which cluster has been updated
             updatedC(iTrl) = closestC;
 
-            epsMu = epsMuOrig;
+%             epsMu = epsMuOrig;
+%             epsMu = epsMuOrig*sseW(iTrl); %weight learning rate by prop SSE reduce from start
+            epsMu = epsMuOrig*spreadW(iTrl); %weight learning rate by prop spreadout-ness reduced from start
+%             epsMu = epsMuOrig*spreadVarW(iTrl); %weight learning rate by prop spreadout-ness reduced from start
+            
+            epsMu = epsMuOrig*sseW(iTrl)*spreadW(iTrl); %weight learning rate by both the above
+
             epsMuAll(iTrl,:) = [epsMu,closestC]; 
 
             %update (with momemtum-like parameter)
@@ -244,37 +261,42 @@ for iterI = 1:nIter
             end
             
             
-%             % compute sse on each trial with respect to 'all trials' - independent data - looks similar if you change 'dataPtsTest' to 'trials'; also useful if want to test less vs more trials on training so that you equate SSE by number of test points
+            % compute sse on each trial with respect to 'all trials' 
+            % trials - since values are all points in the box, no need to use a
+            % trialsTest, juse use all unique locations (unique pairs of xy) from trials
+            
+            distTrl=[];
+            sse=nan(1,nClus);
+            for iClus = 1:nClus
+                distTrl(:,iClus)=sum([mu(iClus,1,iTrl)-trialsUnique(:,1), mu(iClus,2,iTrl)-trialsUnique(:,2)].^2,2);
+            end
+            %                     distTrl=[mu(:,1,iTrl)'-trialsUnique(:,1), mu(:,2,iTrl)'-trialsUnique(:,2)].^2; %trying to vectorise..
+            [indValsTrl, indTmp]=min(distTrl,[],2); % find which clusters are points closest to
+            for iClus = 1:size(clusMu,1)
+                sse(iClus)=sum(sum([mu(iClus,1,iTrl)-trialsUnique(indTmp==iClus,1), mu(iClus,2,iTrl)-trialsUnique(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
+                %                         sse(iClus)=sum(sum([clusMu(iClus,1,iSet,iterI)-dataPtsTest(indTmp==iClus,1), clusMu(iClus,2,iSet,iterI)-dataPtsTest(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
+            end
+            tsse(iTrl)=sum(sse);
+            
+            %compute 'spreaded-ness' - variance of SE across clusters is a measure
+            %of this, assuming uniform data points
+            devAvgSSE           = sse-mean(sse);
+            stdAcrossClus(iTrl) = std(devAvgSSE); % may be better since normalises by nClus?
+            varAcrossClus(iTrl) = var(devAvgSSE);
 
+            sseW(iTrl+1) = tsse(iTrl)./tsse(1);% weight next learning rate by prop of sse from the start
+            
+            spreadW(iTrl+1) = stdAcrossClus(iTrl)./stdAcrossClus(1);
+            spreadW(iTrl+1) = (stdAcrossClus(iTrl)./stdAcrossClus(1)).^0.5; %make it smaller
+%             spreadW(iTrl+1) = (stdAcrossClus(iTrl)./stdAcrossClus(1)).^0.75; %make it smaller
+            
+%             if iTrl<=500 %looks like if use prop spreadoutness, learning rate goes down too much /fast (more useful here average
+%                 spreadW(iTrl+1) = 1;
+%             else
+%                 spreadW(iTrl+1) = stdAcrossClus(iTrl)./mean(stdAcrossClus(100));
+%             end
 
-%trials - since values are all points in the box, no need to use a
-%trialsTest, juse use all unique locations (unique pairs of xy) from trials
-
-% trialsUnique = ...
-
-
-
-
-                    distTrl=[];
-                    sse=nan(1,nClus);
-                    for iClus = 1:size(clusMu,1)
-                        distTrl(:,iClus)=sum([mu(iClus,1,iTrl)-trialsUnique(:,1), mu(iClus,2,iTrl)-trialsUnique(:,2)].^2,2);
-%                         distTrl(:,iClus)=sum([clusMu(iClus,1,iSet,iterI)-dataPtsTest(:,1), clusMu(iClus,2,iSet,iterI)-dataPtsTest(:,2)].^2,2);
-                    end
-                    [indValsTrl, indTmp]=min(distTrl,[],2); % find which clusters are points closest to
-                    for iClus = 1:size(clusMu,1)
-                        sse(iClus)=sum(sum([mu(iClus,1,iTrl)-trialsUnique(indTmp==iClus,1), mu(iClus,2,iTrl)-trialsUnique(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
-%                         sse(iClus)=sum(sum([clusMu(iClus,1,iSet,iterI)-dataPtsTest(indTmp==iClus,1), clusMu(iClus,2,iSet,iterI)-dataPtsTest(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
-                    end
-                    tsse=sum(sse);
-                    
-                    %compute 'spreaded-ness' - variance of SE across clusters is a measure
-                    %of this, assuing uniform data points
-                    devAvgSSE            = sse-mean(sse);
-                    stdAcrossClus = std(devAvgSSE);
-                    varAcrossClus = var(devAvgSSE);
-
-
+%             spreadVarW(iTrl+1) = varAcrossClus(iTrl)./varAcrossClus(1);
 
     end
 %     muEnd(:,:,iterI)=mu(:,:,end);

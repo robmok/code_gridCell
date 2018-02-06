@@ -12,10 +12,10 @@ for iSet=1:5 %size(muAvg,3) %plot - diff averaging over nTrials
 %     voronoi(muAvg(:,1,iSet,iterI),muAvg(:,2,iSet,iterI),'k');
 end
 % 
-% figure; hold on;
-% scatter(muAll(:,1,end),muAll(:,2,end),20e+2,colors,'.');
-% xlim(locRange); ylim(locRange);
-% voronoi(muAll(:,1,end),muAll(:,2,end),'k');
+figure; hold on;
+scatter(muAll(:,1,end),muAll(:,2,end),20e+2,colors,'.');
+xlim(locRange); ylim(locRange);
+voronoi(muAll(:,1,end),muAll(:,2,end),'k');
 %% density map, autocorrelogram
 
 iterI=1; 
@@ -160,7 +160,7 @@ colors = distinguishable_colors(nClus); %function for making distinguishable col
 
 figure;
 % figure('units','normalized','outerposition',[0 0 1 1]);
-for iTrl = 1:nTrials
+for iTrl = 1000:nTrials
     if mod(iTrl,500)==0
 %         iPlot=iPlot+1;
 %         voronoi(muAll(:,1,iTrl,iterI),muAll(:,2,iTrl,iterI),'k')
