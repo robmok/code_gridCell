@@ -15,7 +15,7 @@ end
 figure; hold on;
 scatter(muAll(:,1,end),muAll(:,2,end),20e+2,colors,'.');
 xlim(locRange); ylim(locRange);
-voronoi(muAll(:,1,end),muAll(:,2,end),'k');
+% voronoi(muAll(:,1,end),muAll(:,2,end),'k');
 %% density map, autocorrelogram
 
 iterI=1; 
