@@ -2,7 +2,7 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -11,7 +11,7 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([wd '/gridSCORE_packed']));
 
-dat = 'rand'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
+dat = 'cat'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
 
 % if cat learning specify number of categories (cluster centres) and sigma
 % of the gaussan

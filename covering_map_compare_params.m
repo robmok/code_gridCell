@@ -27,7 +27,7 @@ epsMuVals = [25, 50 75 100];
 
 alphaVals = [0, 2, 5, 8];
 
-stochasticType = 0; %1, 2, 3; % 0, 1 - 2 and 3 are too stoch
+stochasticType = 1; %1, 2, 3; % 0, 1 - 2 and 3 are too stoch
 cVals = ([2/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]); %.1 and stoch = towards middle % cVals = [20/nTrials];
 % cVals = 20/nTrials;
 cVals = round(cVals.*1000000);
@@ -184,7 +184,7 @@ end
 %%
 
 
-for iSet = 5
+for iSet = 3
 
 % %remove nans - this is a bit hacky ...
 % if any(isnan(gA_g(1,:)))

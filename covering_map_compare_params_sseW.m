@@ -18,7 +18,7 @@ dataPtsTest = [randsample(linspace(locRange(1),locRange(2),nSteps),nTrialsTest,'
 
 %% Compute the cluster centres from the desnity map, then compute SSE and rank them
 
-dat = 'gauss'; % cov or gauss - covering map or gauss data
+dat = 'cov'; % cov or gauss - covering map or gauss data
 
 doPlot = 0; %plot - note if loading in many value, this will make too many plots, can crash
 
