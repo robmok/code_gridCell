@@ -160,7 +160,7 @@ colors = distinguishable_colors(nClus); %function for making distinguishable col
 
 figure;
 % figure('units','normalized','outerposition',[0 0 1 1]);
-for iTrl = 1000:nTrials
+for iTrl = 1:nTrials
     if mod(iTrl,500)==0
 %         iPlot=iPlot+1;
 %         voronoi(muAll(:,1,iTrl,iterI),muAll(:,2,iTrl,iterI),'k')
