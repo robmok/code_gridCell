@@ -20,7 +20,7 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 
 %run multuple cluster numbers
-clus2run = [20 30]; %[10 20]; %20, 30
+clus2run = [20, 30]; %[10 20]; %20, 30
 nTrials = 40000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 %box
@@ -62,11 +62,13 @@ epsMuVals = [0.01];
 
 %.05 is too fast .02, .025, 0.35 too fast but can test
 epsMuVals = [0.0025, 0.005, .01, .02, .025]; 
-epsMuVals = [0.0025, 0.005]; 
-% epsMuVals = [.01, .02]; 
+epsMuVals = 0.0025; 
+epsMuVals = 0.005; 
+epsMuVals = .01; 
+epsMuVals = .02; 
 
 %weight learning rate by SSE 
-weightEpsSSE = 1; %1 or 0
+weightEpsSSE = 0; %1 or 0
 
 sigmaGaussVals = [stepSize/3, stepSize/3.5, stepSize/4];
 

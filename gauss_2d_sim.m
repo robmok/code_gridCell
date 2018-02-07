@@ -286,7 +286,8 @@ for iterI = 1:nIter
             % trials - since values are all points in the box, no need to use a
             % trialsTest, juse use all unique locations (unique pairs of xy) from trials
             
-%             distTrl=[];
+            if weightEpsSSE %need to edit if useing other measures (spreadW)
+
             sse=nan(1,nClus);
 %             for iClus = 1:nClus
 %                 distTrl(:,iClus)=sum([mu(iClus,1,iTrl)-trialsUnique(:,1), mu(iClus,2,iTrl)-trialsUnique(:,2)].^2,2);
@@ -306,7 +307,6 @@ for iterI = 1:nIter
 %             devAvgSSE           = sse-mean(sse);
 %             stdAcrossClus(iTrl) = std(devAvgSSE); % may be better since normalises by nClus?
 %             varAcrossClus(iTrl) = var(devAvgSSE);
-            if weightEpsSSE
                 sseW(iTrl+1) = tsse(iTrl)./tsse(1);% weight next learning rate by prop of sse from the start
 %                 if iTrl>100
 %                     sseW(iTrl+1) = tsse(iTrl)./mean(tsse(1:100));
