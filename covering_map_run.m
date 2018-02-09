@@ -2,7 +2,7 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -20,7 +20,7 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 
 %run multuple cluster numbers
-clus2run = 20; %20, 30
+clus2run = 0; %20, 30
 nTrials = 40000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 %box
@@ -39,7 +39,7 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 
 %to test with sseW
 epsMuVals = [.015, .025, .05, .075, .1, .2];  %.01 too slow? - .015 at edge, still getting some good patterns.. .075 is gd! %.3 is too fast, .25 on edge
-epsMuVals = .075; 
+epsMuVals = .1; 
 % epsMuVals = [.015, .025, .05];
 % epsMuVals = [.075, .1, .2]; 
 
