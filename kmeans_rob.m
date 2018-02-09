@@ -11,12 +11,14 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([wd '/gridSCORE_packed']));
 
-locRange = [0, 49];%.9; from -locRange to locRange
+k=25;
 
 nPoints = 100000;  %how many locations
 
 dat = 'rand'; %'rand' points in a box, or 'gauss' - n gaussians in a box
-% dataPts = [randsample(linspace(locRange(1),locRange(2),50),nPoints,'true'); randsample(linspace(locRange(1),locRange(2),50),nPoints,'true')]'; % random points in a box
+
+locRange = [0, 49];%.9; from -locRange to locRange
+dataPts = [randsample(linspace(locRange(1),locRange(2),50),nPoints,'true'); randsample(linspace(locRange(1),locRange(2),50),nPoints,'true')]'; % random points in a box
 
 %all points in box 
 load([saveDir '/randTrialsBox_trialsUnique']);
@@ -31,29 +33,29 @@ dataPts = trialsUnique;
 
 %% k means
 
-k=20;
-
-nKmeans = 50;  % run k means n times %1000
+nKmeans = 1000;  % run k means n times %1000
 nUpdSteps   =  30;    % update steps in the k means algorithm - 40 for random init, 25 for forgy; kmeans++ 20 fine, 22 safe
 
+
+muAll=nan(k,2,nKmeans);
+
 for kMeansIter=1:nKmeans
-    
     if mod(kMeansIter,10)==0
         fprintf('iteration %d \n',kMeansIter);
     end
     
-%     mu=nan(k,2,nUpdSteps+1);
+    mu   = nan(k,2,nUpdSteps+1);
+    sse  = nan(1,k);
+    tsse = nan(1,nKmeans);
     for i = 1:k
         switch dat
             case 'rand'
 %                 mu(i,:,1) = -locRange + locRange.*2.*rand(1,2);  %initiate clusters with a random point in the box
 %                 mu(i,:,1) = dataPts(randi(length(dataPts)),:);   %intiate each cluster with one data point - Forgy method
-                
                 %k means ++ initiatialization
                 if i==1% random datapoint as 1st cluster
                    mu(i,:,1) = dataPts(randi(length(dataPts)),:); 
                 end
-                
                 if i~=k % no need update k+1
                     clear distInit
                     for iClus = 1:i% loop over clusters that exist now
@@ -68,9 +70,8 @@ for kMeansIter=1:nKmeans
                         distClus = [distClus; [distClusTmp, repmat(iClus,length(distClusTmp),1)]];
                     end
                             
-                    %need to keep track of the indices of the original dist variable - get the
-                    %datapoints that were the farthest from all clusters, get that cluster and see which datapoint that was relative to that cluster (since i just save the distance)
-                    
+                    %keep track of the indices of the original dist variable - get
+                    %datapoints that were the furthest from all clusters, get that cluster and see which datapoint that was relative to that cluster (since i just save the distance)
                     distClusNorm = distClus(:,1)./sum(distClus(:,1));
                     distClusPr   = cumsum(distClusNorm(:,1)); %get cumsum, then generate rand val from 0 to 1 and choose smallest val - the larger the dis, the more likely the rand value will lie between it and its previous value in a cumsum plot
                     ind=find(rand(1)<distClusPr,1);% %find smallest value that is larger than the random value (0 to 1 uniform distr)
@@ -90,7 +91,7 @@ for kMeansIter=1:nKmeans
         end
     end
     
-    % start of iteration loop
+    % kmeans - start of kmeans iteration loop
     for upd = 1:nUpdSteps
         for iClus = 1:k% loop over clusters not dataPts, because nPts can be huge (so vectorise over points
             dist(:,iClus)=sum([mu(iClus,1,upd)-dataPts(:,1),  mu(iClus,2,upd)-dataPts(:,2)].^2,2); %squared euclid for k means
@@ -180,7 +181,7 @@ figure;
 for i = 1:6
     subplot(2,3,i); hold on;
 
-%     voronoi(muAllBest(:,1,i),muAllBest(:,2,i),'k');
+    voronoi(muAllBest(:,1,i),muAllBest(:,2,i),'k');
 
     for iClus = 1:k
         plot(muAllBest(iClus,1,i),muAllBest(iClus,2,i),'.','Color',colors(iClus,:),'MarkerSize',25); hold on; %plot cluster final point
