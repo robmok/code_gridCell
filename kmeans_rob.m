@@ -2,8 +2,8 @@
 
 clear all;
 
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 cd(wd);
 
 codeDir = [wd '/code_gridCell'];
@@ -12,13 +12,15 @@ addpath(codeDir); addpath(saveDir);
 addpath(genpath([wd '/gridSCORE_packed']));
 
 k=25;
+% kVals=[7, 9, 15, 20, 25, 30];
+kVals = [20, 25, 30];
 
 nPoints = 100000;  %how many locations
 
 dat = 'rand'; %'rand' points in a box, or 'gauss' - n gaussians in a box
 
 locRange = [0, 49];%.9; from -locRange to locRange
-dataPts = [randsample(linspace(locRange(1),locRange(2),50),nPoints,'true'); randsample(linspace(locRange(1),locRange(2),50),nPoints,'true')]'; % random points in a box
+% dataPts = [randsample(linspace(locRange(1),locRange(2),50),nPoints,'true'); randsample(linspace(locRange(1),locRange(2),50),nPoints,'true')]'; % random points in a box
 
 %all points in box 
 load([saveDir '/randTrialsBox_trialsUnique']);
@@ -36,14 +38,14 @@ dataPts = trialsUnique;
 nKmeans = 1000;  % run k means n times %1000
 nUpdSteps   =  30;    % update steps in the k means algorithm - 40 for random init, 25 for forgy; kmeans++ 20 fine, 22 safe
 
-
+for iK = 1:length(kVals)    
+k=kVals(iK);
 muAll=nan(k,2,nKmeans);
-
+tic
 for kMeansIter=1:nKmeans
     if mod(kMeansIter,10)==0
         fprintf('iteration %d \n',kMeansIter);
     end
-    
     mu   = nan(k,2,nUpdSteps+1);
     sse  = nan(1,k);
     tsse = nan(1,nKmeans);
@@ -107,17 +109,67 @@ for kMeansIter=1:nKmeans
     end
     
     muAll(:,:,kMeansIter)=mu(:,:,end);
-    
+        
     %compute sum of squared errors across clusters
     for iClus = 1:k
         sse(iClus)=sum(sum([(muAll(iClus,1,kMeansIter))-dataPts(ind==iClus,1), (muAll(iClus,2,kMeansIter))-dataPts(ind==iClus,2)].^2,2));
     end
     tsse(kMeansIter)=sum(sse);
 end
+toc
+    muAllkVals{iK}=muAll; %need this since number of k increases; see if better way to code this
 
-[indVal, indSSE] = sort(tsse);
-[y, indSSE2] = sort(indSSE);
 
+%need?
+% [indVal, indSSE] = sort(tsse);
+% [y, indSSE2] = sort(indSSE);
+
+end
+
+
+%%
+gaussSmooth=1;
+
+spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
+densityPlotClus      = zeros(length(spacing),length(spacing),k,nKmeans);
+
+for iK=1:length(kVals)
+    k=kVals(iK);
+    muAll=muAllkVals{iK};
+tic
+for kMeansIter=1:nKmeans
+    if mod(kMeansIter,10)==0
+        fprintf('iteration %d \n',kMeansIter);
+    end
+    for iClus=1:k
+        clusTmp  = squeeze(round(muAll(iClus,:,kMeansIter)))';
+        for iTrlUpd=1:size(clusTmp,2)
+            densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,kMeansIter) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,kMeansIter)+1;
+        end
+    end
+    
+    %make combined (grid cell) plot, smooth
+    densityPlotCentres(:,:,kMeansIter) = sum(densityPlotClus(:,:,:,kMeansIter),3);
+    densityPlotCentresSm = imgaussfilt(densityPlotCentres(:,:,kMeansIter),gaussSmooth);
+    
+    aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram
+    
+    [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+    [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+    gA(kMeansIter,:,iK) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
+    gW(kMeansIter,:,iK) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
+    
+end
+toc
+end
+
+
+
+
+
+
+
+%%
 % Crossvalidation on clusters from k means, assess error on hex / sq maps
 if 0
     
