@@ -1,4 +1,4 @@
-%% k means - hexagonal maps?
+%% k means
 
 clear all;
 
@@ -13,7 +13,8 @@ addpath(genpath([wd '/gridSCORE_packed']));
 
 % kVals=[7, 9, 15, 20, 25, 30];
 kVals = 3:30;%:10;
-kVals = [10, 20, 30];
+% kVals = [3,4,5];
+nKvals = length(kVals);
 
 dat = 'rand'; %'rand' points in a box, or 'cat'
 
@@ -22,7 +23,10 @@ nKmeans = 1000;  % run k means n times %1000
 
 nPoints = 10000;  %how many locations - atm not used for 'rand'
 
-locRange = [0, 49];%.9; from -locRange to locRange
+locRange  = [0, 49];%.9; from -locRange to locRange
+spacing   = linspace(locRange(1),locRange(2),locRange(2)+1); 
+gaussSmooth=1; % smoothing for density plot / autocorrelogram 
+
 
 % does it matter how many points there are if all the same points? e.g.
 % same if just have each trialsUnique twice/x10? - i think not
@@ -42,7 +46,7 @@ switch dat
         dataPts = trialsUnique;
         
         %uniformly sample the box
-%         dataPts = [randsample(linspace(locRange(1),locRange(2),50),nPoints,'true'); randsample(linspace(locRange(1),locRange(2),50),nPoints,'true')]';
+        dataPts = [randsample(linspace(locRange(1),locRange(2),50),nPoints,'true'); randsample(linspace(locRange(1),locRange(2),50),nPoints,'true')]';
 
     case 'cat'
         % draw points from 2 categories (gaussian) from a 2D feature space
@@ -59,22 +63,23 @@ end
 
 nUpdSteps   =  30;    % update steps in the k means algorithm - 40 for random init, 25 for forgy; kmeans++ 20 fine, 22 safe
 
-for iK = 1:length(kVals)    
-k=kVals(iK);
-muAll=nan(k,2,nKmeans);
+densityPlotCentres = zeros(length(spacing),length(spacing),nKmeans,nKvals);
+for iKvals = 1:nKvals    
+nK=kVals(iKvals);
+muAll=nan(nK,2,nKmeans);
 tsseAll = nan(1,nKmeans);
-fprintf('Running k means nK = %d \n',k);
+fprintf('nK = %d \n',nK);
 tic
 for kMeansIter=1:nKmeans
-    if mod(kMeansIter,100)==0
-        fprintf('iteration %d \n',kMeansIter);
+    if mod(kMeansIter,200)==0
+        fprintf('Running k means iteration %d \n',kMeansIter);
     end
-    mu   = nan(k,2,nUpdSteps+1);
-    for i = 1:k
+    mu   = nan(nK,2,nUpdSteps+1);
+    densityPlotClus = zeros(length(spacing),length(spacing),nK);
+    for i = 1:nK
         switch dat
             case 'rand'
-                %k means ++ initiatialization
-                mu(:,:,1) = kmplusInit(dataPts,k);
+                mu(:,:,1) = kmplusInit(dataPts,nK); %k means ++ initiatialization
             case 'cat'
                 mu(i,:,1) = dataPts(randi(length(dataPts)),:);   %intiate each cluster with one data point - Forgy method
 %                 mu(i,:,1) = round(locRange(1) + locRange(2).*rand(1,2));  %initiate clusters with a random point in the box
@@ -85,57 +90,120 @@ for kMeansIter=1:nKmeans
     [muEnd,tsse] = kmeans_rm(mu,dataPts,nK,nUpdSteps);
     muAll(:,:,kMeansIter)=muEnd;
     tsseAll(kMeansIter)=tsse;
+
+    %compute gridness
+    if strcmp(dat,'rand') %if cat learning, no need to compute gridness
+        for iClus=1:nK
+            clusTmp  = squeeze(round(muAll(iClus,:,kMeansIter)))';
+            for iTrlUpd=1:size(clusTmp,2)
+                densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus)+1;
+            end
+        end
+        %make combined (grid cell) plot, smooth
+        densityPlotCentres(:,:,kMeansIter,iKvals) = sum(densityPlotClus,3); 
+        densityPlotCentresSm = imgaussfilt(densityPlotCentres(:,:,kMeansIter,iKvals),gaussSmooth);
+        aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram
+        [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+        [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+        gA(kMeansIter,:,iKvals) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
+        gW(kMeansIter,:,iKvals) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
+    end
 end
 toc
-    muAllkVals{iK}=muAll; %need this since number of k increases; see if better way to code this
-    tssekVals(iK,:)=tsseAll;
+    muAllkVals{iKvals}=muAll; %need this since number of k increases; see if better way to code this
+    tssekVals(iKvals,:)=tsseAll;
+end
+
+% save('kmeans_nK_3-30_uniquePts','muAllkVals','tssekVals', 'gA','gW','densityPlotCentres')
+save('kmeans_nK_3-30_randomPts','muAllkVals','tssekVals', 'gA','gW','densityPlotCentres')
+
 %need?
 % [indVal, indSSE] = sort(tsse);
 % [y, indSSE2] = sort(indSSE);
+%%
 
+
+%plot hist and density plots
+
+%plot hist
+figure; pltCount=1;
+for iK = 1:nKvals
+    k = kVals(iK);
+    
+    subplot(3,2,pltCount)
+    hist(squeeze(gA(:,1,iK)),50);
+    xlim([-.5,1.25]);
+    
+    pltCount = pltCount+1;
+    if mod(iK,6)==0
+    pltCount=1; figure;
+    end
 end
+
+%plot univar scatters
+figure;
+
+dat    = squeeze(gA(:,1,:));
+barpos = .25:.5:.5*size(dat,2);
+colors = distinguishable_colors(size(dat,2));
+colgrey = [.5, .5, .5];
+mu     = mean(dat,1);
+sm     = std(dat)./sqrt(size(dat,1));
+ci     = sm.*tinv(.025,size(dat,1)-1); %compute conf intervals
+plotSpread(dat,'xValues',barpos,'distributionColors',colors);
+errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+scatter(barpos,mu,750,colors,'x');
+xlim([barpos(1)-.5, barpos(end)+.5]);
+ylim([-.5,1.25]);
+
+
+
+% gridness corr with tsse
+figure;
+scatter(gA(:,1,iK),tssekVals(iK,:))
+% [r p] = corr(gA(:,1),tssekVals(iK,:)')
+% [r p] = corr(gA(:,1),tssekVals(iK,:)','type','spearman')
+
+
+
+%plot some grids
 
 
 
 
 %%
-gaussSmooth=1;
-
-spacing         = linspace(locRange(1),locRange(2),locRange(2)+1); 
-densityPlotClus = zeros(length(spacing),length(spacing),k,nKmeans);
-
-for iK=1:length(kVals)
-    k=kVals(iK);
-    muAll=muAllkVals{iK};
-    fprintf('Processing k means gridness: nK = %d \n',k);
-    
-    tic
-    for kMeansIter=1:nKmeans
-        if mod(kMeansIter,100)==0
-            fprintf('iteration %d \n',kMeansIter);
-        end
-        for iClus=1:k
-            clusTmp  = squeeze(round(muAll(iClus,:,kMeansIter)))';
-            for iTrlUpd=1:size(clusTmp,2)
-                densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,kMeansIter) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,kMeansIter)+1;
-            end
-        end
-        
-        %make combined (grid cell) plot, smooth
-        densityPlotCentres(:,:,kMeansIter) = sum(densityPlotClus(:,:,:,kMeansIter),3);
-        densityPlotCentresSm = imgaussfilt(densityPlotCentres(:,:,kMeansIter),gaussSmooth);
-        
-        aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram
-        
-        [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-        [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
-        gA(kMeansIter,:,iK) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
-        gW(kMeansIter,:,iK) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
-        
-    end
-    toc
-end
-
+% densityPlotClus = zeros(length(spacing),length(spacing),nK,nKmeans,nKvals);
+% for iKvals=1:nKvals
+%     nK=kVals(iKvals);
+%     muAll=muAllkVals{iKvals};
+%     fprintf('Processing k means gridness: nK = %d \n',nK);
+%     
+%     tic
+%     for kMeansIter=1:nKmeans
+%         if mod(kMeansIter,100)==0
+%             fprintf('iteration %d \n',kMeansIter);
+%         end
+%         for iClus=1:nK
+%             clusTmp  = squeeze(round(muAll(iClus,:,kMeansIter)))';
+%             for iTrlUpd=1:size(clusTmp,2)
+%                 densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,kMeansIter) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,kMeansIter)+1;
+%             end
+%         end
+%         
+%         %make combined (grid cell) plot, smooth
+%         densityPlotCentres(:,:,kMeansIter) = sum(densityPlotClus(:,:,:,kMeansIter),3);
+%         densityPlotCentresSm = imgaussfilt(densityPlotCentres(:,:,kMeansIter),gaussSmooth);
+%         
+%         aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram
+%         
+%         [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+%         [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+%         gA(kMeansIter,:,iKvals) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
+%         gW(kMeansIter,:,iKvals) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
+%         
+%     end
+%     toc
+% end
 
 %%
 % Crossvalidation on clusters from k means, assess error on hex / sq maps
@@ -175,7 +243,7 @@ end
 
 %save top 3 bottom 3
 bestWorst3=[1,2,3,nKmeans-2,nKmeans-1,nKmeans];
-muAllBest = nan(k,2,length(bestWorst3));
+muAllBest = nan(nK,2,length(bestWorst3));
 for iterI=1:length(bestWorst3)
     muAllBest(:,:,iterI) = muAll(:,:,indSSE2==bestWorst3(iterI));
 end
@@ -193,17 +261,14 @@ end
 
 saveplots=0;
 
-colors = distinguishable_colors(k); %function for making distinguishable colors for plotting
 colgrey = [.5, .5, .5];
 
 % iToPlot=[1,2,3,nKmeans-2,nKmeans-1,nKmeans];
 
-
-iK=20;
-k = iK;
-muAll = muAllkVals{k};
-
-
+iK = 3;
+nK=kVals(iK);
+colors = distinguishable_colors(nK); %function for making distinguishable colors for plotting
+muAll = muAllkVals{iK};
 
 figure;
 for i = 1:6
@@ -211,19 +276,18 @@ for i = 1:6
 
     voronoi(muAll(:,1,i),muAll(:,2,i),'k');
 
-    for iClus = 1:k
+    for iClus = 1:nK
         plot(muAll(iClus,1,i),muAll(iClus,2,i),'.','Color',colors(iClus,:),'MarkerSize',25); hold on; %plot cluster final point
 %         plot(muAll(iClus,1,(indSSE2==iToPlot(i))),muAll(iClus,2,(indSSE2==iToPlot(i))),'.','Color',colors(iClus,:),'MarkerSize',25); hold on; %plot cluster final point
     end
     xlim([locRange(1),locRange(2)]); ylim([locRange(1),locRange(2)]);
     hold on;
     if i==2
-        title(sprintf('Lowest 3 and Highest 3 SSE cluster locations (k=%d)',k));
+        title(sprintf('Lowest 3 and Highest 3 SSE cluster locations (k=%d)',nK));
     end
 end
 if saveplots
-    fname=[wd, sprintf('/kmeans_clus_k_%d_locs_top_bottom_3_datPts%dk',k,nPoints/1000)];
-%     fname = [fname '_limDatPtsTo85'];
+    fname=[wd, sprintf('/kmeans_clus_k_%d_locs_top_bottom_3_datPts%dk',nK,nPoints/1000)];
     saveas(gcf,fname,'png');
 end
 
@@ -232,9 +296,9 @@ end
 % note: tsseXval2 is already ordered from low to high SSE on train set
 
 % SSE sorted on training data
-figure; plot((tsse(indSSE))); title(sprintf('SSE over diff initializations sorted (training data) (k=%d)',k));
+figure; plot((tsse(indSSE))); title(sprintf('SSE over diff initializations sorted (training data) (k=%d)',nK));
 if saveplots
-    fname=[wd, sprintf('/kmeans_clus_k_%d_sse_train_datPts%dk',k,nPoints/1000)];
+    fname=[wd, sprintf('/kmeans_clus_k_%d_sse_train_datPts%dk',nK,nPoints/1000)];
 %     fname = [fname '_limDatPtsTo85'];
     saveas(gcf,fname,'png');
 end
@@ -243,9 +307,9 @@ end
 figure;
 plot(tsseXval2,'Color',[.75 .75 .75]); hold on;
 plot(mean(tsseXval2,2),'k','LineWidth',5);
-title(sprintf('SSE on Test data sorted by training data (k=%d) (nTest=%d)',k,nDataSets));
+title(sprintf('SSE on Test data sorted by training data (k=%d) (nTest=%d)',nK,nDataSets));
 if saveplots
-    fname=[wd, sprintf('/kmeans_clus_k_%d_sse_test_sortedByTrain_datPts%dk',k,nPoints/1000)];
+    fname=[wd, sprintf('/kmeans_clus_k_%d_sse_test_sortedByTrain_datPts%dk',nK,nPoints/1000)];
     saveas(gcf,fname,'png');
 end
 
@@ -257,9 +321,9 @@ plot(tsseXval2(min(mean(tsseXval2,2))==mean(tsseXval2,2),:),'Color',[.5 .5 .5],'
 plot(tsseXval2(1,:),'Color',[.4 .4 .4],'LineWidth',2); %lowest mean SSE from training data
 % plot([tsseSq;tsseHex]');
 
-title(sprintf('SSE over all Test data sets (k=%d) (nTest=%d)(datPts=%dk)',k,nDataSets,nPoints/1000));
+title(sprintf('SSE over all Test data sets (k=%d) (nTest=%d)(datPts=%dk)',nK,nDataSets,nPoints/1000));
 if saveplots
-    fname=[wd, sprintf('/kmeans_clus_k_%d_sse_test_overDatasets_datPts%dk',k,nPoints/1000)];
+    fname=[wd, sprintf('/kmeans_clus_k_%d_sse_test_overDatasets_datPts%dk',nK,nPoints/1000)];
 %     fname = [fname '_limDatPtsTo85'];
     saveas(gcf,fname,'png');
 end
@@ -274,11 +338,11 @@ gaussSmooth=1;
 
 nSets=6; %top and bottom 3 SSE
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
-densityPlotClus      = zeros(length(spacing),length(spacing),k,nSets);
+densityPlotClus      = zeros(length(spacing),length(spacing),nK,nSets);
 
 for iSet=1:nSets
 figure; hold on;
-for iClus=1:k
+for iClus=1:nK
     clusTmp  = squeeze(round(muAllBest(iClus,:,iSet)))';
     for iTrlUpd=1:size(clusTmp,2)
         densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet)+1;
