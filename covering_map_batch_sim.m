@@ -3,6 +3,8 @@ function [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,muAll] = covering_map_batch_si
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
 stepSize=diff(spacing(1:2));
 
+nTrialsTest = nTrials;
+
 gaussSmooth=1; %smoothing for density map
 
 
@@ -204,13 +206,28 @@ for iterI = 1:nIter
             
             
             
+            %batch update - use deltaMu update
+            % save all updates for each cluster for X trials, update it,
+            % then again
             
             
+%             batches = [1, 500:500:nTrials];
+%             for i = 1:length(batches)-1
+%                 ind = deltaMu(1,1,batches(i):batches(i+1))~=0;
+%                 x(i)=mean(deltaMu(1,1,ind));
+%             end
+
+
             
-            
-            
-            
-            
+
+% either
+% 1) save update, keep deltaMuVec a vector of zeros until batch update (so
+% that cluster positions (mu) will remain the same),update, average all 
+% updates using deltaMu, put into deltaMuVec, then update mu positions
+
+% 2) no need to update mu with an empty deltaMuVec - just point to the mu
+% value before the update (save this). Then at update, average all deltaMu
+% updates...etc.
             
             
             
@@ -232,11 +249,16 @@ for iterI = 1:nIter
             end
             
             
+            
+            
+            
+            
+            
             % compute sse on each trial with respect to 'all trials' 
             % trials - since values are all points in the box, no need to use a
             % trialsTest, juse use all unique locations (unique pairs of xy) from trials
             
-            if weightEpsSSE %edit later
+            if weightEpsSSE
                 sse=nan(1,nClus);
                 distTrl=(mu(:,1,iTrl)'-trialsUnique(:,1)).^2+(mu(:,2,iTrl)'-trialsUnique(:,2)).^2; % vectorised
                 [indValsTrl, indTmp]=min(distTrl,[],2); % find which clusters are points closest to

@@ -4,7 +4,7 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -13,7 +13,7 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([wd '/gridSCORE_packed']));
 
-dat = 'cat'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
+dat = 'rand'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
 nCats   = 2; %2 categories
@@ -47,10 +47,11 @@ warpType = 'sq2rect';
 %mometum-like adaptive learning rate - define alpha (higher = weight
 %previous update (direction and magnitude) more; 0 = don't weight previous at all)
 alphaVals = 0;
+alpha=0;
 
 sTypes = 0;%:1;% :3; %0, 1 ,2, 3
+stochasticType=0;
 c=0;
-
 % % Create / load in saved test data
 % % tile the whole space
 % sq=linspace(locRange(1),locRange(2),nSteps);

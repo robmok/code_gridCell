@@ -11,10 +11,10 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([wd '/gridSCORE_packed']));
 
-kVals = 3:30;
+kVals = 10:13;
 nKvals = length(kVals);
 
-saveDat = 1;
+saveDat = 0;
 
 doXval        = 1;  %do (and save) crossvalidation
 nXvalDataSets = 20; %if do xVal, specify how many datasets to generate
@@ -55,7 +55,7 @@ switch dat
         dataPts = dataPts(randperm(length(dataPts)),:);
 end
 
-%% k means
+%% run k means
 
 nUpdSteps   =  30;    % update steps in the k means algorithm - 40 for random init, 25 for forgy; kmeans++ 20 fine, 22 safe
 
@@ -95,8 +95,8 @@ for kMeansIter=1:nKmeans
     
     %run kmeans
     [muEnd,tsse] = kmeans_rm(mu,dataPts,nK,nUpdSteps);
-    muAll(:,:,kMeansIter)=muEnd;
-    tsseAll(kMeansIter)=tsse;
+    muAll(:,:,kMeansIter) = muEnd;
+    tsseAll(kMeansIter)   = tsse;
 
     %compute gridness
     if strcmp(dat,'rand') || strcmp(dat,'randUnique') %if cat learning, no need to compute gridness
@@ -141,6 +141,7 @@ if doXval
     
 sseXval  = nan(1,nK); 
 tsseXval = nan(nKmeans,nXvalDataSets,nKvals);
+% muBest = nan(nK,2,length(bestWorst3),nKvals);
 for iDataSets = 1:nXvalDataSets
     fprintf('xVal dataset %d \n',iDataSets);
     switch dat
@@ -175,12 +176,11 @@ for iDataSets = 1:nXvalDataSets
             end
             tsseXval(clusMeans,iDataSets,iKvals)=sum(sseXval);
         end
-        %save top 3 bottom 3
-        bestWorst3=[1,2,3,nKmeans-2,nKmeans-1,nKmeans];
-        muBest = nan(nK,2,length(bestWorst3),nKvals);
-        for iterI=1:length(bestWorst3)
-            muBest(:,:,iterI,iKvals) = muCurr(:,:,indSSE2(iKvals,:)==bestWorst3(iterI));
-        end
+%         %save top 3 bottom 3
+%         bestWorst3=[1,2,3,nKmeans-2,nKmeans-1,nKmeans];
+%         for iterI=1:length(bestWorst3)
+%             muBest(:,:,iterI,iKvals) = muCurr(:,:,indSSE2(iKvals,:)==bestWorst3(iterI));
+%         end
     end
     
 end
@@ -192,6 +192,6 @@ if saveDat
         case 'rand'
             fname = [saveDir, sprintf('/kmeans_nK_%d-%d_randPts_xVal_%ddatasets',kVals(1),kVals(end),nXvalDataSets)];
     end
-    save(fname,'tsseXval','muBest','kVals')
+    save(fname,'tsseXval','kVals')
 end
 end
