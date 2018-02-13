@@ -2,7 +2,8 @@
 
 %load....
 
-%%
+%% plot hist and density  plots
+
 gridMsr = 'a'; % 'a' or 'w' for allen or willis method
 
 switch gridMsr
@@ -11,7 +12,6 @@ switch gridMsr
     case 'w'
         g = gW;
 end
-%plot hist and density plots
 
 %plot hist
 figure; pltCount=1;
@@ -58,6 +58,9 @@ densityPlotCentresSm = imgaussfilt(densityPlotCentres(:,:,kMeansIter,iKvals),gau
 aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram
 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
 [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+
+
+
 
 
 
@@ -149,15 +152,20 @@ end
 
 
 %scatters - gridness vs cross-validated data
+
 %%%%%
 % - this doesn't work yet; tsseXval is sorted by sse in training set; need
-% reverse the ind from indSSE2, or sth.. save the indSSEtmp?
+% reverse the ind from indSSE2, or sth.. save the indSSE1?
+
+%%%%%%% - to CHECK %%%%%
+% - saved indSSE1 now; put into as an index below, check it works
 %%%%%
+
 for iKvals = 1:nKvals
 figure;
-[r p] = corr(g(:,1,iKvals),mean(tsseXval(:,:,iKvals),2),'type','pearson');
-% [r p] = corr(g(:,1,iKvals),mean(tsseXval(:,:,iKvals),2),'type','spearman');
-scatter(g(:,1,iKvals),mean(tsseXval(:,:,iKvals),2),'.');
+[r p] = corr(g(:,1,iKvals),mean(tsseXval(indSSE1,:,iKvals),2),'type','pearson');
+% [r p] = corr(g(:,1,iKvals),mean(tsseXval(indSSE1,:,iKvals),2),'type','spearman');
+scatter(g(:,1,iKvals),mean(tsseXval(indSSE1,:,iKvals),2),'.');
 title(sprintf('r = %.2f, p = %.5f',r,p))
 end
 %%

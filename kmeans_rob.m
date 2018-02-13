@@ -11,7 +11,7 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([wd '/gridSCORE_packed']));
 
-kVals = 3:30; %3:30
+kVals = 3:30;
 nKvals = length(kVals);
 
 saveDat = 1;
@@ -19,7 +19,7 @@ saveDat = 1;
 doXval        = 1;  %do (and save) crossvalidation
 nXvalDataSets = 20; %if do xVal, specify how many datasets to generate
 
-dat = 'rand'; %'rand' points in a box, randUnique (all unique points in box), or 'cat'
+dat = 'randUnique'; %'rand' points in a box, randUnique (all unique points in box), or 'cat'
 nKmeans = 1000;  % run k means n times %1000
 nPoints = 10000;  %how many locations/datapoints - not used for 'randUnique', though used for xVal
 
@@ -85,6 +85,8 @@ for kMeansIter=1:nKmeans
         switch dat
             case 'rand'
                 mu(:,:,1) = kmplusInit(dataPts,nK); %k means ++ initiatialization
+            case 'randUnique'
+                mu(:,:,1) = kmplusInit(dataPts,nK); %k means ++ initiatialization
             case 'cat'
                 mu(i,:,1) = dataPts(randi(length(dataPts)),:);   %intiate each cluster with one data point - Forgy method
 %                 mu(i,:,1) = round(locRange(1) + locRange(2).*rand(1,2));  %initiate clusters with a random point in the box
@@ -97,7 +99,7 @@ for kMeansIter=1:nKmeans
     tsseAll(kMeansIter)=tsse;
 
     %compute gridness
-    if strcmp(dat,'rand') %if cat learning, no need to compute gridness
+    if strcmp(dat,'rand') || strcmp(dat,'randUnique') %if cat learning, no need to compute gridness
         for iClus=1:nK
             clusTmp  = squeeze(round(muAll(iClus,:,kMeansIter)))';
             for iTrlUpd=1:size(clusTmp,2)
@@ -125,13 +127,13 @@ toc
 end
 
 if saveDat
-switch dat
-    case randUnique
-        fname = [saveDir, sprintf('/kmeans_nK_%d-%d_uniquePts',kVals(1),kVals(end))];
-    case rand
-        fname = [saveDir, sprintf('/kmeans_nK_%d-%d_randPts',kVals(1),kVals(end))];
-end
-        save(fname,'muAllkVals','tssekVals', 'gA','gW','densityPlotCentres','indSSE1','indSSE2')
+    switch dat
+        case 'randUnique'
+            fname = [saveDir, sprintf('/kmeans_nK_%d-%d_uniquePts',kVals(1),kVals(end))];
+        case 'rand'
+            fname = [saveDir, sprintf('/kmeans_nK_%d-%d_randPts',kVals(1),kVals(end))];
+    end
+    save(fname,'muAllkVals','tssekVals', 'gA','gW','densityPlotCentres','indSSE1','indSSE2','kVals')
 end
 
 %% Crossvalidation on clusters from k means, assess and save SSE
@@ -144,7 +146,9 @@ for iDataSets = 1:nXvalDataSets
     switch dat
         case 'rand' % draw random points in a box (uniform distribution)
             dataPtsTest = [randsample(linspace(locRange(1),locRange(2),50),nPoints,'true'); randsample(linspace(locRange(1),locRange(2),50),nPoints,'true')]'; % random points in a box
-        case 'gauss' % points from clusters of 2D gaussians
+        case 'randUnique' % draw random points in a box (uniform distribution)
+            dataPtsTest = [randsample(linspace(locRange(1),locRange(2),50),nPoints,'true'); randsample(linspace(locRange(1),locRange(2),50),nPoints,'true')]'; % random points in a box
+        case 'cat' % points from clusters of 2D gaussians
             nPointsCat = floor(nPoints/nCats); % points to sample
             for iCat = 1:nCats
                 mu(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % ±10 so category centres are not on the edge
@@ -183,11 +187,11 @@ end
 
 if saveDat
     switch dat
-        case randUnique
+        case 'randUnique'
             fname = [saveDir, sprintf('/kmeans_nK_%d-%d_uniquePts_xVal_%ddatasets',kVals(1),kVals(end),nXvalDataSets)];
-        case rand
+        case 'rand'
             fname = [saveDir, sprintf('/kmeans_nK_%d-%d_randPts_xVal_%ddatasets',kVals(1),kVals(end),nXvalDataSets)];
     end
-    save(fname,'tsseXval','muBest')
+    save(fname,'tsseXval','muBest','kVals')
 end
 end
