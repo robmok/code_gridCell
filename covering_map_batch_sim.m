@@ -1,4 +1,5 @@
-function [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE)
+% function [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE)
+function [densityPlot,clusMu,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE)
 
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
 stepSize=diff(spacing(1:2));
@@ -7,27 +8,22 @@ nTrialsTest = nTrials;
 
 gaussSmooth=1; %smoothing for density map
 
+nBatch=round(nTrials/batchSize);
+    
+% selecting cluster postions from a certain phase to test gridness
+% note: with batch, may be less purposeful to average over trials? it would
+% also mean averaging over batches (which would be even more stable). only
+% thing if just looking at some point in time, small batches = less stable.
+trlSel = ceil([nBatch*.33, nBatch*.5, nBatch*.75, nBatch+1]);
+trlSel = ceil([nBatch*.1, nBatch*.25, nBatch*.5, nBatch*.75, nBatch+1]);
 
-if nTrials==40000
-%     fromTrlI = [1.0e+4, 2.0e+4, 3.5e+4, 1.0e+4, 1.5e+4, 3.0e+4, 1.0e+4,  1.5e+4, 2.5e+4, 1.0e+4, 2.0e+4];
-%     toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4];
-
-    fromTrlI = [3.5e+4, 3.0e+4, 2.5e+4, 2.0e+4];
-    toTrlN   = [4.0e+4, 4.0e+4, 4.0e+4, 4.0e+4];
-elseif nTrials==80000
-    % with double nTrials 
-%     fromTrlI = [2.5e+4, 3.5e+4, 7.5e+4, 3.0e+4, 4.0e+4, 7.0e+4, 3.5e+4,  4.5e+4, 5.5e+4, 4.0e+4, 6.0e+4]; %this makes avg over same trials as above
-%     toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4].*2;    
-    fromTrlI = [1.0e+4, 2.0e+4, 3.5e+4, 1.0e+4, 1.5e+4, 3.0e+4, 1.0e+4,  1.5e+4, 2.5e+4, 1.0e+4, 2.0e+4].*2; %this doubles the trials averaged over
-    toTrlN   = [1.5e+4, 2.5e+4, 4.0e+4, 2.0e+4, 2.5e+4, 4.0e+4, 2.50e+4, 3.0e+4, 4.0e+4, 3.0e+4, 4.0e+4].*2;
-end
-nSets                = length(fromTrlI);
+nSets                = length(trlSel);
 densityPlotClus      = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
 densityPlot          = zeros(length(spacing),length(spacing),nSets,nIter);
 clusMu               = nan(nClus,2,nSets,nIter);
-muAvg                = nan(nClus,2,nSets,nIter);
-muAll                = nan(nClus,2,nTrials,nIter);
-nTrlsUpd             = nan(nClus,nSets,nIter);
+% muAvg                = nan(nClus,2,nSets,nIter);
+muAll                = nan(nClus,2,nBatch+1,nIter);
+% nTrlsUpd             = nan(nClus,nSets,nIter);
 gA = nan(nSets,nIter,4);
 gW = nan(nSets,nIter,4);
 for iterI = 1:nIter
@@ -91,9 +87,8 @@ for iterI = 1:nIter
 
     
     %initialise each cluster location  
-    mu = nan(nClus,2,nTrials); %also note variable muUpd below - %variable that only logs updated clusters mean value
+    mu = nan(nClus,2,nBatch+1);
     for clusterI = 1:nClus
-
         % k means++
         if clusterI==1% random datapoint as 1st cluster
             mu(clusterI,:,1) = dataPtsTest(randi(length(dataPtsTest)),:); 
@@ -111,146 +106,129 @@ for iterI = 1:nIter
                 distClusTmp = sum([(mu(iClus,1,1)-dataPtsTest(indOrig(:,clusterI),1)), (mu(iClus,2,1)-dataPtsTest(indOrig(:,clusterI),2))].^2,2);
                 distClus = [distClus; [distClusTmp, repmat(iClus,length(distClusTmp),1)]];
             end
-            
-            %need to keep track of the indices of the original dist variable - get the
-            %datapoints that were the farthest from all clusters, get that cluster and see which datapoint that was relative to that cluster (since i just save the distance)
             distClusNorm = distClus(:,1)./sum(distClus(:,1));
             distClusPr   = cumsum(distClusNorm(:,1)); %get cumsum, then generate rand val from 0 to 1 and choose smallest val - the larger the dis, the more likely the rand value will lie between it and its previous value in a cumsum plot
             ind=find(rand(1)<distClusPr,1);% %find smallest value that is larger than the random value (0 to 1 uniform distr)
-            
             % tmp(i)=distClus(ind,1); %testing if getting the right values; if plot, see that it should be lower pr for closer values, higher for larger. note if very few high distances, this hist will look normally distributed
-            
             clusInd = distClus(ind,2); %find which is the closest cluster
             indDat = find(distInit(:,clusInd)==distClus(ind,1)); %find where the datapoint is in the original vector
-            
             if size(indDat,1)>1
                 indDat=indDat(randi(size(indDat,1),1));
             end
             mu(clusterI+1,:,1) = dataPtsTest(indDat,:);
         end
     end
-    muUpd = mu;  %variable that only logs updated clusters mean value % - get initialised locs
     %%
+    
+%     updatedC = nan(nTrials,1);
+%     epsMuAll = nan(nTrials,2);
+    deltaMu  = zeros(nClus,2,nBatch);
+%     clusUpdates = zeros(nClus,2); %acutally starting at 0 is OK, since there was no momentum from last trial
+    tsse            = nan(nBatch,1);
+    sseW            = ones(nBatch,1);
+    
+    for iBatch=1:nBatch
+        batchInd=batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize; %trials to average over
 
-    updatedC = nan(nTrials,1);
-    epsMuAll = nan(nTrials,2);
-    deltaMu  = zeros(nClus,2,nTrials);
-    clusUpdates = zeros(nClus,2); %acutally starting at 0 is OK, since there was no momentum from last trial
-    tsse            = nan(nTrials,1);
-    sseW            = ones(nTrials,1);
-    for iTrl=1:nTrials
-            
-            %if change size of box half way
-            if iTrl == nTrials*.75 && warpBox
-                trials(nTrials*.75+1:end,:) = trialsExpand;
-            end
-            
-            %compute distances
-            dist2Clus = sqrt(sum([mu(:,1,iTrl)'-trials(iTrl,1); mu(:,2,iTrl)'-trials(iTrl,2)].^2)); % vectorising euclid dist - sqrt(sum((a-b).^2)), since can't use xval method
+        trls2Upd = trials(batchInd,:); %trials to use this batch
 
-            %stochastic update - sel 1 of the closest clusters w random element - stochastic parameter c - large is deterministic, 0 - random            
-
-            if stochasticType %stochastic update
-                if stochasticType==1
-%                     beta=c*(iTrl-1);         % so this gets bigger, and more deterministic with more trials
-                    beta=c*(iTrl+nTrials/50);  % maybe no need to be so stochatic at start
-                elseif stochasticType==2
-                    beta=c*(iTrl+nTrials/50);  % maybe no need to be so stochatic at start
-                    if beta >= c*500 %it might be worth checking if this depends on nClusters - distances will change
-                        beta = c*500;
-                    end
-                elseif stochasticType==3
-                    beta = c*500; % as a function of c %prev:.185; 
-                end
-                dist2Clus2 = exp(-beta.*dist2Clus)./ sum(exp(-beta.*dist2Clus));
-                distClusPr = cumsum(dist2Clus2);
-                closestC=find(rand(1)<distClusPr,1);
-                if isempty(closestC)  %if beta is too big, just do deterministic update (already will be near deterministic anyway)
-                    closestC=find(min(dist2Clus)==dist2Clus);
-                end
-                cParams.betaAll(iTrl)       = beta;
-            else %deterministic update
-                closestC=find(min(dist2Clus)==dist2Clus);
-            end
-            if numel(closestC)>1 %if more than 1, randomly choose one
-                closestC = randsample(closestC,1);
-            end
-            
-            %if stochastic, closestC might not be if more than 1 actual
-            %closest, have to check if stoch update chose one of them
-            actualClosestC = find(min(dist2Clus)==dist2Clus); 
-            closestMatch = zeros(1,length(actualClosestC));
-            for iC = 1:length(actualClosestC)
-                closestMatch(iC) = actualClosestC(iC) == closestC;
-            end
-            cParams.closestChosen(iTrl) = any(closestMatch); %was (one of) the closest cluster selected?
-            cParams.closestDist(iTrl)   = dist2Clus(closestC);
-
-            %log which cluster has been updated
-            updatedC(iTrl) = closestC;
-
-%             epsMu = epsMuOrig;
-            epsMu = epsMuOrig*sseW(iTrl); %weight learning rate by prop SSE reduce from start
-            epsMuAll(iTrl,:) = [epsMu,closestC]; 
-
-            %update (with momemtum-like parameter)
-            deltaMu(closestC,1,iTrl) = ((1-alpha)*(epsMu*(trials(iTrl,1)-mu(closestC,1,iTrl))))+(alpha*clusUpdates(closestC,1));
-            deltaMu(closestC,2,iTrl) = ((1-alpha)*(epsMu*(trials(iTrl,2)-mu(closestC,2,iTrl))))+(alpha*clusUpdates(closestC,2));
-            
-            clusUpdates(closestC,1)=deltaMu(closestC,1,iTrl);
-            clusUpdates(closestC,2)=deltaMu(closestC,2,iTrl);
-
-            deltaMuVec = zeros(nClus,2);
-            deltaMuVec(closestC,:) = deltaMu(closestC,:,iTrl); % only update winner
-            
-            
-            
-            
-            %batch update - use deltaMu update
-            % save all updates for each cluster for X trials, update it,
-            % then again
-            
-            
-%             batches = [1, 500:500:nTrials];
-%             for i = 1:length(batches)-1
-%                 ind = deltaMu(1,1,batches(i):batches(i+1))~=0;
-%                 x(i)=mean(deltaMu(1,1,ind));
+%             %if change size of box half way
+%             if iTrl == nTrials*.75 && warpBox
+%                 trials(nTrials*.75+1:end,:) = trialsExpand;
 %             end
 
+            %compute distances
+%             dist2Clus = sqrt(sum([mu(:,1,iTrl)'-trials(iTrl,1); mu(:,2,iTrl)'-trials(iTrl,2)].^2)); % vectorising euclid dist - sqrt(sum((a-b).^2)), since can't use xval method
+            
+            %compute distances - vectorise both clusters and trials (in batch)
+            dist2Clus = reshape([mu(:,1,iBatch)'-trls2Upd(:,1), mu(:,2,iBatch)'-trls2Upd(:,2)].^2,batchSize,nClus,2);% reshapes it into batchSize x nClus x 2 (x and y locs)
+            dist2Clus = sqrt(sum(dist2Clus,3));
+            
+            %stochastic update - select 1 of the closest clusters w random element - stochastic parameter c - large is deterministic, 0 - random            
+%             if stochasticType %stochastic update
+%                 if stochasticType==1
+% %                     beta=c*(iTrl-1);         % so this gets bigger, and more deterministic with more trials
+%                     beta=c*(iTrl+nTrials/50);  % maybe no need to be so stochatic at start
+%                 elseif stochasticType==2
+%                     beta=c*(iTrl+nTrials/50);  % maybe no need to be so stochatic at start
+%                     if beta >= c*500 %it might be worth checking if this depends on nClusters - distances will change
+%                         beta = c*500;
+%                     end
+%                 elseif stochasticType==3
+%                     beta = c*500; % as a function of c %prev:.185; 
+%                 end
+%                 dist2Clus2 = exp(-beta.*dist2Clus)./ sum(exp(-beta.*dist2Clus));
+%                 distClusPr = cumsum(dist2Clus2);
+%                 closestC=find(rand(1)<distClusPr,1);
+%                 if isempty(closestC)  %if beta is too big, just do deterministic update (already will be near deterministic anyway)
+%                     closestC=find(min(dist2Clus)==dist2Clus);
+%                 end
+%                 cParams.betaAll(iTrl)       = beta;
+%             else %deterministic update
+%                 closestC=find(min(dist2Clus)==dist2Clus);
+%             end
+%             if numel(closestC)>1 %if more than 1, randomly choose one
+%                 closestC = randsample(closestC,1);
+%             end
+            
+            %deterministic update
+%             closestC=find(min(dist2Clus)==dist2Clus);
 
-            
-
-% either
-% 1) save update, keep deltaMuVec a vector of zeros until batch update (so
-% that cluster positions (mu) will remain the same),update, average all 
-% updates using deltaMu, put into deltaMuVec, then update mu positions
-
-% 2) no need to update mu with an empty deltaMuVec - just point to the mu
-% value before the update (save this). Then at update, average all deltaMu
-% updates...etc.
-            
-            
-            
-            
-            
-            
-            % update mean estimates
-            if iTrl~=nTrials %no need to update for last trial +1)
-                mu(:,1,iTrl+1) = mu(:,1,iTrl) + deltaMuVec(:,1);
-                mu(:,2,iTrl+1) = mu(:,2,iTrl) + deltaMuVec(:,2);
-                %log updated value only
-                % don't want to save the cluster positions when they don't move
-                % but need to keep track of the last cluster position
-                % - have two variables, one with all, one without
-                % - the one without; this is with nans just remove
-                % all the nans then put into densityPlotClus).
-                muUpd(closestC,1,iTrl+1)=mu(closestC,1,iTrl+1);
-                muUpd(closestC,2,iTrl+1)=mu(closestC,2,iTrl+1);
+            %deterministic update
+            %%%% -need to find min dist cluster for each trial; better way?
+            %%%% / vectorize?
+            for iTrlBatch = 1:batchSize
+                closestTmp = find(min(dist2Clus(iTrlBatch,:))==dist2Clus(iTrlBatch,:));
+                if numel(closestTmp)>1
+                    closestC(iTrlBatch,:) = randsample(closestTmp,1);
+                else
+                    closestC(iTrlBatch,:) = closestTmp;
+                end
             end
             
+%             %if stochastic, closestC might not be if more than 1 actual
+%             %closest, have to check if stoch update chose one of them
+%             actualClosestC = find(min(dist2Clus)==dist2Clus); 
+%             closestMatch = zeros(1,length(actualClosestC));
+%             for iC = 1:length(actualClosestC)
+%                 closestMatch(iC) = actualClosestC(iC) == closestC;
+%             end
+%             cParams.closestChosen(iTrl) = any(closestMatch); %was (one of) the closest cluster selected?
+%             cParams.closestDist(iTrl)   = dist2Clus(closestC);
+
+            %log which cluster has been updated
+%             updatedC(iTrl) = closestC;
             
+            %learning rate
+            epsMu = epsMuOrig;
+%             epsMu = epsMuOrig*sseW(iTrl); %weight learning rate by prop SSE reduce from start
+%             epsMuAll(iTrl,:) = [epsMu,closestC]; 
             
+            %batch update - save all updates for each cluster for X
+            %trials, update it, then again
+            % - goes through each cluster, compute distances, average,
+            %then update
+            for iClus = 1:nClus
+                updInd = closestC==iClus;
+                if any(nnz(updInd)) %if not, no need to update
+                deltaMu(iClus,1,iBatch) = nanmean(epsMu*(trls2Upd(updInd,1)-mu(iClus,1,iBatch)));
+                deltaMu(iClus,2,iBatch) = nanmean(epsMu*(trls2Upd(updInd,2)-mu(iClus,2,iBatch)));
+                end
+            end
             
+%             %update (with momemtum-like parameter)
+%             deltaMu(closestC,1,iTrl) = ((1-alpha)*(epsMu*(trials(iTrl,1)-mu(closestC,1,iTrl))))+(alpha*clusUpdates(closestC,1));
+%             deltaMu(closestC,2,iTrl) = ((1-alpha)*(epsMu*(trials(iTrl,2)-mu(closestC,2,iTrl))))+(alpha*clusUpdates(closestC,2));
+%             
+%             %for momentum - consider not using this, or switch to a
+%             %'batch-like' momentum later?
+%             clusUpdates(closestC,1)=deltaMu(closestC,1,iTrl);
+%             clusUpdates(closestC,2)=deltaMu(closestC,2,iTrl);
+
+            % update mean estimates
+            
+            mu(:,1,iBatch+1) = mu(:,1,iBatch) + deltaMu(:,1,iBatch);
+            mu(:,2,iBatch+1) = mu(:,2,iBatch) + deltaMu(:,2,iBatch);
             
             
             
@@ -258,6 +236,8 @@ for iterI = 1:nIter
             % trials - since values are all points in the box, no need to use a
             % trialsTest, juse use all unique locations (unique pairs of xy) from trials
             
+            
+            %weight learning rate by SSE - need to adapt for trialwise
             if weightEpsSSE
                 sse=nan(1,nClus);
                 distTrl=(mu(:,1,iTrl)'-trialsUnique(:,1)).^2+(mu(:,2,iTrl)'-trialsUnique(:,2)).^2; % vectorised
@@ -285,7 +265,7 @@ for iterI = 1:nIter
     %positions
     for iSet = 1:nSets
         %compute density map
-        clus = round(muUpd(:,:,fromTrlI(iSet):toTrlN(iSet)));
+        clus = round(mu(:,:,trlSel(iSet)));
         ind=clus<=0; clus(ind)=1; %indices <= 0 make to 1
         for iClus=1:nClus
             ntNanInd = squeeze(~isnan(clus(iClus,1,:)));
@@ -328,8 +308,9 @@ for iterI = 1:nIter
         end
         
         %save average cluster positions (to compare with above)
-        muAvg(:,:,iSet,iterI) = nanmean(mu(:,:,fromTrlI(iSet):toTrlN(iSet)),3);
+%         muAvg(:,:,iSet,iterI) = nanmean(mu(:,:,fromTrlI(iSet):toTrlN(iSet)),3);
     end
+    
 end
 end
 

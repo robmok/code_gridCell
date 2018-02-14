@@ -2,8 +2,8 @@
 
 clear all;
 
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 cd(wd);
 
 codeDir = [wd '/code_gridCell'];
@@ -11,7 +11,7 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([wd '/gridSCORE_packed']));
 
-kVals = 10:13;
+kVals = 10:13; 
 nKvals = length(kVals);
 
 saveDat = 0;

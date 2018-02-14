@@ -3,8 +3,8 @@
 clear all;
 % close all;
 
-wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -22,7 +22,13 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 
 %run multiple cluster numbers
 clus2run = 20; %20, 30
-nTrials = 40000; %how many locations in the box / trials - 2.5k ; 5k if reset
+nTrials = 40000; %how many locations in the box / trials 
+
+batchSize=100; %should be divisible by nTrials
+
+% nTrials=2000000; batchSize=5000 - looks like kmeans. try other values
+
+
 
 %box
 nSteps = 50; %to define spacing beween each loc in box
@@ -31,7 +37,7 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 
 % parameters
 % epsMuVals=[.05 .075 .1];% %learning rate / starting learning rate 
-epsMuVals = [.075 .1]; 
+epsMuVals = 1; 
 
 %weight learning rate by SSE 
 weightEpsSSE = 0; %1 or 0
@@ -77,6 +83,16 @@ switch dat
             load([saveDir '/randTrialsBox_40k']); %load in same data with same trial sequence so same for each sim
         elseif nTrials==80000
             load([saveDir '/randTrialsBox_80k']);
+        else
+            sq=linspace(locRange(1),locRange(2),nSteps);
+            allPts=[];
+            for i=1:length(sq)
+                for j=1:length(sq)
+                    allPts = [allPts; [sq(i), sq(j)]];
+                end
+            end
+            trials=repmat(allPts,nTrials/length(allPts),1); %note, numel of allPts must be divisble by nTrials atm
+            trials=trials(randperm(length(trials)),:); 
         end
         %for computing sse over trials
         load([saveDir '/randTrialsBox_trialsUnique']);
@@ -100,7 +116,8 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
         epsMuOrig=epsMuVals(iEps);
         epsMuOrig1000=epsMuOrig*1000; %for saving
         
-        [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE);
+%         [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE);
+        [densityPlot,clusMu,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE);
         fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dtrls_eps%d_%diters',nClus,nTrials,epsMuOrig1000,nIter)];
         timeTaken=toc;
         if saveDat
