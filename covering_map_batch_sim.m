@@ -14,8 +14,7 @@ nBatch=round(nTrials/batchSize);
 % note: with batch, may be less purposeful to average over trials? it would
 % also mean averaging over batches (which would be even more stable). only
 % thing if just looking at some point in time, small batches = less stable.
-trlSel = ceil([nBatch*.33, nBatch*.5, nBatch*.75, nBatch+1]);
-trlSel = ceil([nBatch*.1, nBatch*.25, nBatch*.5, nBatch*.75, nBatch+1]);
+trlSel = ceil([nBatch*.25, nBatch*.5, nBatch*.67, nBatch*.75, nBatch*.9, nBatch+1]);
 
 nSets                = length(trlSel);
 densityPlotClus      = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
@@ -88,36 +87,8 @@ for iterI = 1:nIter
     
     %initialise each cluster location  
     mu = nan(nClus,2,nBatch+1);
-    for clusterI = 1:nClus
-        % k means++
-        if clusterI==1% random datapoint as 1st cluster
-            mu(clusterI,:,1) = dataPtsTest(randi(length(dataPtsTest)),:); 
-        end
-        if clusterI~=nClus % no need update k+1
-            clear distInit
-            for iClus = 1:clusterI% loop over clusters that exist now
-                distInit(:,iClus)=sum([mu(iClus,1,1)-dataPtsTest(:,1),  mu(iClus,2,1)-dataPtsTest(:,2)].^2,2); %squared euclid for k means
-            end
-            [indValsInit, indInit]=min(distInit,[],2); % find which clusters are points closest to
-            
-            distClus=[];
-            for iClus = 1:clusterI
-                indOrig(:,clusterI) = indInit==iClus;
-                distClusTmp = sum([(mu(iClus,1,1)-dataPtsTest(indOrig(:,clusterI),1)), (mu(iClus,2,1)-dataPtsTest(indOrig(:,clusterI),2))].^2,2);
-                distClus = [distClus; [distClusTmp, repmat(iClus,length(distClusTmp),1)]];
-            end
-            distClusNorm = distClus(:,1)./sum(distClus(:,1));
-            distClusPr   = cumsum(distClusNorm(:,1)); %get cumsum, then generate rand val from 0 to 1 and choose smallest val - the larger the dis, the more likely the rand value will lie between it and its previous value in a cumsum plot
-            ind=find(rand(1)<distClusPr,1);% %find smallest value that is larger than the random value (0 to 1 uniform distr)
-            % tmp(i)=distClus(ind,1); %testing if getting the right values; if plot, see that it should be lower pr for closer values, higher for larger. note if very few high distances, this hist will look normally distributed
-            clusInd = distClus(ind,2); %find which is the closest cluster
-            indDat = find(distInit(:,clusInd)==distClus(ind,1)); %find where the datapoint is in the original vector
-            if size(indDat,1)>1
-                indDat=indDat(randi(size(indDat,1),1));
-            end
-            mu(clusterI+1,:,1) = dataPtsTest(indDat,:);
-        end
-    end
+    mu(:,:,1) = kmplusInit(dataPtsTest,nClus); %kmeans++ initialisation
+    
     %%
     
 %     updatedC = nan(nTrials,1);
@@ -177,12 +148,13 @@ for iterI = 1:nIter
             %deterministic update
             %%%% -need to find min dist cluster for each trial; better way?
             %%%% / vectorize?
+            closestC = nan(1,batchSize);
             for iTrlBatch = 1:batchSize
                 closestTmp = find(min(dist2Clus(iTrlBatch,:))==dist2Clus(iTrlBatch,:));
                 if numel(closestTmp)>1
-                    closestC(iTrlBatch,:) = randsample(closestTmp,1);
+                    closestC(iTrlBatch) = randsample(closestTmp,1);
                 else
-                    closestC(iTrlBatch,:) = closestTmp;
+                    closestC(iTrlBatch) = closestTmp;
                 end
             end
             
@@ -231,25 +203,28 @@ for iterI = 1:nIter
             mu(:,2,iBatch+1) = mu(:,2,iBatch) + deltaMu(:,2,iBatch);
             
             
-            
             % compute sse on each trial with respect to 'all trials' 
             % trials - since values are all points in the box, no need to use a
             % trialsTest, juse use all unique locations (unique pairs of xy) from trials
             
             
-            %weight learning rate by SSE - need to adapt for trialwise
+            %weight learning rate by SSE - 
+            %%%%%%
+            % - atm SSE goes down really quick with batch - even more so
+            % shouldn't weigh by initial SSE!
+            %%%%%%
             if weightEpsSSE
                 sse=nan(1,nClus);
-                distTrl=(mu(:,1,iTrl)'-trialsUnique(:,1)).^2+(mu(:,2,iTrl)'-trialsUnique(:,2)).^2; % vectorised
+                distTrl=(mu(:,1,iBatch)'-trialsUnique(:,1)).^2+(mu(:,2,iBatch)'-trialsUnique(:,2)).^2; % vectorised
                 [indValsTrl, indTmp]=min(distTrl,[],2); % find which clusters are points closest to
                 
                 %any way to vectorize this?
                 for iClus = 1:size(clusMu,1)
-                    sse(iClus)=sum(sum([mu(iClus,1,iTrl)-trialsUnique(indTmp==iClus,1), mu(iClus,2,iTrl)-trialsUnique(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
-                    %                         sse(iClus)=sum(sum([clusMu(iClus,1,iSet,iterI)-dataPtsTest(indTmp==iClus,1), clusMu(iClus,2,iSet,iterI)-dataPtsTest(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
+                    sse(iClus)=sum(sum([mu(iClus,1,iBatch)-trialsUnique(indTmp==iClus,1), mu(iClus,2,iBatch)-trialsUnique(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
+                    % sse(iClus)=sum(sum([clusMu(iClus,1,iSet,iterI)-dataPtsTest(indTmp==iClus,1), clusMu(iClus,2,iSet,iterI)-dataPtsTest(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
                 end
-                tsse(iTrl)=sum(sse);
-                sseW(iTrl+1) = tsse(iTrl)./tsse(1);% weight next learning rate by prop of sse from the start
+                tsse(iBatch)=sum(sse);
+                sseW(iBatch+1) = tsse(iBatch)./tsse(1);% weight next learning rate by prop of sse from the start
             end
 
 

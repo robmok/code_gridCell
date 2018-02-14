@@ -29,7 +29,6 @@ batchSize=100; %should be divisible by nTrials
 % nTrials=2000000; batchSize=5000 - looks like kmeans. try other values
 
 
-
 %box
 nSteps = 50; %to define spacing beween each loc in box
 locRange = [0, nSteps-1]; %[-1, 1]; % from locRange(1) to locRange(2)
