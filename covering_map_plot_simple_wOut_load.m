@@ -167,10 +167,10 @@ for iTrl = 1:nTrials
 %     end
 %     xlim(locRange); ylim(locRange);
 
-%     if mod(iTrl,5)==0 %plot centers after x trials
+    if mod(iTrl,5)==0 %plot centers after x trials
         for i=1:nClus
             plot(squeeze(muAll(i,1,iTrl,iterI)),squeeze(muAll(i,2,iTrl,iterI)),'.','Color',colors(i,:),'MarkerSize',10); hold on; %make marker size bigger - larger/smoother firing field!
         end
         drawnow;
-%     end
+    end
 end

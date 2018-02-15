@@ -3,8 +3,8 @@
 clear all;
 % close all;
 
-% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -21,13 +21,16 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 
 %run multiple cluster numbers
-clus2run = 20; %20, 30
-nTrials = 40000; %how many locations in the box / trials 
+clus2run = 3:8; %20, 30
+nTrials = 100000; %how many locations in the box / trials 
 
-batchSize=100; %should be divisible by nTrials
+% batchSizeVals = [1, 50, 100, 200, 500]; %should be divisible by nTrials
+% batchSizeVals = [1]; 
+% batchSizeVals = [50]; 
+batchSizeVals = [100, 200, 500]; 
+% batchSizeVals = 100; 
 
 % nTrials=2000000; batchSize=5000 - looks like kmeans. try other values
-
 
 %box
 nSteps = 50; %to define spacing beween each loc in box
@@ -35,8 +38,10 @@ locRange = [0, nSteps-1]; %[-1, 1]; % from locRange(1) to locRange(2)
 stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %smallest diff between locs
 
 % parameters
-% epsMuVals=[.05 .075 .1];% %learning rate / starting learning rate 
-epsMuVals = 1; 
+epsMuVals=[.01, .05, .075, .1, .2, .3];% %learning rate / starting learning rate 
+% epsMuVals=[.01, .05, .075];
+% epsMuVals=[.1, .2, .3];
+% epsMuVals = 0.1; 
 
 %weight learning rate by SSE 
 weightEpsSSE = 0; %1 or 0
@@ -72,41 +77,48 @@ c=0;
 % trialsUnique=allPts;
 % save([saveDir '/randTrialsBox_trialsUnique'],'trialsUnique');
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
-nIter=1; %how many iterations (starting points)
+nIter=250; %how many iterations (starting points)
 
 switch dat
+        case 'randUnique'
+        %all unique points in box
+        load([saveDir '/randTrialsBox_trialsUnique']);
+        trials = trialsUnique;
+        % does it matter how many points there are if all the same points? e.g.
+        % same if just have each trialsUnique twice/x10? - i think not
+        % trials = repmat(dataPts,50,1);
     case 'rand'
-        if nTrials==40000
-            load([saveDir '/randTrialsBox_40k']); %load in same data with same trial sequence so same for each sim
-        elseif nTrials==80000
-            load([saveDir '/randTrialsBox_80k']);
-        else
-            sq=linspace(locRange(1),locRange(2),nSteps);
-            allPts=[];
-            for i=1:length(sq)
-                for j=1:length(sq)
-                    allPts = [allPts; [sq(i), sq(j)]];
-                end
-            end
-            trials=repmat(allPts,nTrials/length(allPts),1); %note, numel of allPts must be divisble by nTrials atm
-            trials=trials(randperm(length(trials)),:); 
-        end
+        trials = [randsample(linspace(locRange(1),locRange(2),50),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),50),nTrials,'true')]';
+%         if nTrials==40000
+%             load([saveDir '/randTrialsBox_40k']); %load in same data with same trial sequence so same for each sim
+%         elseif nTrials==80000
+%             load([saveDir '/randTrialsBox_80k']);
+%         else
+%             sq=linspace(locRange(1),locRange(2),nSteps);
+%             allPts=[];
+%             for i=1:length(sq)
+%                 for j=1:length(sq)
+%                     allPts = [allPts; [sq(i), sq(j)]];
+%                 end
+%             end
+%             trials=repmat(allPts,nTrials/length(allPts),1); %note, numel of allPts must be divisble by nTrials atm
+%             trials=trials(randperm(length(trials)),:); 
+%         end
         %for computing sse over trials
         load([saveDir '/randTrialsBox_trialsUnique']);
     case 'cat'
         % draw points from 2 categories (gaussian) from a 2D feature space
-        nPoints = floor(nTrials/nCats); % points to sample
+        nTrials = floor(nTrials/nCats); % points to sample
         for iCat = 1:nCats
             mu(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % ±10 so category centres are not on the edge
-            datPtsGauss(:,:,iCat) = round(repmat(mu(iCat,:),nPoints,1) + randn(nPoints,2)*R); % key - these are the coordinates of the points
+            datPtsGauss(:,:,iCat) = round(repmat(mu(iCat,:),nTrials,1) + randn(nTrials,2)*R); % key - these are the coordinates of the points
         end
         trials = reshape(datPtsGauss,nTrials,2);
         trials = trials(randperm(length(trials)),:);
         trialsUnique=[];
 end
-    
 
 tic
 for iClus2run = 1:length(clus2run) %nClus conditions to run
@@ -114,26 +126,22 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
     for iEps = 1:length(epsMuVals) 
         epsMuOrig=epsMuVals(iEps);
         epsMuOrig1000=epsMuOrig*1000; %for saving
-        
-%         [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE);
-        [densityPlot,clusMu,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE);
-        fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dtrls_eps%d_%diters',nClus,nTrials,epsMuOrig1000,nIter)];
-        timeTaken=toc;
-        if saveDat
-            if warpBox
-                fname = [fname '_warpBox'];
+        for iBvals = 1:length(batchSizeVals)
+            batchSize = batchSizeVals(iBvals);
+            fprintf('Running  nClus=%d, epsMu=%d, batchSize=%d\n',nClus,epsMuOrig1000,batchSize)
+            %         [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE);
+            [densityPlot,clusMu,gA,gW,~] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE);
+            fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter)];
+            timeTaken=toc;
+            if saveDat
+                if warpBox
+                    fname = [fname '_warpBox'];
+                end
+                cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
+                save(fname,'densityPlot','clusMu','gA','gW','nIter','timeTaken');
             end
-            cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
-            save(fname,'densityPlot','clusMu','gA','gW','muAvg','nIter','timeTaken');
         end
+        
     end
 end
-
-
-
 toc
-
-
-
-% figure; plot(cParams.closestChosen)
-% propClosestC = nnz(cParams.closestChosen)/nTrials

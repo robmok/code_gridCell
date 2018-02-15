@@ -2,8 +2,8 @@
 
 clear all;
 
-wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 cd(wd);
 
 codeDir = [wd '/code_gridCell'];
@@ -129,9 +129,9 @@ end
 if saveDat
     switch dat
         case 'randUnique'
-            fname = [saveDir, sprintf('/kmeans_nK_%d-%d_uniquePts',kVals(1),kVals(end))];
+            fname = [saveDir, sprintf('/kmeans_nK_%d-%d_uniquePts_%diters',kVals(1),kVals(end),nKmeans)];
         case 'rand'
-            fname = [saveDir, sprintf('/kmeans_nK_%d-%d_randPts',kVals(1),kVals(end))];
+            fname = [saveDir, sprintf('/kmeans_nK_%d-%d_randPts_%diters',kVals(1),kVals(end),nKmeans)];
     end
     save(fname,'muAllkVals','tssekVals', 'gA','gW','densityPlotCentres','indSSE1','indSSE2','kVals')
 end
@@ -188,9 +188,9 @@ end
 if saveDat
     switch dat
         case 'randUnique'
-            fname = [saveDir, sprintf('/kmeans_nK_%d-%d_uniquePts_xVal_%ddatasets',kVals(1),kVals(end),nXvalDataSets)];
+            fname = [saveDir, sprintf('/kmeans_nK_%d-%d_uniquePts_xVal_%ddatasets_%diters',kVals(1),kVals(end),nXvalDataSets,nKmeans)];
         case 'rand'
-            fname = [saveDir, sprintf('/kmeans_nK_%d-%d_randPts_xVal_%ddatasets',kVals(1),kVals(end),nXvalDataSets)];
+            fname = [saveDir, sprintf('/kmeans_nK_%d-%d_randPts_xVal_%ddatasets_%diters',kVals(1),kVals(end),nXvalDataSets,nKmeans)];
     end
     save(fname,'tsseXval','kVals')
 end
