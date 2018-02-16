@@ -75,19 +75,19 @@ switch gridMsr
     case 'w'
         g = gW;
 end
-
-%plot hist
-figure; pltCount=1;
-for iK = 1:nKvals    
-    subplot(3,2,pltCount)
-    hist(squeeze(g(:,1,iK)),50);
-    xlim([-.5,1.25]);
-    
-    pltCount = pltCount+1;
-    if mod(iK,6)==0
-    pltCount=1; figure;
-    end
-end
+% 
+% %plot hist
+% figure; pltCount=1;
+% for iK = 1:nKvals    
+%     subplot(3,2,pltCount)
+%     hist(squeeze(g(:,1,iK)),50);
+%     xlim([-.5,1.25]);
+%     
+%     pltCount = pltCount+1;
+%     if mod(iK,6)==0
+%     pltCount=1; figure;
+%     end
+% end
 
 %plot univar scatters
 figure;
@@ -100,7 +100,7 @@ sm      = std(dat1)./sqrt(size(dat1,1));
 ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
 plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
 errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-scatter(barpos,mu,750,colors,'x');
+scatter(barpos,mu,750,colors,'x','LineWidth',1);
 xlim([barpos(1)-.5, barpos(end)+.5]);
 ylim([-.5,1.25]);
 
@@ -115,7 +115,7 @@ ylim([-.5,1.25]);
 %% Crossvalidation - SSE on the test dataset, corr with gridness
 % note: tsseXval is already ordered from low to high SSE on train set
 
-iToPlot = 25:38; %1:28 - but plotting all will create too many plots atm - make subplots
+iToPlot = [7, 9, 13, 16, 20, 24]; %1:28 - but plotting all will create too many plots atm - make subplots
 
 
 
@@ -151,8 +151,8 @@ end
 %scatter plots - corr of gridness and SSE: original data
 for iKvals = iToPlot
 figure;
-[r, p] = corr(g(:,1,iKvals),(tssekVals(iKvals,:)'),'type','pearson');
-% [r p] = corr(g(:,1,iKvals),(tssekVals(iKvals,:)'),'type','spearman');
+% [r, p] = corr(g(:,1,iKvals),(tssekVals(iKvals,:)'),'type','pearson');
+[r p] = corr(g(:,1,iKvals),(tssekVals(iKvals,:)'),'type','spearman');
 scatter(g(:,1,iKvals),(tssekVals(iKvals,:)'),'.');
 title(sprintf('r = %.2f, p = %.5f',r,p))
 end
@@ -160,30 +160,43 @@ end
 % corr of gridness and SSE: cross-validated data
 for iKvals = iToPlot
 figure;
-[r, p] = corr(g(:,1,iKvals),nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),'type','pearson');
-% [r p] = corr(g(:,1,iKvals),mean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),'type','spearman');
-scatter(g(:,1,iKvals),nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),'.');
+% [r, p] = corr(g(:,1,iKvals),nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),'type','pearson');
+[r p] = corr(g(:,1,iKvals),nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),'type','spearman');
+% scatter(g(:,1,iKvals),nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),'.');
+scatter(nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),g(:,1,iKvals),'.');
 title(sprintf('r = %.2f, p = %.5f',r,p))
 end
 
 
-
+iToPlot = [4:28];
+% corr of gridness and SSE: cross-validated data
+figure; hold on;
+iPlt=0;
+for iKvals = iToPlot
+    iPlt=iPlt+1;
+    subplot(5,5,iPlt)
+    % [r, p] = corr(g(:,1,iKvals),nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),'type','pearson');
+    [r p] = corr(g(:,1,iKvals),nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),'type','spearman');
+    % scatter(g(:,1,iKvals),nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),'.');
+    scatter(nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),g(:,1,iKvals),'.');
+    title(sprintf('r = %.2f, p = %.5f',r,p))
+end
 
 
 % are 30/60 degree orientations --> better gridness? nk=3 suggests so.
 % others not sure; most orientations at 0, 90 and 40/50.. (3 peaks in the
 % hist). just need more iters to get more 30/60 degree grids then will get
 % better gridness scores?
-for iKvals = iToPlot
-figure;
-
-% hist(g(:,2,iKvals),50);
+% for iKvals = iToPlot
+% figure;
+% 
+% % hist(g(:,2,iKvals),50);
 % scatter(g(:,1,iKvals),g(:,2,iKvals))
-
-end
+% 
+% end
 %% Density plots for top / bottom 3
 
-iToPlot = 15:18;
+iToPlot = 12;%[4, 22, 28];
 
 gaussSmooth             = 1;
 nSets                   = 6; %top and bottom 3 SSE

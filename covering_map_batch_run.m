@@ -21,13 +21,13 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 
 %run multiple cluster numbers
-clus2run = [4:2:18, 3:2:19]; % 22:2:30 %20, 30
+clus2run = [22:2:30 21:2:29]; %[4:2:18, 3:2:19]; %20, 30
 nTrials = 100000; %how many locations in the box / trials 
 
-% batchSizeVals = [1, 50, 100, 200, 500]; %should be divisible by nTrials
-batchSizeVals = 1; 
-batchSizeVals = 50; 
-batchSizeVals = [100, 200, 500]; 
+batchSizeVals = [1, 50, 100, 200, 500]; %should be divisible by nTrials
+% batchSizeVals = 1; 
+% batchSizeVals = 50; 
+% batchSizeVals = [100, 200, 500]; 
 % batchSizeVals = 100; 
 
 % nTrials=2000000; batchSize=5000 - looks like kmeans. try other values
