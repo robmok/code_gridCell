@@ -78,6 +78,29 @@ figure;
     
 end
 
+%%
+
+gaussSmooth=1;
+iSet=5;
+for iterI = 1:5
+    
+densityPlotCentresSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
+
+figure; hold on;
+subplot(1,2,1)
+imagesc(densityPlotCentresSm);
+% 
+aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram
+% subplot(1,3,2)
+% imagesc(aCorrMap,[-.45 .45]);
+
+% figure;
+subplot(1,2,2)
+
+[g,gdataA] = gridSCORE(aCorrMap,'allen',1);
+% [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
+end
+
 
 %% mu - plot each trial; could compute gridness on each trial?
 

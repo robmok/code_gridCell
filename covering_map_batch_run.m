@@ -21,14 +21,16 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 
 %run multiple cluster numbers
-clus2run = [22:2:30 21:2:29]; %[4:2:18, 3:2:19]; %20, 30
-nTrials = 100000; %how many locations in the box / trials 
+% clus2run = 20; %20, 30
+clus2run = [20, 22, 24, 26 , 28, 30, 17, 19]; %20, 30
+clus2run = [3, 4, 5, 6, 7, 9, 11, 13, 15, 27, 29]; 
+clus2run = [8, 10, 12, 14 16, 18, 21, 23, 25]; 
+nTrials = 10000000; %how many locations in the box / trials 
 
-batchSizeVals = [1, 50, 100, 200, 500]; %should be divisible by nTrials
-% batchSizeVals = 1; 
-% batchSizeVals = 50; 
-% batchSizeVals = [100, 200, 500]; 
-% batchSizeVals = 100; 
+% batchSizeVals = [1, 50, 100, 200, 500]; %should be divisible by nTrials
+
+nBatches = 10000;
+batchSizeVals = nTrials/nBatches; 
 
 % nTrials=2000000; batchSize=5000 - looks like kmeans. try other values
 
@@ -41,7 +43,7 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 epsMuVals=[.01, .05, .075, .1, .2, .3];% %learning rate / starting learning rate 
 % epsMuVals=[.01, .05, .075];
 % epsMuVals=[.1, .2, .3];
-% epsMuVals = 0.1; 
+epsMuVals = 0.075; 
 
 %weight learning rate by SSE 
 weightEpsSSE = 0; %1 or 0
@@ -79,7 +81,7 @@ c=0;
 %%
 saveDat=1; %save simulations
 
-nIter=250; %how many iterations (starting points)
+nIter=200; %how many iterations (starting points)
 
 switch dat
         case 'randUnique'
@@ -130,7 +132,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
             batchSize = batchSizeVals(iBvals);
             fprintf('Running  nClus=%d, epsMu=%d, batchSize=%d\n',nClus,epsMuOrig1000,batchSize)
             %         [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE);
-            [densityPlot,clusMu,gA,gW,~] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE);
+            [densityPlot,clusMu,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE);
             fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter)];
             timeTaken=toc;
             if saveDat

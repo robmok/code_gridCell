@@ -5,6 +5,9 @@ function [tsseXVal] = xVal_clus(dat, nIter, nXvalDataSets, mu)
 % measure)
 
 
+
+
+
 % input args: dat, nIter, nXvalDataSets, mu (cluster centre locations
 
 % output:tsseXval, spreadoutness
