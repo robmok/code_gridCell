@@ -22,9 +22,10 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 
 %run multiple cluster numbers
 % clus2run = 20; %20, 30
-clus2run = [20, 22, 24, 26 , 28, 30, 17, 19]; %20, 30
-clus2run = [3, 4, 5, 6, 7, 9, 11, 13, 15, 27, 29]; 
-clus2run = [8, 10, 12, 14 16, 18, 21, 23, 25]; 
+clus2run = [20, 22, 24, 26, 17, 19]; %20, 30
+clus2run = [8, 10, 12, 14 16, 18, 21, 23]; 
+clus2run = [28, 30, 9, 11, 13, 15,]; 
+clus2run = [3, 4, 5, 6, 7, 25, 27, 29]; 
 nTrials = 10000000; %how many locations in the box / trials 
 
 % batchSizeVals = [1, 50, 100, 200, 500]; %should be divisible by nTrials
