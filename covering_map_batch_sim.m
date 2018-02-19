@@ -9,7 +9,8 @@ nTrialsTest = nTrials;
 gaussSmooth=1; %smoothing for density map
 
 nBatch=round(nTrials/batchSize);
-    
+batchSize = floor(batchSize); % when have decimal points, above needed
+
 % selecting cluster postions from a certain phase to test gridness
 % note: with batch, may be less purposeful to average over trials? it would
 % also mean averaging over batches (which would be even more stable). only

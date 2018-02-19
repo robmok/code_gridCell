@@ -25,15 +25,16 @@ clus2run = 20; %20, 30
 % clus2run = [20, 22, 24, 26, 17, 19]; %20, 30
 % clus2run = [8, 10, 12, 14 16, 18, 21, 23]; 
 % clus2run = [28, 30, 9, 11, 13, 15,]; 
-% clus2run = [3, 4, 5, 6, 7, 25, 27, 29]; 
-nTrials = 5000000; %how many locations in the box / trials 
+clus2run = [18, 22:2:30, 10:2:16]; 
+% nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 
 % nTrials = 500000; 
 
 % batchSizeVals = [1, 50, 100, 200, 500]; %should be divisible by nTrials
 
-nBatches = 1250; 
-batchSizeVals = nTrials/nBatches; 
+% nBatches = [7500, 10000, 15000]; 
+nBatches = [5000, 2500]; 
+batchSizeVals = nTrials./nBatches; 
 
 
 % %tesing 60+clusters
@@ -145,7 +146,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
             fprintf('Running  nClus=%d, epsMu=%d, batchSize=%d\n',nClus,epsMuOrig1000,batchSize)
             %         [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE);
             [densityPlot,clusMu,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE);
-            fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter)];
+            fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(batchSize),nIter)];
             timeTaken=toc;
             if saveDat
                 if warpBox
