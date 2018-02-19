@@ -21,17 +21,27 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 
 %run multiple cluster numbers
-% clus2run = 20; %20, 30
-clus2run = [20, 22, 24, 26, 17, 19]; %20, 30
-clus2run = [8, 10, 12, 14 16, 18, 21, 23]; 
-clus2run = [28, 30, 9, 11, 13, 15,]; 
-clus2run = [3, 4, 5, 6, 7, 25, 27, 29]; 
-nTrials = 10000000; %how many locations in the box / trials 
+clus2run = 20; %20, 30
+% clus2run = [20, 22, 24, 26, 17, 19]; %20, 30
+% clus2run = [8, 10, 12, 14 16, 18, 21, 23]; 
+% clus2run = [28, 30, 9, 11, 13, 15,]; 
+% clus2run = [3, 4, 5, 6, 7, 25, 27, 29]; 
+nTrials = 5000000; %how many locations in the box / trials 
+nTrials = 2500000; 
+% nTrials = 500000; 
 
 % batchSizeVals = [1, 50, 100, 200, 500]; %should be divisible by nTrials
 
-nBatches = 10000;
+nBatches = 1250; 
 batchSizeVals = nTrials/nBatches; 
+
+
+% %tesing 60+clusters
+% nTrials = 1000000; 
+% nBatches = 1000;
+% batchSizeVals = nTrials/nBatches; 
+
+
 
 % nTrials=2000000; batchSize=5000 - looks like kmeans. try other values
 
@@ -45,6 +55,7 @@ epsMuVals=[.01, .05, .075, .1, .2, .3];% %learning rate / starting learning rate
 % epsMuVals=[.01, .05, .075];
 % epsMuVals=[.1, .2, .3];
 epsMuVals = 0.075; 
+% epsMuVals = 0.025;  %testing 60+clusetrs
 
 %weight learning rate by SSE 
 weightEpsSSE = 0; %1 or 0

@@ -17,6 +17,24 @@ nSet=6;
 
 batchSizeVals = [1, 50, 100, 200, 500];
 epsMuVals=[.01, .05, .075, .1, .2, .3];% %learning rate / starting learning rate 
+
+
+% % new - one single LARGE batchSize, large nTrials, all nClus conds
+clus2run = 3:30;%[7,8,10,12]; 
+nTrials=10000000;
+batchSizeVals=1000;
+nIter=200;
+epsMuVals=.075;
+
+
+% %new 2 - testing several relatively high batch / nTrial numbers
+% clus2run = 20;
+% nTrials=5000000;
+% batchSizeVals=[500, 1000, 2000];
+% 
+
+
+
 gaussSmooth=1; 
 
 for iClus2run = 1:length(clus2run) 
@@ -53,7 +71,7 @@ for iClus2run = 1:length(clus2run)
         end
     end
 end
-%% plot hist and density  plots
+%% plot univar scatters
 
 gridMsrType = 'a'; % 'a' or 'w' for allen or willis method
 
@@ -84,20 +102,73 @@ end
 
 
 
+iSet=6;
+
+%plot univar scatters - over clusters
+figure; hold on;
+dat1     = squeeze(datTmp(iSet,:,:,:,:));
+barpos  = .25:.5:.5*size(dat1,2);
+colors  = distinguishable_colors(size(dat1,2));
+colgrey = [.5, .5, .5];
+mu      = mean(dat1,1);
+sm      = std(dat1)./sqrt(size(dat1,1));
+ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
+errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+% scatter(barpos,mu,750,colors,'x');
+% scatter(barpos,mu,750,colors,'.');
+scatter(barpos,mu,200,colors,'d','filled');
+xlim([barpos(1)-.5, barpos(end)+.5]);
+ylim([-.5,1.25]);
+title(sprintf('%s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
 
 
-iSet=5;
+%plot hist
+figure; pltCount=1;
+iToPlot = 2:length(clus2run);
+for iClus2Run = iToPlot
+    subplot(3,3,pltCount)
+    hist(dat1(:,iClus2Run),40); %50
+    xlim([-.5,1.25]);
+    title(sprintf('%d',iClus2Run+2));
+    if mod(pltCount,9)==0 && iClus2Run~=iToPlot(end)
+        pltCount=1; figure;
+    else
+        pltCount = pltCount+1;
+    end
+end
+% 
+% 
 
-%plot univar scatters
 
-for iClus2Run = 1:length(clus2run)
+% plot univar scatters
 
-
-% % comparing learning rate, with batch vals in subplots
+% for iClus2Run = 1:length(clus2run)
+% 
+% % % comparing learning rate, with batch vals in subplots
+% % figure; hold on;
+% % for iBvals = 1:length(batchSizeVals)
+% %     subplot(2,3,iBvals);
+% %     dat1     = squeeze(datTmp(iSet,:,:,iBvals));
+% %     barpos  = .25:.5:.5*size(dat1,2);
+% %     colors  = distinguishable_colors(size(dat1,2));
+% %     colgrey = [.5, .5, .5];
+% %     mu      = mean(dat1,1);
+% %     sm      = std(dat1)./sqrt(size(dat1,1));
+% %     ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+% %     plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
+% %     errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+% %     scatter(barpos,mu,750,colors,'x');
+% %     xlim([barpos(1)-.5, barpos(end)+.5]);
+% %     ylim([-.5,1.25]);
+% %     title(sprintf('%s - batchVal=%d',gridMeasure,batchSizeVals(iBvals)))
+% % end
+% 
+% % % comparing batch vals, with learning rate in subplots
 % figure; hold on;
-% for iBvals = 1:length(batchSizeVals)
-%     subplot(2,3,iBvals);
-%     dat1     = squeeze(datTmp(iSet,:,:,iBvals));
+% for iEps = 1:length(epsMuVals)
+%     subplot(2,3,iEps);
+%     dat1     = squeeze(datTmp(iSet,:,iEps,:,iClus2Run));
 %     barpos  = .25:.5:.5*size(dat1,2);
 %     colors  = distinguishable_colors(size(dat1,2));
 %     colgrey = [.5, .5, .5];
@@ -109,32 +180,27 @@ for iClus2Run = 1:length(clus2run)
 %     scatter(barpos,mu,750,colors,'x');
 %     xlim([barpos(1)-.5, barpos(end)+.5]);
 %     ylim([-.5,1.25]);
-%     title(sprintf('%s - batchVal=%d',gridMeasure,batchSizeVals(iBvals)))
+%     title(sprintf('%s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
+% end
+% 
+% 
 % end
 
-% % comparing batch vals, with learning rate in subplots
-figure; hold on;
-for iEps = 1:length(epsMuVals)
-    subplot(2,3,iEps);
-    dat1     = squeeze(datTmp(iSet,:,iEps,:,iClus2Run));
-    barpos  = .25:.5:.5*size(dat1,2);
-    colors  = distinguishable_colors(size(dat1,2));
-    colgrey = [.5, .5, .5];
-    mu      = mean(dat1,1);
-    sm      = std(dat1)./sqrt(size(dat1,1));
-    ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
-    plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-    errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-    scatter(barpos,mu,750,colors,'x');
-    xlim([barpos(1)-.5, barpos(end)+.5]);
-    ylim([-.5,1.25]);
-    title(sprintf('%s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
-end
+%testing one sim only
 
-
-end
-
-
+% dat1=squeeze(gA(iSet,:,1));
+% figure;
+% barpos  = .25:.5:.5*size(dat1,1);
+% colors  = distinguishable_colors(size(dat1,1));
+% colgrey = [.5, .5, .5];
+% mu      = mean(dat1);
+% sm      = std(dat1)./sqrt(size(dat1,2));
+% ci      = sm.*tinv(.025,size(dat1,2)-1); %compute conf intervals
+% plotSpread(dat1','xValues',barpos);
+% errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+% scatter(barpos,mu,750,'x');
+% xlim([barpos(1)-.5, barpos(end)+.5]);
+% ylim([-.5,1.25]);
 %% density plots
 
 iSet = 5;

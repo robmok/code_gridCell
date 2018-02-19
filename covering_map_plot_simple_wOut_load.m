@@ -18,10 +18,10 @@ xlim(locRange); ylim(locRange);
 % voronoi(muAll(:,1,end),muAll(:,2,end),'k');
 %% density map, autocorrelogram
 
-iterI=1; 
+iterI=2; 
 gaussSmooth=1;
 
-for iSet=1:size(densityPlot,3) %plot - diff averaging over nTrials
+for iSet=1%:size(densityPlot,3) %plot - diff averaging over nTrials
     densityPlotSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
     aCorrMap=ndautoCORR(densityPlotSm); %autocorrelogram
 
@@ -81,8 +81,8 @@ end
 %%
 
 gaussSmooth=1;
-iSet=5;
-for iterI = 1:5
+for iSet=1:6
+for iterI = 1%1:20
     
 densityPlotCentresSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
 
@@ -100,7 +100,7 @@ subplot(1,2,2)
 [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
 % [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
 end
-
+end
 
 %% mu - plot each trial; could compute gridness on each trial?
 
