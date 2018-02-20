@@ -23,6 +23,8 @@ densityPlot          = zeros(length(spacing),length(spacing),nSets,nIter);
 clusMu               = nan(nClus,2,nSets,nIter);
 % muAvg                = nan(nClus,2,nSets,nIter);
 muAll                = nan(nClus,2,nBatch+1,nIter);
+% tsseAll              = nan(nBatch+1,nIter); %not sure if this is +1 or
+% not
 % nTrlsUpd             = nan(nClus,nSets,nIter);
 gA = nan(nSets,nIter,4);
 gW = nan(nSets,nIter,4);
@@ -226,12 +228,37 @@ for iterI = 1:nIter
                 end
                 tsse(iBatch)=sum(sse);
                 sseW(iBatch+1) = tsse(iBatch)./tsse(1);% weight next learning rate by prop of sse from the start
+                
+%                 devAvgSSE             = sse-mean(sse);
+%                 stdAcrossClus(iBatch) = std(devAvgSSE); % may be better since normalises by nClus?
+%                 varAcrossClus(iBatch) = var(devAvgSSE);
             end
+            
+%             %compute SSE and save - don't do if run above. consider only
+%             %running this outside of the sim? - yes; in xVal_clus.m. Also
+%             not sure if this works here
+
+%             sse=nan(1,nClus);
+%             distTrl=(mu(:,1,iBatch)'-trialsUnique(:,1)).^2+(mu(:,2,iBatch)'-trialsUnique(:,2)).^2; % vectorised
+%             [indValsTrl, indTmp]=min(distTrl,[],2); % find which clusters are points closest to
+%             
+%             %any way to vectorize this?
+%             for iClus = 1:size(clusMu,1)
+%                 sse(iClus)=sum(sum([mu(iClus,1,iBatch)-trialsUnique(indTmp==iClus,1), mu(iClus,2,iBatch)-trialsUnique(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
+%                 % sse(iClus)=sum(sum([clusMu(iClus,1,iSet,iterI)-dataPtsTest(indTmp==iClus,1), clusMu(iClus,2,iSet,iterI)-dataPtsTest(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
+%             end
+%             tsse(iBatch)=sum(sse);
+%             sseW(iBatch+1) = tsse(iBatch)./tsse(1);% weight next learning rate by prop of sse from the start
+%             devAvgSSE             = sse-mean(sse);
+%             stdAcrossClus(iBatch) = std(devAvgSSE); % may be better since normalises by nClus?
+%             varAcrossClus(iBatch) = var(devAvgSSE);
 
 
     end
-    muAll(:,:,:,iterI) = mu;
-    
+    muAll(:,:,:,iterI)      = mu;
+%     tsseAll(:,iterI)        = tsse;
+%     sseSpreadSd(:,iterI)    = stdAcrossClus;
+%     sseSpreadVar(:,iterI)   = varAcrossClus;
 
     % densityPlotClus - density plot with each cluster in dim 3 - more like
     % a place cell map - use to find clusMu (clus centres) - leave it out
