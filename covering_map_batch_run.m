@@ -25,7 +25,9 @@ clus2run = 20; %20, 30
 % clus2run = [20, 22, 24, 26, 17, 19]; %20, 30
 % clus2run = [8, 10, 12, 14 16, 18, 21, 23]; 
 % clus2run = [28, 30, 9, 11, 13, 15,]; 
-clus2run = [18, 22:2:30, 10:2:16]; 
+clus2run = 18:2:24; %running 18:2:30; later could run 10:2:16
+clus2run = 26:2:30;
+
 % nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 
 % nTrials = 500000; 
@@ -33,16 +35,24 @@ nTrials = 2500000;
 % batchSizeVals = [1, 50, 100, 200, 500]; %should be divisible by nTrials
 
 % nBatches = [7500, 10000, 15000]; 
-nBatches = [5000, 2500]; 
+% nBatches = 7500; 
+nBatches = 5000; 
+% nBatches = 2500; 
 batchSizeVals = nTrials./nBatches; 
+
+%%%
+% define batch size based on average number of updates per cluster
+%%%
+% avgBatchUpdate = 25; 
+avgBatchUpdate = [10, 25, 35, 50]; 
+% batchSizePerClus = clus2run.*avgBatchUpdate;
+% nBatches = nTrials./batchSizePerClus; %per clus cond %this is actually not used..
 
 
 % %tesing 60+clusters
 % nTrials = 1000000; 
 % nBatches = 1000;
 % batchSizeVals = nTrials/nBatches; 
-
-
 
 % nTrials=2000000; batchSize=5000 - looks like kmeans. try other values
 
@@ -141,12 +151,17 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
     for iEps = 1:length(epsMuVals) 
         epsMuOrig=epsMuVals(iEps);
         epsMuOrig1000=epsMuOrig*1000; %for saving
-        for iBvals = 1:length(batchSizeVals)
-            batchSize = batchSizeVals(iBvals);
-            fprintf('Running  nClus=%d, epsMu=%d, batchSize=%d\n',nClus,epsMuOrig1000,batchSize)
+        for iBvals = 1:length(avgBatchUpdate) %length(batchSizeVals)
+%             batchSize = batchSizeVals(iBvals); %fixed batch size
+            batchSize = clus2run(iClus2run).*avgBatchUpdate(iBvals); % batch size depends on average updates per cluster (depends on nClus cond)
+%             fprintf('Running  nClus=%d, epsMu=%d, batchSize=%d\n',nClus,epsMuOrig1000,batchSize)
+            fprintf('Running  nClus=%d, epsMu=%d, avgBatchUpd=%d; batchSize=%d\n',nClus,epsMuOrig1000,avgBatchUpdate(iBvals),batchSize)
             %         [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE);
             [densityPlot,clusMu,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE);
-            fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(batchSize),nIter)];
+%             fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(batchSize),nIter)];
+            %if use avgBatchUpdate
+            fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(avgBatchUpdate(iBvals)),round(batchSize),nIter)];
+            
             timeTaken=toc;
             if saveDat
                 if warpBox

@@ -30,15 +30,15 @@ epsMuVals=.075;
 % %new 2 - testing several relatively high batch / nTrial numbers
 clus2run = 20;
 nTrials=5000000;
-batchSizeVals=[500, 1000, 2000];
+batchSizeVals=[333, 500,667, 1000, 2000];
 
 % new 3 - ...
-% covering_map_batch_dat_20clus_2500ktrls_eps75_batchSiz500_200iters_194703
-% nTrials=2500000;
-% batchSizeVals=[500, 1000, 2000];
-% 
+nTrials=2500000;
+batchSizeVals=[167, 250, 333, 500, 1000, 2000];
 
-
+% new 4
+% nTrials=5000000;
+% batchSizeVals=[333, 500, 667];
 
 gaussSmooth=1; 
 

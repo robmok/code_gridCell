@@ -8,7 +8,7 @@ nTrialsTest = nTrials;
 
 gaussSmooth=1; %smoothing for density map
 
-nBatch=round(nTrials/batchSize);
+nBatch=floor(nTrials/batchSize);
 batchSize = floor(batchSize); % when have decimal points, above needed
 
 % selecting cluster postions from a certain phase to test gridness
