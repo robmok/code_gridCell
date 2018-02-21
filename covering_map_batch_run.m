@@ -35,9 +35,10 @@ nTrials = 2500000;
 %batch size
 fixBatchSize = 0; %fixed, or batchSize depends on mean updates per cluster
 
+% 13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000
 if fixBatchSize
-    % nBatches = [7500, 10000, 15000];
-    nBatches = fliplr([20000, 30000, 100000, 200000]);
+    nBatches = [7500, 10000, 15000];
+%     nBatches = fliplr([20000, 30000, 100000, 200000]);
     % nBatches = 200000;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
@@ -165,6 +166,8 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                 fprintf('Running  nClus=%d, epsMu=%d, avgBatchUpd=%d; batchSize=%d\n',nClus,epsMuOrig1000,avgBatchUpdate(iBvals),batchSize)
                 [densityPlot,clusMu,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(avgBatchUpdate(iBvals)),round(batchSize),nIter)];
+                %temp for not same trls
+                fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz%d_%diters_notSameTrls',nClus,round(nTrials/1000),epsMuOrig1000,round(avgBatchUpdate(iBvals)),round(batchSize),nIter)];
             end
             timeTaken=toc;
             if saveDat

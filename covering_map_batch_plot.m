@@ -26,7 +26,6 @@ epsMuVals=[.01, .05, .075, .1, .2, .3];% %learning rate / starting learning rate
 nIter=200;
 epsMuVals=.075;
 % 
-% 
 % %new 2 - testing several relatively high batch / nTrial numbers
 clus2run = 20;
 nTrials=5000000;
@@ -34,18 +33,22 @@ batchSizeVals=[333, 500,667, 1000, 2000];
 
 % new 3 - ...
 nTrials=2500000;
-batchSizeVals=[13, 25, 167, 250, 333, 500, 1000, 2000];
+batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
 
 % new 4
 % nTrials=5000000;
 % batchSizeVals=[333, 500, 667];
 
 
-% new 5
-nTrials=2500000;
-clus2run = [18:2:30]; 
-batchSizeVals=[333, 500, 1000];
+% new 5 - fixed batch sizes
+% nTrials=2500000;
+% clus2run = [18:2:30]; 
+% batchSizeVals=[333, 500, 1000];
 
+% new 6 - batchSizes based on mean updates per clus per batch
+% *need change fname
+clus2run = [18:2:22]; 
+batchSizeVals=[10, 25, 35, 50]; %avgBatchVals
 
 gaussSmooth=1; 
 
@@ -55,11 +58,17 @@ for iClus2run = 1:length(clus2run)
         epsMuOrig=epsMuVals(iEps);
         epsMuOrig1000=epsMuOrig*1000;
         for iBvals = 1:length(batchSizeVals)
-            batchSize = batchSizeVals(iBvals);
-            fprintf('Loading nClus=%d, epsMu=%d, batchSize=%d\n',nClus,epsMuOrig1000,batchSize)
+%             batchSize = batchSizeVals(iBvals);
+%             fprintf('Loading nClus=%d, epsMu=%d, batchSize=%d\n',nClus,epsMuOrig1000,batchSize)
 
             %load
-            fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter)];
+%             fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter)];
+            
+            %avgBatch
+            avgBatch = batchSizeVals(iBvals);
+            fprintf('Loading nClus=%d, epsMu=%d, avgBatchSize=%d\n',nClus,epsMuOrig1000,avgBatch)
+
+            fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz*_%diters*',nClus,round(nTrials/1000),epsMuOrig1000,avgBatch,nIter)];
             f = dir(fname); filesToLoad = cell(1,length(f));
             for iF = 1%:length(f)
                 filesToLoad{iF} = f(iF).name;
@@ -116,25 +125,25 @@ end
 
 iSet=6;
 
-% %plot univar scatters - over clusters
-% figure; hold on;
-% dat1     = squeeze(datTmp(iSet,:,:,:,:));
-% barpos  = .25:.5:.5*size(dat1,2);
-% colors  = distinguishable_colors(size(dat1,2));
-% colgrey = [.5, .5, .5];
-% mu      = mean(dat1,1);
-% sm      = std(dat1)./sqrt(size(dat1,1));
-% ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
-% plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-% errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-% % scatter(barpos,mu,750,colors,'x');
-% % scatter(barpos,mu,750,colors,'.');
-% scatter(barpos,mu,200,colors,'d','filled');
-% xlim([barpos(1)-.5, barpos(end)+.5]);
-% ylim([-.5,1.25]);
-% title(sprintf('%s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
-% 
-% 
+%plot univar scatters - over clusters
+figure; hold on;
+dat1     = squeeze(datTmp(iSet,:,:,:,:));
+barpos  = .25:.5:.5*size(dat1,2);
+colors  = distinguishable_colors(size(dat1,2));
+colgrey = [.5, .5, .5];
+mu      = mean(dat1,1);
+sm      = std(dat1)./sqrt(size(dat1,1));
+ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
+errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+% scatter(barpos,mu,750,colors,'x');
+% scatter(barpos,mu,750,colors,'.');
+scatter(barpos,mu,200,colors,'d','filled');
+xlim([barpos(1)-.5, barpos(end)+.5]);
+ylim([-.5,1.25]);
+title(sprintf('%s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
+
+
 % %plot hist
 % figure; pltCount=1;
 % iToPlot = 2:length(clus2run);
