@@ -34,11 +34,18 @@ batchSizeVals=[333, 500,667, 1000, 2000];
 
 % new 3 - ...
 nTrials=2500000;
-batchSizeVals=[167, 250, 333, 500, 1000, 2000];
+batchSizeVals=[13, 25, 167, 250, 333, 500, 1000, 2000];
 
 % new 4
 % nTrials=5000000;
 % batchSizeVals=[333, 500, 667];
+
+
+% new 5
+nTrials=2500000;
+clus2run = [18:2:30]; 
+batchSizeVals=[333, 500, 1000];
+
 
 gaussSmooth=1; 
 
@@ -147,6 +154,7 @@ iSet=6;
 
 
 % plot univar scatters
+% figure; hold on;
 
 for iClus2Run = 1:length(clus2run)
 
@@ -171,6 +179,7 @@ for iClus2Run = 1:length(clus2run)
 
 % % comparing batch vals, with learning rate in subplots
 figure; hold on;
+% subplot(2,4,iClus2Run)
 for iEps = 1:length(epsMuVals)
 %     subplot(2,3,iEps);
     dat1     = squeeze(datTmp(iSet,:,iEps,:,iClus2Run));

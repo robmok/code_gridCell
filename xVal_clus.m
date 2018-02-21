@@ -61,7 +61,6 @@ indSSE2(iterI,:) = indSSE1(iterI,:);
 %%%%%
 
 %Crossvalidation
-
 sseXval  = nan(1,nClus); 
 tsseXval = nan(nIter,nXvalDataSets);
 % muBest = nan(nClus,2,length(bestWorst3));

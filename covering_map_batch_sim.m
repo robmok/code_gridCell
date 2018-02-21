@@ -1,5 +1,5 @@
 % function [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE)
-function [densityPlot,clusMu,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE)
+function [densityPlot,clusMu,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE)
 
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
 stepSize=diff(spacing(1:2));
@@ -32,6 +32,26 @@ for iterI = 1:nIter
     
     fprintf('iter %d \n',iterI);
     epsMu = epsMuOrig; %revert learning rate back to original if reset
+
+    if ~useSameTrls %if want training data to be different set of points
+        switch dat
+            case 'randUnique'
+                load([saveDir '/randTrialsBox_trialsUnique']);
+                trials = trialsUnique;
+            case 'rand'
+                trials = [randsample(linspace(locRange(1),locRange(2),50),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),50),nTrials,'true')]';
+            case 'cat'
+                % draw points from 2 categories (gaussian) from a 2D feature space
+                nTrials = floor(nTrials/nCats); % points to sample
+                for iCat = 1:nCats
+                    mu(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % ±10 so category centres are not on the edge
+                    datPtsGauss(:,:,iCat) = round(repmat(mu(iCat,:),nTrials,1) + randn(nTrials,2)*R); % key - these are the coordinates of the points
+                end
+                trials = reshape(datPtsGauss,nTrials,2);
+                trials = trials(randperm(length(trials)),:);
+                trialsUnique=[];
+        end
+    end
     
     switch box
         case 'square'
@@ -214,7 +234,7 @@ for iterI = 1:nIter
             %weight learning rate by SSE - 
             %%%%%%
             % - atm SSE goes down really quick with batch - even more so
-            % shouldn't weigh by initial SSE!
+            % than before shouldn't weigh by initial SSE!
             %%%%%%
             if weightEpsSSE
                 sse=nan(1,nClus);
