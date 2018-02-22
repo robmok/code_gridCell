@@ -5,13 +5,13 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
 saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
-addpath(genpath([codeDir '/gridSCORE_packed'])); %note edited this - in codeDir now not wd
+addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in codeDir now not wd
 
 dat = 'rand'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
 
@@ -24,8 +24,8 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 clus2run = 20; %20, 30
 % clus2run = 18:2:24; %running 18:2:30; later could run 10:2:16
 % clus2run = 26:2:30;
-clus2run = 18;
-clus2run = 26;
+clus2run = 11;
+% clus2run = 26;
 
 % nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 
@@ -39,7 +39,7 @@ if fixBatchSize
     nBatches = [30000, 100000, 200000, 500000];
 %     nBatches = [2500, 1250];
 %     nBatches = fliplr([20000, 30000, 100000, 200000, 500000]);
-%     nBatches = 500000;
+    nBatches = 1250;
 
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
@@ -103,9 +103,9 @@ c=0;
 % trialsUnique=allPts;
 % save([saveDir '/randTrialsBox_trialsUnique'],'trialsUnique');
 %%
-saveDat=1; %save simulations
+saveDat=0; %save simulations
 
-nIter=200; %how many iterations (starting points)
+nIter=6; %how many iterations (starting points)
 
 switch dat
         case 'randUnique'

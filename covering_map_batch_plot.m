@@ -37,14 +37,15 @@ epsMuVals=.075;
 % batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
 
 % new 3 - fixed batch sizes across clusters
-% nTrials=2500000;
+nTrials=2500000;
 % clus2run = [18:2:30]; 
 % batchSizeVals=[333, 500, 1000];
 
 % new 4 - batchSizes based on mean updates per clus per batch (avgBatch)
-% fixBatchSize = 0;
-% clus2run = [18:2:28]; 
-% batchSizeVals=[10, 25, 35, 50]; %avgBatchVals
+fixBatchSize = 0;
+clus2run = [18:2:28]; 
+% clus2run = [18 20 26]; 
+batchSizeVals=[10, 25, 35, 50]; %avgBatchVals
 
 %load loop
 for iClus2run = 1:length(clus2run) 
@@ -63,6 +64,7 @@ for iClus2run = 1:length(clus2run)
                 avgBatch = batchSizeVals(iBvals);
                 fprintf('Loading nClus=%d, epsMu=%d, avgBatchSize=%d\n',nClus,epsMuOrig1000,avgBatch)
                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz*_%diters*',nClus,round(nTrials/1000),epsMuOrig1000,avgBatch,nIter)];
+%                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz*_%diters_not*',nClus,round(nTrials/1000),epsMuOrig1000,avgBatch,nIter)];
             end
             
             %edit if want to load more than one file per sim, merge
