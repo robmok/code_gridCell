@@ -9,7 +9,7 @@ cd(wd);
 codeDir = [wd '/code_gridCell'];
 saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
-addpath(genpath([wd '/gridSCORE_packed']));
+addpath(genpath([codeDir '/gridSCORE_packed']));
 
 kVals = 10:13; 
 nKvals = length(kVals);

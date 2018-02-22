@@ -5,13 +5,13 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
 saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
-addpath(genpath([wd '/gridSCORE_packed']));
+addpath(genpath([codeDir '/gridSCORE_packed'])); %note edited this - in codeDir now not wd
 
 dat = 'rand'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
 
