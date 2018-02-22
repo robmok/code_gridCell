@@ -4,7 +4,7 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -158,7 +158,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                     fname = [fname '_warpBox'];
                 end
                 cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
-                save(fname,'densityPlot','clusMu','gA','gW','nIter','timeTaken');
+                save(fname,'densityPlot','clusMu','gA','gW','nIter','timeTaken','trials'); %added trials for xval
             end
         end
         
