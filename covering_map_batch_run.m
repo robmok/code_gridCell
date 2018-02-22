@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -25,7 +25,7 @@ clus2run = 20; %20, 30
 % clus2run = 18:2:24; %running 18:2:30; later could run 10:2:16
 % clus2run = 26:2:30;
 clus2run = 18;
-clus2run = 26;
+% clus2run = 26;
 
 % nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 
@@ -35,7 +35,8 @@ fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
 
 % 13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000
 if fixBatchSize
-    nBatches = [1250, 2500, 5000, 7500, 10000, 15000, 20000, 30000, 100000, 200000, 500000];
+    nBatches = [1250, 2500, 5000, 7500, 10000, 15000, 20000];
+%     nBatches = [30000, 100000, 200000, 500000];
 %     nBatches = [2500, 1250];
 %     nBatches = fliplr([20000, 30000, 100000, 200000, 500000]);
 %     nBatches = 500000;
@@ -117,12 +118,13 @@ switch dat
     case 'rand'
         trials = [randsample(linspace(locRange(1),locRange(2),50),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),50),nTrials,'true')]';
         %for computing sse over trials
-        load([saveDir '/randTrialsBox_trialsUnique']);
+%         load([saveDir '/randTrialsBox_trialsUnique']);
+        trialsUnique=[];
     case 'cat'
         % draw points from 2 categories (gaussian) from a 2D feature space
         nTrials = floor(nTrials/nCats); % points to sample
         for iCat = 1:nCats
-            mu(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % ±10 so category centres are not on the edge
+            mu(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % ï¿½10 so category centres are not on the edge
             datPtsGauss(:,:,iCat) = round(repmat(mu(iCat,:),nTrials,1) + randn(nTrials,2)*R); % key - these are the coordinates of the points
         end
         trials = reshape(datPtsGauss,nTrials,2);
