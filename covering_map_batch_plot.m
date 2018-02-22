@@ -9,66 +9,63 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([wd '/gridSCORE_packed']));
 
+
+
 % load
-clus2run = [7,8,10,12]; 
-nTrials = 100000; %how many locations in the box / trials 
-nIter=250;
-nSet=6;
+nSet        = 6;
+gaussSmooth = 1; 
+fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
-batchSizeVals = [1, 50, 100, 200, 500];
-epsMuVals=[.01, .05, .075, .1, .2, .3];% %learning rate / starting learning rate 
+% clus2run = [7,8,10,12]; 
+% nTrials = 100000; 
+% nIter=250;
+% batchSizeVals = [1, 50, 100, 200, 500];
+% epsMuVals=[.01, .05, .075, .1, .2, .3];% learning rate / starting learning rate 
 
 
-% % new - one single LARGE batchSize, large nTrials, all nClus conds
-% clus2run = 3:30;%[7,8,10,12]; 
-% nTrials=10000000;
-% batchSizeVals=1000;
+% sims 1 - one single LARGE batchSize, large nTrials, all nClus conds
+clus2run = 3:30;%[7,8,10,12]; 
+nTrials=10000000;
+batchSizeVals=1000;
 nIter=200;
 epsMuVals=.075;
-% 
-% %new 2 - testing several relatively high batch / nTrial numbers
-clus2run = 20;
-nTrials=5000000;
-batchSizeVals=[333, 500,667, 1000, 2000];
 
-% new 3 - ...
-nTrials=2500000;
-batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
+% sims 2 - a smaller val of trials; testing batch sizes (works fine) - also
+% have some sims with ntrials = 5000000 (less batchSizeVals)
+% clus2run = 20;
+% nTrials=2500000;
+% batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
 
-% new 4
-% nTrials=5000000;
-% batchSizeVals=[333, 500, 667];
-
-
-% new 5 - fixed batch sizes
+% new 3 - fixed batch sizes across clusters
 % nTrials=2500000;
 % clus2run = [18:2:30]; 
 % batchSizeVals=[333, 500, 1000];
 
-% new 6 - batchSizes based on mean updates per clus per batch
-% *need change fname
-clus2run = [18:2:22]; 
-batchSizeVals=[10, 25, 35, 50]; %avgBatchVals
+% new 4 - batchSizes based on mean updates per clus per batch (avgBatch)
+% fixBatchSize = 0;
+% clus2run = [18:2:28]; 
+% batchSizeVals=[10, 25, 35, 50]; %avgBatchVals
 
-gaussSmooth=1; 
-
+%load loop
 for iClus2run = 1:length(clus2run) 
     nClus = clus2run(iClus2run);
     for iEps = 1:length(epsMuVals) 
         epsMuOrig=epsMuVals(iEps);
         epsMuOrig1000=epsMuOrig*1000;
         for iBvals = 1:length(batchSizeVals)
-%             batchSize = batchSizeVals(iBvals);
-%             fprintf('Loading nClus=%d, epsMu=%d, batchSize=%d\n',nClus,epsMuOrig1000,batchSize)
-
-            %load
-%             fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter)];
             
-            %avgBatch
-            avgBatch = batchSizeVals(iBvals);
-            fprintf('Loading nClus=%d, epsMu=%d, avgBatchSize=%d\n',nClus,epsMuOrig1000,avgBatch)
-
-            fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz*_%diters*',nClus,round(nTrials/1000),epsMuOrig1000,avgBatch,nIter)];
+            %fixed batch
+            if fixBatchSize
+                batchSize = batchSizeVals(iBvals);
+                fprintf('Loading nClus=%d, epsMu=%d, batchSize=%d\n',nClus,epsMuOrig1000,batchSize)
+                fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter)];
+            else %avgBatch
+                avgBatch = batchSizeVals(iBvals);
+                fprintf('Loading nClus=%d, epsMu=%d, avgBatchSize=%d\n',nClus,epsMuOrig1000,avgBatch)
+                fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz*_%diters*',nClus,round(nTrials/1000),epsMuOrig1000,avgBatch,nIter)];
+            end
+            
+            %edit if want to load more than one file per sim, merge
             f = dir(fname); filesToLoad = cell(1,length(f));
             for iF = 1%:length(f)
                 filesToLoad{iF} = f(iF).name;
@@ -122,76 +119,12 @@ switch gridMeasure
 end
 
 
-
 iSet=6;
 
-%plot univar scatters - over clusters
-figure; hold on;
-dat1     = squeeze(datTmp(iSet,:,:,:,:));
-barpos  = .25:.5:.5*size(dat1,2);
-colors  = distinguishable_colors(size(dat1,2));
-colgrey = [.5, .5, .5];
-mu      = mean(dat1,1);
-sm      = std(dat1)./sqrt(size(dat1,1));
-ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
-plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-% scatter(barpos,mu,750,colors,'x');
-% scatter(barpos,mu,750,colors,'.');
-scatter(barpos,mu,200,colors,'d','filled');
-xlim([barpos(1)-.5, barpos(end)+.5]);
-ylim([-.5,1.25]);
-title(sprintf('%s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
-
-
-% %plot hist
-% figure; pltCount=1;
-% iToPlot = 2:length(clus2run);
-% for iClus2Run = iToPlot
-%     subplot(3,3,pltCount)
-%     hist(dat1(:,iClus2Run),40); %50
-%     xlim([-.5,1.25]);
-%     title(sprintf('%d',iClus2Run+2));
-%     if mod(pltCount,9)==0 && iClus2Run~=iToPlot(end)
-%         pltCount=1; figure;
-%     else
-%         pltCount = pltCount+1;
-%     end
-% end
-% % 
-% 
-
-
-% plot univar scatters
-% figure; hold on;
-
-for iClus2Run = 1:length(clus2run)
-
-% % comparing learning rate, with batch vals in subplots
-% figure; hold on;
-% for iBvals = 1:length(batchSizeVals)
-%     subplot(2,3,iBvals);
-%     dat1     = squeeze(datTmp(iSet,:,:,iBvals));
-%     barpos  = .25:.5:.5*size(dat1,2);
-%     colors  = distinguishable_colors(size(dat1,2));
-%     colgrey = [.5, .5, .5];
-%     mu      = mean(dat1,1);
-%     sm      = std(dat1)./sqrt(size(dat1,1));
-%     ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
-%     plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-%     errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-%     scatter(barpos,mu,750,colors,'x');
-%     xlim([barpos(1)-.5, barpos(end)+.5]);
-%     ylim([-.5,1.25]);
-%     title(sprintf('%s - batchVal=%d',gridMeasure,batchSizeVals(iBvals)))
-% end
-
-% % comparing batch vals, with learning rate in subplots
-figure; hold on;
-% subplot(2,4,iClus2Run)
-for iEps = 1:length(epsMuVals)
-%     subplot(2,3,iEps);
-    dat1     = squeeze(datTmp(iSet,:,iEps,:,iClus2Run));
+%plot univar scatters - over clusters (e.g. one batch size)
+if size(gridness,4)==1 %only 1 batchSize
+    figure; hold on;
+    dat1     = squeeze(datTmp(iSet,:,:,:,:));
     barpos  = .25:.5:.5*size(dat1,2);
     colors  = distinguishable_colors(size(dat1,2));
     colgrey = [.5, .5, .5];
@@ -200,14 +133,82 @@ for iEps = 1:length(epsMuVals)
     ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
     plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
     errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-    scatter(barpos,mu,750,colors,'x');
+    % scatter(barpos,mu,750,colors,'x');
+    % scatter(barpos,mu,750,colors,'.');
+    scatter(barpos,mu,100,colors,'d','filled');
     xlim([barpos(1)-.5, barpos(end)+.5]);
     ylim([-.5,1.25]);
     title(sprintf('%s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
+    
+    %plot hist
+    figure; pltCount=1;
+    iToPlot = 2:length(clus2run);
+    for iClus2Run = iToPlot
+        subplot(3,3,pltCount)
+        hist(dat1(:,iClus2Run),40); %50
+        xlim([-.5,1.25]);
+        title(sprintf('%d',iClus2Run+2));
+        if mod(pltCount,9)==0 && iClus2Run~=iToPlot(end)
+            pltCount=1; figure;
+        else
+            pltCount = pltCount+1;
+        end
+    end
 end
 
 
+% %plot univar scatters - comparing batchSizeVals, with clusters in separate plots
+
+if size(gridness,4)>1 % more than 1 batchSize
+    
+figure; hold on;
+for iClus2Run = 1:length(clus2run)
+    % comparing batch vals, with cluster nums in subplots; can edit for eps
+%     figure; hold on;
+    subplot(2,3,iClus2Run)
+    for iEps = 1:length(epsMuVals)
+        %     subplot(2,3,iEps);
+        dat1     = squeeze(datTmp(iSet,:,iEps,:,iClus2Run));
+        barpos  = .25:.5:.5*size(dat1,2);
+        colors  = distinguishable_colors(size(dat1,2));
+        colgrey = [.5, .5, .5];
+        mu      = mean(dat1,1);
+        sm      = std(dat1)./sqrt(size(dat1,1));
+        ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+        plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
+        errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+        scatter(barpos,mu,750,colors,'x');
+        xlim([barpos(1)-.5, barpos(end)+.5]);
+        ylim([-.5,1.25]);
+        title(sprintf('%s - eps=%d, nClus=%d',gridMeasure,epsMuVals(iEps)*1000,clus2run(iClus2Run)))
+    end
+   
+    
+    % % comparing learning rate, with batch vals in subplots
+    % figure; hold on;
+    % for iBvals = 1:length(batchSizeVals)
+    %     subplot(2,3,iBvals);
+    %     dat1     = squeeze(datTmp(iSet,:,:,iBvals));
+    %     barpos  = .25:.5:.5*size(dat1,2);
+    %     colors  = distinguishable_colors(size(dat1,2));
+    %     colgrey = [.5, .5, .5];
+    %     mu      = mean(dat1,1);
+    %     sm      = std(dat1)./sqrt(size(dat1,1));
+    %     ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+    %     plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
+    %     errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+    %     scatter(barpos,mu,750,colors,'x');
+    %     xlim([barpos(1)-.5, barpos(end)+.5]);
+    %     ylim([-.5,1.25]);
+    %     title(sprintf('%s - batchVal=%d',gridMeasure,batchSizeVals(iBvals)))
+    % end
 end
+
+end
+
+
+
+
 
 %testing one sim only
 

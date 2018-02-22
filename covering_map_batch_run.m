@@ -22,43 +22,36 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 
 %run multiple cluster numbers
 clus2run = 20; %20, 30
-% clus2run = [20, 22, 24, 26, 17, 19]; %20, 30
-% clus2run = [8, 10, 12, 14 16, 18, 21, 23]; 
-% clus2run = [28, 30, 9, 11, 13, 15,]; 
 % clus2run = 18:2:24; %running 18:2:30; later could run 10:2:16
 % clus2run = 26:2:30;
+clus2run = 18;
+clus2run = 26;
 
 % nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 
-% nTrials = 500000; 
 
 %batch size
-fixBatchSize = 0; %fixed, or batchSize depends on mean updates per cluster
+fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
 
 % 13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000
 if fixBatchSize
-    nBatches = [7500, 10000, 15000];
-%     nBatches = fliplr([20000, 30000, 100000, 200000]);
-    % nBatches = 200000;
+    nBatches = [1250, 2500, 5000, 7500, 10000, 15000, 20000, 30000, 100000, 200000, 500000];
+%     nBatches = [2500, 1250];
+%     nBatches = fliplr([20000, 30000, 100000, 200000, 500000]);
+%     nBatches = 500000;
+
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
 else % define batch size based on average number of updates per cluster
-    avgBatchUpdate = [10, 25, 35, 50];
-    % avgBatchUpdate = 25;
+    avgBatchUpdate = [10, 25, 35, 50]; % avgBatchUpdate = 25;
     nBvals = length(avgBatchUpdate);
-    % batchSizePerClus = clus2run.*avgBatchUpdate;
-    % nBatches = nTrials./batchSizePerClus; %per clus cond %this is actually not used..
+    % batchSizePerClus = clus2run.*avgBatchUpdate; %just to check
+    % nBatches = nTrials./batchSizePerClus; %per clus cond %this is not used..
 end
 
 % use the same training data (trials) across current sims or gen new data
 useSameTrls=0;
 
-
-
-% %tesing 60+clusters
-% nTrials = 1000000; 
-% nBatches = 1000;
-% batchSizeVals = nTrials/nBatches; 
 
 %box
 nSteps = 50; %to define spacing beween each loc in box
@@ -67,10 +60,14 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 
 % parameters
 epsMuVals=[.01, .05, .075, .1, .2, .3];% %learning rate / starting learning rate 
-% epsMuVals=[.01, .05, .075];
-% epsMuVals=[.1, .2, .3];
 epsMuVals = 0.075; 
-% epsMuVals = 0.025;  %testing 60+clusetrs
+
+
+% %tesing 60+clusters
+% nTrials = 1000000; 
+% nBatches = 1000;
+% batchSizeVals = nTrials/nBatches; 
+% epsMuVals = 0.025; 
 
 %weight learning rate by SSE 
 weightEpsSSE = 0; %1 or 0
@@ -78,8 +75,7 @@ weightEpsSSE = 0; %1 or 0
 %define box / environement - random points in a box
 box = 'square'; %square, rect, trapz, trapzSq (trapz and a square box attached)
 
-% change box shape during learning
-%rectangle
+% change box shape during learning rectangle
 warpBox = 0; %1 or 0
 warpType = 'sq2rect';
 
@@ -120,21 +116,6 @@ switch dat
         % trials = repmat(dataPts,50,1);
     case 'rand'
         trials = [randsample(linspace(locRange(1),locRange(2),50),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),50),nTrials,'true')]';
-%         if nTrials==40000
-%             load([saveDir '/randTrialsBox_40k']); %load in same data with same trial sequence so same for each sim
-%         elseif nTrials==80000
-%             load([saveDir '/randTrialsBox_80k']);
-%         else
-%             sq=linspace(locRange(1),locRange(2),nSteps);
-%             allPts=[];
-%             for i=1:length(sq)
-%                 for j=1:length(sq)
-%                     allPts = [allPts; [sq(i), sq(j)]];
-%                 end
-%             end
-%             trials=repmat(allPts,nTrials/length(allPts),1); %note, numel of allPts must be divisble by nTrials atm
-%             trials=trials(randperm(length(trials)),:); 
-%         end
         %for computing sse over trials
         load([saveDir '/randTrialsBox_trialsUnique']);
     case 'cat'

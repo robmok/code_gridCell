@@ -12,7 +12,7 @@ nBatch=floor(nTrials/batchSize);
 batchSize = floor(batchSize); % when have decimal points, above needed
 
 % selecting cluster postions from a certain phase to test gridness
-% note: with batch, may be less purposeful to average over trials? it would
+% note: with batch, may be less purposeful to average over trials. it would
 % also mean averaging over batches (which would be even more stable). only
 % thing if just looking at some point in time, small batches = less stable.
 trlSel = ceil([nBatch*.25, nBatch*.5, nBatch*.67, nBatch*.75, nBatch*.9, nBatch+1]);
@@ -21,11 +21,8 @@ nSets                = length(trlSel);
 densityPlotClus      = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
 densityPlot          = zeros(length(spacing),length(spacing),nSets,nIter);
 clusMu               = nan(nClus,2,nSets,nIter);
-% muAvg                = nan(nClus,2,nSets,nIter);
 muAll                = nan(nClus,2,nBatch+1,nIter);
-% tsseAll              = nan(nBatch+1,nIter); %not sure if this is +1 or
-% not
-% nTrlsUpd             = nan(nClus,nSets,nIter);
+% tsseAll              = nan(nBatch+1,nIter); %not sure if this is +1 or not; not tested
 gA = nan(nSets,nIter,4);
 gW = nan(nSets,nIter,4);
 for iterI = 1:nIter
@@ -221,7 +218,6 @@ for iterI = 1:nIter
 %             clusUpdates(closestC,2)=deltaMu(closestC,2,iTrl);
 
             % update mean estimates
-            
             mu(:,1,iBatch+1) = mu(:,1,iBatch) + deltaMu(:,1,iBatch);
             mu(:,2,iBatch+1) = mu(:,2,iBatch) + deltaMu(:,2,iBatch);
             
@@ -233,8 +229,8 @@ for iterI = 1:nIter
             
             %weight learning rate by SSE - 
             %%%%%%
-            % - atm SSE goes down really quick with batch - even more so
-            % than before shouldn't weigh by initial SSE!
+            % - atm SSE goes down really quick with batch - shouldn't weigh
+            % by initial SSE!(even more so than before)
             %%%%%%
             if weightEpsSSE
                 sse=nan(1,nClus);
@@ -330,8 +326,6 @@ for iterI = 1:nIter
             gW(iSet,iterI,:) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
         end
         
-        %save average cluster positions (to compare with above)
-%         muAvg(:,:,iSet,iterI) = nanmean(mu(:,:,fromTrlI(iSet):toTrlN(iSet)),3);
     end
     
 end

@@ -81,8 +81,8 @@ end
 %%
 
 gaussSmooth=1;
-for iSet=1:6
-for iterI = 1%1:20
+for iSet=6
+for iterI = 1:10%1:20
     
 densityPlotCentresSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
 
