@@ -32,9 +32,6 @@ for iterI = 1:nIter
 
     if ~useSameTrls %if want training data to be different set of points
         switch dat
-            case 'randUnique'
-                load([saveDir '/randTrialsBox_trialsUnique']);
-                trials = trialsUnique;
             case 'rand'
                 trials = [randsample(linspace(locRange(1),locRange(2),50),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),50),nTrials,'true')]';
             case 'cat'
@@ -48,6 +45,7 @@ for iterI = 1:nIter
                 trials = trials(randperm(length(trials)),:);
                 trialsUnique=[];
         end
+	%trialsAll(:,:,iterI) = trials;
     end
     
     switch box

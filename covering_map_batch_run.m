@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -24,7 +24,7 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 clus2run = 20; %20, 30
 % clus2run = 18:2:24; %running 18:2:30; later could run 10:2:16
 % clus2run = 26:2:30;
-clus2run = 11;
+clus2run = [16,25]; %[11,10]; 
 % clus2run = 26;
 
 % nTrials = 5000000; %how many locations in the box / trials 
@@ -37,6 +37,7 @@ fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
 if fixBatchSize
     nBatches = [1250, 2500, 5000, 7500, 10000, 15000, 20000];
     nBatches = [30000, 100000, 200000, 500000];
+    nBatches = [30000, 100000, 200000, 500000,1250, 2500, 5000, 7500, 10000, 15000, 20000];
 %     nBatches = [2500, 1250];
 %     nBatches = fliplr([20000, 30000, 100000, 200000, 500000]);
     nBatches = 1250;
@@ -103,9 +104,9 @@ c=0;
 % trialsUnique=allPts;
 % save([saveDir '/randTrialsBox_trialsUnique'],'trialsUnique');
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
-nIter=6; %how many iterations (starting points)
+nIter=200; %how many iterations (starting points)
 
 switch dat
         case 'randUnique'
@@ -158,7 +159,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                     fname = [fname '_warpBox'];
                 end
                 cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
-                save(fname,'densityPlot','clusMu','gA','gW','nIter','timeTaken','trials'); %added trials for xval
+                save(fname,'densityPlot','clusMu','gA','gW','nIter','timeTaken'); %added trialsAll for xval - removed, too big.maybe compute at end of each sim? or at each set
             end
         end
         
