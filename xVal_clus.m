@@ -1,9 +1,7 @@
 function xVal_results = xVal_clus(dat,nXvalDataSets, locRange, mu, nIter, dataPts)
 % Crossvalidation function - save SSE and SSE per cluster (spreadoutness
 % measure) 
-% tsse, tsseXval, sseSprdSd, sseSprdVar, sseSprdSdXval, sseSprdVarXval, indSSE, indSpr
-
-% input:  dat, nIter, nXvalDataSets, mu (cluster centre locs)
+% input: dat, nIter, nXvalDataSets, mu (cluster centre locs)
 % output: tsseXval, spreadoutness, indices for top SSE/spreadoutness on training data
 
 %%%%%%%%
@@ -42,12 +40,6 @@ nClus   = size(mu,1);
 
 
 %% compute SSE and spreadoutness from the original data
-
-%*****
-% atm i don't save orig data or compute sse; i suppose saving orig data will
-% be easiest..
-%%%%%
-
 tsse       = nan(1,nIter);
 sseSprdSd  = nan(1,nIter);
 sseSprdVar = nan(1,nIter);
