@@ -4,7 +4,7 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -23,15 +23,16 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 %run multiple cluster numbers
 clus2run = 20; %20, 30
 % clus2run = 18:2:24; %running 18:2:30; later could run 10:2:16
-% clus2run = 26:2:30;
-clus2run = [16,25]; %[11,10]; 
-% clus2run = 26;
+clus2run = 18:2:22;
+% clus2run = 22:2:26;
+% clus2run = 28:2:30;
+% clus2run = [16,25]; %[11,10]; 
 
 % nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 
 
 %batch size
-fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
+fixBatchSize = 0; %fixed, or batchSize depends on mean updates per cluster
 
 % 13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000
 if fixBatchSize
@@ -45,9 +46,10 @@ if fixBatchSize
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
 else % define batch size based on average number of updates per cluster
-    avgBatchUpdate = [10, 25, 35, 50]; % avgBatchUpdate = 25;
+    avgBatchUpdate = [10, 25, 35, 50]; % 
+    avgBatchUpdate = [1, 2, 5];
     nBvals = length(avgBatchUpdate);
-    % batchSizePerClus = clus2run.*avgBatchUpdate; %just to check
+%     batchSizePerClus = clus2run.*avgBatchUpdate %just to check
     % nBatches = nTrials./batchSizePerClus; %per clus cond %this is not used..
 end
 

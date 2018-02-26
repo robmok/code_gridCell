@@ -43,7 +43,7 @@ nTrials=2500000;
 
 % new 4 - batchSizes based on mean updates per clus per batch (avgBatch)
 fixBatchSize = 0;
-clus2run = [18:2:28]; 
+clus2run = [18:2:30]; 
 % clus2run = [18 20 26]; 
 batchSizeVals=[10, 25, 35, 50]; %avgBatchVals
 
@@ -64,7 +64,7 @@ for iClus2run = 1:length(clus2run)
                 avgBatch = batchSizeVals(iBvals);
                 fprintf('Loading nClus=%d, epsMu=%d, avgBatchSize=%d\n',nClus,epsMuOrig1000,avgBatch)
                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz*_%diters*',nClus,round(nTrials/1000),epsMuOrig1000,avgBatch,nIter)];
-%                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz*_%diters_not*',nClus,round(nTrials/1000),epsMuOrig1000,avgBatch,nIter)];
+%                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz*_%diters_useSameTrls*',nClus,round(nTrials/1000),epsMuOrig1000,avgBatch,nIter)];
             end
             
             %edit if want to load more than one file per sim, merge
@@ -167,7 +167,7 @@ figure; hold on;
 for iClus2Run = 1:length(clus2run)
     % comparing batch vals, with cluster nums in subplots; can edit for eps
 %     figure; hold on;
-    subplot(2,3,iClus2Run)
+    subplot(3,3,iClus2Run)
     for iEps = 1:length(epsMuVals)
         %     subplot(2,3,iEps);
         dat1     = squeeze(datTmp(iSet,:,iEps,:,iClus2Run));
