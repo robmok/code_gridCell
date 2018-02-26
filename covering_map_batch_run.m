@@ -13,7 +13,11 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in codeDir now not wd
 
-dat = 'rand'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
+% dat = 'rand'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
+dat = 'circ'; %rect, trapz, trapzSq - rand=square box now; might edit later
+
+
+
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
 nCats   = 2; %2 categories
@@ -21,16 +25,12 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 
 %run multiple cluster numbers
-clus2run = 20; %20, 30
-% clus2run = 18:2:24; %running 18:2:30; later could run 10:2:16
-clus2run = 18:2:22;
+clus2run = 12; %20, 30
+% clus2run = 18:2:22;
 % clus2run = 22:2:26;
 % clus2run = 28:2:30;
-% clus2run = [16, 25]; %[11,10]; 
-clus2run = [10, 12]; 
-% clus2run = [11, 14]; 
-% clus2run = [16, 24]; 
-% clus2run = [28, 22]; 
+% clus2run = [10, 12]; % [11, 14] [16, 24]; [28, 22]; 
+
 % nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 
 
@@ -44,7 +44,7 @@ if fixBatchSize
     nBatches = [30000, 100000, 200000, 500000, 1250, 2500, 5000, 7500, 10000, 15000, 20000];
 %     nBatches = [2500, 1250];
 %     nBatches = fliplr([20000, 30000, 100000, 200000, 500000]);
-%     nBatches = 1250;
+    nBatches = 2500;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
 else % define batch size based on average number of updates per cluster
@@ -107,9 +107,9 @@ c=0;
 % trialsUnique=allPts;
 % save([saveDir '/randTrialsBox_trialsUnique'],'trialsUnique');
 %%
-saveDat=1; %save simulations
+saveDat=0; %save simulations
 
-nIter=200; %how many iterations (starting points)
+nIter=6; %how many iterations (starting points)
 
 switch dat
         case 'randUnique'
@@ -134,6 +134,8 @@ switch dat
         trials = reshape(datPtsGauss,nTrials,2);
         trials = trials(randperm(length(trials)),:);
         trialsUnique=[];
+    otherwise
+        trials=[]; trialsUnique=[];
 end
 
 tic

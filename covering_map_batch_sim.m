@@ -2,7 +2,7 @@
 function [densityPlot,clusMu,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE)
 
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
-stepSize=diff(spacing(1:2));
+stepSize=diff(spacing(1:2)); nSteps = length(spacing);
 
 nTrialsTest = nTrials;
 
@@ -32,8 +32,9 @@ for iterI = 1:nIter
 
     if ~useSameTrls %if want training data to be different set of points
         switch dat
-            case 'rand'
-                trials = [randsample(linspace(locRange(1),locRange(2),50),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),50),nTrials,'true')]';
+            case 'rand' %square
+                trials      = [randsample(linspace(locRange(1),locRange(2),50),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),50),nTrials,'true')]';
+                dataPtsTest = [randsample(linspace(locRange(1),locRange(2),50),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),50),nTrials,'true')]';
             case 'cat'
                 % draw points from 2 categories (gaussian) from a 2D feature space
                 nTrials = floor(nTrials/nCats); % points to sample
@@ -44,54 +45,89 @@ for iterI = 1:nIter
                 trials = reshape(datPtsGauss,nTrials,2);
                 trials = trials(randperm(length(trials)),:);
                 trialsUnique=[];
-        end
-	%trialsAll(:,:,iterI) = trials;
-    end
-    
-    switch box
-        case 'square'
-%             trials      = [randsample(spacing,nTrials,'true'); randsample(spacing,nTrials,'true')]';
-            dataPtsTest = [randsample(linspace(locRange(1),locRange(2),locRange(2)+1),nTrialsTest,'true'); randsample(linspace(locRange(1),locRange(2),locRange(2)+1),nTrialsTest,'true')]'; % random points in a box
-        case 'rect'
-%             trials      = [randsample(-1:diff(spacing(1:2)):2,nTrials,'true'); randsample(spacing,nTrials,'true')]';
-            dataPtsTest = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)*2,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
-        case 'trapz'
-            trapY=locRange(2).*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
-            trapX=spacing;
-            trapPts=[];
-            for i=1:length(trapY)
-               trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
-            end
-%             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1            
-            % use this to select from the PAIR in trapPts
-            trialInd     = randi(length(trapPts),nTrials,1);
-            trials       = trapPts(:,trialInd)';
-            trialIndTest = randi(length(trapPts),nTrials,1);
-            dataPtsTest  = trapPts(:,trialIndTest)';
-            
-        case 'trapzSq' %probably need a more narrow trapezium!
-            trapY=locRange(2)/2.*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
-            trapY=trapY+floor(length(trapY)./2);
-            trapX=spacing;
-            trapPts=[];
-            for i=1:length(trapY)
-               trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
-            end
-            %make square box attached to it
-            sqX=spacing;
-            sqY=spacing(1:floor(length(spacing)/2));
-            for i=1:length(sqX)
-                tic
-                for j=1:length(sqY)
-                    trapPts = [trapPts, [sqX(i); sqY(j)]];
+                
+                for iCat = 1:nCats
+                    mu(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % ±10 so category centres are not on the edge
+                    datPtsGauss(:,:,iCat) = round(repmat(mu(iCat,:),nTrials,1) + randn(nTrials,2)*R); % key - these are the coordinates of the points
                 end
-                toc
-            end
-            % use this to select from the PAIR in trapPts
-            trialInd=randi(length(trapPts),nTrials,1);
-            trials=trapPts(:,trialInd)';
-            trialIndTest = randi(length(trapPts),nTrials,1);
-            dataPtsTest  = trapPts(:,trialIndTest)';
+                dataPtsTest = reshape(datPtsGauss,nTrials,2);
+                dataPtsTest = dataPtsTest(randperm(length(dataPtsTest)),:);
+                
+            case 'rect'
+%                 trials = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)*2,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
+                trials      = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)/2,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
+                dataPtsTest = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)/2,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
+            case 'trapz'
+                trapY=locRange(2).*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
+                trapX=spacing;
+                trapPts=[];
+                for i=1:length(trapY)
+                    trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
+                end
+                %             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1
+                % use this to select from the PAIR in trapPts
+                trialInd     = randi(length(trapPts),nTrials,1);
+                trials       = trapPts(:,trialInd)';
+                trialIndTest = randi(length(trapPts),nTrials,1);
+                trials  = trapPts(:,trialIndTest)';
+                %dataPtsTest
+                trialIndTest     = randi(length(trapPts),nTrials,1);
+                dataPtsTest       = trapPts(:,trialIndTest)';
+                trialIndTest = randi(length(trapPts),nTrials,1);
+                dataPtsTest  = trapPts(:,trialIndTest)';
+                
+            case 'trapzSq' %probably need a more narrow trapezium!
+                trapY=locRange(2)/2.*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
+                trapY=trapY+floor(length(trapY)./2);
+                trapX=spacing;
+                trapPts=[];
+                for i=1:length(trapY)
+                    trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
+                end
+                %make square box attached to it
+                sqX=spacing;
+                sqY=spacing(1:floor(length(spacing)/2));
+                for i=1:length(sqX)
+                    for j=1:length(sqY)
+                        trapPts = [trapPts, [sqX(i); sqY(j)]];
+                    end
+                end
+                % use this to select from the PAIR in trapPts
+                trialInd=randi(length(trapPts),nTrials,1);
+                trials=trapPts(:,trialInd)';
+                trialIndTest = randi(length(trapPts),nTrials,1);
+                trials  = trapPts(:,trialIndTest)';
+                %dataPtsTest
+                trialIndTest     = randi(length(trapPts),nTrials,1);
+                dataPtsTest      = trapPts(:,trialIndTest)';
+                trialIndTest = randi(length(trapPts),nTrials,1);
+                dataPtsTest  = trapPts(:,trialIndTest)';
+            case 'circ'
+                % Create logical image of a circle
+                imageSizeX = nSteps;
+                [columnsInImage, rowsInImage] = meshgrid(1:imageSizeX, 1:imageSizeX);
+                centerX = nSteps/2; centerY = nSteps/2;
+                radius = nSteps/2-1;
+                circIm = (rowsInImage - centerY).^2 ...
+                    + (columnsInImage - centerX).^2 <= radius.^2;
+                circPts=[]; % find circle points in XY coords
+                for iX=1:length(circIm)
+                    yVals = find(circIm(iX,:));
+                    circPts = [circPts; ones(length(yVals),1)*iX, yVals'];
+                end
+                trialInd=randi(length(circPts),nTrials,1);
+                trials=circPts(trialInd,:);
+                trialIndTest = randi(length(circPts),nTrials,1);
+                trials  = circPts(trialIndTest,:);
+                %dataPtsTest
+                trialIndTest     = randi(length(circPts),nTrials,1);
+                dataPtsTest      = circPts(trialIndTest,:);
+                trialIndTest = randi(length(circPts),nTrials,1);
+                dataPtsTest  = circPts(trialIndTest,:);
+                
+                
+        end
+        %trialsAll(:,:,iterI) = trials;
     end
     
     % if expand box
@@ -106,7 +142,6 @@ for iterI = 1:nIter
     %initialise each cluster location  
     mu = nan(nClus,2,nBatch+1);
     mu(:,:,1) = kmplusInit(dataPtsTest,nClus); %kmeans++ initialisation
-    
     %%
     
 %     updatedC = nan(nTrials,1);
@@ -314,7 +349,7 @@ for iterI = 1:nIter
             densityPlotSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
         end
         
-        if strcmp(dat,'rand') %if finding cats, won't be gridlike
+        if ~strcmp(dat,'cat') %if finding cats, won't be gridlike
             %compute autocorrmap, no need to save
             aCorrMap = ndautoCORR(densityPlotSm);
             %compute gridness

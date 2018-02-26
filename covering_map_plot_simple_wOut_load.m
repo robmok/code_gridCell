@@ -18,7 +18,7 @@ xlim(locRange); ylim(locRange);
 % voronoi(muAll(:,1,end),muAll(:,2,end),'k');
 %% density map, autocorrelogram
 
-iterI=2; 
+iterI=1; 
 gaussSmooth=1;
 
 for iSet=1%:size(densityPlot,3) %plot - diff averaging over nTrials
@@ -82,7 +82,7 @@ end
 
 gaussSmooth=1;
 for iSet=6
-for iterI = 1:10%1:20
+for iterI = 1:10
     
 densityPlotCentresSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
 
@@ -183,7 +183,7 @@ colors = distinguishable_colors(nClus); %function for making distinguishable col
 
 figure;
 % figure('units','normalized','outerposition',[0 0 1 1]);
-for iTrl = 200000-100:nTrials
+for iTrl = 1:nTrials
 %     if mod(iTrl,500)==0
 % %         iPlot=iPlot+1;
 % %         voronoi(muAll(:,1,iTrl,iterI),muAll(:,2,iTrl,iterI),'k')
