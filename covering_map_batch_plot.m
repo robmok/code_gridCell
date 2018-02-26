@@ -35,7 +35,6 @@ epsMuVals=.075;
 clus2run = [18 20 26];
 nTrials=2500000;
 batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
-batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 1000, 2000]; % clus20 no 500?? re running
 
 % new 3 - fixed batch sizes across clusters
 % nTrials=2500000;
