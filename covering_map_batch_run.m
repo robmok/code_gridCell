@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -26,28 +26,30 @@ clus2run = 20; %20, 30
 clus2run = 18:2:22;
 % clus2run = 22:2:26;
 % clus2run = 28:2:30;
-% clus2run = [16,25]; %[11,10]; 
-
+% clus2run = [16, 25]; %[11,10]; 
+clus2run = [10, 12]; 
+% clus2run = [11, 14]; 
+% clus2run = [16, 24]; 
+% clus2run = [28, 22]; 
 % nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 
 
 %batch size
-fixBatchSize = 0; %fixed, or batchSize depends on mean updates per cluster
+fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
 
 % 13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000
 if fixBatchSize
     nBatches = [1250, 2500, 5000, 7500, 10000, 15000, 20000];
     nBatches = [30000, 100000, 200000, 500000];
-    nBatches = [30000, 100000, 200000, 500000,1250, 2500, 5000, 7500, 10000, 15000, 20000];
+    nBatches = [30000, 100000, 200000, 500000, 1250, 2500, 5000, 7500, 10000, 15000, 20000];
 %     nBatches = [2500, 1250];
 %     nBatches = fliplr([20000, 30000, 100000, 200000, 500000]);
-    nBatches = 1250;
-
+%     nBatches = 1250;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
 else % define batch size based on average number of updates per cluster
     avgBatchUpdate = [10, 25, 35, 50]; % 
-    avgBatchUpdate = [1, 2, 5];
+    avgBatchUpdate = [1, 2, 5]; % avgBatchUpdate = 25;
     nBvals = length(avgBatchUpdate);
 %     batchSizePerClus = clus2run.*avgBatchUpdate %just to check
     % nBatches = nTrials./batchSizePerClus; %per clus cond %this is not used..
@@ -65,7 +67,6 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 % parameters
 epsMuVals=[.01, .05, .075, .1, .2, .3];% %learning rate / starting learning rate 
 epsMuVals = 0.075; 
-
 
 % %tesing 60+clusters
 % nTrials = 1000000; 
@@ -152,14 +153,16 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                 fprintf('Running  nClus=%d, epsMu=%d, avgBatchUpd=%d; batchSize=%d\n',nClus,epsMuOrig1000,avgBatchUpdate(iBvals),batchSize)
                 [densityPlot,clusMu,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(avgBatchUpdate(iBvals)),round(batchSize),nIter)];
-                %temp for not same trls
-                fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz%d_%diters_notSameTrls',nClus,round(nTrials/1000),epsMuOrig1000,round(avgBatchUpdate(iBvals)),round(batchSize),nIter)];
             end
             timeTaken=toc;
             if saveDat
+                if useSameTrls
+                    fname = [fname '_useSameTrls'];
+                end
                 if warpBox
                     fname = [fname '_warpBox'];
                 end
+                
                 cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
                 save(fname,'densityPlot','clusMu','gA','gW','nIter','timeTaken'); %added trialsAll for xval - removed, too big.maybe compute at end of each sim? or at each set
             end
