@@ -32,7 +32,7 @@ for iterI = 1:nIter
 
     if ~useSameTrls %if want training data to be different set of points
         switch dat
-            case 'rand' %square
+            case 'square' %square
                 trials      = [randsample(linspace(locRange(1),locRange(2),50),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),50),nTrials,'true')]';
                 dataPtsTest = [randsample(linspace(locRange(1),locRange(2),50),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),50),nTrials,'true')]';
             case 'cat'

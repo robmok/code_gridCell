@@ -4,7 +4,7 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -13,10 +13,8 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in codeDir now not wd
 
-% dat = 'rand'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
-dat = 'circ'; %rect, trapz, trapzSq - rand=square box now; might edit later
-
-
+% dat = 'square'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
+dat = 'circ'; %square rect, trapz, trapzSq - rand=square box now; might edit later
 
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
@@ -25,11 +23,22 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 
 %run multiple cluster numbers
-clus2run = 12; %20, 30
+clus2run = 28; %20, 30
 % clus2run = 18:2:22;
 % clus2run = 22:2:26;
 % clus2run = 28:2:30;
 % clus2run = [10, 12]; % [11, 14] [16, 24]; [28, 22]; 
+
+%circ run
+%love01
+clus2run = [12, 26]; 
+clus2run = [30, 14, 18]; 
+clus2run = [28, 22, 10]; 
+
+%love06
+clus2run = 16; 
+clus2run = 20;
+clus2run = 24;
 
 % nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 
@@ -40,8 +49,8 @@ fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
 % 13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000
 if fixBatchSize
     nBatches = [1250, 2500, 5000, 7500, 10000, 15000, 20000];
-    nBatches = [30000, 100000, 200000, 500000];
-    nBatches = [30000, 100000, 200000, 500000, 1250, 2500, 5000, 7500, 10000, 15000, 20000];
+%     nBatches = [30000, 100000, 200000, 500000];
+%     nBatches = [30000, 100000, 200000, 500000, 1250, 2500, 5000, 7500, 10000, 15000, 20000];
 %     nBatches = [2500, 1250];
 %     nBatches = fliplr([20000, 30000, 100000, 200000, 500000]);
     nBatches = 2500;
@@ -109,7 +118,7 @@ c=0;
 %%
 saveDat=0; %save simulations
 
-nIter=6; %how many iterations (starting points)
+nIter=2; %how many iterations (starting points)
 
 switch dat
         case 'randUnique'
@@ -119,7 +128,7 @@ switch dat
         % does it matter how many points there are if all the same points? e.g.
         % same if just have each trialsUnique twice/x10? - i think not
         % trials = repmat(dataPts,50,1);
-    case 'rand'
+    case 'square'
         trials = [randsample(linspace(locRange(1),locRange(2),50),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),50),nTrials,'true')]';
         %for computing sse over trials
 %         load([saveDir '/randTrialsBox_trialsUnique']);
@@ -163,6 +172,9 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                 end
                 if warpBox
                     fname = [fname '_warpBox'];
+                end
+                if ~strcmp(dat,'square') %atm, only square not append name; later add to above fname
+                    fname = [fname sprintf('_%s',dat)];
                 end
                 
                 cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);

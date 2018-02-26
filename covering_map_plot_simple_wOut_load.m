@@ -78,11 +78,11 @@ figure;
     
 end
 
-%%
+%% newest gridness
 
 gaussSmooth=1;
 for iSet=6
-for iterI = 1:10
+for iterI = 1:4%:10
     
 densityPlotCentresSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
 
