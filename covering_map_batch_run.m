@@ -4,8 +4,8 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -31,14 +31,14 @@ clus2run = 28; %20, 30
 
 %circ run
 %love01
-clus2run = [12, 26]; 
 clus2run = [30, 14, 18]; 
-clus2run = [28, 22, 10]; 
+% clus2run = [28, 22, 10]; 
+% clus2run = [12, 26]; 
 
 %love06
-clus2run = 16; 
-clus2run = 20;
-clus2run = 24;
+% clus2run = 16; 
+% clus2run = 20;
+% clus2run = 24;
 
 % nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 
@@ -116,9 +116,9 @@ c=0;
 % trialsUnique=allPts;
 % save([saveDir '/randTrialsBox_trialsUnique'],'trialsUnique');
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
-nIter=2; %how many iterations (starting points)
+nIter=200; %how many iterations (starting points)
 
 switch dat
         case 'randUnique'
