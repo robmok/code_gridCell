@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -13,8 +13,9 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in codeDir now not wd
 
+%define box / environment - random points in a box
 % dat = 'square'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
-dat = 'circ'; %square rect, trapz, trapzSq - rand=square box now; might edit later
+dat = 'trapz'; %square rect, trapz, trapzSqs, or cat (cat learning)
 
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
@@ -23,7 +24,7 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 
 %run multiple cluster numbers
-clus2run = 28; %20, 30
+clus2run = 20; %20, 30
 % clus2run = 18:2:22;
 % clus2run = 22:2:26;
 % clus2run = 28:2:30;
@@ -31,7 +32,7 @@ clus2run = 28; %20, 30
 
 %circ run
 %love01
-clus2run = [30, 14, 18]; 
+% clus2run = [30, 14, 18]; 
 % clus2run = [28, 22, 10]; 
 % clus2run = [12, 26]; 
 
@@ -39,6 +40,10 @@ clus2run = [30, 14, 18];
 % clus2run = 16; 
 % clus2run = 20;
 % clus2run = 24;
+
+%trapz - 16, 20, 26
+
+
 
 % nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 
@@ -53,7 +58,7 @@ if fixBatchSize
 %     nBatches = [30000, 100000, 200000, 500000, 1250, 2500, 5000, 7500, 10000, 15000, 20000];
 %     nBatches = [2500, 1250];
 %     nBatches = fliplr([20000, 30000, 100000, 200000, 500000]);
-%     nBatches = 2500;
+    nBatches = 2500;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
 else % define batch size based on average number of updates per cluster
@@ -85,9 +90,6 @@ epsMuVals = 0.075;
 
 %weight learning rate by SSE 
 weightEpsSSE = 0; %1 or 0
-
-%define box / environement - random points in a box
-box = 'square'; %square, rect, trapz, trapzSq (trapz and a square box attached)
 
 % change box shape during learning rectangle
 warpBox = 0; %1 or 0
@@ -136,7 +138,7 @@ switch dat
     case 'cat'
         % draw points from 2 categories (gaussian) from a 2D feature space
         nTrials = floor(nTrials/nCats); % points to sample
-        for iCat = 1:nCats
+        for iCat = 1:nCats 
             mu(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % �10 so category centres are not on the edge
             datPtsGauss(:,:,iCat) = round(repmat(mu(iCat,:),nTrials,1) + randn(nTrials,2)*R); % key - these are the coordinates of the points
         end
@@ -156,15 +158,14 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
         for iBvals = 1:nBvals
             if fixBatchSize
                 batchSize = batchSizeVals(iBvals); %fixed batch size
-                fprintf('Running  nClus=%d, epsMu=%d, batchSize=%d\n',nClus,epsMuOrig1000,batchSize)
-                [densityPlot,clusMu,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
+                fprintf('Running %s, nClus=%d, epsMu=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000,batchSize)
                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(batchSize),nIter)];
             else % define batch size based on average number of updates per cluster 
                 batchSize = clus2run(iClus2run).*avgBatchUpdate(iBvals); % batch size depends on average updates per cluster (depends on nClus cond)
-                fprintf('Running  nClus=%d, epsMu=%d, avgBatchUpd=%d; batchSize=%d\n',nClus,epsMuOrig1000,avgBatchUpdate(iBvals),batchSize)
-                [densityPlot,clusMu,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
+                fprintf('Running %s, nClus=%d, epsMu=%d, avgBatchUpd=%d; batchSize=%d\n',dat,nClus,epsMuOrig1000,avgBatchUpdate(iBvals),batchSize)
                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(avgBatchUpdate(iBvals)),round(batchSize),nIter)];
             end
+            [densityPlot,clusMu,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
             timeTaken=toc;
             if saveDat
                 if useSameTrls
@@ -176,7 +177,6 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                 if ~strcmp(dat,'square') %atm, only square not append name; later add to above fname
                     fname = [fname sprintf('_%s',dat)];
                 end
-                
                 cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
                 save(fname,'densityPlot','clusMu','gA','gW','nIter','timeTaken'); %added trialsAll for xval - removed, too big.maybe compute at end of each sim? or at each set
             end

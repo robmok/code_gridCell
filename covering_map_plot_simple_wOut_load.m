@@ -82,7 +82,7 @@ end
 
 gaussSmooth=1;
 for iSet=6
-for iterI = 1:4%:10
+for iterI = 1:3%:10
     
 densityPlotCentresSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
 
@@ -99,6 +99,34 @@ subplot(1,2,2)
 
 [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
 % [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
+end
+end
+
+%% gridness - left vs right half
+
+gaussSmooth=1;
+for iSet=6
+for iterI = 1%:10
+    
+    densityPlotCentresSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
+    
+    figure; hold on;
+    subplot(1,3,1)
+    imagesc(densityPlotCentresSm);
+    
+    %left half of box
+    subplot(1,3,2)
+    aCorrMap = ndautoCORR(densityPlotCentresSm(:,1:length(densityPlot)/2));
+    [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
+    % [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
+    gdataA
+    
+    %right half of box
+    subplot(1,3,3)
+    aCorrMap = ndautoCORR(densityPlotCentresSm(:,length(densityPlot)/2+1:end));
+    [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
+    % [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
+    gdataA
 end
 end
 

@@ -1,5 +1,5 @@
 % function [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE)
-function [densityPlot,clusMu,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE)
+function [densityPlot,clusMu,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE)
 
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
 stepSize=diff(spacing(1:2)); nSteps = length(spacing);
@@ -25,6 +25,12 @@ muAll                = nan(nClus,2,nBatch+1,nIter);
 % tsseAll              = nan(nBatch+1,nIter); %not sure if this is +1 or not; not tested
 gA = nan(nSets,nIter,4);
 gW = nan(nSets,nIter,4);
+%if trapz - compute gridness of left/right half of boxes too
+if strcmp(dat,'trapz') || strcmp(dat,'trapzSq')
+    gA = nan(nSets,nIter,4,3);
+    gW = nan(nSets,nIter,4,3);
+end
+
 for iterI = 1:nIter
     
     fprintf('iter %d \n',iterI);
@@ -55,11 +61,15 @@ for iterI = 1:nIter
                 
             case 'rect'
 %                 trials = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)*2,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
-                trials      = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)/2,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
-                dataPtsTest = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)/2,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
+                trials      = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)/1.5,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
+                dataPtsTest = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)/1.5,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
             case 'trapz'
-                trapY=locRange(2).*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
-                trapX=spacing;
+                %if scale to Krupic:
+                %%%%%
+                spacingTrapz = spacing(15:38); %23.7 would be right, here 24; krupic (relative): [5.26, 23.68, 50]
+                %%%%%
+                trapY=locRange(2).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
+                trapX=spacingTrapz;
                 trapPts=[];
                 for i=1:length(trapY)
                     trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
@@ -355,8 +365,26 @@ for iterI = 1:nIter
             %compute gridness
             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
             [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
-            gA(iSet,iterI,:) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
-            gW(iSet,iterI,:) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
+            gA(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
+            gW(iSet,iterI,:,1) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
+            
+            %split in half then compute gridness for each half
+            if strcmp(dat,'trapz') || strcmp(dat,'trapzSq') 
+                
+                %left half of box
+                aCorrMap = ndautoCORR(densityPlotSm(:,1:length(spacing)/2));
+                [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+                [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+                gA(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
+                gW(iSet,iterI,:,2) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
+                %right half of box
+                aCorrMap = ndautoCORR(densityPlotSm(:,length(spacing)/2+1:end));
+                [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+                [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+                gA(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
+                gW(iSet,iterI,:,3) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];                
+            end
+            
         end
         
     end

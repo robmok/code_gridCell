@@ -42,10 +42,10 @@ batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
 % batchSizeVals=[333, 500, 1000];
 
 % new 4 - batchSizes based on mean updates per clus per batch (avgBatch)
-% fixBatchSize = 0;
-% clus2run = [18:2:30]; 
-% % clus2run = [18 20 26]; 
-% batchSizeVals=[10, 25, 35, 50]; %avgBatchVals
+fixBatchSize = 0;
+clus2run = [18:2:30]; 
+clus2run = [18 22];% 28]; % running these on love01
+batchSizeVals=[1, 2, 5, 10, 25, 35, 50]; %avgBatchVals - 1,2,5 new
 
 %load loop
 for iClus2run = 1:length(clus2run) 
@@ -167,7 +167,7 @@ figure; hold on;
 for iClus2Run = 1:length(clus2run)
     % comparing batch vals, with cluster nums in subplots; can edit for eps
 %     figure; hold on;
-    subplot(3,1,iClus2Run)
+    subplot(2,1,iClus2Run)
     for iEps = 1:length(epsMuVals)
         %     subplot(2,3,iEps);
         dat1     = squeeze(datTmp(iSet,:,iEps,:,iClus2Run));
