@@ -32,7 +32,7 @@ clus2run = 20; %20, 30
 
 %circ run
 %love01
-% clus2run = [30, 14, 18]; 
+% clus2run = [30, 14, 18]; % dailed to run - 30 too big? run 14 and 18 here
 % clus2run = [28, 22, 10]; 
 % clus2run = [12, 26]; 
 
@@ -40,9 +40,11 @@ clus2run = 20; %20, 30
 % clus2run = 16; 
 % clus2run = 20;
 % clus2run = 24;
+% clus2run = 18;
+% clus2run = [14, 30]; %worried 30 will kill the computer again
 
 %trapz - 16, 20, 26
-
+clus2run = [16, 26, 12, 18, 24, 22, 28];
 
 
 % nTrials = 5000000; %how many locations in the box / trials 
