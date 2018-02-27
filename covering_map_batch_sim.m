@@ -134,8 +134,6 @@ for iterI = 1:nIter
                 dataPtsTest      = circPts(trialIndTest,:);
                 trialIndTest = randi(length(circPts),nTrials,1);
                 dataPtsTest  = circPts(trialIndTest,:);
-                
-                
         end
         %trialsAll(:,:,iterI) = trials;
     end

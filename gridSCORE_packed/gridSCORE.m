@@ -109,7 +109,11 @@ switch method
         for a = 1:length(as)
             mrot = imrotate(imcent,as(a),'bilinear','crop');
             r = corrcoef(mrot(:),imcent(:),'rows','pairwise'); 
-            rs(a) = r(1,2);
+            if ~isnan(r) %RM added 28/02/18 - trapz left/right gridness problem
+                rs(a) = r(1,2);
+            else
+                rs(a) = nan;
+            end
         end
         g = ((rs(2)+rs(4))/2) - ((rs(1)+rs(3)+rs(5))/3);
 
@@ -203,7 +207,11 @@ switch method
         for a = 1:length(as)
             mrot = imrotate(imcent,as(a),'bilinear','crop');
             r = corrcoef(mrot(:),imcent(:),'rows','pairwise'); 
-            rs(a) = r(1,2);
+            if ~isnan(r) %RM added 28/02/18 - trapz left/right gridness problem
+                rs(a) = r(1,2);
+            else
+                rs(a) = nan;
+            end
         end
         g = nanmin([rs(2),rs(4)]) - nanmax([rs(1),rs(3),rs(5)]);        
 
