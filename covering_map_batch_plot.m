@@ -24,7 +24,6 @@ dat='square';
 % batchSizeVals = [1, 50, 100, 200, 500];
 % epsMuVals=[.01, .05, .075, .1, .2, .3];% learning rate / starting learning rate 
 
-
 % sims 1 - one single LARGE batchSize, large nTrials, all nClus conds
 clus2run = 3:30;%[7,8,10,12]; 
 nTrials=10000000;
@@ -50,18 +49,18 @@ batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
 % batchSizeVals=[1, 2, 5, 10, 25, 35, 50]; %avgBatchVals - 1,2,5 new
 
 %new 5 - circ
-% fixBatchSize = 1;
-% clus2run = [12, 14, 16, 18, 20, 24]; % 28];
-% nTrials=2500000;
-% batchSizeVals=[125, 167, 250, 333, 500, 1000, 2000];
-% dat='circ';
+fixBatchSize = 1;
+clus2run = [12, 14, 16, 18, 20, 24]; % 28];
+nTrials=2500000;
+batchSizeVals=[125, 167, 250, 333, 500, 1000, 2000];
+dat='circ';
 
 %new 5 - trapz
-fixBatchSize = 1;
-clus2run = [12, 16:2:28];
-nTrials=2500000;
-batchSizeVals=1000;
-dat='trapz';
+% fixBatchSize = 1;
+% clus2run = [12, 16:2:28];
+% nTrials=2500000;
+% batchSizeVals=1000;
+% dat='trapz';
 
 %load loop
 for iClus2run = 1:length(clus2run) 
@@ -336,34 +335,56 @@ end
 nnz(peaksA~=6)
 nnz(peaksW~=6)
 
-figure; scatter(reshape(peaksA(:,:,:,2),1,numel(peaksA(:,:,:,2))), reshape(gTmpA(:,:,:,2),1,numel(gTmpA(:,:,:,2)))); ylim([-.1, 1]);
-figure; scatter(reshape(peaksA(:,:,:,3),1,numel(peaksA(:,:,:,3))), reshape(gTmpA(:,:,:,3),1,numel(gTmpA(:,:,:,3)))); ylim([-.1, 1]);
-
-
+% figure; scatter(reshape(peaksA(:,:,:,2),1,numel(peaksA(:,:,:,2))), reshape(gTmpA(:,:,:,2),1,numel(gTmpA(:,:,:,2)))); ylim([-.1, 1]);
+% figure; scatter(reshape(peaksA(:,:,:,3),1,numel(peaksA(:,:,:,3))), reshape(gTmpA(:,:,:,3),1,numel(gTmpA(:,:,:,3)))); ylim([-.1, 1]);
 
 %% density plots
+close all
 
-iSet = 5;
+iSet=6;
+iEps=1;
+gaussSmooth=1;
 
 
-for iClus2run = 1:length(clus2run) 
-    
-    for iEps = 3%1:length(epsMuVals) 
-        
-        for iBvals = 1:length(batchSizeVals)
-            figure;
-            subplot(1,3,1);
-            imagesc(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run));
-            aCorrMap=ndautoCORR(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run)); %autocorrelogram
-            subplot(1,3,2);
-            imagesc(aCorrMap,[-.45 .45]);
-            subplot(1,3,3);
-            [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
-            % [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
-
-        end
-    end
+if strcmp(dat,'trapz') || strcmp(dat,'trapzNorm')
+subPlt = [2,2];
+else
+    subPlt = [1,2];
 end
+
+%set
+iClus2run = 5;
+iBvals    = 1;
+
+iters2plot = 2:10;
+
+fprintf(sprintf('clus %d batchSizeVals %d\n',clus2run(iClus2run),batchSizeVals(iBvals)));
+for iterI = iters2plot
+    densityPlotCentresSm = imgaussfilt(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
+    
+    figure; hold on;
+    subplot(subPlt(1),subPlt(2),1)
+    imagesc(densityPlotCentresSm);
+    subplot(subPlt(1),subPlt(2),2)
+    
+    aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram
+    [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
+    %         [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
+    
+    peaksA(iClus2run,iBvals,iterI,1)=length(gdataA.near_peaks);
+    
+    if strcmp(dat,'trapz') || strcmp(dat,'trapzNorm')
+        subplot(subPlt(1),subPlt(2),3)
+        aCorrMap = ndautoCORR(densityPlotCentresSm(:,1:size(densityPlotAll,1)/2));
+        [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
+        subplot(subPlt(1),subPlt(2),4)
+        aCorrMap = ndautoCORR(densityPlotCentresSm(:,size(densityPlotAll,1)/2+1:end));
+        [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
+        
+    end
+    
+end
+
 
 
 
