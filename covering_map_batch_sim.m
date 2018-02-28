@@ -85,6 +85,25 @@ for iterI = 1:nIter
                 dataPtsTest       = trapPts(:,trialIndTest)';
                 trialIndTest = randi(length(trapPts),nTrials,1);
                 dataPtsTest  = trapPts(:,trialIndTest)';
+            case 'trapzNorm' % not scale to Krupic:
+                spacingTrapz = spacing; 
+                trapY=locRange(2).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
+                trapX=spacingTrapz;
+                trapPts=[];
+                for i=1:length(trapY)
+                    trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
+                end
+                %             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1
+                % use this to select from the PAIR in trapPts
+                trialInd     = randi(length(trapPts),nTrials,1);
+                trials       = trapPts(:,trialInd)';
+                trialIndTest = randi(length(trapPts),nTrials,1);
+                trials  = trapPts(:,trialIndTest)';
+                %dataPtsTest
+                trialIndTest     = randi(length(trapPts),nTrials,1);
+                dataPtsTest       = trapPts(:,trialIndTest)';
+                trialIndTest = randi(length(trapPts),nTrials,1);
+                dataPtsTest  = trapPts(:,trialIndTest)';
                 
             case 'trapzSq' %probably need a more narrow trapezium!
                 trapY=locRange(2)/2.*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
@@ -367,7 +386,7 @@ for iterI = 1:nIter
             gW(iSet,iterI,:,1) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
             
             %split in half then compute gridness for each half
-            if strcmp(dat,'trapz') || strcmp(dat,'trapzSq') 
+            if strcmp(dat,'trapz') || strcmp(dat,'trapzSq') || strcmp(dat,'trapzNorm')
                 
                 %left half of box
                 aCorrMap = ndautoCORR(densityPlotSm(:,1:length(spacing)/2));

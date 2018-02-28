@@ -15,7 +15,7 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 % dat = 'square'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
-dat = 'circ'; %square rect, trapz, trapzSqs, or cat (cat learning)
+dat = 'trapzNorm'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
 
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
@@ -32,7 +32,7 @@ clus2run = 20; %20, 30
 
 %circ run
 %love01
-% clus2run = [30, 14, 18]; % dailed to run - 30 too big? run 14 and 18 here
+% clus2run = [30]; % failed to run - 30 too big? 
 % clus2run = [28, 22, 10]; 
 % clus2run = [12, 26]; 
 
@@ -41,12 +41,18 @@ clus2run = 20; %20, 30
 % clus2run = 20;
 % clus2run = 24;
 % clus2run = 18;
-% clus2run = [14, 30]; %worried 30 will kill the computer again
-clus2run = [22, 17, 23];
+% clus2run = [14, 30]; %worried 30 will kill the computer again - running
+% ok now though..
+% clus2run = [22];
+% clus2run = [23];
+% clus2run = [25];
 
 
 %trapz - 16, 20, 26
 %clus2run = [16, 26, 12, 18, 24, 22, 28];
+% trapzNorm on love01
+clus2run = [16, 12, 18, 26];
+clus2run = [24, 22, 28];
 
 
 % nTrials = 5000000; %how many locations in the box / trials 
