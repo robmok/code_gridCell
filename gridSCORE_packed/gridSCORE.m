@@ -53,12 +53,12 @@ end
 %% Calculate grid score
 switch method       
     case {'allen'}
-        %% Method used by Wills et al. (2012) The abrupt development of adult-like grid cell firing in the medial entorhinal cortex
+        %% Method used by Perez-Escobar et al. (2016) Visual landmarks sharpen grid cell metric and confer context specificity to neurons of the medial entorhinal cortex
         % find blobs
-        imb = im>0.1;
-        blobs = regionprops(imb,'Centroid','Area','PixelIdxList');
+        imb = im>0.1; %threshold of autocorrelogram
+        blobs = regionprops(imb,'Centroid','Area','PixelIdxList'); % get all blobs
         as = [blobs.Area].';
-        blobs = blobs(as>10,:);
+        blobs = blobs(as>10,:); %get blobs more than 10 pixels
 
         % get distance to image centre
         cents = cell2mat({blobs.Centroid}.');
@@ -73,25 +73,28 @@ switch method
         % sort blobs according to distance
         [ds,sindx] = sort(ds,'ascend');
         blobs = blobs(sindx,:);
-        if length(blobs)==1
+        if length(blobs)==1 %if only 1 blob, exits function
             return
         end
-        if length(blobs)>7
+        if length(blobs)>7 %if more than 7, get closest 7
             blobs = blobs(1:7,:);
             ds = ds(1:7,:);
         end       
         
         % calculate grid orientation
-        L = createLine(ones(length(blobs)-1,2).*blobs(1).Centroid,cell2mat({blobs(2:end).Centroid}'));
+        L = createLine(ones(length(blobs)-1,2).*blobs(1).Centroid,cell2mat({blobs(2:end).Centroid}')); %draw line through 6 blob centres, through centre blob
         as = 360 - rad2deg(lineAngle(L));
-        grid_ori = min(as);        
+        grid_ori = min(as); %get smallest angle as grid orientation
         
         % calculate mean distance to closest blobs
         mds = mean(ds);
-        dcut = ceil(mds*1.25);
+        dcut = ceil(mds*1.25); %this value determine how much is cut - increasing it to 1.5 --> increased g of the example a bit (from 1.023 to 1.066)
         dcuti = ceil(mds*0.4);
 
-        % cut to the central portion of the autocorrelation
+        % cut to the central portion of the autocorrelation - %NOTE this
+        % cuts half of each of the 6 peaks out (since takes mean distance
+        % of blob centroids to centre, then cuts a circle); will this
+        % underestimate?
         rcent = round([blobs(1).Centroid(2),blobs(1).Centroid(1)]);
         imp = padarray(im,[dcut dcut],NaN,'both'); % pad array - sometimes mds is calculated diagonally and is larger than im is wide
         imcent = imp(rcent(1)+dcut-dcut:rcent(1)+dcut+dcut,rcent(2)+dcut-dcut:rcent(2)+dcut+dcut); % take the central part of the padded image
@@ -109,7 +112,7 @@ switch method
         for a = 1:length(as)
             mrot = imrotate(imcent,as(a),'bilinear','crop');
             r = corrcoef(mrot(:),imcent(:),'rows','pairwise'); 
-            if ~isnan(r) %RM added 28/02/18 - trapz left/right gridness problem
+            if ~isnan(r) %RM added 28/02/18 - trapz left/right gridness problem; when >1 blob but <7
                 rs(a) = r(1,2);
             else
                 rs(a) = nan;
@@ -213,7 +216,7 @@ switch method
                 rs(a) = nan;
             end
         end
-        g = nanmin([rs(2),rs(4)]) - nanmax([rs(1),rs(3),rs(5)]);        
+        g = nanmin([rs(2),rs(4)]) - nanmax([rs(1),rs(3),rs(5)]); % big diff to above here: get minimum of the 60/120 deg corr minus highest other
 
         % collect data
         gdata.mid_peak = blobs(1).Centroid;
