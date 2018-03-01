@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
- wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+%  wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -15,7 +15,7 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 % dat = 'square'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
-dat = 'circ'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
+dat = 'trapzNorm'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
 
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
@@ -51,9 +51,10 @@ clus2run = [20, 26, 28, 23, 25];
 
 %trapz - 16, 20, 26
 %clus2run = [16, 26, 12, 18, 24, 22, 28];
-% trapzNorm on love01
-% clus2run = [16, 12, 18, 26];
-% clus2run = [24, 22, 28];
+% trapzNorm on love01 - trying again on love06
+clus2run = [16, 12, 18, 26];
+clus2run = [22, 24, 28];
+
 
 % nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 
