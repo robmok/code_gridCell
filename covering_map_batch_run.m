@@ -4,7 +4,7 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 %  wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -15,7 +15,7 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 % dat = 'square'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
-dat = 'trapzNorm'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
+dat = 'square'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
 
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
@@ -24,7 +24,7 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 
 %run multiple cluster numbers
-clus2run = 20; %20, 30
+clus2run = 12; %20, 30
 % clus2run = 18:2:22;
 % clus2run = 22:2:26;
 % clus2run = 28:2:30;
@@ -34,7 +34,7 @@ clus2run = 20; %20, 30
 %love01
 % clus2run = [28, 22, 10];  %[12, 26]; %note 30 failed to run before
 %new:run smaller batches
-clus2run = [20, 26, 28, 23, 25];
+% clus2run = [20, 26, 28, 23, 25];
 % clus2run = [12, 16, 24, 14, 30];
 
 %love06
@@ -52,8 +52,8 @@ clus2run = [20, 26, 28, 23, 25];
 %trapz - 16, 20, 26
 %clus2run = [16, 26, 12, 18, 24, 22, 28];
 % trapzNorm on love01 - trying again on love06
-clus2run = [16, 12, 18, 26];
-clus2run = [22, 24, 28];
+% clus2run = [16, 12, 18, 26];
+% clus2run = [22, 24, 28];
 
 
 % nTrials = 5000000; %how many locations in the box / trials 
@@ -69,7 +69,7 @@ if fixBatchSize
 %     nBatches = [30000, 100000, 200000, 500000, 1250, 2500, 5000, 7500, 10000, 15000, 20000];
 %     nBatches = [2500, 1250];
 %     nBatches = fliplr([20000, 30000, 100000, 200000, 500000]);
-%     nBatches = 2500;
+    nBatches = 2500;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
 else % define batch size based on average number of updates per cluster
@@ -129,9 +129,9 @@ c=0;
 % trialsUnique=allPts;
 % save([saveDir '/randTrialsBox_trialsUnique'],'trialsUnique');
 %%
-saveDat=1; %save simulations
+saveDat=0; %save simulations
 
-nIter=200; %how many iterations (starting points)
+nIter=3; %how many iterations (starting points)
 
 switch dat
         case 'randUnique'
