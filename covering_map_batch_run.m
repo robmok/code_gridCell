@@ -35,7 +35,7 @@ clus2run = 20; %20, 30
 % clus2run = [28, 22, 10];  %[12, 26]; %note 30 failed to run before
 %new:run smaller batches
 clus2run = [20, 26, 28, 23, 25];
-% clus2run = [12, 16, 24, 14, 30];
+clus2run = [12, 16, 24, 14, 30];
 
 %love06
 % clus2run = 16; 
@@ -53,7 +53,7 @@ clus2run = [20, 26, 28, 23, 25];
 %clus2run = [16, 26, 12, 18, 24, 22, 28];
 % trapzNorm on love01 - trying again on love06
 clus2run = [16, 12, 18, 26];
-clus2run = [22, 24, 28];
+% clus2run = [22, 24, 28];
 
 
 % nTrials = 5000000; %how many locations in the box / trials 
@@ -69,7 +69,7 @@ if fixBatchSize
 %     nBatches = [30000, 100000, 200000, 500000, 1250, 2500, 5000, 7500, 10000, 15000, 20000];
 %     nBatches = [2500, 1250];
 %     nBatches = fliplr([20000, 30000, 100000, 200000, 500000]);
-%     nBatches = 2500;
+    nBatches = 2500;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
 else % define batch size based on average number of updates per cluster
