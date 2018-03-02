@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-%  wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+ wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -32,13 +32,12 @@ clus2run = 5; %20, 30
 
 %fewer clusters run
 %love06 - circle - running
-clus2run = [5, 6, 3];
+% clus2run = [5, 6, 3];
 % clus2run = [8, 7, 4];
 
-
 %love01 - square
-
-
+clus2run = [5, 6, 3];
+% clus2run = [8, 7, 4];
 
 
 
