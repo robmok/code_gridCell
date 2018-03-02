@@ -33,7 +33,7 @@ epsMuVals=.075;
 
 % sims 2 - a smaller val of trials; testing batch sizes (works fine) - also
 % have some sims with ntrials = 5000000 (less batchSizeVals)
-clus2run = [10 11 16 18 20 26];% 28];
+clus2run = [10 11 12:2:28];
 nTrials=2500000;
 batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
 
@@ -49,11 +49,11 @@ batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
 % batchSizeVals=[1, 2, 5, 10, 25, 35, 50]; %avgBatchVals - 1,2,5 new
 
 %new 5 - circ
-fixBatchSize = 1;
-clus2run = [12, 14, 16, 18, 20, 24]; % 28];
-nTrials=2500000;
-batchSizeVals=[125, 167, 250, 333, 500, 1000, 2000];
-dat='circ';
+% fixBatchSize = 1;
+% clus2run = [12, 14, 16, 18, 20, 24]; % 28];
+% nTrials=2500000;
+% batchSizeVals=[125, 167, 250, 333, 500, 1000, 2000];
+% dat='circ';
 
 %new 5 - trapz
 % fixBatchSize = 1;

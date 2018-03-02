@@ -4,7 +4,7 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 %  wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -24,7 +24,7 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 
 %run multiple cluster numbers
-clus2run = 12; %20, 30
+clus2run = 22; %20, 30
 % clus2run = 18:2:22;
 % clus2run = 22:2:26;
 % clus2run = 28:2:30;
@@ -70,6 +70,8 @@ if fixBatchSize
 %     nBatches = [2500, 1250];
 %     nBatches = fliplr([20000, 30000, 100000, 200000, 500000]);
     nBatches = 2500;
+    nBatches = [200000]; %clus22
+%     nBatches = [500000]; %clus22
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
 else % define batch size based on average number of updates per cluster
@@ -129,9 +131,9 @@ c=0;
 % trialsUnique=allPts;
 % save([saveDir '/randTrialsBox_trialsUnique'],'trialsUnique');
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
-nIter=3; %how many iterations (starting points)
+nIter=200; %how many iterations (starting points)
 
 switch dat
         case 'randUnique'
