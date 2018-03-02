@@ -26,7 +26,7 @@ muAll                = nan(nClus,2,nBatch+1,nIter);
 gA = nan(nSets,nIter,4);
 gW = nan(nSets,nIter,4);
 %if trapz - compute gridness of left/right half of boxes too
-if strcmp(dat,'trapz') || strcmp(dat,'trapzSq')
+if strcmp(dat,'trapz') || strcmp(dat,'trapzSq') || strcmp(dat,'trapz1')
     gA = nan(nSets,nIter,4,3);
     gW = nan(nSets,nIter,4,3);
 end
@@ -63,11 +63,11 @@ for iterI = 1:nIter
 %                 trials = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)*2,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
                 trials      = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)/1.5,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
                 dataPtsTest = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)/1.5,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
-            case 'trapz'
+            case 'trapzKrupic'
                 %if scale to Krupic:
                 %%%%%
-                spacingTrapz = spacing(15:38); %23.7 would be right, here 24; krupic (relative): [5.26, 23.68, 50]
-                %%%%%
+                spacingTrapz = spacing(13:37); %23.7 would be right, here 24; krupic (relative): [5.26, 23.68, 50]
+                %%%%% 
                 trapY=locRange(2).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
                 trapX=spacingTrapz;
                 trapPts=[];
@@ -85,7 +85,7 @@ for iterI = 1:nIter
                 dataPtsTest       = trapPts(:,trialIndTest)';
                 trialIndTest = randi(length(trapPts),nTrials,1);
                 dataPtsTest  = trapPts(:,trialIndTest)';
-            case 'trapzNorm' % not scale to Krupic:
+            case 'trapz' % not scale to Krupic: (this was trapzNorm)
                 spacingTrapz = spacing; 
                 trapY=locRange(2).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
                 trapX=spacingTrapz;
@@ -105,6 +105,63 @@ for iterI = 1:nIter
                 trialIndTest = randi(length(trapPts),nTrials,1);
                 dataPtsTest  = trapPts(:,trialIndTest)';
                 
+            case 'trapz1' % new - scale differently - more like box but more squished
+                spacingTrapz = spacing(10:41); 
+                trapY=locRange(2).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
+                trapX=spacingTrapz;
+                trapPts=[];
+                for i=1:length(trapY)
+                    trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
+                end
+                %             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1
+                % use this to select from the PAIR in trapPts
+                trialInd     = randi(length(trapPts),nTrials,1);
+                trials       = trapPts(:,trialInd)';
+                trialIndTest = randi(length(trapPts),nTrials,1);
+                trials  = trapPts(:,trialIndTest)';
+                %dataPtsTest
+                trialIndTest     = randi(length(trapPts),nTrials,1);
+                dataPtsTest       = trapPts(:,trialIndTest)';
+                trialIndTest = randi(length(trapPts),nTrials,1);
+                dataPtsTest  = trapPts(:,trialIndTest)';                
+            case 'trapz2' % new - scale differently - more like box but more squished
+                spacingTrapz = spacing(7:44); 
+                trapY=locRange(2).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
+                trapX=spacingTrapz;
+                trapPts=[];
+                for i=1:length(trapY)
+                    trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
+                end
+                %             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1
+                % use this to select from the PAIR in trapPts
+                trialInd     = randi(length(trapPts),nTrials,1);
+                trials       = trapPts(:,trialInd)';
+                trialIndTest = randi(length(trapPts),nTrials,1);
+                trials  = trapPts(:,trialIndTest)';
+                %dataPtsTest
+                trialIndTest     = randi(length(trapPts),nTrials,1);
+                dataPtsTest       = trapPts(:,trialIndTest)';
+                trialIndTest = randi(length(trapPts),nTrials,1);
+                dataPtsTest  = trapPts(:,trialIndTest)';    
+            case 'trapz3' % new - scale differently - more like box but more squished
+                spacingTrapz = spacing(4:47); 
+                trapY=locRange(2).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
+                trapX=spacingTrapz;
+                trapPts=[];
+                for i=1:length(trapY)
+                    trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
+                end
+                %             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1
+                % use this to select from the PAIR in trapPts
+                trialInd     = randi(length(trapPts),nTrials,1);
+                trials       = trapPts(:,trialInd)';
+                trialIndTest = randi(length(trapPts),nTrials,1);
+                trials  = trapPts(:,trialIndTest)';
+                %dataPtsTest
+                trialIndTest     = randi(length(trapPts),nTrials,1);
+                dataPtsTest       = trapPts(:,trialIndTest)';
+                trialIndTest = randi(length(trapPts),nTrials,1);
+                dataPtsTest  = trapPts(:,trialIndTest)';    
             case 'trapzSq' %probably need a more narrow trapezium!
                 trapY=locRange(2)/2.*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
                 trapY=trapY+floor(length(trapY)./2);
@@ -386,7 +443,7 @@ for iterI = 1:nIter
             gW(iSet,iterI,:,1) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
             
             %split in half then compute gridness for each half
-            if strcmp(dat,'trapz') || strcmp(dat,'trapzSq') || strcmp(dat,'trapzNorm')
+            if strcmp(dat,'trapz') || strcmp(dat,'trapzSq') || strcmp(dat,'trapz1') || strcmp(dat,'trapz2') || strcmp(dat,'trapz3') || strcmp(dat,'trapzKrupic')
                 
                 %left half of box
                 aCorrMap = ndautoCORR(densityPlotSm(:,1:length(spacing)/2));

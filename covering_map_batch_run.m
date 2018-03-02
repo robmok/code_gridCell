@@ -15,8 +15,10 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 % dat = 'square'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
-dat = 'circ'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
-
+dat = 'trapz1'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
+dat = 'trapz2';
+% dat = 'trapz3';
+% dat = 'trapzKrupic';
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
 nCats   = 2; %2 categories
@@ -35,8 +37,8 @@ clus2run = 5; %20, 30
 % clus2run = [5, 6, 3];
 % clus2run = [8, 7, 4];
 
-%love01 - square
-clus2run = [5, 6, 3];
+%love01 - square - running
+% clus2run = [5, 6, 3];
 % clus2run = [8, 7, 4];
 
 
@@ -61,11 +63,12 @@ clus2run = [5, 6, 3];
 
 
 %trapz - 16, 20, 26
-%clus2run = [16, 26, 12, 18, 24, 22, 28];
-% trapzNorm on love01 - trying again on love06
-% clus2run = [16, 12, 18, 26];
-% clus2run = [22, 24, 28];
 
+%love 06 - trapz1
+clus2run = [16, 26, 12, 14];
+% clus2run = [18, 24, 22, 28];
+% love01 - 2, 3, krupic
+clus2run = [16, 22, 12, 26, 14, 18, 24, 28];
 
 % nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 
@@ -80,7 +83,7 @@ if fixBatchSize
 %     nBatches = [30000, 100000, 200000, 500000, 1250, 2500, 5000, 7500, 10000, 15000, 20000];
 %     nBatches = [2500, 1250];
 %     nBatches = fliplr([20000, 30000, 100000, 200000, 500000]);
-%     nBatches = 2500;
+    nBatches = 2500;
 %     nBatches = [200000]; %clus22
 %     nBatches = [500000]; %clus22
     batchSizeVals = nTrials./nBatches;
