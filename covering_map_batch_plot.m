@@ -33,7 +33,7 @@ epsMuVals=.075;
 
 % sims 2 - a smaller val of trials; testing batch sizes (works fine) - also
 % have some sims with ntrials = 5000000 (less batchSizeVals)
-clus2run = [10 11 12:2:28];
+clus2run = [10 11 12:2:20 24:2:28]; %22 running
 nTrials=2500000;
 batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
 
@@ -49,11 +49,12 @@ batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
 % batchSizeVals=[1, 2, 5, 10, 25, 35, 50]; %avgBatchVals - 1,2,5 new
 
 %new 5 - circ
-% fixBatchSize = 1;
-% clus2run = [12, 14, 16, 18, 20, 24]; % 28];
-% nTrials=2500000;
+fixBatchSize = 1;
+clus2run = [10:2:20, 22:26, 28, 30];
+nTrials=2500000;
 % batchSizeVals=[125, 167, 250, 333, 500, 1000, 2000];
-% dat='circ';
+batchSizeVals=[167, 250, 333, 500, 1000, 2000];
+dat='circ';
 
 %new 5 - trapz
 % fixBatchSize = 1;
@@ -61,6 +62,14 @@ batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
 % nTrials=2500000;
 % batchSizeVals=1000;
 % dat='trapz';
+
+% new 6 trapzNorm
+% fixBatchSize = 1;
+% clus2run = [12, 16, 18, 22:2:28];
+% nTrials=2500000;
+% batchSizeVals=1000;
+% dat='trapzNorm';
+
 
 %load loop
 for iClus2run = 1:length(clus2run) 
@@ -167,7 +176,7 @@ if size(gridness,4)==1 %only 1 batchSize
     ylim([-.5,1.25]);
     title(sprintf('%s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
     
-    if strcmp(dat,'trapz')
+    if strcmp(dat,'trapz') || strcmp(dat,'trapzNorm')
         figure; hold on;
         dat1     = squeeze(datTmp(iSet,:,:,:,:,2));
         mu      = mean(dat1,1);
@@ -281,7 +290,7 @@ end
 % ylim([-.5,1.25]);
 
 
-%% check gridness meausres
+%% check gridness measures
 
 doPlot=0;
 

@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
- wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+%  wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -15,7 +15,7 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 % dat = 'square'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
-dat = 'square'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
+dat = 'circ'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
 
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
@@ -24,11 +24,23 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 
 %run multiple cluster numbers
-clus2run = 22; %20, 30
+clus2run = 5; %20, 30
 % clus2run = 18:2:22;
 % clus2run = 22:2:26;
 % clus2run = 28:2:30;
 % clus2run = [10, 12]; % [11, 14] [16, 24]; [28, 22]; 
+
+%fewer clusters run
+%love06 - circle - running
+clus2run = [5, 6, 3];
+% clus2run = [8, 7, 4];
+
+
+%love01 - square
+
+
+
+
 
 %circ run
 %love01
@@ -65,13 +77,13 @@ fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
 % 13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000
 if fixBatchSize
     nBatches = [1250, 2500, 5000, 7500, 10000, 15000, 20000];
-    nBatches = [30000, 100000, 200000, 500000];
+%     nBatches = [30000, 100000, 200000, 500000];
 %     nBatches = [30000, 100000, 200000, 500000, 1250, 2500, 5000, 7500, 10000, 15000, 20000];
 %     nBatches = [2500, 1250];
 %     nBatches = fliplr([20000, 30000, 100000, 200000, 500000]);
-    nBatches = 2500;
-    nBatches = [200000]; %clus22
-    nBatches = [500000]; %clus22
+%     nBatches = 2500;
+%     nBatches = [200000]; %clus22
+%     nBatches = [500000]; %clus22
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
 else % define batch size based on average number of updates per cluster
