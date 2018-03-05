@@ -18,10 +18,10 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 % dat = 'trapz1'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
 % dat = 'trapz2';
 % dat = 'trapz3';
-dat = 'trapzKrupic';
-% dat = 'trapzScaled1';
-% dat = 'trapzScaled2';
-dat = 'trapzScaled3';
+% dat = 'trapzKrupic';
+dat = 'trapzScaled1';
+dat = 'trapzScaled2';
+% dat = 'trapzScaled3';
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
 nCats   = 2; %2 categories
@@ -68,8 +68,7 @@ clus2run = 12; %20, 30
 %trapz
 clus2run = 20; %for all trapz conditions - missed
 clus2run = [16, 22, 12, 26, 14, 18, 24, 28];
-% clus2run = [16, 22, 12, 26];
-% clus2run = [14, 18, 24, 28];
+clus2run = [26,24, 28];
 
 % nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 

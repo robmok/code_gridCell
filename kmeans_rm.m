@@ -8,8 +8,7 @@ for upd = 1:nUpdSteps
 %         dist(:,iK)=sum([mu(iK,1,upd)-dataPts(:,1),  mu(iK,2,upd)-dataPts(:,2)].^2,2); %squared euclid for k means
 %     end
     %vectorized
-    dist1 = reshape([mu(:,1,upd)'-dataPts(:,1),  mu(:,2,upd)'-dataPts(:,2)].^2,length(dataPts),nK,2); %squared euclid for k means
-    dist  = sum(dist1,3);
+    dist = sum(reshape([mu(:,1,upd)'-dataPts(:,1),  mu(:,2,upd)'-dataPts(:,2)].^2,length(dataPts),nK,2),3); %squared euclid for k means
 
     [indVals, ind]=min(dist,[],2); % find which clusters are points closest to
     for iK = 1:nK
