@@ -16,7 +16,7 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 kVals = 3:17; 
 % kVals = 18:25; 
 % kVals = 26:30; 
-% kVals = 3;
+% kVals = 10;
 nKvals = length(kVals);
 
 saveDat = 1;

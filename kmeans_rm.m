@@ -3,9 +3,14 @@ function [muEnd,tsse] = kmeans_rm(mu,dataPts,nK,nUpdSteps)
 %first trial of mu has to be specified (e.g. by kmplusInit.m)
 
 for upd = 1:nUpdSteps
-    for iK = 1:nK% loop over clusters not dataPts, because nPts can be huge (so vectorise over points
-        dist(:,iK)=sum([mu(iK,1,upd)-dataPts(:,1),  mu(iK,2,upd)-dataPts(:,2)].^2,2); %squared euclid for k means
-    end
+    dist = nan(length(dataPts),nK);
+%     for iK = 1:nK% loop over clusters not dataPts, because nPts can be huge (so vectorise over points
+%         dist(:,iK)=sum([mu(iK,1,upd)-dataPts(:,1),  mu(iK,2,upd)-dataPts(:,2)].^2,2); %squared euclid for k means
+%     end
+    %vectorized
+    dist1 = reshape([mu(:,1,upd)'-dataPts(:,1),  mu(:,2,upd)'-dataPts(:,2)].^2,length(dataPts),nK,2); %squared euclid for k means
+    dist  = sum(dist1,3);
+
     [indVals, ind]=min(dist,[],2); % find which clusters are points closest to
     for iK = 1:nK
         if any(isnan([mean(dataPts(ind==iK,1)), mean(dataPts(ind==iK,2))]))
