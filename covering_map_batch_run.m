@@ -15,10 +15,13 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 % dat = 'square'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
-dat = 'trapz1'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
-dat = 'trapz2';
+% dat = 'trapz1'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
+% dat = 'trapz2';
 % dat = 'trapz3';
-% dat = 'trapzKrupic';
+dat = 'trapzKrupic';
+% dat = 'trapzScaled1';
+% dat = 'trapzScaled2';
+dat = 'trapzScaled3';
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
 nCats   = 2; %2 categories
@@ -26,7 +29,7 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 
 %run multiple cluster numbers
-clus2run = 5; %20, 30
+clus2run = 12; %20, 30
 % clus2run = 18:2:22;
 % clus2run = 22:2:26;
 % clus2run = 28:2:30;
@@ -62,13 +65,11 @@ clus2run = 5; %20, 30
 % clus2run = [25];
 
 
-%trapz - 16, 20, 26
-
-%love 06 - trapz1
-clus2run = [16, 26, 12, 14];
-% clus2run = [18, 24, 22, 28];
-% love01 - 2, 3, krupic
+%trapz
+clus2run = 20; %for all trapz conditions - missed
 clus2run = [16, 22, 12, 26, 14, 18, 24, 28];
+% clus2run = [16, 22, 12, 26];
+% clus2run = [14, 18, 24, 28];
 
 % nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 
@@ -106,7 +107,7 @@ locRange = [0, nSteps-1]; %[-1, 1]; % from locRange(1) to locRange(2)
 stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %smallest diff between locs
 
 % parameters
-epsMuVals=[.01, .05, .075, .1, .2, .3];% %learning rate / starting learning rate 
+% epsMuVals=[.01, .05, .075, .1, .2, .3];% %learning rate / starting learning rate 
 epsMuVals = 0.075; 
 
 % %tesing 60+clusters
@@ -192,7 +193,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                 fprintf('Running %s, nClus=%d, epsMu=%d, avgBatchUpd=%d; batchSize=%d\n',dat,nClus,epsMuOrig1000,avgBatchUpdate(iBvals),batchSize)
                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(avgBatchUpdate(iBvals)),round(batchSize),nIter)];
             end
-            [densityPlot,clusMu,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
+            [densityPlot,clusMu,gA,gW] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
             timeTaken=toc;
             if saveDat
                 if useSameTrls

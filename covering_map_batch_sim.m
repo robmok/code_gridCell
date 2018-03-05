@@ -1,4 +1,3 @@
-% function [densityPlot,clusMu,muAvg,nTrlsUpd,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,box,warpType,epsMuOrig,nTrials,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,dat,weightEpsSSE)
 function [densityPlot,clusMu,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE)
 
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
@@ -17,11 +16,13 @@ batchSize = floor(batchSize); % when have decimal points, above needed
 % thing if just looking at some point in time, small batches = less stable.
 trlSel = ceil([nBatch*.25, nBatch*.5, nBatch*.67, nBatch*.75, nBatch*.9, nBatch+1]);
 
+if nargout > 4
+    muAll            = nan(nClus,2,nBatch+1,nIter);
+end
 nSets                = length(trlSel);
 densityPlotClus      = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
 densityPlot          = zeros(length(spacing),length(spacing),nSets,nIter);
 clusMu               = nan(nClus,2,nSets,nIter);
-muAll                = nan(nClus,2,nBatch+1,nIter);
 % tsseAll              = nan(nBatch+1,nIter); %not sure if this is +1 or not; not tested
 gA = nan(nSets,nIter,4);
 gW = nan(nSets,nIter,4);
@@ -66,7 +67,7 @@ for iterI = 1:nIter
             case 'trapzKrupic'
                 %if scale to Krupic:
                 %%%%%
-                spacingTrapz = spacing(13:37); %23.7 would be right, here 24; krupic (relative): [5.26, 23.68, 50]
+                spacingTrapz = spacing(14:37); %23.7 would be right, here 24; krupic (relative): [5.26, 23.68, 50]
                 %%%%% 
                 trapY=locRange(2).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
                 trapX=spacingTrapz;
@@ -161,7 +162,94 @@ for iterI = 1:nIter
                 trialIndTest     = randi(length(trapPts),nTrials,1);
                 dataPtsTest       = trapPts(:,trialIndTest)';
                 trialIndTest = randi(length(trapPts),nTrials,1);
-                dataPtsTest  = trapPts(:,trialIndTest)';    
+                dataPtsTest  = trapPts(:,trialIndTest)'; 
+                
+                
+            case 'trapzScaled1' % new - scale differently - now loc > 50 though
+                
+                spacingTrapz = spacing(10:41); 
+                a=length(spacingTrapz); %trapz length1
+                b=locRange(2)+1; %50 - trapz length2
+                h=round(((locRange(2)+1)^2)/((a+b)/2)); %trapz height (area = 50^2; like square)
+                trapY=h.*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
+                trapX=spacingTrapz;
+                trapPts=[];
+                for i=1:length(trapY)
+                    trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
+                end
+                %             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1
+                % use this to select from the PAIR in trapPts
+                trialInd     = randi(length(trapPts),nTrials,1);
+                trials       = trapPts(:,trialInd)';
+                trialIndTest = randi(length(trapPts),nTrials,1);
+                trials  = trapPts(:,trialIndTest)';
+                %dataPtsTest
+                trialIndTest     = randi(length(trapPts),nTrials,1);
+                dataPtsTest       = trapPts(:,trialIndTest)';
+                trialIndTest = randi(length(trapPts),nTrials,1);
+                dataPtsTest  = trapPts(:,trialIndTest)'; 
+                
+                %redefine densityPlot array size - 
+                densityPlotClus      = zeros(b,h,nClus,nSets,nIter);
+                densityPlot          = zeros(b,h,nSets,nIter);
+                                
+            case 'trapzScaled2' % new - scale differently - now loc > 50 though
+                
+                spacingTrapz = spacing(7:44); 
+                a=length(spacingTrapz); %trapz length1
+                b=locRange(2)+1; %50 - trapz length2
+                h=round(((locRange(2)+1)^2)/((a+b)/2)); %trapz height (area = 50^2; like square)
+                trapY=h.*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
+                trapX=spacingTrapz;
+                trapPts=[];
+                for i=1:length(trapY)
+                    trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
+                end
+                %             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1
+                % use this to select from the PAIR in trapPts
+                trialInd     = randi(length(trapPts),nTrials,1);
+                trials       = trapPts(:,trialInd)';
+                trialIndTest = randi(length(trapPts),nTrials,1);
+                trials  = trapPts(:,trialIndTest)';
+                %dataPtsTest
+                trialIndTest     = randi(length(trapPts),nTrials,1);
+                dataPtsTest       = trapPts(:,trialIndTest)';
+                trialIndTest = randi(length(trapPts),nTrials,1);
+                dataPtsTest  = trapPts(:,trialIndTest)'; 
+                
+                %redefine densityPlot array size - 
+                densityPlotClus      = zeros(b,h,nClus,nSets,nIter);
+                densityPlot          = zeros(b,h,nSets,nIter);                
+                
+            case 'trapzScaled3' % new - scale differently - now loc > 50 though
+                
+                spacingTrapz = spacing(4:47); 
+                a=length(spacingTrapz); %trapz length1
+                b=locRange(2)+1; %50 - trapz length2
+                h=round(((locRange(2)+1)^2)/((a+b)/2)); %trapz height (area = 50^2; like square)
+                trapY=h.*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
+                trapX=spacingTrapz;
+                trapPts=[];
+                for i=1:length(trapY)
+                    trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
+                end
+                %             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1
+                % use this to select from the PAIR in trapPts
+                trialInd     = randi(length(trapPts),nTrials,1);
+                trials       = trapPts(:,trialInd)';
+                trialIndTest = randi(length(trapPts),nTrials,1);
+                trials  = trapPts(:,trialIndTest)';
+                %dataPtsTest
+                trialIndTest     = randi(length(trapPts),nTrials,1);
+                dataPtsTest       = trapPts(:,trialIndTest)';
+                trialIndTest = randi(length(trapPts),nTrials,1);
+                dataPtsTest  = trapPts(:,trialIndTest)'; 
+                
+                %redefine densityPlot array size - 
+                densityPlotClus      = zeros(b,h,nClus,nSets,nIter);
+                densityPlot          = zeros(b,h,nSets,nIter);
+                
+                
             case 'trapzSq' %probably need a more narrow trapezium!
                 trapY=locRange(2)/2.*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
                 trapY=trapY+floor(length(trapY)./2);
@@ -388,7 +476,9 @@ for iterI = 1:nIter
 
 
     end
-    muAll(:,:,:,iterI)      = mu;
+    if nargout > 4
+        muAll(:,:,:,iterI)      = mu;
+    end
 %     tsseAll(:,iterI)        = tsse;
 %     sseSpreadSd(:,iterI)    = stdAcrossClus;
 %     sseSpreadVar(:,iterI)   = varAcrossClus;
@@ -416,7 +506,7 @@ for iterI = 1:nIter
         end
         
         %now also compute clus means
-        densityPlotClusSmth = zeros(length(spacing),length(spacing),nClus);
+        densityPlotClusSmth = zeros(size(densityPlot,1),size(densityPlot,2),nClus);
         for iClus=1:nClus
             %find peaks
             densityPlotClusSmth(:,:,iClus)=imgaussfilt(densityPlotClus(:,:,iClus,iSet,iterI),gaussSmooth);

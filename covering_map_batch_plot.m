@@ -9,8 +9,6 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed']));
 
-
-
 % load
 nSet        = 6;
 gaussSmooth = 1; 
@@ -33,7 +31,8 @@ epsMuVals=.075;
 
 % sims 2 - a smaller val of trials; testing batch sizes (works fine) - also
 % have some sims with ntrials = 5000000 (less batchSizeVals)
-clus2run = [10 11 12:2:20 24:2:28]; %22 running
+clus2run = [10 11 12:2:28];
+% clus2run = 28; % plotting one nClus cond over sets
 nTrials=2500000;
 batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
 
@@ -49,26 +48,21 @@ batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
 % batchSizeVals=[1, 2, 5, 10, 25, 35, 50]; %avgBatchVals - 1,2,5 new
 
 %new 5 - circ
-fixBatchSize = 1;
-clus2run = [10:2:20, 22:26, 28, 30];
-nTrials=2500000;
-% batchSizeVals=[125, 167, 250, 333, 500, 1000, 2000];
-batchSizeVals=[167, 250, 333, 500, 1000, 2000];
-dat='circ';
+% fixBatchSize = 1;
+% clus2run = [10:2:20, 22:26, 28, 30];
+% clus2run = 14; % plotting one nClus cond over sets
+% nTrials=2500000;
+% % batchSizeVals=[125, 167, 250, 333, 500, 1000, 2000];
+% batchSizeVals=[167, 250, 333, 500, 1000, 2000];
+% dat='circ';
 
 %new 5 - trapz
 % fixBatchSize = 1;
-% clus2run = [12, 16:2:28];
+% clus2run = [12:2:18 22:2:28];
 % nTrials=2500000;
 % batchSizeVals=1000;
-% dat='trapz';
+% dat='trapz3'; %trapz1, trapz2, trapz3, trapzKrupic, trapzNorm (or rename to trapz)
 
-% new 6 trapzNorm
-% fixBatchSize = 1;
-% clus2run = [12, 16, 18, 22:2:28];
-% nTrials=2500000;
-% batchSizeVals=1000;
-% dat='trapzNorm';
 
 
 %load loop
@@ -176,30 +170,44 @@ if size(gridness,4)==1 %only 1 batchSize
     ylim([-.5,1.25]);
     title(sprintf('%s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
     
-    if strcmp(dat,'trapz') || strcmp(dat,'trapzNorm')
-        figure; hold on;
-        dat1     = squeeze(datTmp(iSet,:,:,:,:,2));
-        mu      = mean(dat1,1);
-        sm      = std(dat1)./sqrt(size(dat1,1));
-        ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
-        plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-        errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-        scatter(barpos,mu,100,colors,'d','filled');
-        xlim([barpos(1)-.5, barpos(end)+.5]);
-        ylim([-.5,1.25]);
-        title(sprintf('Left half of box %s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
+    if strcmp(dat(1:5),'trapz')
+%         figure; hold on;
+%         dat1    = squeeze(datTmp(iSet,:,:,:,:,2));
+%         mu      = nanmean(dat1,1);
+%         sm      = nanstd(dat1)./sqrt(size(dat1,1));
+%         ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+%         plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
+%         errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+%         scatter(barpos,mu,100,colors,'d','filled');
+%         xlim([barpos(1)-.5, barpos(end)+.5]);
+%         ylim([-.5,1.25]);
+%         title(sprintf('Left half of box %s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
+%         
+%         figure; hold on;
+%         dat1    = squeeze(datTmp(iSet,:,:,:,:,3));
+%         mu      = nanmean(dat1,1);
+%         sm      = nanstd(dat1)./sqrt(size(dat1,1));
+%         ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+%         plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
+%         errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+%         scatter(barpos,mu,100,colors,'d','filled');
+%         xlim([barpos(1)-.5, barpos(end)+.5]);
+%         ylim([-.5,1.25]);
+%         title(sprintf('Right half of box %s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
         
         figure; hold on;
-        dat1     = squeeze(datTmp(iSet,:,:,:,:,3));
-        mu      = mean(dat1,1);
-        sm      = std(dat1)./sqrt(size(dat1,1));
+        dat1    = squeeze(datTmp(iSet,:,:,:,:,2))-squeeze(datTmp(iSet,:,:,:,:,3));
+        mu      = nanmean(dat1,1);
+        sm      = nanstd(dat1)./sqrt(size(dat1,1));
         ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
         plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
         errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
         scatter(barpos,mu,100,colors,'d','filled');
         xlim([barpos(1)-.5, barpos(end)+.5]);
-        ylim([-.5,1.25]);
-        title(sprintf('Right half of box %s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
+        ylim([-1.5,1.5]);
+        title(sprintf('Left-right half of box %s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
+        
+        
     end
     
 %     %plot hist
@@ -242,7 +250,7 @@ for iClus2Run = 1:length(clus2run)
         scatter(barpos,mu,750,colors,'x');
         xlim([barpos(1)-.5, barpos(end)+.5]);
 %         ylim([0,1]);
-        ylim([-.5,1.25]);
+%         ylim([-.5,1.5]);
         title(sprintf('%s - eps=%d, nClus=%d',gridMeasure,epsMuVals(iEps)*1000,clus2run(iClus2Run)))
     end
    
@@ -268,6 +276,62 @@ for iClus2Run = 1:length(clus2run)
 end
 
 end
+
+
+
+
+
+%plot over sets
+if 0
+if size(gridness,4)>1 
+    figure; hold on;
+    for iBatchVals = 1:length(batchSizeVals)        
+        subplot(ceil(length(batchSizeVals)/2),2,iBatchVals); hold on;
+        dat1     = squeeze(datTmp(:,:,:,iBatchVals,:,:))';
+        barpos  = .25:.5:.5*size(dat1,2);
+        colors  = distinguishable_colors(size(dat1,2));
+        colgrey = [.5, .5, .5];
+        mu      = nanmean(dat1,1);
+        sm      = nanstd(dat1)./sqrt(size(dat1,1));
+        ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+        plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
+        errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+        scatter(barpos,mu,100,colors,'d','filled');
+        xlim([barpos(1)-.5, barpos(end)+.5]);
+        ylim([-.5,1.25]);
+        title(sprintf('%s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
+    end
+    
+%     if strcmp(dat,'trapz') || strcmp(dat,'trapzNorm')
+%         figure; hold on;
+%         dat1     = squeeze(datTmp(iSet,:,:,:,:,2));
+%         mu      = mean(dat1,1);
+%         sm      = std(dat1)./sqrt(size(dat1,1));
+%         ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+%         plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
+%         errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+%         scatter(barpos,mu,100,colors,'d','filled');
+%         xlim([barpos(1)-.5, barpos(end)+.5]);
+%         ylim([-.5,1.25]);
+%         title(sprintf('Left half of box %s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
+%         
+%         figure; hold on;
+%         dat1     = squeeze(datTmp(iSet,:,:,:,:,3));
+%         mu      = mean(dat1,1);
+%         sm      = std(dat1)./sqrt(size(dat1,1));
+%         ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+%         plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
+%         errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+%         scatter(barpos,mu,100,colors,'d','filled');
+%         xlim([barpos(1)-.5, barpos(end)+.5]);
+%         ylim([-.5,1.25]);
+%         title(sprintf('Right half of box %s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
+%     end
+end
+end
+
+
+
 
 
 
