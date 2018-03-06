@@ -20,7 +20,7 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 % dat = 'trapz3';
 % dat = 'trapzKrupic';
 dat = 'trapzScaled1';
-dat = 'trapzScaled2';
+% dat = 'trapzScaled2';
 % dat = 'trapzScaled3';
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan

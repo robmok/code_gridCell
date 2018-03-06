@@ -13,9 +13,10 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed']));
 
-kVals = 3:17; 
-kVals = 18:25; 
-kVals = 26:30; 
+kVals = 3:11; 
+kVals = 12:17; 
+% kVals = 18:25; 
+% kVals = 26:30; 
 % kVals = 15;
 nKvals = length(kVals);
 
@@ -26,7 +27,7 @@ nXvalDataSets = 20; %if do xVal, specify how many datasets to generate
 
 dat = 'circ'; %'rand' points in a box, randUnique (all unique points in box), or 'cat'
 nKmeans = 1000;  % run k means n times %1000
-nPoints = 10000;  %how many locations/datapoints - not used for 'randUnique', though used for xVal
+nPoints = 3000;  %how many locations/datapoints - not used for 'randUnique', though used for xVal
 
 
 %%%%
