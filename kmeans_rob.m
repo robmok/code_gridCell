@@ -4,7 +4,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -13,10 +13,15 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed']));
 
-kVals = 3:17; 
+kVals = 3:11; 
+kVals = 12:17; 
 % kVals = 18:25; 
 % kVals = 26:30; 
+<<<<<<< HEAD
 % kVals = 10;
+=======
+% kVals = 15;
+>>>>>>> b099964ae8053adf9cffefa09c0a001bafbf8338
 nKvals = length(kVals);
 
 saveDat = 1;
@@ -26,7 +31,7 @@ nXvalDataSets = 20; %if do xVal, specify how many datasets to generate
 
 dat = 'circ'; %'rand' points in a box, randUnique (all unique points in box), or 'cat'
 nKmeans = 1000;  % run k means n times %1000
-nPoints = 10000;  %how many locations/datapoints - not used for 'randUnique', though used for xVal
+nPoints = 3000;  %how many locations/datapoints - not used for 'randUnique', though used for xVal
 
 
 %%%%

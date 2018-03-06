@@ -337,8 +337,8 @@ for iterI = 1:nIter
 %             dist2Clus = sqrt(sum([mu(:,1,iTrl)'-trials(iTrl,1); mu(:,2,iTrl)'-trials(iTrl,2)].^2)); % vectorising euclid dist - sqrt(sum((a-b).^2)), since can't use xval method
             
             %compute distances - vectorise both clusters and trials (in batch)
-            dist2Clus = reshape([mu(:,1,iBatch)'-trls2Upd(:,1), mu(:,2,iBatch)'-trls2Upd(:,2)].^2,batchSize,nClus,2);% reshapes it into batchSize x nClus x 2 (x and y locs)
-            dist2Clus = sqrt(sum(dist2Clus,3));
+            dist2Clus = sqrt(sum(reshape([mu(:,1,iBatch)'-trls2Upd(:,1), mu(:,2,iBatch)'-trls2Upd(:,2)].^2,batchSize,nClus,2),3));% reshapes it into batchSize x nClus x 2 (x and y locs)
+%             dist2Clus = sqrt(sum(dist2Clus,3));
             
             %stochastic update - select 1 of the closest clusters w random element - stochastic parameter c - large is deterministic, 0 - random            
 %             if stochasticType %stochastic update
