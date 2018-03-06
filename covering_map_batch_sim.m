@@ -27,7 +27,7 @@ clusMu               = nan(nClus,2,nSets,nIter);
 gA = nan(nSets,nIter,4);
 gW = nan(nSets,nIter,4);
 %if trapz - compute gridness of left/right half of boxes too
-if strcmp(dat,'trapz') || strcmp(dat,'trapzSq') || strcmp(dat,'trapz1')
+if strcmp(dat(1:5),'trapz')
     gA = nan(nSets,nIter,4,3);
     gW = nan(nSets,nIter,4,3);
 end
@@ -533,7 +533,7 @@ for iterI = 1:nIter
             gW(iSet,iterI,:,1) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
             
             %split in half then compute gridness for each half
-            if strcmp(dat,'trapz') || strcmp(dat,'trapzSq') || strcmp(dat,'trapz1') || strcmp(dat,'trapz2') || strcmp(dat,'trapz3') || strcmp(dat,'trapzKrupic')
+            if  strcmp(dat(1:5),'trapz')
                 
                 %left half of box
                 aCorrMap = ndautoCORR(densityPlotSm(:,1:length(spacing)/2));

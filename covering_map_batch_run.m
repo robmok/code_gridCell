@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-%  wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+ wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -68,7 +68,7 @@ clus2run = 12; %20, 30
 %trapz
 clus2run = 20; %for all trapz conditions - missed
 clus2run = [16, 22, 12, 26, 14, 18, 24, 28];
-clus2run = [26,24, 28];
+% clus2run = [26,24, 28];
 
 % nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 
