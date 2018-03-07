@@ -15,19 +15,18 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 
 kVals = 3:17; 
 kVals = 18:25; 
-% kVals = 26:30; 
+kVals = 26:30; 
 % kVals = 15;
 nKvals = length(kVals);
 
 saveDat = 1;
 
-doXval        = 1;  %do (and save) crossvalidation
+doXval        = 0;  %do (and save) crossvalidation
 nXvalDataSets = 20; %if do xVal, specify how many datasets to generate
 
-dat = 'square'; %'rand' points in a box, randUnique (all unique points in box), or 'cat'
+dat = 'circ'; %'rand' points in a box, randUnique (all unique points in box), or 'cat'
 nKmeans = 1000;  % run k means n times %1000
-nPoints = 5000;  %how many locations/datapoints - not used for 'randUnique', though used for xVal; 3k, 5k, 10k
-
+nPoints = 10000;  %how many locations/datapoints - not used for 'randUnique', though used for xVal; 3k, 5k, 10k
 
 %%%%
 locRange  = [0, 49];%.9; from -locRange to locRange
@@ -40,15 +39,13 @@ nCats = 2;
 sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 
 switch dat
-    case 'randUnique'
-        %all unique points in box
+    case 'randUnique'  %all unique points in square box
         load([saveDir '/randTrialsBox_trialsUnique']);
         dataPts = trialsUnique;
         % does it matter how many points there are if all the same points? e.g.
         % same if just have each trialsUnique twice/x10? - i think not
         % dataPts = repmat(dataPts,50,1);
-    case 'square'
-        %uniformly sample the box
+    case 'square' %uniformly sample the box
         dataPts = [randsample(linspace(locRange(1),locRange(2),50),nPoints,'true'); randsample(linspace(locRange(1),locRange(2),50),nPoints,'true')]';
     case 'circ'
         % Create logical image of a circle
@@ -84,62 +81,52 @@ nUpdSteps   =  30;    % update steps in the k means algorithm - 40 for random in
 
 densityPlotCentres = zeros(length(spacing),length(spacing),nKmeans,nKvals);
 
-% check
 tssekVals = nan(nKvals,nKmeans);
 indSSE1 = nan(nKvals,nKmeans);
 indSSE2 = nan(nKvals,nKmeans);
-muAllkVals = cell(1,nKvals); % check - this should work
+muAllkVals = cell(1,nKvals);
 gA = nan(nKmeans,4,nKvals);
 gW = nan(nKmeans,4,nKvals);
 
-for iKvals = 1:nKvals    
-nK=kVals(iKvals);
-muAll=nan(nK,2,nKmeans);
-tsseAll = nan(1,nKmeans);
-fprintf('nK = %d \n',nK);
-tic
-for kMeansIter=1:nKmeans
-    if mod(kMeansIter,200)==0
-        fprintf('Running k means iteration %d \n',kMeansIter);
-    end
-    mu   = nan(nK,2,nUpdSteps+1);
-    densityPlotClus = zeros(length(spacing),length(spacing),nK);
-    for i = 1:nK
-%         switch dat
-%             case 'square'
-%                 mu(:,:,1) = kmplusInit(dataPts,nK); %k means ++ initiatialization
-%             case 'randUnique'
-%                 mu(:,:,1) = kmplusInit(dataPts,nK); %k means ++ initiatialization
-%             case 'cat'
-%                 mu(i,:,1) = dataPts(randi(length(dataPts)),:);   %intiate each cluster with one data point - Forgy method
-% %                 mu(i,:,1) = round(locRange(1) + locRange(2).*rand(1,2));  %initiate clusters with a random point in the box
-%         end
-        mu(:,:,1) = kmplusInit(dataPts,nK); %k means ++ initiatialization
-    end
-    
-    %run kmeans
-    [muEnd,tsse] = kmeans_rm(mu,dataPts,nK,nUpdSteps);
-    muAll(:,:,kMeansIter) = muEnd;
-    tsseAll(kMeansIter)   = tsse;
-
-    %compute gridness
-    if ~strcmp(dat,'cat') %if cat learning, no need to compute gridness
-        for iClus=1:nK
-            clusTmp  = squeeze(round(muAll(iClus,:,kMeansIter)))';
-            for iTrlUpd=1:size(clusTmp,2)
-                densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus)+1;
-            end
+for iKvals = 1:nKvals
+    nK=kVals(iKvals);
+    muAll=nan(nK,2,nKmeans);
+    tsseAll = nan(1,nKmeans);
+    fprintf('nK = %d \n',nK);
+    tic
+    for kMeansIter=1:nKmeans
+        if mod(kMeansIter,200)==0
+            fprintf('Running k means iteration %d \n',kMeansIter);
         end
-        %make combined (grid cell) plot, smooth
-        densityPlotCentres(:,:,kMeansIter,iKvals) = sum(densityPlotClus,3); 
-        densityPlotCentresSm = imgaussfilt(densityPlotCentres(:,:,kMeansIter,iKvals),gaussSmooth);
-        aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram
-        [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-        [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
-        gA(kMeansIter,:,iKvals) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
-        gW(kMeansIter,:,iKvals) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
+        mu   = nan(nK,2,nUpdSteps+1);
+        densityPlotClus = zeros(length(spacing),length(spacing),nK);
+        for i = 1:nK
+            mu(:,:,1) = kmplusInit(dataPts,nK); %k means ++ initiatialization
+        end
+        
+        %run kmeans
+        [muEnd,tsse] = kmeans_rm(mu,dataPts,nK,nUpdSteps);
+        muAll(:,:,kMeansIter) = muEnd;
+        tsseAll(kMeansIter)   = tsse;
+        
+        %compute gridness
+        if ~strcmp(dat,'cat') %if cat learning, no need to compute gridness
+            for iClus=1:nK
+                clusTmp  = squeeze(round(muAll(iClus,:,kMeansIter)))';
+                for iTrlUpd=1:size(clusTmp,2)
+                    densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus)+1;
+                end
+            end
+            %combine/make density plot
+            densityPlotCentres(:,:,kMeansIter,iKvals) = sum(densityPlotClus,3);
+            densityPlotCentresSm = imgaussfilt(densityPlotCentres(:,:,kMeansIter,iKvals),gaussSmooth);
+            aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram
+            [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+            [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+            gA(kMeansIter,:,iKvals) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
+            gW(kMeansIter,:,iKvals) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
+        end
     end
-end
 toc
     muAllkVals{iKvals}=muAll; %need this since number of k increases; see if better way to code this
     tssekVals(iKvals,:)=tsseAll;
@@ -151,12 +138,6 @@ toc
 end
 
 if saveDat
-%     switch dat
-%         case 'randUnique'
-%             fname = [saveDir, sprintf('/kmeans_nK_%d-%d_uniquePts_%diters',kVals(1),kVals(end),nKmeans)];
-%         case 'rand'
-%             fname = [saveDir, sprintf('/kmeans_nK_%d-%d_randPts_%diters',kVals(1),kVals(end),nKmeans)];
-%     end
     fname = [saveDir, sprintf('/kmeans_nK_%d-%d_%s_nPoints%d_%diters',kVals(1),kVals(end),dat,nPoints,nKmeans)];
     save(fname,'muAllkVals','tssekVals', 'gA','gW','densityPlotCentres','indSSE1','indSSE2','kVals')
 end

@@ -71,7 +71,7 @@ dataPtsTest    = nan(nDataPtsTest,2,nXvalDataSets);
 for iDataSets = 1:nXvalDataSets
     fprintf('xVal dataset %d \n',iDataSets);
     switch dat
-        case 'rand' % draw random points in a box (uniform distribution)
+        case 'square' % draw random points in a box (uniform distribution)
             dataPtsTest(:,:,iDataSets) = [randsample(linspace(locRange(1),locRange(2),50),nDataPtsTest,'true'); randsample(linspace(locRange(1),locRange(2),50),nDataPtsTest,'true')]'; % random points in a box
         case 'randUnique' % draw random points in a box (uniform distribution)
             dataPtsTest(:,:,iDataSets) = [randsample(linspace(locRange(1),locRange(2),50),nDataPtsTest,'true'); randsample(linspace(locRange(1),locRange(2),50),nDataPtsTest,'true')]'; % random points in a box
@@ -83,17 +83,32 @@ for iDataSets = 1:nXvalDataSets
             end
             dataPtsTestTmp = reshape(datPtsGauss,nDataPtsTest,2);
             dataPtsTest(:,2,iDataSets) = dataPts(randperm(length(dataPtsTestTmp)),:);
+        case 'circ'
+            % Create logical image of a circle
+            imageSizeX = nSteps;
+            [columnsInImage, rowsInImage] = meshgrid(1:imageSizeX, 1:imageSizeX);
+            centerX = nSteps/2; centerY = nSteps/2;
+            radius = nSteps/2-1;
+            circIm = (rowsInImage - centerY).^2 ...
+                + (columnsInImage - centerX).^2 <= radius.^2;
+            circPts=[]; % find circle points in XY coords
+            for iX=1:length(circIm)
+                yVals = find(circIm(iX,:));
+                circPts = [circPts; ones(length(yVals),1)*iX, yVals'];
+            end
+            trialInd=randi(length(circPts),nTrials,1);
+            dataPtsTest=circPts(trialInd,:);
+            trialIndTest = randi(length(circPts),nTrials,1);
+            dataPtsTest  = circPts(trialIndTest,:);
     end
     
     % Crossvalidation start
     for iterI=1:nIter
         %compute distance of existing clusters with new datapoints
-%         distXval=(mu(:,1,indSSE1==iterI)-dataPtsTest(:,1,iDataSets)').^2+mu(:,2,indSSE1==iterI)-dataPtsTest(:,2,iDataSets)'.^2;% vectorised - check
         distXval=(mu(:,1,iterI)-dataPtsTest(:,1,iDataSets)').^2+mu(:,2,iterI)-dataPtsTest(:,2,iDataSets)'.^2;% vectorised - not sorted by SSE
         [indValsTest, indTest]=min(distXval,[],1); % find which clusters are points closest to
         for iClus = 1:nClus
             sseXval(iClus)=sum(sum([mu(iClus,1,iterI)-dataPtsTest(indTest==iClus,1,iDataSets), mu(iClus,2,iterI)-dataPtsTest(indTest==iClus,2,iDataSets)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
-%             sseXval(iClus)=sum(sum([(mu(iClus,1,indSSE1==iterI))-dataPtsTest(indTest==iClus,1), (mu(iClus,2,indSSE1==iterI))-dataPtsTest(indTest==iClus,2)].^2,2)); %             % old - ordered by SSE on training set
         end
         tsseXval(iterI,iDataSets)          = sum(sseXval);
         devAvgSSEXval                      = sseXval-mean(sseXval); % compute SSE per cluster (spreadoutness measure)

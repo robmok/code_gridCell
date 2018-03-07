@@ -20,8 +20,6 @@ if nargout > 4
     muAll            = nan(nClus,2,nBatch+1,nIter);
 end
 nSets                = length(trlSel);
-densityPlotClus      = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
-densityPlot          = zeros(length(spacing),length(spacing),nSets,nIter);
 clusMu               = nan(nClus,2,nSets,nIter);
 % tsseAll              = nan(nBatch+1,nIter); %not sure if this is +1 or not; not tested
 gA = nan(nSets,nIter,4);
@@ -31,6 +29,25 @@ if strcmp(dat(1:5),'trapz')
     gA = nan(nSets,nIter,4,3);
     gW = nan(nSets,nIter,4,3);
 end
+
+%set densityPlot array size
+trapzSpacing{1} = spacing(10:41);
+trapzSpacing{2} = spacing(7:44); 
+trapzSpacing{3} = spacing(4:47);
+if strcmp(dat(1:11),'trapzScaled')
+    spacingTrapz = trapzSpacing{str2double(dat(12))}; %trapzScaled1,2,3
+    a=length(spacingTrapz); %trapz length1
+    b=locRange(2)+1; %50 - trapz length2
+    h=round(((locRange(2)+1)^2)/((a+b)/2)); %trapz height (area = 50^2; like square)
+elseif strcmp(dat,'trapzKrupic2')
+    b=length(spacing)*1.5; %make smaller; since datapoints dont reach out there
+    h=length(spacing)*2;
+else
+    b=length(spacing);
+    h=length(spacing);
+end
+densityPlotClus = zeros(b,h,nClus,nSets,nIter);
+densityPlot     = zeros(b,h,nSets,nIter);
 
 for iterI = 1:nIter
     
@@ -86,6 +103,27 @@ for iterI = 1:nIter
                 dataPtsTest       = trapPts(:,trialIndTest)';
                 trialIndTest = randi(length(trapPts),nTrials,1);
                 dataPtsTest  = trapPts(:,trialIndTest)';
+            case 'trapzKrupic2'
+                 %if scale to Krupic x 2:
+                spacingTrapz = spacing(14:37); %23.7 would be right, here 24; krupic (relative): [5.26, 23.68, 50]
+                trapY=locRange(2)*2.*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
+                trapX=spacingTrapz(1):2:spacingTrapz(end)*2;
+                trapPts=[];
+                for i=1:length(trapY)
+                    trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
+                end
+                %             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1
+                % use this to select from the PAIR in trapPts
+                trialInd     = randi(length(trapPts),nTrials,1);
+                trials       = trapPts(:,trialInd)';
+                trialIndTest = randi(length(trapPts),nTrials,1);
+                trials  = trapPts(:,trialIndTest)';
+                %dataPtsTest
+                trialIndTest     = randi(length(trapPts),nTrials,1);
+                dataPtsTest       = trapPts(:,trialIndTest)';
+                trialIndTest = randi(length(trapPts),nTrials,1);
+                dataPtsTest  = trapPts(:,trialIndTest)';
+                
             case 'trapz' % not scale to Krupic: (this was trapzNorm)
                 spacingTrapz = spacing; 
                 trapY=locRange(2).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
@@ -164,13 +202,8 @@ for iterI = 1:nIter
                 trialIndTest = randi(length(trapPts),nTrials,1);
                 dataPtsTest  = trapPts(:,trialIndTest)'; 
                 
-                
             case 'trapzScaled1' % new - scale differently - now loc > 50 though
-                
-                spacingTrapz = spacing(10:41); 
-                a=length(spacingTrapz); %trapz length1
-                b=locRange(2)+1; %50 - trapz length2
-                h=round(((locRange(2)+1)^2)/((a+b)/2)); %trapz height (area = 50^2; like square)
+%                 spacingTrapz = spacing(10:41); 
                 trapY=h.*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
                 trapX=spacingTrapz;
                 trapPts=[];
@@ -188,17 +221,9 @@ for iterI = 1:nIter
                 dataPtsTest       = trapPts(:,trialIndTest)';
                 trialIndTest = randi(length(trapPts),nTrials,1);
                 dataPtsTest  = trapPts(:,trialIndTest)'; 
-                
-                %redefine densityPlot array size - 
-                densityPlotClus      = zeros(b,h,nClus,nSets,nIter);
-                densityPlot          = zeros(b,h,nSets,nIter);
-                                
+                          
             case 'trapzScaled2' % new - scale differently - now loc > 50 though
-                
-                spacingTrapz = spacing(7:44); 
-                a=length(spacingTrapz); %trapz length1
-                b=locRange(2)+1; %50 - trapz length2
-                h=round(((locRange(2)+1)^2)/((a+b)/2)); %trapz height (area = 50^2; like square)
+%                 spacingTrapz = spacing(7:44); 
                 trapY=h.*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
                 trapX=spacingTrapz;
                 trapPts=[];
@@ -216,17 +241,9 @@ for iterI = 1:nIter
                 dataPtsTest       = trapPts(:,trialIndTest)';
                 trialIndTest = randi(length(trapPts),nTrials,1);
                 dataPtsTest  = trapPts(:,trialIndTest)'; 
-                
-                %redefine densityPlot array size - 
-                densityPlotClus      = zeros(b,h,nClus,nSets,nIter);
-                densityPlot          = zeros(b,h,nSets,nIter);                
-                
+               
             case 'trapzScaled3' % new - scale differently - now loc > 50 though
-                
-                spacingTrapz = spacing(4:47); 
-                a=length(spacingTrapz); %trapz length1
-                b=locRange(2)+1; %50 - trapz length2
-                h=round(((locRange(2)+1)^2)/((a+b)/2)); %trapz height (area = 50^2; like square)
+%                 spacingTrapz = spacing(4:47); 
                 trapY=h.*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
                 trapX=spacingTrapz;
                 trapPts=[];
@@ -244,11 +261,6 @@ for iterI = 1:nIter
                 dataPtsTest       = trapPts(:,trialIndTest)';
                 trialIndTest = randi(length(trapPts),nTrials,1);
                 dataPtsTest  = trapPts(:,trialIndTest)'; 
-                
-                %redefine densityPlot array size - 
-                densityPlotClus      = zeros(b,h,nClus,nSets,nIter);
-                densityPlot          = zeros(b,h,nSets,nIter);
-                
                 
             case 'trapzSq' %probably need a more narrow trapezium!
                 trapY=locRange(2)/2.*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
@@ -309,7 +321,6 @@ for iterI = 1:nIter
         case 'rect2sq'
             trialsExpand = [randsample(spacing,nTrials*.75,'true'); randsample(spacing,nTrials*.75,'true')]'; %this doesn't work - actually, maybe this isn't a thing?
     end
-
     
     %initialise each cluster location  
     mu = nan(nClus,2,nBatch+1);

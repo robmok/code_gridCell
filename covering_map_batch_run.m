@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
- wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+%  wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -18,10 +18,11 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 % dat = 'trapz1'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
 % dat = 'trapz2';
 % dat = 'trapz3';
-% dat = 'trapzKrupic';
+dat = 'trapzKrupic';
+dat = 'trapzKrupic2';
 dat = 'trapzScaled1';
-% dat = 'trapzScaled2';
-% dat = 'trapzScaled3';
+dat = 'trapzScaled2';
+dat = 'trapzScaled3';
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
 nCats   = 2; %2 categories
@@ -35,40 +36,12 @@ clus2run = 12; %20, 30
 % clus2run = 28:2:30;
 % clus2run = [10, 12]; % [11, 14] [16, 24]; [28, 22]; 
 
-%fewer clusters run
-%love06 - circle - running
-% clus2run = [5, 6, 3];
-% clus2run = [8, 7, 4];
-
-%love01 - square - running
-% clus2run = [5, 6, 3];
-% clus2run = [8, 7, 4];
-
-
-
-%circ run
-%love01
-% clus2run = [28, 22, 10];  %[12, 26]; %note 30 failed to run before
-%new:run smaller batches
-% clus2run = [20, 26, 28, 23, 25];
-% clus2run = [12, 16, 24, 14, 30];
-
-%love06
-% clus2run = 16; 
-% clus2run = 20;
-% clus2run = 24;
-% clus2run = 18;
-% clus2run = [14, 30]; %worried 30 will kill the computer again - running
-% ok now though..
-% clus2run = [22];
-% clus2run = [23];
-% clus2run = [25];
-
-
 %trapz
-clus2run = 20; %for all trapz conditions - missed
-clus2run = [16, 22, 12, 26, 14, 18, 24, 28];
-% clus2run = [26,24, 28];
+clus2run = 26; %for all trapz conditions
+clus2run = [18, 24, 26, 28, 16, 30, 20, 22];
+
+% clus2run = [16, 22, 24, 28];
+% clus2run = [26, 18, 30, 20];
 
 % nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 
@@ -84,8 +57,6 @@ if fixBatchSize
 %     nBatches = [2500, 1250];
 %     nBatches = fliplr([20000, 30000, 100000, 200000, 500000]);
     nBatches = 2500;
-%     nBatches = [200000]; %clus22
-%     nBatches = [500000]; %clus22
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
 else % define batch size based on average number of updates per cluster

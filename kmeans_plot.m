@@ -11,33 +11,36 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 
 
-dat = 'randUnique'; %'rand' points in a box, randUnique (all unique points in box), or 'cat'
+dat = 'square'; %'square', 'circ'
 
 kVals = 3:30; 
 nKmeans = 1000;
 nPoints = 10000; 
 nKvals = length(kVals);
 
-nXvalDataSets = 20;
+nXvalDataSets = 5;%20;
 
 %load in data
-switch dat
-    case 'randUnique'
-        fname1 = [saveDir, sprintf('/kmeans_nK_%d-%d_uniquePts_%diters',kVals(1),kVals(end),nKmeans)];
-        fname2 = [saveDir, sprintf('/kmeans_nK_%d-%d_uniquePts_xVal_%ddatasets_%diters',kVals(1),kVals(end),nXvalDataSets,nKmeans)];
-    case 'rand'
-        fname1 = [saveDir, sprintf('/kmeans_nK_%d-%d_randPts_%diters',kVals(1),kVals(end),nKmeans)];
-        fname2 = [saveDir, sprintf('/kmeans_nK_%d-%d_randPts_xVal_%ddatasets_%diters',kVals(1),kVals(end),nXvalDataSets,nKmeans)];
-end
-load(fname1);
-load(fname2);
+fname=[saveDir sprintf('/kmeans_nK_3-30_%s_nPoints%d_1000iters',dat,nPoints)];
+load(fname);
 
-%merge
-% fname=[saveDir '/kmeans_nK_3-17_randPts_1000iters'];
+%load in xVal
+fname = sprintf('/kmeans_nK_%d-%d_%s_nPoints%d_%diters_xVal_%ddatasets',kVals(1),kVals(end),dat,nPoints,nKmeans,nXvalDataSets);
+load(fname);
+
+tsseXval=xVal_results.tsseXval;
+tsseSprdSdXval=xVal_results.sseSprdSdXval;
+sseSprdVarXval=xVal_results.sseSprdVarXval;
+
+
+% %merge
+% dat='circ'; %square, circ
+% nPoints=5000; %3k, 5k, 10k
+% fname=[saveDir sprintf('/kmeans_nK_3-17_%s_nPoints%d_1000iters',dat,nPoints)];
 % d1=load(fname);
-% fname=[saveDir '/kmeans_nK_18-25_randPts_1000iters'];
+% fname=[saveDir sprintf('/kmeans_nK_18-25_square_nPoints%d_1000iters',nPoints)];
 % d2=load(fname);
-% fname=[saveDir '/kmeans_nK_26-30_randPts_1000iters'];
+% fname=[saveDir sprintf('/kmeans_nK_26-30_square_nPoints%d_1000iters',nPoints)];
 % d3=load(fname);
 % densityPlotCentres  = cat(4,d1.densityPlotCentres,d2.densityPlotCentres,d3.densityPlotCentres);
 % gA                  = cat(3,d1.gA,d2.gA,d3.gA);
@@ -47,8 +50,8 @@ load(fname2);
 % kVals               = cat(2,d1.kVals,d2.kVals,d3.kVals);
 % muAllkVals          = cat(2,d1.muAllkVals,d2.muAllkVals,d3.muAllkVals);
 % tssekVals           = cat(1,d1.tssekVals,d2.tssekVals,d3.tssekVals);
-% if 0
-%     fname=[saveDir '/kmeans_nK_3-30_randPts_1000iters'];
+% if 1
+%     fname=[saveDir sprintf('/kmeans_nK_3-30_%s_nPoints%d_1000iters',dat,nPoints)];
 %     save(fname,'muAllkVals','tssekVals', 'gA','gW','densityPlotCentres','indSSE1','indSSE2','kVals')
 % end
 % 
@@ -168,7 +171,7 @@ title(sprintf('r = %.2f, p = %.5f',r,p))
 end
 
 
-iToPlot = [4:28];
+iToPlot = [3:27];
 % corr of gridness and SSE: cross-validated data
 figure; hold on;
 iPlt=0;
@@ -194,6 +197,19 @@ end
 % scatter(g(:,1,iKvals),g(:,2,iKvals))
 % 
 % end
+
+
+
+
+
+% DOUBLE CHECK THIS IS RESHAPED CORRECTLY
+[r p] = corr(reshape(g(:,1,:),numel(g(:,1,:)),1),reshape(tssekVals',numel(tssekVals),1),'type','spearman')
+figure; scatter(reshape(tssekVals',numel(tssekVals),1),reshape(g(:,1,:),numel(g(:,1,:)),1),'.')
+
+%or this way? then n.s.
+[r p] = corr(reshape(g(:,1,:),numel(g(:,1,:)),1),reshape(tssekVals,numel(tssekVals),1),'type','spearman')
+figure; scatter(reshape(tssekVals,numel(tssekVals),1),reshape(g(:,1,:),numel(g(:,1,:)),1),'.')
+
 %% Density plots for top / bottom 3
 
 iToPlot = 12;%[4, 22, 28];

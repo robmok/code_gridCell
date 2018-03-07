@@ -58,10 +58,15 @@ batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
 
 %new 5 - trapz
 fixBatchSize = 1;
-clus2run = [12:2:18 22, 26]; %24? need rerun? 28?
+clus2run = [12:2:18 22, 26]; % trapz1-3, krupic
+% clus2run = [16, 18, 20, 22, 24, 26, 28, 30]; %new - more clusters (trapzScaled1-3, krupic2)
 nTrials=2500000;
 batchSizeVals=1000;
-dat='trapzScaled1'; %trapz1, trapz2, trapz3, trapzKrupic, trapzNorm (or rename to trapz)
+dat='trapzKrupic'; %trapz1, trapz2, trapz3, trapzKrupic, trapzNorm (or rename to trapz)
+
+%krupic - cant find 6 peaks quite often; so probelmatic possibly
+% check krupic2 when done
+
 
 
 
@@ -419,17 +424,17 @@ iEps=1;
 gaussSmooth=1;
 
 
-if strcmp(dat,'trapz') || strcmp(dat,'trapzNorm')
+if strcmp(dat(1:5),'trapz')
 subPlt = [2,2];
 else
     subPlt = [1,2];
 end
 
 %set
-iClus2run = 5;
+iClus2run = 3;
 iBvals    = 1;
 
-iters2plot = 2:10;
+iters2plot = 15:25;
 
 fprintf(sprintf('clus %d batchSizeVals %d\n',clus2run(iClus2run),batchSizeVals(iBvals)));
 for iterI = iters2plot
@@ -446,11 +451,11 @@ for iterI = iters2plot
     
     peaksA(iClus2run,iBvals,iterI,1)=length(gdataA.near_peaks);
     
-    if strcmp(dat,'trapz') || strcmp(dat,'trapzNorm')
-        subplot(subPlt(1),subPlt(2),3)
+    if strcmp(dat(1:5),'trapz')
+        subplot(subPlt(1),subPlt(2),3);
         aCorrMap = ndautoCORR(densityPlotCentresSm(:,1:size(densityPlotAll,1)/2));
         [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
-        subplot(subPlt(1),subPlt(2),4)
+        subplot(subPlt(1),subPlt(2),4);
         aCorrMap = ndautoCORR(densityPlotCentresSm(:,size(densityPlotAll,1)/2+1:end));
         [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
         
