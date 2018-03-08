@@ -24,9 +24,9 @@ saveDat = 1;
 doXval        = 0;  %do (and save) crossvalidation
 nXvalDataSets = 20; %if do xVal, specify how many datasets to generate
 
-dat = 'circ'; %'rand' points in a box, randUnique (all unique points in box), or 'cat'
+dat = 'square'; %'rand' points in a box, randUnique (all unique points in box), or 'cat'
 nKmeans = 1000;  % run k means n times %1000
-nPoints = 10000;  %how many locations/datapoints - not used for 'randUnique', though used for xVal; 3k, 5k, 10k
+nPoints = 3000;  %how many locations/datapoints - not used for 'randUnique', though used for xVal; 3k, 5k, 10k
 
 %%%%
 locRange  = [0, 49];%.9; from -locRange to locRange
@@ -139,6 +139,7 @@ end
 
 if saveDat
     fname = [saveDir, sprintf('/kmeans_nK_%d-%d_%s_nPoints%d_%diters',kVals(1),kVals(end),dat,nPoints,nKmeans)];
+    cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
     save(fname,'muAllkVals','tssekVals', 'gA','gW','densityPlotCentres','indSSE1','indSSE2','kVals')
 end
 
@@ -209,13 +210,7 @@ for iDataSets = 1:nXvalDataSets
     
 end
 
-if saveDat
-%     switch dat
-%         case 'randUnique'
-%             fname = [saveDir, sprintf('/kmeans_nK_%d-%d_uniquePts_xVal_%ddatasets_%diters',kVals(1),kVals(end),nXvalDataSets,nKmeans)];
-%         case 'rand'
-%             fname = [saveDir, sprintf('/kmeans_nK_%d-%d_randPts_xVal_%ddatasets_%diters',kVals(1),kVals(end),nXvalDataSets,nKmeans)];
-%     end
+if saveDat && doXval
     fname = [saveDir, sprintf('/kmeans_nK_%d-%d_%s_nPoints%d_xVal_%ddatasets_%diters',kVals(1),kVals(end),dat,nPoints,nXvalDataSets,nKmeans)];
 
     save(fname,'tsseXval','kVals')

@@ -15,7 +15,7 @@ dat = 'square'; %'square', 'circ'
 
 kVals = 3:30; 
 nKmeans = 1000;
-nPoints = 10000; 
+nPoints = 3000; 
 nKvals = length(kVals);
 
 nXvalDataSets = 5;%20;
@@ -25,7 +25,7 @@ fname=[saveDir sprintf('/kmeans_nK_3-30_%s_nPoints%d_1000iters',dat,nPoints)];
 load(fname);
 
 %load in xVal
-fname = sprintf('/kmeans_nK_%d-%d_%s_nPoints%d_%diters_xVal_%ddatasets',kVals(1),kVals(end),dat,nPoints,nKmeans,nXvalDataSets);
+fname = [saveDir sprintf('/kmeans_nK_%d-%d_%s_nPoints%d_%diters_xVal_%ddatasets',kVals(1),kVals(end),dat,nPoints,nKmeans,nXvalDataSets)];
 load(fname);
 
 tsseXval=xVal_results.tsseXval;
@@ -151,64 +151,83 @@ for iKvals = iToPlot
     % end
 end
 
-%scatter plots - corr of gridness and SSE: original data
-for iKvals = iToPlot
-figure;
-% [r, p] = corr(g(:,1,iKvals),(tssekVals(iKvals,:)'),'type','pearson');
-[r p] = corr(g(:,1,iKvals),(tssekVals(iKvals,:)'),'type','spearman');
-scatter(g(:,1,iKvals),(tssekVals(iKvals,:)'),'.');
-title(sprintf('r = %.2f, p = %.5f',r,p))
-end
+% %scatter plots - corr of gridness and SSE: original data
+% for iKvals = iToPlot
+% figure;
+% % [r, p] = corr(g(:,1,iKvals),(tssekVals(iKvals,:)'),'type','pearson');
+% [r p] = corr(g(:,1,iKvals),(tssekVals(iKvals,:)'),'type','spearman');
+% scatter(g(:,1,iKvals),(tssekVals(iKvals,:)'),'.');
+% title(sprintf('r = %.2f, p = %.5f',r,p))
+% end
+% 
+% % corr of gridness and SSE: cross-validated data
+% for iKvals = iToPlot
+% figure;
+% % [r, p] = corr(g(:,1,iKvals),nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),'type','pearson');
+% [r p] = corr(g(:,1,iKvals),nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),'type','spearman');
+% % scatter(g(:,1,iKvals),nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),'.');
+% scatter(nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),g(:,1,iKvals),'.');
+% title(sprintf('r = %.2f, p = %.5f',r,p))
+% end
 
-% corr of gridness and SSE: cross-validated data
-for iKvals = iToPlot
-figure;
-% [r, p] = corr(g(:,1,iKvals),nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),'type','pearson');
-[r p] = corr(g(:,1,iKvals),nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),'type','spearman');
-% scatter(g(:,1,iKvals),nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),'.');
-scatter(nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),g(:,1,iKvals),'.');
-title(sprintf('r = %.2f, p = %.5f',r,p))
-end
 
-
-iToPlot = [3:27];
-% corr of gridness and SSE: cross-validated data
+% corr of gridness and SSE: original data
+iToPlot = [1:28];
 figure; hold on;
 iPlt=0;
 for iKvals = iToPlot
     iPlt=iPlt+1;
-    subplot(5,5,iPlt)
-    % [r, p] = corr(g(:,1,iKvals),nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),'type','pearson');
-    [r p] = corr(g(:,1,iKvals),nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),'type','spearman');
-    % scatter(g(:,1,iKvals),nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),'.');
-    scatter(nanmean(tsseXval(indSSE1(iKvals,:),:,iKvals),2),g(:,1,iKvals),'.');
-    title(sprintf('r = %.2f, p = %.5f',r,p))
+    subplot(6,5,iPlt)
+    [r p] = corr(g(:,1,iKvals),tssekVals(iKvals,:)','type','spearman');
+    r1(iKvals)=r;
+    p1(iKvals)=p;
+    p1corr(iKvals)=p*nKvals;
+    scatter(tssekVals(iKvals,:)',g(:,1,iKvals),'.');
+    title(sprintf('r = %.2f, p (crcted) = %.5f',r,p*nKvals))
 end
+
+
+% corr of gridness and SSE: cross-validated data
+iToPlot = [1:28];
+figure; hold on;
+iPlt=0;
+for iKvals = iToPlot
+    iPlt=iPlt+1;
+    subplot(6,5,iPlt)
+    [r p] = corr(g(:,1,iKvals),nanmean(tsseXval(:,:,iKvals),2),'type','spearman');
+    r1(iKvals)=r;
+    p1(iKvals)=p;
+    p1corr(iKvals)=p*nKvals;
+    scatter(nanmean(tsseXval(:,:,iKvals),2),g(:,1,iKvals),'.');
+    title(sprintf('r = %.2f, p (crcted) = %.5f',r,p*nKvals))
+end
+
+
 
 
 % are 30/60 degree orientations --> better gridness? nk=3 suggests so.
 % others not sure; most orientations at 0, 90 and 40/50.. (3 peaks in the
 % hist). just need more iters to get more 30/60 degree grids then will get
 % better gridness scores?
-% for iKvals = iToPlot
-% figure;
-% 
-% % hist(g(:,2,iKvals),50);
-% scatter(g(:,1,iKvals),g(:,2,iKvals))
-% 
-% end
+figure; hold on;
+iPlt=0;
+for iKvals = iToPlot
+    iPlt=iPlt+1;
+    subplot(6,5,iPlt)
+    % hist(g(:,2,iKvals),50);
+    scatter(g(:,1,iKvals),g(:,2,iKvals),'.')
+end
 
 
 
+clus2use=2:28;
 
+[r p] = corr(reshape(squeeze(g(:,1,clus2use)),numel(g(:,1,clus2use)),1),reshape(tssekVals(clus2use,:)',numel(tssekVals(clus2use,:)),1),'type','spearman')
+figure; scatter(reshape(tssekVals(clus2use,:)',numel(tssekVals(clus2use,:)),1),reshape(squeeze(g(:,1,clus2use)),numel(g(:,1,clus2use)),1),'.')
 
-% DOUBLE CHECK THIS IS RESHAPED CORRECTLY
-[r p] = corr(reshape(g(:,1,:),numel(g(:,1,:)),1),reshape(tssekVals',numel(tssekVals),1),'type','spearman')
-figure; scatter(reshape(tssekVals',numel(tssekVals),1),reshape(g(:,1,:),numel(g(:,1,:)),1),'.')
-
-%or this way? then n.s.
-[r p] = corr(reshape(g(:,1,:),numel(g(:,1,:)),1),reshape(tssekVals,numel(tssekVals),1),'type','spearman')
-figure; scatter(reshape(tssekVals,numel(tssekVals),1),reshape(g(:,1,:),numel(g(:,1,:)),1),'.')
+%multiply by nK 
+[r p] = corr(reshape(squeeze(g(:,1,clus2use)),numel(g(:,1,clus2use)),1),reshape(tssekVals(clus2use,:)'.*kVals(clus2use),numel(tssekVals(clus2use,:)),1),'type','spearman')
+figure; scatter(reshape(tssekVals(clus2use,:)'.*kVals(clus2use),numel(tssekVals(clus2use,:)),1),reshape(squeeze(g(:,1,clus2use)),numel(g(:,1,clus2use)),1),'.')
 
 %% Density plots for top / bottom 3
 
