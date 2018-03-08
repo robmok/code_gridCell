@@ -34,14 +34,16 @@ end
 trapzSpacing{1} = spacing(10:41);
 trapzSpacing{2} = spacing(7:44); 
 trapzSpacing{3} = spacing(4:47);
-if strcmp(dat(1:11),'trapzScaled')
-    spacingTrapz = trapzSpacing{str2double(dat(12))}; %trapzScaled1,2,3
-    a=length(spacingTrapz); %trapz length1
-    b=locRange(2)+1; %50 - trapz length2
-    h=round(((locRange(2)+1)^2)/((a+b)/2)); %trapz height (area = 50^2; like square)
-elseif strcmp(dat,'trapzKrupic2')
-    b=length(spacing)*1.5; %make smaller; since datapoints dont reach out there
-    h=length(spacing)*2;
+if strcmp(dat(1:5),'trapz')
+    if strcmp(dat(1:11),'trapzScaled')
+        spacingTrapz = trapzSpacing{str2double(dat(12))}; %trapzScaled1,2,3
+        a=length(spacingTrapz); %trapz length1
+        b=locRange(2)+1; %50 - trapz length2
+        h=round(((locRange(2)+1)^2)/((a+b)/2)); %trapz height (area = 50^2; like square)
+    elseif strcmp(dat,'trapzKrupic2')
+        b=length(spacing)*1.5; %make smaller; since datapoints dont reach out there
+        h=length(spacing)*2;
+    end
 else
     b=length(spacing);
     h=length(spacing);
@@ -78,7 +80,6 @@ for iterI = 1:nIter
                 dataPtsTest = dataPtsTest(randperm(length(dataPtsTest)),:);
                 
             case 'rect'
-%                 trials = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)*2,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
                 trials      = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)/1.5,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
                 dataPtsTest = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)/1.5,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
             case 'trapzKrupic'
@@ -307,7 +308,7 @@ for iterI = 1:nIter
                 trials  = circPts(trialIndTest,:);
                 %dataPtsTest
                 trialIndTest     = randi(length(circPts),nTrials,1);
-                dataPtsTest      = circPts(trialIndTest,:);
+%                 dataPtsTest      = circPts(trialIndTest,:);
                 trialIndTest = randi(length(circPts),nTrials,1);
                 dataPtsTest  = circPts(trialIndTest,:);
         end
@@ -381,7 +382,7 @@ for iterI = 1:nIter
             %deterministic update
 %             closestC=find(min(dist2Clus)==dist2Clus);
 
-            %deterministic update
+            %deterministic update - batch; save closestC for each trial
             %%%% -need to find min dist cluster for each trial; better way?
             %%%% / vectorize?
             closestC = nan(1,batchSize);

@@ -94,6 +94,7 @@ for iDataSets = 1:nXvalDataSets
             dataPtsTest(:,2,iDataSets) = dataPts(randperm(length(dataPtsTestTmp)),:);
         case 'circ'
             % Create logical image of a circle
+            nSteps = length(linspace(locRange(1),locRange(2),locRange(2)+1));
             imageSizeX = nSteps;
             [columnsInImage, rowsInImage] = meshgrid(1:imageSizeX, 1:imageSizeX);
             centerX = nSteps/2; centerY = nSteps/2;
@@ -105,10 +106,10 @@ for iDataSets = 1:nXvalDataSets
                 yVals = find(circIm(iX,:));
                 circPts = [circPts; ones(length(yVals),1)*iX, yVals'];
             end
-            trialInd=randi(length(circPts),nTrials,1);
-            dataPtsTest=circPts(trialInd,:);
-            trialIndTest = randi(length(circPts),nTrials,1);
-            dataPtsTest  = circPts(trialIndTest,:);
+            trialInd=randi(length(circPts),nDataPtsTest,1);
+%             dataPtsTest=circPts(trialInd,:);
+            trialIndTest = randi(length(circPts),nDataPtsTest,1);
+            dataPtsTest(:,:,iDataSets)  = circPts(trialIndTest,:);
     end
     
     % Crossvalidation start

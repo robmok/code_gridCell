@@ -13,7 +13,7 @@ locRange = [0, 49]; %box dims
 %load
 kVals = 3:30; 
 nKvals = length(kVals);
-dat='square'; %square, circ
+dat='circ'; %square, circ
 nKmeans = 1000;
 nPoints = 10000; %3k, 5k, 10k
 fname = [saveDir, sprintf('/kmeans_nK_%d-%d_%s_nPoints%d_%diters',kVals(1),kVals(end),dat,nPoints,nKmeans)];
