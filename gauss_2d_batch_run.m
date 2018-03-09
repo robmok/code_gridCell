@@ -3,7 +3,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -25,6 +25,8 @@ clus2run = 20; %[10 20]; %20, 30
 clus2run = [20 18];
 clus2run = [16 28];
 clus2run = [24 14];
+%love06 circ
+% clus2run = [20, 16, 24]; %need to run the other 3 if want (if sq runs through)
 
 nTrials = 2500000; 
 
@@ -107,8 +109,26 @@ switch dat
         trials = reshape(datPtsGauss,nTrials,2);
         trials = trials(randperm(length(trials)),:);
         trialsUnique=[];
+    case 'circ'
+        % Create logical image of a circle
+        imageSizeX = nSteps;
+        [columnsInImage, rowsInImage] = meshgrid(1:imageSizeX, 1:imageSizeX);
+        centerX = nSteps/2; centerY = nSteps/2;
+        radius = nSteps/2-1;
+        circIm = (rowsInImage - centerY).^2 ...
+            + (columnsInImage - centerX).^2 <= radius.^2;
+        circPts=[]; % find circle points in XY coords
+        for iX=1:length(circIm)
+            yVals = find(circIm(iX,:));
+            circPts = [circPts; ones(length(yVals),1)*iX, yVals'];
+        end
+        trialInd=randi(length(circPts),nTrials,1);
+        trials=circPts(trialInd,:);
+        %dataPtsTest
+        trialIndTest = randi(length(circPts),nTrials,1);
+        dataPtsTest  = circPts(trialIndTest,:);
 end
-    
+
 
 tic
 if ~neigh %separating neigh and stoch/momentum params
@@ -145,7 +165,7 @@ if ~neigh %separating neigh and stoch/momentum params
                                 fprintf('Running %s, nClus=%d, epsMu=%d, batchSize=%d\n',dat,nClus,epsMuOrig10000,batchSize)
                                 [densityPlot,clusMu,gA,gW,rSeed,muAll] = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat,weightEpsSSE);
 %                                 fname = [saveDir, sprintf('/gauss_batch_%dclus__%dsigma_%dktrls_eps%d_alpha%d_stype%d_cVal%d_sseW%d_batchSiz%d_%diters',nClus,sigmaGauss100,round(nTrials/1000),epsMuOrig10000,alpha10,stochasticType,c1m,weightEpsSSE,round(batchSize),nIter)];
-                                fname = [saveDir, sprintf('/gauss_batch_%dclus_%dsigma_%dktrls_eps%d_batchSiz%d_%diters',nClus,sigmaGauss100,round(nTrials/1000),epsMuOrig10000,round(batchSize),nIter)];                                
+                                fname = [saveDir, sprintf('/gauss_batch_%dclus_%dsigma_%dktrls_eps%d_batchSiz%d_%diters_%s',nClus,sigmaGauss100,round(nTrials/1000),epsMuOrig10000,round(batchSize),nIter,dat)];                                
                                 timeTaken=toc;
                                 if saveDat
                                     if warpBox
