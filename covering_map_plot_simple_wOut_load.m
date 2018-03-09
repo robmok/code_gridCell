@@ -81,8 +81,8 @@ end
 %% newest gridness
 
 gaussSmooth=1;
-for iSet=6
-for iterI = 1:3%:10
+for iSet=1:6
+for iterI = 1%:3%:10
     
 densityPlotCentresSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
 
@@ -206,7 +206,7 @@ end
 
 nClus = size(muAll,1);
 
-iterI = 2;
+iterI = 1;
 colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
 
 figure;
@@ -218,7 +218,7 @@ for iTrl = 1:nTrials
 %     end
 %     xlim(locRange); ylim(locRange);
 
-    if mod(iTrl,5)==0 %plot centers after x trials
+    if mod(iTrl,10)==0 %plot centers after x trials
         for i=1:nClus
             plot(squeeze(muAll(i,1,iTrl,iterI)),squeeze(muAll(i,2,iTrl,iterI)),'.','Color',colors(i,:),'MarkerSize',10); hold on; %make marker size bigger - larger/smoother firing field!
         end

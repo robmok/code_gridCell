@@ -1,4 +1,4 @@
-function [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,muAll] = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,plotGrids,dat,weightEpsSSE)
+function [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,muAll] = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat,weightEpsSSE)
 
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
 stepSize=diff(spacing(1:2));
@@ -184,10 +184,11 @@ for iterI = 1:nIter
 
     %%
 
-    updatedC    =   nan(nTrials,1);
-    deltaMu     =    zeros(nClus,2,nTrials);    
-    clusUpdates =   zeros(nClus,2); %acutally starting at 0 is OK, since there was no momentum from last trial
-    act         =   nan(nClus,batchSize);
+    updatedC     =   nan(nTrials,1);
+    deltaMu      =   zeros(nClus,2,nTrials);  
+    deltaMuBatch =   zeros(nClus,2,batchSize);  %new batch thing
+    clusUpdates  =   zeros(nClus,2); %acutally starting at 0 is OK, since there was no momentum from last trial
+    act          =   nan(nClus,batchSize);
     
     tsse            = nan(nTrials,1);
 %     stdAcrossClus   = nan(nTrials,1);
@@ -202,7 +203,7 @@ for iterI = 1:nIter
         trls2Upd = trials(batchInd,:); %trials to use this batch
 
         epsMuVec = zeros(nClus,1);
-            
+
 %             %if change size of box half way
 %             if iTrl == nTrials*.75 && warpBox
 %                 trials(nTrials*.75+1:end,:) = trialsExpand;
@@ -241,7 +242,6 @@ for iterI = 1:nIter
 %                 closestC = randsample(closestC,1);
 %             end
 
-
             %deterministic update - batch; save closestC for each trial
             closestC = nan(1,batchSize);
             for iTrlBatch = 1:batchSize
@@ -253,7 +253,36 @@ for iterI = 1:nIter
                 end
                 %save the activation for each trial to update
                 actUpd(closestC(iTrlBatch),iTrlBatch)=mvnpdf(trls2Upd(iTrlBatch,:),mu(closestC(iTrlBatch),:,iBatch),eye(2)*sigmaGauss); % save only the winner
+                
+                
+                % hmm, better way?
+%                 fbk=zeros(nClus,1); %put above later
+%                 fbk(closestC(iTrlBatch))=1;
+                epsMuVec(closestC(iTrlBatch))=epsMuOrig;
+                
+                % so this does it for each trial, set epsMuOrig, fbk at 1
+                % - if want to use vector, need to note which clusters
+                % might not have an update (unlikely but useful; esp for
+                % cat learning) and put epsMuVec to 0 on those batches,
+                % fdbck to 0 [though if have epsmuvec, no need bother?
+                deltaMuBatch(closestC(iTrlBatch),1,iTrlBatch)=fitDeltaMuX(epsMuOrig,trls2Upd(iTrlBatch,1)-mu(closestC(iTrlBatch),1,iBatch),trls2Upd(iTrlBatch,2)-mu(closestC(iTrlBatch),2,iBatch),1,actUpd(closestC(iTrlBatch),iTrlBatch));
+                deltaMuBatch(closestC(iTrlBatch),2,iTrlBatch)=fitDeltaMuY(epsMuOrig,trls2Upd(iTrlBatch,1)-mu(closestC(iTrlBatch),1,iBatch),trls2Upd(iTrlBatch,2)-mu(closestC(iTrlBatch),2,iBatch),1,actUpd(closestC(iTrlBatch),iTrlBatch));
+                
+
             end
+            deltaMuBatchAll(:,:,:,iBatch) = deltaMuBatch;
+            actUpdAll(:,:,iBatch) = actUpd;
+            
+            % and then can use this to update:
+%             - mean(squeeze(deltaMuBatch(1,1,:))) 
+%             - mean(squeeze(deltaMuBatch(1,2,:)))
+
+
+
+
+
+
+
             
             %but need to also get deltaMuX and deltaMuY for each of these
             %trials; put this above? if so will be computing trial by trial
@@ -292,13 +321,13 @@ for iterI = 1:nIter
 %             actUpd(closestC,iTrl) =act(closestC,iTrl); % save only the winner
 
          
-            fbk=zeros(nClus,1); %put above later
-            fbk(closestC)=1;
-            
-            % compute deltaMu first, then add the momentum value
-            deltaMuX=fitDeltaMuX(epsMuVec,trials(iTrl,1)-mu(:,1,iTrl),trials(iTrl,2)-mu(:,2,iTrl),fbk,act(:,iTrl));
-            deltaMuY=fitDeltaMuY(epsMuVec,trials(iTrl,1)-mu(:,1,iTrl),trials(iTrl,2)-mu(:,2,iTrl),fbk,act(:,iTrl));
-            
+%             fbk=zeros(nClus,1); %put above later
+%             fbk(closestC)=1;
+%             
+%             % compute deltaMu first, then add the momentum value
+%             deltaMuX=fitDeltaMuX(epsMuVec,trials(iTrl,1)-mu(:,1,iTrl),trials(iTrl,2)-mu(:,2,iTrl),fbk,act(:,iTrl));
+%             deltaMuY=fitDeltaMuY(epsMuVec,trials(iTrl,1)-mu(:,1,iTrl),trials(iTrl,2)-mu(:,2,iTrl),fbk,act(:,iTrl));
+%             
                 
 
             
@@ -318,7 +347,7 @@ for iterI = 1:nIter
 % %             epsMuVec(closestC)=epsMuOrig;
             
             %weight learning rate by sse
-            epsMuVec(closestC) = epsMuOrig*sseW(iTrl); %weight learning rate by prop SSE reduce from start
+%             epsMuVec(closestC) = epsMuOrig*sseW(iTrl); %weight learning rate by prop SSE reduce from start
 %             epsMuVec(closestC) = epsMuOrig*spreadW(iTrl); %weight learning rate by prop spreadout-ness reduced from start
 %             epsMuVec(closestC) = epsMuOrig*spreadVarW(iTrl); %weight learning rate by prop spreadout-ness reduced from start
 %             epsMuVec(closestC) = epsMuOrig*sseW(iTrl)*spreadW(iTrl); %weight learning rate by both the above
@@ -335,24 +364,23 @@ for iterI = 1:nIter
             %%% copied over 
                         
             %learning rate
-            epsMu = epsMuOrig; % or use epsMuAll above?
+%             epsMu = epsMuOrig; % or use epsMuAll above?
             
             
             %batch update - save all updates for each cluster for X trials, update it, then again
             % - goes through each cluster, compute distances, average, then update
-            for iClus = 1:nClus
-                updInd = closestC==iClus;
-                if any(nnz(updInd)) %if not, no need to update
-                deltaMu(iClus,1,iBatch) = nanmean(epsMu*(trls2Upd(updInd,1)-mu(iClus,1,iBatch)));
-                deltaMu(iClus,2,iBatch) = nanmean(epsMu*(trls2Upd(updInd,2)-mu(iClus,2,iBatch)));
-                end
-            end
+%             for iClus = 1:nClus
+%                 updInd = closestC==iClus;
+%                 if any(nnz(updInd)) %if not, no need to update
+%                 deltaMu(iClus,1,iBatch) = nanmean(epsMu*(trls2Upd(updInd,1)-mu(iClus,1,iBatch)));
+%                 deltaMu(iClus,2,iBatch) = nanmean(epsMu*(trls2Upd(updInd,2)-mu(iClus,2,iBatch)));
+%                 end
+%             end
 
             % update mean estimates
-            mu(:,1,iBatch+1) = mu(:,1,iBatch) + deltaMu(:,1,iBatch);
-            mu(:,2,iBatch+1) = mu(:,2,iBatch) + deltaMu(:,2,iBatch);
-            
-                      
+            mu(:,1,iBatch+1) = mu(:,1,iBatch) + mean(squeeze(deltaMuBatch(:,1,:)),2);
+            mu(:,2,iBatch+1) = mu(:,2,iBatch) + mean(squeeze(deltaMuBatch(:,2,:)),2);
+                                  
             %%%%
             
             
@@ -365,24 +393,24 @@ for iterI = 1:nIter
 %             
 %             clusUpdates(closestC,1)=deltaMu(closestC,1,iTrl);
 %             clusUpdates(closestC,2)=deltaMu(closestC,2,iTrl);
-
-            deltaMuVec = zeros(nClus,2);
-            deltaMuVec(closestC,:) = deltaMu(closestC,:,iTrl); % only update winner            
-            
-            % update mean estimates
-            if iTrl~=nTrials %no need to update for last trial +1)
-                mu(:,1,iTrl+1) = mu(:,1,iTrl) + deltaMuVec(:,1);
-                mu(:,2,iTrl+1) = mu(:,2,iTrl) + deltaMuVec(:,2);
-                %log updated value only
-                % don't want to save the cluster positions when they don't move
-                % but need to keep track of the last cluster position
-                % - have two variables, one with all, one without
-                % - the one without; this is with nans just remove
-                % all the nans then put into densityPlotClus).
-                muUpd(closestC,1,iTrl+1)=mu(closestC,1,iTrl+1);
-                muUpd(closestC,2,iTrl+1)=mu(closestC,2,iTrl+1);
-            end
-            
+% 
+%             deltaMuVec = zeros(nClus,2);
+%             deltaMuVec(closestC,:) = deltaMu(closestC,:,iTrl); % only update winner            
+%             
+%             % update mean estimates
+%             if iTrl~=nTrials %no need to update for last trial +1)
+%                 mu(:,1,iTrl+1) = mu(:,1,iTrl) + deltaMuVec(:,1);
+%                 mu(:,2,iTrl+1) = mu(:,2,iTrl) + deltaMuVec(:,2);
+%                 %log updated value only
+%                 % don't want to save the cluster positions when they don't move
+%                 % but need to keep track of the last cluster position
+%                 % - have two variables, one with all, one without
+%                 % - the one without; this is with nans just remove
+%                 % all the nans then put into densityPlotClus).
+%                 muUpd(closestC,1,iTrl+1)=mu(closestC,1,iTrl+1);
+%                 muUpd(closestC,2,iTrl+1)=mu(closestC,2,iTrl+1);
+%             end
+%             
             
             % compute sse on each trial with respect to 'all trials'
             % trials - since values are all points in the box, no need to use a
@@ -420,12 +448,15 @@ for iterI = 1:nIter
             
     end
     muAll(:,:,:,iterI) = mu;
-    actAll(:,:,iterI)  = actUpd;
+    actAll(:,:,iterI)  = reshape(actUpdAll,nClus,nTrials); %save trial-by-trial act over blocks, here unrolling it
     
     for iSet = 1:nSets
         %compute density map
-        clus = round(muUpd(:,:,fromTrlI(iSet):toTrlN(iSet)));
-        actClus = actAll(:,fromTrlI(iSet)-1:toTrlN(iSet)-1,iterI); % NB: -1 trial - this is to match up with the 'updated' location on the next trial indexed by clus - if just use act, might want to match simply to mu itself
+%         clus = round(muUpd(:,:,fromTrlI(iSet):toTrlN(iSet)));
+        clus = round(mu(:,:,trlSel(iSet)));
+%         actClus = actAll(:,fromTrlI(iSet)-1:toTrlN(iSet)-1,iterI); % NB: -1 trial - this is to match up with the 'updated' location on the next trial indexed by clus - if just use act, might want to match simply to mu itself
+        actClus = actAll(:,trlSel(iSet),iterI); 
+        
         ind=clus<=0; clus(ind)=1;  % indices <= 0 make to 1
         ind=clus>50; clus(ind)=50; % if overshoot out of the box, make it 50
         for iClus=1:nClus
@@ -438,6 +469,21 @@ for iterI = 1:nIter
             for iTrlUpd=1:size(clusTmp,2)
                 densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet,iterI)     = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet, iterI)   + 1;
                 densityPlotClusAct(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet,iterI)  = densityPlotClusAct(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet,iterI) + actTmp(iTrlUpd);
+            end
+        end
+        
+        %compute density map
+        clus = round(mu(:,:,trlSel(iSet)));
+        ind=clus<=0; clus(ind)=1; %indices <= 0 make to 1
+        for iClus=1:nClus
+            ntNanInd = squeeze(~isnan(clus(iClus,1,:)));
+            clusTmp = []; %clear else dimensions change over clus/sets
+            clusTmp(1,:) = squeeze(clus(iClus,1,ntNanInd)); %split into two to keep array dim constant - when only 1 location, the array flips.
+            clusTmp(2,:) = squeeze(clus(iClus,2,ntNanInd));
+            %             clusTmp = squeeze(clus(iClus,:,ntNanInd));
+            nTrlsUpd(iClus,iSet,iterI)=nnz(ntNanInd);
+            for iTrlUpd=1:size(clusTmp,2)
+                densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet,iterI) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet, iterI)+1;
             end
         end
                 
@@ -542,7 +588,7 @@ for iterI = 1:nIter
         
 
         %save average cluster positions (to compare with above)
-        muAvg(:,:,iSet,iterI) = mean(mu(:,:,fromTrlI(iSet):toTrlN(iSet)),3);
+        muAvg(:,:,iSet,iterI) = mean(mu(:,:,trlSel(iSet)),3);
     end    
 end
 end

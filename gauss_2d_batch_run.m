@@ -2,7 +2,7 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -24,12 +24,12 @@ clus2run = 20; %[10 20]; %20, 30
 % nTrials = 40000; %how many locations in the box / trials - 2.5k ; 5k if reset
 
 %batch
-nTrials = 2500000; 
+nTrials = 2500000./2; 
 %batch size
 fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
 
 
-nBatches = 2500;
+nBatches = 1250; %2500
 batchSizeVals = nTrials./nBatches;
 nBvals = length(batchSizeVals); %length(avgBatchUpdate)
  
@@ -65,7 +65,7 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 
 %.05 is too fast .02, .025, 0.35 too fast but can test
 epsMuVals = [0.0025, 0.005, .01, .02, .025]; 
-epsMuVals = .01; 
+epsMuVals = .0075; %atm .01 works well-ish but a bit fast, could be slower
 
 %weight learning rate by SSE 
 weightEpsSSE = 0; %1 or 0
@@ -157,7 +157,7 @@ if ~neigh %separating neigh and stoch/momentum params
                                 alpha10 = alpha*10; %for saving simulations
                                 fprintf('Running alphaVal %0.2f\n',alpha);
                                 tic
-                                [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,muAll] = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,trialsUnique,stochasticType,c,plotGrids,dat,weightEpsSSE);
+                                [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,muAll] = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat,weightEpsSSE);
                                 fname = [saveDir, sprintf('/covering_map_dat_gauss_%dclus_%dsigma_%dtrls_eps%d_alpha%d_stype%d_cVal%d_sseW%d_%diters',nClus,sigmaGauss100,nTrials,epsMuOrig10000,alpha10,stochasticType,c1m,weightEpsSSE,nIter)];
                                 timeTaken=toc;
                                 if saveDat
