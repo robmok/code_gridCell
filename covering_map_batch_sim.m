@@ -271,11 +271,7 @@ for iterI = 1:nIter
                 end
                 trialInd=randi(length(circPts),nTrials,1);
                 trials=circPts(trialInd,:);
-                trialIndTest = randi(length(circPts),nTrials,1);
-                trials  = circPts(trialIndTest,:);
                 %dataPtsTest
-                trialIndTest     = randi(length(circPts),nTrials,1);
-%                 dataPtsTest      = circPts(trialIndTest,:);
                 trialIndTest = randi(length(circPts),nTrials,1);
                 dataPtsTest  = circPts(trialIndTest,:);
         end
