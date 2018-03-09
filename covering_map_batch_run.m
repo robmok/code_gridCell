@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-%  wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+  wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -23,7 +23,7 @@ dat = 'trapzKrupic2';
 dat = 'trapzKrupic3';
 % dat = 'trapzScaled1';
 % dat = 'trapzScaled2';
-% dat = 'trapzScaled3';
+ dat = 'trapzScaled3';
 % dat = 'trapzNorm';%not scaled, fit into square
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
@@ -40,6 +40,8 @@ clus2run = 12; %20, 30
 
 %trapz
 clus2run = [18, 24, 26, 28, 16, 30, 20, 22];
+%clus2run = [18, 24, 26, 28];
+%clus2run = [16, 30, 20, 22];
 % clus2run = [20, 30, 14]; %trapznorm
 
 % nTrials = 5000000; %how many locations in the box / trials 
