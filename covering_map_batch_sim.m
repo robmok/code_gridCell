@@ -34,7 +34,7 @@ end
 trapzSpacing{1} = spacing(10:41);
 trapzSpacing{2} = spacing(7:44); 
 trapzSpacing{3} = spacing(4:47);
-if strcmp(dat(1:5),'trapz')
+if strcmp(dat(1:5),'trapz') && length(dat)>10
     if strcmp(dat(1:11),'trapzScaled')
         spacingTrapz = trapzSpacing{str2double(dat(12))}; %trapzScaled1,2,3
         a=length(spacingTrapz); %trapz length1
@@ -43,6 +43,9 @@ if strcmp(dat(1:5),'trapz')
     elseif strcmp(dat,'trapzKrupic2')
         b=length(spacing)*1.5; %make smaller; since datapoints dont reach out there
         h=length(spacing)*2;
+    elseif strcmp(dat,'trapzKrupic3')
+        b=length(spacing)*2; %make smaller; since datapoints dont reach out there
+        h=length(spacing)*3;
     end
 else
     b=length(spacing);
@@ -97,11 +100,7 @@ for iterI = 1:nIter
                 % use this to select from the PAIR in trapPts
                 trialInd     = randi(length(trapPts),nTrials,1);
                 trials       = trapPts(:,trialInd)';
-                trialIndTest = randi(length(trapPts),nTrials,1);
-                trials  = trapPts(:,trialIndTest)';
                 %dataPtsTest
-                trialIndTest     = randi(length(trapPts),nTrials,1);
-                dataPtsTest       = trapPts(:,trialIndTest)';
                 trialIndTest = randi(length(trapPts),nTrials,1);
                 dataPtsTest  = trapPts(:,trialIndTest)';
             case 'trapzKrupic2'
@@ -113,19 +112,27 @@ for iterI = 1:nIter
                 for i=1:length(trapY)
                     trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
                 end
-                %             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1
                 % use this to select from the PAIR in trapPts
                 trialInd     = randi(length(trapPts),nTrials,1);
                 trials       = trapPts(:,trialInd)';
-                trialIndTest = randi(length(trapPts),nTrials,1);
-                trials  = trapPts(:,trialIndTest)';
                 %dataPtsTest
-                trialIndTest     = randi(length(trapPts),nTrials,1);
-                dataPtsTest       = trapPts(:,trialIndTest)';
                 trialIndTest = randi(length(trapPts),nTrials,1);
-                dataPtsTest  = trapPts(:,trialIndTest)';
-                
-            case 'trapz' % not scale to Krupic: (this was trapzNorm)
+                dataPtsTest  = trapPts(:,trialIndTest)';  
+            case 'trapzKrupic3'
+                 %if scale to Krupic x 3:
+                spacingTrapz = spacing(14:37); %23.7 would be right, here 24; krupic (relative): [5.26, 23.68, 50]
+                trapY=locRange(2)*3.*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
+                trapX=spacingTrapz(1):2:spacingTrapz(end)*2;
+                trapPts=[];
+                for i=1:length(trapY)
+                    trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
+                end
+                trialInd     = randi(length(trapPts),nTrials,1);
+                trials       = trapPts(:,trialInd)';
+                %dataPtsTest
+                trialIndTest      = randi(length(trapPts),nTrials,1);
+                dataPtsTest       = trapPts(:,trialIndTest)';
+            case 'trapzNorm' % not scale - fit into square 
                 spacingTrapz = spacing; 
                 trapY=locRange(2).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
                 trapX=spacingTrapz;
@@ -133,15 +140,9 @@ for iterI = 1:nIter
                 for i=1:length(trapY)
                     trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
                 end
-                %             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1
-                % use this to select from the PAIR in trapPts
                 trialInd     = randi(length(trapPts),nTrials,1);
                 trials       = trapPts(:,trialInd)';
-                trialIndTest = randi(length(trapPts),nTrials,1);
-                trials  = trapPts(:,trialIndTest)';
                 %dataPtsTest
-                trialIndTest     = randi(length(trapPts),nTrials,1);
-                dataPtsTest       = trapPts(:,trialIndTest)';
                 trialIndTest = randi(length(trapPts),nTrials,1);
                 dataPtsTest  = trapPts(:,trialIndTest)';
                 
@@ -153,15 +154,10 @@ for iterI = 1:nIter
                 for i=1:length(trapY)
                     trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
                 end
-                %             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1
                 % use this to select from the PAIR in trapPts
                 trialInd     = randi(length(trapPts),nTrials,1);
                 trials       = trapPts(:,trialInd)';
-                trialIndTest = randi(length(trapPts),nTrials,1);
-                trials  = trapPts(:,trialIndTest)';
                 %dataPtsTest
-                trialIndTest     = randi(length(trapPts),nTrials,1);
-                dataPtsTest       = trapPts(:,trialIndTest)';
                 trialIndTest = randi(length(trapPts),nTrials,1);
                 dataPtsTest  = trapPts(:,trialIndTest)';                
             case 'trapz2' % new - scale differently - more like box but more squished
@@ -172,17 +168,12 @@ for iterI = 1:nIter
                 for i=1:length(trapY)
                     trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
                 end
-                %             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1
                 % use this to select from the PAIR in trapPts
                 trialInd     = randi(length(trapPts),nTrials,1);
                 trials       = trapPts(:,trialInd)';
-                trialIndTest = randi(length(trapPts),nTrials,1);
-                trials  = trapPts(:,trialIndTest)';
                 %dataPtsTest
-                trialIndTest     = randi(length(trapPts),nTrials,1);
-                dataPtsTest       = trapPts(:,trialIndTest)';
                 trialIndTest = randi(length(trapPts),nTrials,1);
-                dataPtsTest  = trapPts(:,trialIndTest)';    
+                dataPtsTest  = trapPts(:,trialIndTest)';  
             case 'trapz3' % new - scale differently - more like box but more squished
                 spacingTrapz = spacing(4:47); 
                 trapY=locRange(2).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
@@ -191,17 +182,12 @@ for iterI = 1:nIter
                 for i=1:length(trapY)
                     trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
                 end
-                %             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1
                 % use this to select from the PAIR in trapPts
                 trialInd     = randi(length(trapPts),nTrials,1);
                 trials       = trapPts(:,trialInd)';
-                trialIndTest = randi(length(trapPts),nTrials,1);
-                trials  = trapPts(:,trialIndTest)';
                 %dataPtsTest
-                trialIndTest     = randi(length(trapPts),nTrials,1);
-                dataPtsTest       = trapPts(:,trialIndTest)';
                 trialIndTest = randi(length(trapPts),nTrials,1);
-                dataPtsTest  = trapPts(:,trialIndTest)'; 
+                dataPtsTest  = trapPts(:,trialIndTest)';  
                 
             case 'trapzScaled1' % new - scale differently - now loc > 50 though
 %                 spacingTrapz = spacing(10:41); 
@@ -211,17 +197,12 @@ for iterI = 1:nIter
                 for i=1:length(trapY)
                     trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
                 end
-                %             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1
                 % use this to select from the PAIR in trapPts
                 trialInd     = randi(length(trapPts),nTrials,1);
                 trials       = trapPts(:,trialInd)';
-                trialIndTest = randi(length(trapPts),nTrials,1);
-                trials  = trapPts(:,trialIndTest)';
                 %dataPtsTest
-                trialIndTest     = randi(length(trapPts),nTrials,1);
-                dataPtsTest       = trapPts(:,trialIndTest)';
                 trialIndTest = randi(length(trapPts),nTrials,1);
-                dataPtsTest  = trapPts(:,trialIndTest)'; 
+                dataPtsTest  = trapPts(:,trialIndTest)';  
                           
             case 'trapzScaled2' % new - scale differently - now loc > 50 though
 %                 spacingTrapz = spacing(7:44); 
@@ -231,17 +212,12 @@ for iterI = 1:nIter
                 for i=1:length(trapY)
                     trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
                 end
-                %             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1
                 % use this to select from the PAIR in trapPts
                 trialInd     = randi(length(trapPts),nTrials,1);
                 trials       = trapPts(:,trialInd)';
-                trialIndTest = randi(length(trapPts),nTrials,1);
-                trials  = trapPts(:,trialIndTest)';
                 %dataPtsTest
-                trialIndTest     = randi(length(trapPts),nTrials,1);
-                dataPtsTest       = trapPts(:,trialIndTest)';
                 trialIndTest = randi(length(trapPts),nTrials,1);
-                dataPtsTest  = trapPts(:,trialIndTest)'; 
+                dataPtsTest  = trapPts(:,trialIndTest)';  
                
             case 'trapzScaled3' % new - scale differently - now loc > 50 though
 %                 spacingTrapz = spacing(4:47); 
@@ -251,17 +227,12 @@ for iterI = 1:nIter
                 for i=1:length(trapY)
                     trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
                 end
-                %             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1
                 % use this to select from the PAIR in trapPts
                 trialInd     = randi(length(trapPts),nTrials,1);
                 trials       = trapPts(:,trialInd)';
-                trialIndTest = randi(length(trapPts),nTrials,1);
-                trials  = trapPts(:,trialIndTest)';
                 %dataPtsTest
-                trialIndTest     = randi(length(trapPts),nTrials,1);
-                dataPtsTest       = trapPts(:,trialIndTest)';
                 trialIndTest = randi(length(trapPts),nTrials,1);
-                dataPtsTest  = trapPts(:,trialIndTest)'; 
+                dataPtsTest  = trapPts(:,trialIndTest)';  
                 
             case 'trapzSq' %probably need a more narrow trapezium!
                 trapY=locRange(2)/2.*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
@@ -280,15 +251,11 @@ for iterI = 1:nIter
                     end
                 end
                 % use this to select from the PAIR in trapPts
-                trialInd=randi(length(trapPts),nTrials,1);
-                trials=trapPts(:,trialInd)';
-                trialIndTest = randi(length(trapPts),nTrials,1);
-                trials  = trapPts(:,trialIndTest)';
+                trialInd     = randi(length(trapPts),nTrials,1);
+                trials       = trapPts(:,trialInd)';
                 %dataPtsTest
-                trialIndTest     = randi(length(trapPts),nTrials,1);
-                dataPtsTest      = trapPts(:,trialIndTest)';
                 trialIndTest = randi(length(trapPts),nTrials,1);
-                dataPtsTest  = trapPts(:,trialIndTest)';
+                dataPtsTest  = trapPts(:,trialIndTest)';  
             case 'circ'
                 % Create logical image of a circle
                 imageSizeX = nSteps;

@@ -59,10 +59,10 @@ batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
 %new 5 - trapz
 fixBatchSize = 1;
 clus2run = [12:2:18 22, 26]; % trapz1-3, krupic
-% clus2run = [16, 18, 20, 22, 24, 26, 28, 30]; %new - more clusters (trapzScaled1-3, krupic2)
+clus2run = [16, 18, 20, 22, 24, 26, 28, 30]; %new - more clusters (trapzScaled1-3, krupic2)
 nTrials=2500000;
 batchSizeVals=1000;
-dat='trapzKrupic'; %trapz1, trapz2, trapz3, trapzKrupic, trapzNorm (or rename to trapz)
+dat='trapzScaled3'; %trapz1, trapz2, trapz3, trapzKrupic, trapzNorm (or rename to trapz)
 
 %krupic - cant find 6 peaks quite often; so probelmatic possibly
 % check krupic2 when done
