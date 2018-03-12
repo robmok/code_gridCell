@@ -28,6 +28,8 @@ clus2run = [24 14];
 %love06 circ
 % clus2run = [20, 16, 24]; %need to run the other 3 if want (if sq runs through)
 
+%love 06 square; sigmaGauss 3
+clus2run = [20, 16, 24]; 
 nTrials = 2500000; 
 
 %batch size
@@ -48,8 +50,8 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 % learning rate - 
 epsMuVals = [.0075, .01, .02]; 
 epsMuVals = .0075; %atm .01 works well-ish but a bit fast, could be slower; .0075, 005
-epsMuVals = .01;
-epsMuVals = .02;
+% epsMuVals = .01;
+% epsMuVals = .02;
 
 
 %weight learning rate by SSE 
@@ -58,7 +60,7 @@ weightEpsSSE = 0; %1 or 0
 %looks like optimizing the std is also important - stepSize/3.5 is pretty good
 % sigmaGaussVals = [stepSize/3, stepSize/3.5, stepSize/4];
 sigmaGaussVals = stepSize/3.5;
-% sigmaGaussVals = stepSize/3; %with smaller sigmaGauss, need faster learning rate ; e.g. 0.075 was too slow (though ok for sigmaGauss=3.5); 0.01 still slow; 0.05 is gd but fast
+sigmaGaussVals = stepSize/3; %with smaller sigmaGauss, need faster learning rate ; e.g. 0.075 was too slow (though ok for sigmaGauss=3.5); 0.01 still slow; 0.05 is gd but fast
 % sigmaGaussVals = stepSize/4;
 
 %define box / environement - random points in a box
@@ -88,9 +90,9 @@ if neigh
 end
 
 %%
-saveDat=1; %save simulations
+saveDat=0; %save simulations
 
-nIter=200; %how many iterations (starting points)
+nIter=1; %how many iterations (starting points)
 
 plotGrids = 0; %plot to test? if nIter > 8, then won't plot
 
@@ -162,7 +164,7 @@ if ~neigh %separating neigh and stoch/momentum params
 %                                 fprintf('Running alphaVal %0.2f\n',alpha);
                                 tic
 %                                 [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,muAll] = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat,weightEpsSSE);
-                                fprintf('Running %s, nClus=%d, epsMu=%d, batchSize=%d\n',dat,nClus,epsMuOrig10000,batchSize)
+                                fprintf('Running %s, nClus=%d, epsMu=%d, sigmaGauss=%d, batchSize=%d\n',dat,nClus,epsMuOrig10000,sigmaGauss100,batchSize)
                                 [densityPlot,clusMu,gA,gW,rSeed,muAll] = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat,weightEpsSSE);
 %                                 fname = [saveDir, sprintf('/gauss_batch_%dclus__%dsigma_%dktrls_eps%d_alpha%d_stype%d_cVal%d_sseW%d_batchSiz%d_%diters',nClus,sigmaGauss100,round(nTrials/1000),epsMuOrig10000,alpha10,stochasticType,c1m,weightEpsSSE,round(batchSize),nIter)];
                                 fname = [saveDir, sprintf('/gauss_batch_%dclus_%dsigma_%dktrls_eps%d_batchSiz%d_%diters_%s',nClus,sigmaGauss100,round(nTrials/1000),epsMuOrig10000,round(batchSize),nIter,dat)];                                

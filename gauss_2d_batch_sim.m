@@ -491,7 +491,7 @@ for iterI = 1:nIter
 %         ind=isnan(densityPlotActNormTmp); densityPlotActNormTmp(ind)=0;
 %         densityPlotActNormSm = imgaussfilt(densityPlotActNormTmp,gaussSmooth);
 %        
-        if strcmp(dat,'rand') %if finding cats, won't be gridlike
+        if ~strcmp(dat,'cat') %if finding cats, won't be gridlike
             if plotGrids && nIter < 8
                 %compute autocorrmap, no need to save
                 aCorrMap = ndautoCORR(densityPlotSm);
