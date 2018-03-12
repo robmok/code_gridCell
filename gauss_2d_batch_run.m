@@ -3,7 +3,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -11,7 +11,7 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in codeDir now not wd
 
-dat = 'circ'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
+dat = 'square'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
 
 % if cat learning specify number of categories (cluster centres) and sigma
 % of the gaussan
@@ -25,8 +25,14 @@ clus2run = 20; %[10 20]; %20, 30
 clus2run = [20, 18];
 %clus2run = [16, 28];
 %clus2run = [24, 14];
+
+%love01
+clus2run=18;
+clus2run=28;
+clus2run=14;
+
 %love06 circ
-% clus2run = [20, 16, 24]; %need to run the other 3 if want (if sq runs through)
+% clus2run = [20, 16, 24];
 % clus2run = [18, 28, 14]; % love06
 
 %love 06 square; sigmaGauss 3 - later
@@ -53,8 +59,8 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 % learning rate - 
 epsMuVals = [.0075, .01, .02]; 
 epsMuVals = .0075; %atm .01 works well-ish but a bit fast, could be slower; .0075, 005
-epsMuVals = .01;
-epsMuVals = .02;
+%epsMuVals = .01;
+%epsMuVals = .02;
 
 
 %weight learning rate by SSE 
