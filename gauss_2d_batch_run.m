@@ -22,14 +22,20 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 %run multuple cluster numbers
 clus2run = 20; %[10 20]; %20, 30
 % nTrials = 40000; %how many locations in the box / trials - 2.5k ; 5k if reset
-clus2run = [20 18];
-clus2run = [16 28];
-clus2run = [24 14];
+clus2run = [18];
+%clus2run = [28];
+%clus2run = [14];
 %love06 circ
 % clus2run = [20, 16, 24]; %need to run the other 3 if want (if sq runs through)
 
-%love 06 square; sigmaGauss 3
-clus2run = [20, 16, 24]; 
+
+%love 06 square; 
+%clus2run=16;
+
+%love 06 square; sigmaGauss 3 - later
+% clus2run = [20, 16, 24]; 
+
+
 nTrials = 2500000; 
 
 %batch size
@@ -50,7 +56,7 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 % learning rate - 
 epsMuVals = [.0075, .01, .02]; 
 epsMuVals = .0075; %atm .01 works well-ish but a bit fast, could be slower; .0075, 005
-% epsMuVals = .01;
+epsMuVals = .01;
 % epsMuVals = .02;
 
 
@@ -60,7 +66,7 @@ weightEpsSSE = 0; %1 or 0
 %looks like optimizing the std is also important - stepSize/3.5 is pretty good
 % sigmaGaussVals = [stepSize/3, stepSize/3.5, stepSize/4];
 sigmaGaussVals = stepSize/3.5;
-sigmaGaussVals = stepSize/3; %with smaller sigmaGauss, need faster learning rate ; e.g. 0.075 was too slow (though ok for sigmaGauss=3.5); 0.01 still slow; 0.05 is gd but fast
+% sigmaGaussVals = stepSize/3; %with smaller sigmaGauss, need faster learning rate ; e.g. 0.075 was too slow (though ok for sigmaGauss=3.5); 0.01 still slow; 0.05 is gd but fast
 % sigmaGaussVals = stepSize/4;
 
 %define box / environement - random points in a box
@@ -90,9 +96,9 @@ if neigh
 end
 
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
-nIter=1; %how many iterations (starting points)
+nIter=200; %how many iterations (starting points)
 
 plotGrids = 0; %plot to test? if nIter > 8, then won't plot
 
