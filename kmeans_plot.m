@@ -9,7 +9,7 @@ cd(wd);
 codeDir = [wd '/code_gridCell'];
 saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
-
+addpath(genpath([codeDir '/gridSCORE_packed']));
 
 dat = 'circ'; %'square', 'circ'
 
@@ -174,7 +174,7 @@ end
 
 %% Density plots for top / bottom 3
 
-iToPlot = 12;%[4, 22, 28];
+iToPlot = 16;%[4, 22, 28];
 
 gaussSmooth             = 1;
 nSets                   = 6; %top and bottom 3 SSE

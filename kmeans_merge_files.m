@@ -7,13 +7,13 @@ saveDir = [wd '/data_gridCell'];
 saveDat = 0;
 
 dat='circ'; %square, circ
-nPoints=10000; %3k, 5k, 10k
+nPoints=3000; %3k, 5k, 10k
 
 fname=[saveDir sprintf('/kmeans_nK_3-17_%s_nPoints%d_1000iters',dat,nPoints)];
 d1=load(fname);
-fname=[saveDir sprintf('/kmeans_nK_18-25_square_nPoints%d_1000iters',nPoints)];
+fname=[saveDir sprintf('/kmeans_nK_18-25_%s_nPoints%d_1000iters',dat,nPoints)];
 d2=load(fname);
-fname=[saveDir sprintf('/kmeans_nK_26-30_square_nPoints%d_1000iters',nPoints)];
+fname=[saveDir sprintf('/kmeans_nK_26-30_%s_nPoints%d_1000iters',dat,nPoints)];
 d3=load(fname);
 densityPlotCentres  = cat(4,d1.densityPlotCentres,d2.densityPlotCentres,d3.densityPlotCentres);
 gA                  = cat(3,d1.gA,d2.gA,d3.gA);

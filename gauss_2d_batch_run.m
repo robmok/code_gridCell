@@ -9,9 +9,9 @@ cd(wd);
 codeDir = [wd '/code_gridCell'];
 saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
-addpath(genpath([wd '/gridSCORE_packed']));
+addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in codeDir now not wd
 
-dat = 'square'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
+dat = 'circ'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
 
 % if cat learning specify number of categories (cluster centres) and sigma
 % of the gaussan
@@ -22,15 +22,12 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 %run multuple cluster numbers
 clus2run = 20; %[10 20]; %20, 30
 % nTrials = 40000; %how many locations in the box / trials - 2.5k ; 5k if reset
-clus2run = [18];
-%clus2run = [28];
-%clus2run = [14];
+clus2run = [20, 18];
+%clus2run = [16, 28];
+%clus2run = [24, 14];
 %love06 circ
 % clus2run = [20, 16, 24]; %need to run the other 3 if want (if sq runs through)
-
-
-%love 06 square; 
-%clus2run=16;
+% clus2run = [18, 28, 14]; % love06
 
 %love 06 square; sigmaGauss 3 - later
 % clus2run = [20, 16, 24]; 
@@ -57,7 +54,7 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 epsMuVals = [.0075, .01, .02]; 
 epsMuVals = .0075; %atm .01 works well-ish but a bit fast, could be slower; .0075, 005
 epsMuVals = .01;
-% epsMuVals = .02;
+epsMuVals = .02;
 
 
 %weight learning rate by SSE 
