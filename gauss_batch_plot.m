@@ -14,57 +14,21 @@ nSet        = 6;
 gaussSmooth = 1; 
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
-dat='circ';
 
-% clus2run = [7,8,10,12]; 
-% nTrials = 100000; 
-% nIter=250;
-% batchSizeVals = [1, 50, 100, 200, 500];
-% epsMuVals=[.01, .05, .075, .1, .2, .3];% learning rate / starting learning rate 
-
-% sims 1 - one single LARGE batchSize, large nTrials, all nClus conds
-clus2run = 3:30;%[7,8,10,12]; 
-nTrials=10000000;
-batchSizeVals=1000;
+dat='square';
 nIter=200;
-epsMuVals=.075;
+epsMuVals = [.0075, .01, .02]; 
 
-% sims 2 - a smaller val of trials; testing batch sizes (works fine) - also
-% have some sims with ntrials = 5000000 (less batchSizeVals)
-clus2run = [10:2:28]; % also have 11 but left out plot
-% clus2run = 28; % plotting one nClus cond over sets
+
+clus2run = [16, 20, 24]; %14 18, 28 still running
 nTrials=2500000;
-batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
-
-% new 3 - fixed batch sizes across clusters
-% nTrials=2500000;
-% clus2run = [18:2:30]; 
-% batchSizeVals=[333, 500, 1000];
-
-% new 4 - batchSizes based on mean updates per clus per batch (avgBatch)
-% fixBatchSize = 0;
-% clus2run = [18:2:30]; 
-% % clus2run = [18 22 28]; % running these on love01
-% batchSizeVals=[1, 2, 5, 10, 25, 35, 50]; %avgBatchVals - 1,2,5 new
-
-%new 5 - circ
-fixBatchSize = 1;
-clus2run = [10:2:20, 22:26, 28, 30];
-% clus2run = 14; % plotting one nClus cond over sets
-nTrials=2500000;
-% batchSizeVals=[125, 167, 250, 333, 500, 1000, 2000];
-batchSizeVals=[167, 250, 333, 500, 1000, 2000];
-dat='circ';
-
-%new 5 - trapz
-% fixBatchSize = 1;
-% clus2run = [12:2:18 22, 26]; % trapz1-3, krupic
-% clus2run = [16, 18, 20, 22, 24, 26, 28, 30]; %new - more clusters (trapzScaled1-3, krupic2,3)
-% nTrials=2500000;
-% batchSizeVals=1000;
-% dat='trapzScaled3'; %trapz1, trapz2, trapz3, trapzKrupic, trapzNorm (or rename to trapz)
+batchSizeVals=[250, 500, 1000, 2000];
 
 
+%sigmaGauss - temp
+stepSize = 1;
+sigmaGaussVals = round([stepSize/3, stepSize/3.5].*100);
+sigmaGauss100  = sigmaGaussVals(2);
 
 
 %load loop
@@ -72,55 +36,77 @@ for iClus2run = 1:length(clus2run)
     nClus = clus2run(iClus2run);
     for iEps = 1:length(epsMuVals) 
         epsMuOrig=epsMuVals(iEps);
-        epsMuOrig1000=epsMuOrig*1000;
+        epsMuOrig10000=epsMuOrig*10000;
         for iBvals = 1:length(batchSizeVals)
             
             %fixed batch
             if fixBatchSize
                 batchSize = batchSizeVals(iBvals);
-                fprintf('Loading nClus=%d, epsMu=%d, batchSize=%d\n',nClus,epsMuOrig1000,batchSize)
+                fprintf('Loading nClus=%d, epsMu=%d, batchSize=%d\n',nClus,epsMuOrig10000,batchSize)
                 if ~strcmp(dat,'square')
-                    fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+                    fname = [saveDir, sprintf('/gauss_batch_%dclus_%dsigma_%dktrls_eps%d_batchSiz%d_%diters_%s*',nClus,sigmaGauss100,round(nTrials/1000),epsMuOrig10000,batchSize,nIter,dat)];
                 else
-                    fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter)];
+                    fname = [saveDir, sprintf('/gauss_batch_%dclus_%dsigma_%dktrls_eps%d_batchSiz%d_%diters*',nClus,sigmaGauss100,round(nTrials/1000),epsMuOrig10000,batchSize,nIter)];
                 end
-            else %avgBatch
-                avgBatch = batchSizeVals(iBvals);
-                fprintf('Loading nClus=%d, epsMu=%d, avgBatchSize=%d\n',nClus,epsMuOrig1000,avgBatch)
-                if ~strcmp(dat,'square')
-                    fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz*_%diters*_%s',nClus,round(nTrials/1000),epsMuOrig1000,avgBatch,nIter,dat)];
-                else
-                    fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz*_%diters*',nClus,round(nTrials/1000),epsMuOrig1000,avgBatch,nIter)];
+                
+                %edit if want to load more than one file per sim, merge
+                f = dir(fname); filesToLoad = cell(1,length(f));
+                for iF = 1%:length(f)
+                    filesToLoad{iF} = f(iF).name;
+                    load(f(iF).name);
                 end
-            end
-            
-            
-            %edit if want to load more than one file per sim, merge
-            f = dir(fname); filesToLoad = cell(1,length(f));
-            for iF = 1%:length(f)
-                filesToLoad{iF} = f(iF).name;
-                load(f(iF).name);
-            end
-            
-            for iterI = 1:nIter
-                for iSet=1:nSet
-                    densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
+                
+%                 for iterI = 1:nIter
+%                     for iSet=1:nSet
+%                         densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
+%                     end
+%                 end
+                
+                
+%                 %organise gridness values (allen vs willis method)
+%                 gA_gAll(:,:,iEps,iBvals,iClus2run,:)   = gA(:,:,1,:);
+%                 gA_oAll(:,:,iEps,iBvals,iClus2run,:)   = gA(:,:,2,:);
+%                 gA_radAll(:,:,iEps,iBvals,iClus2run,:) = gA(:,:,3,:);
+%                 gA_wavAll(:,:,iEps,iBvals,iClus2run,:) = gA(:,:,4,:);
+%                 gW_gAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,1,:);
+%                 gW_oAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,2,:);
+%                 gW_radAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,3,:);
+%                 gW_wavAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,4,:);
+                
+                %% TEMP: didn't save gridness measures correctly in sims, so temporarily doing it here (fix it!)
+               
+                for iterI = 1:nIter
+                    for iSet=1:nSet
+                        densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
+                        densityPlotCentresSm = imgaussfilt(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
+                        aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram
+                        [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+                        [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+                        
+                        %organise gridness values (allen vs willis method)
+                        gA_gAll(iSet,iterI,iEps,iBvals,iClus2run)   = gdataA.g_score;
+                        gA_oAll(iSet,iterI,iEps,iBvals,iClus2run)   = gdataA.orientation;
+                        gA_radAll(iSet,iterI,iEps,iBvals,iClus2run) = gdataA.radius;
+                        gA_wavAll(iSet,iterI,iEps,iBvals,iClus2run) = gdataA.wavelength;
+                        gW_gAll(iSet,iterI,iEps,iBvals,iClus2run)   = gdataW.g_score;
+                        gW_oAll(iSet,iterI,iEps,iBvals,iClus2run)   = gdataW.orientation;
+                        gW_radAll(iSet,iterI,iEps,iBvals,iClus2run) = gdataW.radius;
+                        gW_wavAll(iSet,iterI,iEps,iBvals,iClus2run) = gdataW.wavelength;
+                    end
                 end
-            end
-            %organise gridness values (allen vs willis method)
-            gA_gAll(:,:,iEps,iBvals,iClus2run,:)   = gA(:,:,1,:);
-            gA_oAll(:,:,iEps,iBvals,iClus2run,:)   = gA(:,:,2,:);
-            gA_radAll(:,:,iEps,iBvals,iClus2run,:) = gA(:,:,3,:);
-            gA_wavAll(:,:,iEps,iBvals,iClus2run,:) = gA(:,:,4,:);
-            gW_gAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,1,:);
-            gW_oAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,2,:);
-            gW_radAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,3,:);
-            gW_wavAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,4,:);
-            
 
+                
+                
+                
+                
+                
+                
+                
+            end
         end
     end
 end
+
 %% plot univar scatters
 
 gridMsrType = 'a'; % 'a' or 'w' for allen or willis method
@@ -332,87 +318,6 @@ if size(gridness,4)>1
 end
 end
 
-
-
-
-
-
-
-
-%testing one sim only
-
-% dat1=squeeze(gA(iSet,:,1));
-% figure;
-% barpos  = .25:.5:.5*size(dat1,1);
-% colors  = distinguishable_colors(size(dat1,1));
-% colgrey = [.5, .5, .5];
-% mu      = mean(dat1);
-% sm      = std(dat1)./sqrt(size(dat1,2));
-% ci      = sm.*tinv(.025,size(dat1,2)-1); %compute conf intervals
-% plotSpread(dat1','xValues',barpos);
-% errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-% scatter(barpos,mu,750,'x');
-% xlim([barpos(1)-.5, barpos(end)+.5]);
-% ylim([-.5,1.25]);
-
-
-%% check gridness measures
-
-doPlot=0;
-
-iSet=6;
-iEps=1;
-gaussSmooth=1;
-nIter=200;
-
-for iClus2run = 1:length(clus2run)
-for iBvals = 1:length(batchSizeVals)
-    fprintf(sprintf('Running clus %d batchSizeVals %d\n',clus2run(iClus2run),batchSizeVals(iBvals)));
-    for iterI = 1:nIter
-        densityPlotCentresSm = imgaussfilt(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
-        
-        if doPlot
-            figure; hold on;
-            subplot(1,2,1)
-            imagesc(densityPlotCentresSm);
-            % figure;
-            subplot(1,2,2);
-        end
-        
-        aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram
-        [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
-%         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
-        
-        peaksA(iClus2run,iBvals,iterI,1)=length(gdataA.near_peaks);
-%         peaksW(iClus2run,iBvals,iterI,1)=length(gdataW.near_peaks);
-        
-        if strcmp(dat,'trapz')
-            aCorrMap = ndautoCORR(densityPlotCentresSm(:,1:size(densityPlotAll,1)/2));
-            [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
-            %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
-            peaksA(iClus2run,iBvals,iterI,2)=length(gdataA.near_peaks);
-            gTmpA(iClus2run,iBvals,iterI,2) = gdataA.g_score;
-            %             peaksW(iClus2run,iBvals,iterI,2)=length(gdataW.near_peaks);
-            
-            aCorrMap = ndautoCORR(densityPlotCentresSm(:,size(densityPlotAll,1)/2+1:end));
-            [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
-            %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
-            peaksA(iClus2run,iBvals,iterI,3)=length(gdataA.near_peaks);
-            gTmpA(iClus2run,iBvals,iterI,3) = gdataA.g_score;
-            %             peaksW(iClus2run,iBvals,iterI,3)=length(gdataW.near_peaks);
-            
-        end
-        
-    end
-end
-end
-
-nnz(peaksA~=6)
-nnz(peaksW~=6)
-
-% figure; scatter(reshape(peaksA(:,:,:,2),1,numel(peaksA(:,:,:,2))), reshape(gTmpA(:,:,:,2),1,numel(gTmpA(:,:,:,2)))); ylim([-.1, 1]);
-% figure; scatter(reshape(peaksA(:,:,:,3),1,numel(peaksA(:,:,:,3))), reshape(gTmpA(:,:,:,3),1,numel(gTmpA(:,:,:,3)))); ylim([-.1, 1]);
-
 %% density plots
 close all
 
@@ -428,12 +333,12 @@ else
 end
 
 %set
-iClus2run = 12;
-iBvals    = 4;
+iClus2run = 2;
+iBvals    = 3;
 
 iters2plot = 40:60;
 
-fprintf(sprintf('clus %d batchSizeVals %d\n',clus2run(iClus2run),batchSizeVals(iBvals)));
+% fprintf(sprintf('clus %d batchSizeVals %d\n',clus2run(iClus2run),batchSizeVals(iBvals)));
 for iterI = iters2plot
     densityPlotCentresSm = imgaussfilt(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
     
@@ -459,9 +364,3 @@ for iterI = iters2plot
     end
     
 end
-
-
-
-
-
-

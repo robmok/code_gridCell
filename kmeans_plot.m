@@ -15,7 +15,7 @@ dat = 'circ'; %'square', 'circ'
 
 kVals   = 3:30; 
 nKmeans = 1000;
-nPoints = 3000; %3k, 5k, 10k
+nPoints = 10000; %3k, 5k, 10k
 nKvals  = length(kVals);
 
 nDataPtsTest = 3000; %3k, 5k, 10k
@@ -74,7 +74,7 @@ ylim([-.5,1.25]);
 %% Crossvalidation - SSE on the test dataset
 % note: tsseXval is already ordered from low to high SSE on train set
 
-% iToPlot = 1:28;
+iToPlot = 1:28;
 % % SSE on test data,  showing lowest SSE on training data
 % figure; hold on;
 % iPlt=0;
@@ -123,8 +123,9 @@ for iKvals = iToPlot
     r1(iKvals)=r;
     p1(iKvals)=p;
     p1corr(iKvals)=p*nKvals;
+    if p1corr(iKvals)>1, p1corr(iKvals)=1; end
     scatter(err(iKvals,:)',g(:,1,iKvals),'.');
-    title(sprintf('r = %.2f, p (crcted) = %.5f',r,p*nKvals))
+    title(sprintf('nK=%d, r = %.2f, p (crcted) = %.3f',kVals(iKvals),r,p1corr(iKvals)))
 end
 [r1; p1corr]'
 
@@ -139,8 +140,9 @@ for iKvals = iToPlot
     r1(iKvals)=r;
     p1(iKvals)=p;
     p1corr(iKvals)=p*nKvals;
+    if p1corr(iKvals)>1, p1corr(iKvals)=1; end
     scatter(nanmean(xValErr(:,:,iKvals),2),g(:,1,iKvals),'.');
-    title(sprintf('r = %.2f, p (crcted) = %.5f',r,p*nKvals))
+    title(sprintf('nK=%d, r = %.2f, p (crcted) = %.3f',kVals(iKvals),r,p1corr(iKvals)))
 end
 
 [r1; p1corr]'

@@ -23,7 +23,7 @@ dat = 'trapzKrupic2';
 dat = 'trapzKrupic3';
 % dat = 'trapzScaled1';
 % dat = 'trapzScaled2';
- dat = 'trapzScaled3';
+%  dat = 'trapzScaled3';
 % dat = 'trapzNorm';%not scaled, fit into square
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
@@ -40,9 +40,8 @@ clus2run = 12; %20, 30
 
 %trapz
 clus2run = [18, 24, 26, 28, 16, 30, 20, 22];
-%clus2run = [18, 24, 26, 28];
-%clus2run = [16, 30, 20, 22];
-% clus2run = [20, 30, 14]; %trapznorm
+clus2run = [18, 24, 26, 28]; %krupic3
+clus2run = [16, 30, 20, 22];
 
 % nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 

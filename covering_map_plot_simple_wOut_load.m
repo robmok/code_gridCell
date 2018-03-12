@@ -16,69 +16,8 @@ figure; hold on;
 scatter(muAll(:,1,end),muAll(:,2,end),20e+2,colors,'.');
 xlim(locRange); ylim(locRange);
 % voronoi(muAll(:,1,end),muAll(:,2,end),'k');
-%% density map, autocorrelogram
 
-iterI=1; 
-gaussSmooth=1;
-
-for iSet=1%:size(densityPlot,3) %plot - diff averaging over nTrials
-    densityPlotSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
-    aCorrMap=ndautoCORR(densityPlotSm); %autocorrelogram
-
-    figure; hold on;
-    subplot(1,2,1); imagesc(densityPlotSm);
-    subplot(1,2,2); imagesc(aCorrMap,[-.5 .5]);
-end
-
-%% density map, unsmoothed, smoothed
-
-iterI=1; 
-gaussSmooth=1;
-
-for iSet=1:4%size(muAvg,3) 
-
-   figure; hold on;
-    subplot(1,2,1); imagesc(densityPlot(:,:,iSet,iterI));
-    densityPlotSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
-    subplot(1,2,2); imagesc(densityPlotSm);
-end
-
-%%
-gaussSmooth=1;
-
-nSets=11;
-spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
-% densityPlotClus      = zeros(length(spacing),length(spacing),nClus,nSets,nIter);
-densityPlotClus      = zeros(length(spacing),length(spacing),nClus,nSets);
-
-for iSet=1:4%:nSets
-
-for iClus=1:nClus
-    clusTmp  = squeeze(round(muAvg(iClus,:,iSet)))';
-    for iTrlUpd=1:size(clusTmp,2)
-%         densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet,iterI) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet, iterI)+1;
-        densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet)+1;
-    end
-end
-
-%make combined (grid cell) plot, smooth
-densityPlotCentres(:,:,iSet) = sum(densityPlotClus(:,:,:,iSet),3);
-densityPlotCentresSm = imgaussfilt(densityPlotCentres(:,:,iSet),gaussSmooth);
-
-figure;
-imagesc(densityPlotCentresSm);
-
-aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram
-figure;
-imagesc(aCorrMap,[-.45 .45]);
-
-figure;
-[g,gdataA] = gridSCORE(aCorrMap,'allen',1);
-% [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
-    
-end
-
-%% newest gridness
+%% gridness, autocorrelogram
 
 gaussSmooth=1;
 for iSet=1:6
@@ -129,39 +68,6 @@ for iterI = 1%:10
     gdataA
 end
 end
-
-%% mu - plot each trial; could compute gridness on each trial?
-
-gaussSmooth=1;
-% 
-% spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
-% densityPlotClus      = zeros(length(spacing),length(spacing),nClus,nSets);
-% 
-% 
-% i = 30000; % could compute the gridness over trials..
-% 
-% for iClus=1:nClus
-%     clusTmp  = squeeze(round(muAll(iClus,:,i)))';
-%     for iTrlUpd=1:size(clusTmp,2)
-%         densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet)+1;
-%     end
-% end
-% 
-% %make combined (grid cell) plot, smooth
-% densityPlotCentres(:,:,iSet) = sum(densityPlotClus(:,:,:,iSet),3);
-% densityPlotCentresSm = imgaussfilt(densityPlotCentres(:,:,iSet),gaussSmooth);
-% 
-% figure;
-% imagesc(densityPlotCentresSm);
-% 
-% aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram
-% figure;
-% imagesc(aCorrMap,[-.45 .45]);
-% 
-% figure;
-% [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
-% % [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
-    
 
 %% plot over time (need muAll as output arg)
 
@@ -225,3 +131,37 @@ for iTrl = 1:nTrials
         drawnow;
     end
 end
+
+
+%% mu - plot each trial; could compute gridness on each trial?
+
+gaussSmooth=1;
+% 
+% spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
+% densityPlotClus      = zeros(length(spacing),length(spacing),nClus,nSets);
+% 
+% 
+% i = 30000; % could compute the gridness over trials..
+% 
+% for iClus=1:nClus
+%     clusTmp  = squeeze(round(muAll(iClus,:,i)))';
+%     for iTrlUpd=1:size(clusTmp,2)
+%         densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet)+1;
+%     end
+% end
+% 
+% %make combined (grid cell) plot, smooth
+% densityPlotCentres(:,:,iSet) = sum(densityPlotClus(:,:,:,iSet),3);
+% densityPlotCentresSm = imgaussfilt(densityPlotCentres(:,:,iSet),gaussSmooth);
+% 
+% figure;
+% imagesc(densityPlotCentresSm);
+% 
+% aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram
+% figure;
+% imagesc(aCorrMap,[-.45 .45]);
+% 
+% figure;
+% [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
+% % [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
+    

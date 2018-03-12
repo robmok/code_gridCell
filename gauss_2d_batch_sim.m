@@ -2,7 +2,8 @@
 function [densityPlot,clusMu,gA,gW,rSeed,muAll] = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat,weightEpsSSE)
 
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
-stepSize=diff(spacing(1:2));
+stepSize=diff(spacing(1:2)); nSteps = length(spacing);
+
 % epsMu = epsMuOrig;
 
 %for crossvalidation - 
@@ -43,9 +44,8 @@ gW = nan(nSets,nIter,4);
 % gA_actNorm = nan(nSets,nIter,4);
 % gW_actNorm = nan(nSets,nIter,4);
 
-
 %if trapz - compute gridness of left/right half of boxes too
-if strcmp(dat(1:5),'trapz')
+if strcmp(dat(1:4),'trap')
     gA = nan(nSets,nIter,4,3);
     gW = nan(nSets,nIter,4,3);
 end
@@ -54,7 +54,7 @@ end
 trapzSpacing{1} = spacing(10:41);
 trapzSpacing{2} = spacing(7:44);
 trapzSpacing{3} = spacing(4:47);
-if strcmp(dat(1:5),'trapz') && length(dat)>10
+if strcmp(dat(1:4),'trap') && length(dat)>10
     if strcmp(dat(1:11),'trapzScaled')
         spacingTrapz = trapzSpacing{str2double(dat(12))}; %trapzScaled1,2,3
         a=length(spacingTrapz); %trapz length1
@@ -491,7 +491,7 @@ for iterI = 1:nIter
 %         ind=isnan(densityPlotActNormTmp); densityPlotActNormTmp(ind)=0;
 %         densityPlotActNormSm = imgaussfilt(densityPlotActNormTmp,gaussSmooth);
 %        
-        if strcmp(dat,'rand') %if finding cats, won't be gridlike
+        if ~strcmp(dat,'cat') %if finding cats, won't be gridlike
             if plotGrids && nIter < 8
                 %compute autocorrmap, no need to save
                 aCorrMap = ndautoCORR(densityPlotSm);
