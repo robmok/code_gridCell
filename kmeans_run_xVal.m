@@ -15,8 +15,10 @@ kVals = 3:30;
 nKvals = length(kVals);
 dat='circ'; %square, circ
 nKmeans = 1000;
-nPoints = 10000; %3k, 5k, 10k
-fname = [saveDir, sprintf('/kmeans_nK_%d-%d_%s_nPoints%d_%diters',kVals(1),kVals(end),dat,nPoints,nKmeans)];
+nPoints = 3000; %3k, 5k, 10k
+% fname = [saveDir, sprintf('/kmeans_nK_%d-%d_%s_nPoints%d_%diters',kVals(1),kVals(end),dat,nPoints,nKmeans)];
+fname = [saveDir, sprintf('/kmeans_nK_%d-%d_%s_nPoints%d_%diters_2',kVals(1),kVals(end),dat,nPoints,nKmeans)]; %5k and 10k
+
 load(fname);
 
 %xVal specs
@@ -36,7 +38,8 @@ for iDataPtsTest = 1:length(nDataPtsTestVals)
     xVal_results = xVal_clusConds(muAllkVals, dat,nXvalDataSets, nDataPtsTestVals(iDataPtsTest), locRange, nKmeans);
 
     if saveDat
-        fname = [saveDir sprintf('/kmeans_xVal_nK_%d-%d_%s_%dtrainPts_%dtestPts_%diters_%ddatasets',kVals(1),kVals(end),dat,nPoints, nDataPtsTestVals(iDataPtsTest),nKmeans,nXvalDataSets)];
+%         fname = [saveDir sprintf('/kmeans_xVal_nK_%d-%d_%s_%dtrainPts_%dtestPts_%diters_%ddatasets',kVals(1),kVals(end),dat,nPoints, nDataPtsTestVals(iDataPtsTest),nKmeans,nXvalDataSets)];
+        fname = [saveDir sprintf('/kmeans_xVal_nK_%d-%d_%s_%dtrainPts_%dtestPts_%diters_%ddatasets_2',kVals(1),kVals(end),dat,nPoints, nDataPtsTestVals(iDataPtsTest),nKmeans,nXvalDataSets)];
         save(fname,'xVal_results');
     end
     

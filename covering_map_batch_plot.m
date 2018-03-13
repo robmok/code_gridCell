@@ -57,12 +57,13 @@ batchSizeVals=[167, 250, 333, 500, 1000, 2000];
 dat='circ';
 
 %new 5 - trapz
-% fixBatchSize = 1;
-% clus2run = [12:2:18 22, 26]; % trapz1-3, krupic
-% clus2run = [16, 18, 20, 22, 24, 26, 28, 30]; %new - more clusters (trapzScaled1-3, krupic2,3)
-% nTrials=2500000;
-% batchSizeVals=1000;
-% dat='trapzScaled3'; %trapz1, trapz2, trapz3, trapzKrupic, trapzNorm (or rename to trapz)
+fixBatchSize = 1;
+clus2run = [12:2:18 22, 26]; % trapz1-3, krupic
+clus2run = [16, 18, 20, 22, 24, 26, 28, 30]; %new - more clusters (trapzScaled1-3, krupic2,3)
+clus2run = [16, 18, 20, 24, 26, 30]; %krupic3 done
+nTrials=2500000;
+batchSizeVals=1000;
+dat='trapzKrupic3'; %trapz1, trapz2, trapz3, trapzKrupic, trapzNorm (or rename to trapz)
 
 
 
@@ -428,8 +429,8 @@ else
 end
 
 %set
-iClus2run = 12;
-iBvals    = 4;
+iClus2run = 5;
+iBvals    = 1;
 
 iters2plot = 40:60;
 

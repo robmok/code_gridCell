@@ -1,5 +1,6 @@
 % function [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,muAll] = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat,weightEpsSSE)
-function [densityPlot,clusMu,gA,gW,rSeed,muAll] = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat,weightEpsSSE)
+% function [densityPlot,clusMu,gA,gW,rSeed,muAll] = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat,weightEpsSSE)
+function [actAll, densityPlot,clusMu,gA,gW,rSeed,muAll] = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat,weightEpsSSE)
 
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
 stepSize=diff(spacing(1:2)); nSteps = length(spacing);
@@ -35,7 +36,7 @@ nSets                = length(trlSel);
 
 clusMu               = nan(nClus,2,nSets,nIter);
 muAvg                = nan(nClus,2,nSets,nIter);
-% actAll               = nan(nClus,nTrials,nIter); %keep this trial by trial
+actAll               = nan(nClus,nTrials,nIter); %keep this trial by trial
 nTrlsUpd             = nan(nClus,nSets,nIter);
 gA = nan(nSets,nIter,4);
 gW = nan(nSets,nIter,4);
@@ -414,7 +415,7 @@ for iterI = 1:nIter
             
     end
     muAll(:,:,:,iterI) = mu;
-%     actAll(:,:,iterI)  = reshape(actUpdAll,nClus,nTrials); %save trial-by-trial act over blocks, here unrolling it    
+    actAll(:,:,iterI)  = reshape(actUpdAll,nClus,nTrials); %save trial-by-trial act over blocks, here unrolling it    
     
 %     closestClusAll(:,iterI) = reshape(closestCbatch,1,nTrials);
     

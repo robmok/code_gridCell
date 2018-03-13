@@ -40,8 +40,7 @@ clus2run = 12; %20, 30
 
 %trapz
 clus2run = [18, 24, 26, 28, 16, 30, 20, 22];
-clus2run = [18, 24, 26, 28]; %krupic3
-clus2run = [16, 30, 20, 22];
+clus2run = [28 22 14]; %krupic3
 
 % nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 

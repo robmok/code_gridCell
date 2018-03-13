@@ -6,12 +6,18 @@ figure; hold on;
 xlim([0,50]); ylim([0,50]);
 
 zlims=[15 40];
-for iTrl = nTrials*.5:nTrials
+
+rng(rSeed(1));
+trials      = [randsample(linspace(locRange(1),locRange(2),locRange(2)+1),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),locRange(2)+1),nTrials,'true')]'; % random points in a box
+
+
+for iTrl = nTrials*.25:nTrials
     
     densityPlotAct(trials(iTrl,1)+1, trials(iTrl,2)+1) = densityPlotAct(trials(iTrl,1)+1, trials(iTrl,2)+1)+ sum(actAll(:,iTrl)).^2; %squaring might make it look better..
     if mod(iTrl,2000)==0 %plot centers after x trials
 %     imagesc(densityPlotAct,zlims); drawnow;
-    imagesc(imgaussfilt(densityPlotAct,1)); drawnow;
+%     imagesc(imgaussfilt(densityPlotAct,1)); colorbar; drawnow;
+    imagesc(imgaussfilt(densityPlotAct,1),[0 100]);  drawnow;
     end
     
 %     densityPlotAct1(trials(iTrl,1)+1, trials(iTrl,2)+1) = densityPlotAct1(trials(iTrl,1)+1, trials(iTrl,2)+1)+ (actAll(1,iTrl)).^2;

@@ -106,8 +106,6 @@ for iDataSets = 1:nXvalDataSets
                 yVals = find(circIm(iX,:));
                 circPts = [circPts; ones(length(yVals),1)*iX, yVals'];
             end
-            trialInd=randi(length(circPts),nDataPtsTest,1);
-%             dataPtsTest=circPts(trialInd,:);
             trialIndTest = randi(length(circPts),nDataPtsTest,1);
             dataPtsTest(:,:,iDataSets)  = circPts(trialIndTest,:);
     end

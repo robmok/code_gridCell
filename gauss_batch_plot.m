@@ -43,11 +43,7 @@ for iClus2run = 1:length(clus2run)
             if fixBatchSize
                 batchSize = batchSizeVals(iBvals);
                 fprintf('Loading nClus=%d, epsMu=%d, batchSize=%d\n',nClus,epsMuOrig10000,batchSize)
-                if ~strcmp(dat,'square')
-                    fname = [saveDir, sprintf('/gauss_batch_%dclus_%dsigma_%dktrls_eps%d_batchSiz%d_%diters_%s*',nClus,sigmaGauss100,round(nTrials/1000),epsMuOrig10000,batchSize,nIter,dat)];
-                else
-                    fname = [saveDir, sprintf('/gauss_batch_%dclus_%dsigma_%dktrls_eps%d_batchSiz%d_%diters*',nClus,sigmaGauss100,round(nTrials/1000),epsMuOrig10000,batchSize,nIter)];
-                end
+                fname = [saveDir, sprintf('/gauss_batch_%dclus_%dsigma_%dktrls_eps%d_batchSiz%d_%diters_%s*',nClus,sigmaGauss100,round(nTrials/1000),epsMuOrig10000,batchSize,nIter,dat)];
                 
                 %edit if want to load more than one file per sim, merge
                 f = dir(fname); filesToLoad = cell(1,length(f));
@@ -56,62 +52,23 @@ for iClus2run = 1:length(clus2run)
                     load(f(iF).name);
                 end
                 
-%                 for iterI = 1:nIter
-%                     for iSet=1:nSet
-%                         densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
-%                     end
-%                 end
-%                 
-%                 
-%                 %organise gridness values (allen vs willis method)
-%                 gA_gAll(:,:,iEps,iBvals,iClus2run,:)   = gA(:,:,1,:);
-%                 gA_oAll(:,:,iEps,iBvals,iClus2run,:)   = gA(:,:,2,:);
-%                 gA_radAll(:,:,iEps,iBvals,iClus2run,:) = gA(:,:,3,:);
-%                 gA_wavAll(:,:,iEps,iBvals,iClus2run,:) = gA(:,:,4,:);
-%                 gW_gAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,1,:);
-%                 gW_oAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,2,:);
-%                 gW_radAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,3,:);
-%                 gW_wavAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,4,:);
-
-
-
-                
-                %% TEMP: didn't save gridness measures correctly in sims, so temporarily doing it here (fix it!)
-               
                 for iterI = 1:nIter
                     for iSet=1:nSet
                         densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
-                        densityPlotCentresSm = imgaussfilt(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
-                        aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram
-                        [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-                        [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
-                        
-                        gA(iSet,iterI,:) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
-                        gW(iSet,iterI,:) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
-                        fname = [saveDir, sprintf('/gauss_batch_%dclus_%dsigma_%dktrls_eps%d_batchSiz%d_%diters_%s*',nClus,sigmaGauss100,round(nTrials/1000),epsMuOrig10000,batchSize,nIter,dat)];
-%                         fname = [saveDir, f(iF).name];
-
-                        save(fname,'densityPlot','clusMu','gA','gW','nIter','rSeed','timeTaken');
-
-                                                            
-                        %organise gridness values (allen vs willis method)
-%                         gA_gAll(iSet,iterI,iEps,iBvals,iClus2run)   = gdataA.g_score;
-%                         gA_oAll(iSet,iterI,iEps,iBvals,iClus2run)   = gdataA.orientation;
-%                         gA_radAll(iSet,iterI,iEps,iBvals,iClus2run) = gdataA.radius;
-%                         gA_wavAll(iSet,iterI,iEps,iBvals,iClus2run) = gdataA.wavelength;
-%                         gW_gAll(iSet,iterI,iEps,iBvals,iClus2run)   = gdataW.g_score;
-%                         gW_oAll(iSet,iterI,iEps,iBvals,iClus2run)   = gdataW.orientation;
-%                         gW_radAll(iSet,iterI,iEps,iBvals,iClus2run) = gdataW.radius;
-%                         gW_wavAll(iSet,iterI,iEps,iBvals,iClus2run) = gdataW.wavelength;
                     end
                 end
+                
+                
+                %organise gridness values (allen vs willis method)
+                gA_gAll(:,:,iEps,iBvals,iClus2run,:)   = gA(:,:,1,:);
+                gA_oAll(:,:,iEps,iBvals,iClus2run,:)   = gA(:,:,2,:);
+                gA_radAll(:,:,iEps,iBvals,iClus2run,:) = gA(:,:,3,:);
+                gA_wavAll(:,:,iEps,iBvals,iClus2run,:) = gA(:,:,4,:);
+                gW_gAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,1,:);
+                gW_oAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,2,:);
+                gW_radAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,3,:);
+                gW_wavAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,4,:);
 
-                
-                
-                
-                
-                
-                
                 
             end
         end
@@ -226,14 +183,15 @@ if size(gridness,4)==1 %only 1 batchSize
 end
 
 
-% %plot univar scatters - comparing batchSizeVals, with clusters in separate plots
-
+%plot univar scatters - comparing batchSizeVals, with learning rates in sep
+%plts, with clusters in separate figs
 if size(gridness,4)>1 % more than 1 batchSize
-    for iEps = 1:length(epsMuVals)
+    for iClus2Run = 1:length(clus2run)
         figure; hold on;
-        for iClus2Run = 1:length(clus2run)
+        for iEps = 1:length(epsMuVals)
             % comparing batch vals, with cluster nums in subplots; can edit for eps
-            subplot(ceil(length(clus2run)/2),2,iClus2Run);
+            %             subplot(ceil(length(epsMuVals)/2),2,iEps);
+            subplot(1,3,iEps);
             %     subplot(2,3,iEps);
             dat1     = squeeze(datTmp(iSet,:,iEps,:,iClus2Run,1));
             barpos  = .25:.5:.5*size(dat1,2);
@@ -247,34 +205,63 @@ if size(gridness,4)>1 % more than 1 batchSize
             scatter(barpos,mu,750,colors,'x');
             xlim([barpos(1)-.5, barpos(end)+.5]);
             %         ylim([0,1]);
-            %         ylim([-.5,1.5]);
+            ylim([-.5,1.25]);
             title(sprintf('%s - eps=%d, nClus=%d',gridMeasure,epsMuVals(iEps)*10000,clus2run(iClus2Run)))
             
-            
-            
-            
-            % % comparing learning rate, with batch vals in subplots
-            % figure; hold on;
-            % for iBvals = 1:length(batchSizeVals)
-            %     subplot(2,3,iBvals);
-            %     dat1     = squeeze(datTmp(iSet,:,:,iBvals));
-            %     barpos  = .25:.5:.5*size(dat1,2);
-            %     colors  = distinguishable_colors(size(dat1,2));
-            %     colgrey = [.5, .5, .5];
-            %     mu      = mean(dat1,1);
-            %     sm      = std(dat1)./sqrt(size(dat1,1));
-            %     ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
-            %     plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-            %     errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-            %     scatter(barpos,mu,750,colors,'x');
-            %     xlim([barpos(1)-.5, barpos(end)+.5]);
-            %     ylim([-.5,1.25]);
-            %     title(sprintf('%s - batchVal=%d',gridMeasure,batchSizeVals(iBvals)))
-            % end
         end
     end
     
 end
+
+
+%plot univar scatters - comparing batchSizeVals, with clusters in separate plots
+% figure; hold on;
+% if size(gridness,4)>1 % more than 1 batchSize
+%     for iEps = 1:length(epsMuVals)
+%         for iClus2Run = 1:length(clus2run)
+%             % comparing batch vals, with cluster nums in subplots
+%             subplot(ceil(length(clus2run)/2),2,iClus2Run);
+%             %     subplot(2,3,iEps);
+%             dat1     = squeeze(datTmp(iSet,:,iEps,:,iClus2Run,1));
+%             barpos  = .25:.5:.5*size(dat1,2);
+%             colors  = distinguishable_colors(size(dat1,2));
+%             colgrey = [.5, .5, .5];
+%             mu      = mean(dat1,1);
+%             sm      = std(dat1)./sqrt(size(dat1,1));
+%             ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+%             plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
+%             errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+%             scatter(barpos,mu,750,colors,'x');
+%             xlim([barpos(1)-.5, barpos(end)+.5]);
+%             %         ylim([0,1]);
+%             ylim([-.5,1.25]);
+%             title(sprintf('%s - eps=%d, nClus=%d',gridMeasure,epsMuVals(iEps)*10000,clus2run(iClus2Run)))
+%             
+%             
+%             
+%             
+%             % % comparing learning rate, with batch vals in subplots
+%             % figure; hold on;
+%             % for iBvals = 1:length(batchSizeVals)
+%             %     subplot(2,3,iBvals);
+%             %     dat1     = squeeze(datTmp(iSet,:,:,iBvals));
+%             %     barpos  = .25:.5:.5*size(dat1,2);
+%             %     colors  = distinguishable_colors(size(dat1,2));
+%             %     colgrey = [.5, .5, .5];
+%             %     mu      = mean(dat1,1);
+%             %     sm      = std(dat1)./sqrt(size(dat1,1));
+%             %     ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+%             %     plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
+%             %     errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+%             %     scatter(barpos,mu,750,colors,'x');
+%             %     xlim([barpos(1)-.5, barpos(end)+.5]);
+%             %     ylim([-.5,1.25]);
+%             %     title(sprintf('%s - batchVal=%d',gridMeasure,batchSizeVals(iBvals)))
+%             % end
+%         end
+%     end
+%     
+% end
 
 
 
@@ -375,3 +362,53 @@ for iterI = iters2plot
     end
     
 end
+
+%% plot gauss activations (batch)
+% 
+% densityPlotAct        = zeros(50,50);
+% densityPlotAct1       = zeros(50,50); %one cluster
+% figure; hold on;
+% xlim([0,50]); ylim([0,50]);
+% 
+% 
+% iterI = 1; 
+% %seed to regenerate trials
+% rng(rSeed(iterI));
+% 
+% locRange = [0, 49];
+% spacing  = linspace(locRange(1),locRange(2),locRange(2)+1);
+% trials   = [randsample(locRange(1):diff( v(1:2)):locRange(2)*2,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
+% 
+% zlims=[15 40];
+% for iTrl = nTrials*.5:nTrials
+%     
+%     densityPlotAct(trials(iTrl,1)+1, trials(iTrl,2)+1) = densityPlotAct(trials(iTrl,1)+1, trials(iTrl,2)+1)+ sum(actAll(:,iTrl)).^2; %squaring might make it look better..
+%     if mod(iTrl,2000)==0 %plot centers after x trials
+% %     imagesc(densityPlotAct,zlims); drawnow;
+%     imagesc(imgaussfilt(densityPlotAct,1)); drawnow;
+%     end
+%     
+% %     densityPlotAct1(trials(iTrl,1)+1, trials(iTrl,2)+1) = densityPlotAct1(trials(iTrl,1)+1, trials(iTrl,2)+1)+ (actAll(1,iTrl)).^2;
+% %     if mod(iTrl,2000)==0 %plot centers after x trials
+% %         imagesc(imgaussfilt(densityPlotAct1,1)); drawnow;
+% %     end
+%     
+%     
+% end
+%     %%
+% zlims=[10 20];
+% 
+% figure;
+% imagesc(densityPlotAct,zlims);
+% figure;
+% imagesc(imgaussfilt(densityPlotAct,1),zlims)
+% % 
+% % zlims1=[.5 1.5];
+% % figure;
+% % imagesc(densityPlotAct1,zlims1);
+% % figure;
+% % imagesc(imgaussfilt(densityPlotAct1,1),zlims1)
+% %     
+% %%
+% aCorrMap=ndautoCORR(imgaussfilt(densityPlotAct,1)); %autocorrelogram
+% [g,gdataA] = gridSCORE(aCorrMap,'allen',1);

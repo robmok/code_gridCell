@@ -11,7 +11,7 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed']));
 
-dat = 'circ'; %'square', 'circ'
+dat = 'square'; %'square', 'circ'
 
 kVals   = 3:30; 
 nKmeans = 1000;
@@ -23,10 +23,12 @@ nXvalDataSets = 20;
 
 %load in data
 fname=[saveDir sprintf('/kmeans_nK_3-30_%s_nPoints%d_1000iters',dat,nPoints)];
+% fname=[saveDir sprintf('/kmeans_nK_3-30_%s_nPoints%d_1000iters_2',dat,nPoints)]; %circ only now
 load(fname);
 
 % load in xVal
 fname = [saveDir sprintf('/kmeans_xVal_nK_%d-%d_%s_%dtrainPts_%dtestPts_%diters_%ddatasets',kVals(1),kVals(end),dat,nPoints, nDataPtsTest,nKmeans,nXvalDataSets)];
+% fname = [saveDir sprintf('/kmeans_xVal_nK_%d-%d_%s_%dtrainPts_%dtestPts_%diters_%ddatasets_2',kVals(1),kVals(end),dat,nPoints, nDataPtsTest,nKmeans,nXvalDataSets)];
 load(fname);
 
 tsseXval=xVal_results.tsseXval;
@@ -136,7 +138,7 @@ iPlt=0;
 for iKvals = iToPlot
     iPlt=iPlt+1;
     subplot(6,5,iPlt)
-    [r p] = corr(g(:,1,iKvals),nanmean(xValErr(:,:,iKvals),2),'type','spearman');
+    [r p] = corr(g(:,1,iKvals),nanmean(xValErr(:,1:10,iKvals),2),'type','spearman');
     r1(iKvals)=r;
     p1(iKvals)=p;
     p1corr(iKvals)=p*nKvals;
