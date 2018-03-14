@@ -25,6 +25,4 @@ for iK = 1:nK
     sse(iK)=nansum(nansum([(muEnd(iK,1))-dataPts(ind==iK,1), (muEnd(iK,2))-dataPts(ind==iK,2)].^2,2));
 end
 tsse = nansum(sse);
-
-
 end

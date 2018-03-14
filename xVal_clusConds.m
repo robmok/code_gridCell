@@ -2,18 +2,14 @@ function xVal_results = xVal_clusConds(mu, dat,nXvalDataSets, nDataPtsTest, locR
 % Crossvalidation function - save SSE and SSE per cluster (spreadoutness
 % measure) 
 
-
 %NOTE: mu and dataPts have to be a cell array: mu{nClusConds}(nClus,2,nIter) and dataPts{nClusConds}
-
-
 %%%%%%%%
 %inputs%
 %%%%%%%%
 % mu:             cluster centre locs - new: should be a cell array mu{nClusConds}(nClus,2,nIter)
 % dat:            string - what is the data: 'rand', 'randUnique','cat'
 % nXvalDataSets:  number of datasets to generate to do xVal over
-% nDataPtsTest:   number of points to generate in test set (same as
-% nTrials?)
+% nDataPtsTest:   number of points to generate in test set
 % locRange:       range where the data lie (box is [0, 49, but might need
 % to edit for different shapes)
 
@@ -25,16 +21,10 @@ function xVal_results = xVal_clusConds(mu, dat,nXvalDataSets, nDataPtsTest, locR
 %output%
 %%%%%%%%
 % tsseXval, spreadoutness, indices for top SSE/spreadoutness on training data
-% ++
-
+% ++?
 %saveDat? - put in saveDir here, or leave for outside?
 
 nClusConds = length(mu);
-
-%%%%%
-% NEED TO SEE IF THIS WORKS WITH DATAPTS AS A CELL ARRAY
-%%%%
-    
 %% compute SSE and spreadoutness from the original data (if exist)
 tsse       = nan(1,nIter,nClusConds);
 sseSprdSd  = nan(1,nIter,nClusConds);
@@ -91,7 +81,7 @@ for iDataSets = 1:nXvalDataSets
                 datPtsGauss(:,:,iCat) = round(repmat(datPtsTmp(iCat,:),nTrialsCat,1) + randn(nTrialsCat,2)*R); % key - these are the coordinates of the points
             end
             dataPtsTestTmp = reshape(datPtsGauss,nDataPtsTest,2);
-            dataPtsTest(:,2,iDataSets) = dataPts(randperm(length(dataPtsTestTmp)),:);
+            dataPtsTest(:,:,iDataSets) = dataPts(randperm(length(dataPtsTestTmp)),:);
         case 'circ'
             % Create logical image of a circle
             nSteps = length(linspace(locRange(1),locRange(2),locRange(2)+1));
