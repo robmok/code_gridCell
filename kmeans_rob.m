@@ -3,8 +3,8 @@
 clear all;
 
 wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 

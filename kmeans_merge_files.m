@@ -14,7 +14,7 @@ d1=load(fname);
 fname=[saveDir sprintf('/kmeans_nK_18-25_%s_nPoints%d_1000iters',dat,nPoints)];
 d2=load(fname);
 fname=[saveDir sprintf('/kmeans_nK_26-30_%s_nPoints%d_1000iters',dat,nPoints)];
-d3=load(fname
+d3=load(fname);
 
 % % new - edit
 % fname=[saveDir sprintf('/kmeans_nK_3-17_%s_nPoints%d_1000iters_*',dat,nPoints)];
@@ -39,3 +39,51 @@ if saveDat
 %     fname=[saveDir sprintf('/kmeans_nK_3-30_%s_nPoints%d_1000iters_2',dat,nPoints)];
     save(fname,'muAllkVals','tssekVals', 'gA','gW','densityPlotCentres','indSSE1','indSSE2','kVals')
 end
+
+
+
+%% new - merge multiple same nclus conds then across multiple nclus conds
+
+
+%first set of nClus conds
+
+fname=[saveDir sprintf('/kmeans_nK_3-22_%s_nPoints%d_1000iters*',dat,nPoints)];
+f = dir(fname); 
+filesToLoad = cell(1,length(f));
+% d1=load(fname);
+%             muAllTmp={}; nIterCount=0;
+for iF = 1%:length(f)
+    filesToLoad{iF} = f(iF).name;
+    dTmp=load(f(iF).name);
+    d(iF)=load(f(iF).name); %would this work? or below
+%     d(iF) = dTmp;
+    
+
+
+
+%     need?
+%     nIterCount = [nIterCount, nIter+nIterCount(end)]; %count number of iters to index below when merging
+end
+
+% merge here e.g. 
+% cat(2,d(:).gA); %consider which dim to cat over
+
+% note muAllkVals will be struct array
+
+
+
+
+
+
+
+
+%second set of nClus conds
+fname=[saveDir sprintf('/kmeans_nK_23-30_%s_nPoints%d_1000iters*',dat,nPoints)];
+f = dir(fname); 
+
+
+
+%then merge across clus (can use original code in above cell)
+
+
+

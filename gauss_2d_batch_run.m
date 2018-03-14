@@ -175,8 +175,8 @@ if ~neigh %separating neigh and stoch/momentum params
                                 tic
 %                                 [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,muAll] = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat,weightEpsSSE);
                                 fprintf('Running %s, nClus=%d, epsMu=%d, sigmaGauss=%d, batchSize=%d\n',dat,nClus,epsMuOrig10000,sigmaGauss100,batchSize)
-%                                 [densityPlot,clusMu,gA,gW,rSeed,muAll] = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat,weightEpsSSE);
-                                [actAll, densityPlot,clusMu,gA,gW,rSeed,muAll] = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat,weightEpsSSE);
+                                [densityPlot,clusMu,gA,gW,rSeed,muAll] = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat,weightEpsSSE);
+%                                 [actAll, densityPlot,clusMu,gA,gW,rSeed,muAll] = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat,weightEpsSSE);
 %                                 fname = [saveDir, sprintf('/gauss_batch_%dclus__%dsigma_%dktrls_eps%d_alpha%d_stype%d_cVal%d_sseW%d_batchSiz%d_%diters',nClus,sigmaGauss100,round(nTrials/1000),epsMuOrig10000,alpha10,stochasticType,c1m,weightEpsSSE,round(batchSize),nIter)];
                                 fname = [saveDir, sprintf('/gauss_batch_%dclus_%dsigma_%dktrls_eps%d_batchSiz%d_%diters_%s',nClus,sigmaGauss100,round(nTrials/1000),epsMuOrig10000,round(batchSize),nIter,dat)];                                
                                 timeTaken=toc;
