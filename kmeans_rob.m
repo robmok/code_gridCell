@@ -17,11 +17,11 @@ runScriptTimes=2; %rerun whole script x times
 saveDat = 1;
 
 kVals = 3:22; 
-% kVals = 23:30; 
+ kVals = 23:30; 
 % kVals = 10;
 nKvals = length(kVals);
 
-dat = 'square'; %'rand' points in a box, randUnique (all unique points in box), or 'cat'
+dat = 'circ'; %'rand' points in a box, randUnique (all unique points in box), or 'cat'
 nKmeans = 200;  % run k means n times 
 % nPoints = 5000;  %how many locations/datapoints - not used for 'randUnique'
 nPointsVals = [5000, 10000]; % also did 3000 before
