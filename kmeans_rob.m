@@ -4,7 +4,7 @@ clear all;
 
 wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -17,11 +17,11 @@ runScriptTimes=2; %rerun whole script x times
 saveDat = 1;
 
 kVals = 3:22; 
-kVals = 23:30; 
+% kVals = 23:30; 
 % kVals = 10;
 nKvals = length(kVals);
 
-dat = 'circ'; %'rand' points in a box, randUnique (all unique points in box), or 'cat'
+dat = 'square'; %'rand' points in a box, randUnique (all unique points in box), or 'cat'
 nKmeans = 200;  % run k means n times 
 % nPoints = 5000;  %how many locations/datapoints - not used for 'randUnique'
 nPointsVals = [5000, 10000]; % also did 3000 before
