@@ -1,4 +1,4 @@
-function [densityPlot,clusMu,gA,gW,rSeed,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE)
+function [densityPlot,densityPlotAct,clusMu,gA,gW,gA_act,gW_act,rSeed,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE)
 
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
 stepSize=diff(spacing(1:2)); nSteps = length(spacing);
@@ -22,15 +22,17 @@ trlSel = ceil([nBatch*.25, nBatch*.5, nBatch*.67, nBatch*.75, nBatch*.9, nBatch+
 %note that this is averaging over trials, not just batches though - might
 %be to show activations as clusters are stationary as well as move?
 
-fromTrlI = [nTrials*.24+1, nTrials*.49+1, nTrials*.66+1, nTrials*.74+1, nTrials*.89+1, nTrials*.99+1]; % 1% of trials, should have a handful of batch updates %+1 so not 1 trial extra
-toTrlN   = [nTrials*.25,   nTrials*.5,    nTrials*.67,   nTrials*.75,   nTrials*.9,    nTrials+1];%same prop to above batches; but show activations that lead up to this
+fromTrlI = round([nTrials*.24+1, nTrials*.49+1, nTrials*.66+1, nTrials*.74+1, nTrials*.89+1, nTrials*.99+1]); % 1% of trials, should have a handful of batch updates %+1 so not 1 trial extra
+toTrlN   = round([nTrials*.25,   nTrials*.5,    nTrials*.67,   nTrials*.75,   nTrials*.9,    nTrials+1]);%same prop to above batches; but show activations that lead up to this
    
 
-if nargout > 5
+if nargout > 8
     muAll            = nan(nClus,2,nBatch+1,nIter);
 end
 nSets                = length(trlSel);
 clusMu               = nan(nClus,2,nSets,nIter);
+actAll               = nan(nClus,nTrials); %keep this trial by trial
+
 % tsseAll              = nan(nBatch+1,nIter); %not sure if this is +1 or not; not tested
 % rSeed = struct(1,nIter); %how to initialise this struct?
 gA = nan(nSets,nIter,4);
@@ -62,8 +64,9 @@ else
     b=length(spacing);
     h=length(spacing);
 end
-densityPlotClus = zeros(b,h,nClus,nSets,nIter);
-densityPlot     = zeros(b,h,nSets,nIter);
+densityPlotClus    = zeros(b,h,nClus,nSets,nIter);
+densityPlot        = zeros(b,h,nSets,nIter);
+densityPlotAct     = zeros(b,h,nSets,nIter);
 
 for iterI = 1:nIter
     
@@ -303,6 +306,8 @@ for iterI = 1:nIter
     %initialise each cluster location  
     mu = nan(nClus,2,nBatch+1);
     mu(:,:,1) = kmplusInit(dataPtsTest,nClus); %kmeans++ initialisation
+    
+    actTrl = zeros(nClus,batchSize);
     %%
     
 %     updatedC = nan(nTrials,1);
@@ -311,6 +316,9 @@ for iterI = 1:nIter
 %     clusUpdates = zeros(nClus,2); %acutally starting at 0 is OK, since there was no momentum from last trial
     tsse            = nan(nBatch,1);
     sseW            = ones(nBatch,1);
+    
+    actTrlAll = nan(nClus,batchSize,nBatch); %check
+
     
     for iBatch=1:nBatch
         batchInd=batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize; %trials to average over
@@ -370,8 +378,16 @@ for iterI = 1:nIter
                 else
                     closestC(iTrlBatch) = closestTmp;
                 end
+                
+                %compute activation
+                sigmaGauss = stepSize/3.5; %move up later
+                actTrl(closestC(iTrlBatch),iTrlBatch)=mvnpdf(trls2Upd(iTrlBatch,:),mu(closestC(iTrlBatch),:,iBatch),eye(2)*sigmaGauss); % save only the winner
+                
+                
+                
             end
-            
+            actTrlAll(:,:,iBatch) = actTrl;
+
 %             %if stochastic, closestC might not be if more than 1 actual
 %             %closest, have to check if stoch update chose one of them
 %             actualClosestC = find(min(dist2Clus)==dist2Clus); 
@@ -465,9 +481,19 @@ for iterI = 1:nIter
 
 
     end
-    if nargout > 5
+    if nargout > 8
         muAll(:,:,:,iterI)      = mu;
     end
+    actAll  = reshape(actTrlAll,nClus,nTrials); %save trial-by-trial act over blocks, here unrolling it
+
+    %compute activation plots using saved gauss activations
+    for iSet = 1:nSets
+        for iTrl = fromTrlI(iSet):toTrlN(iSet)
+            densityPlotAct(trials(iTrl,1)+1, trials(iTrl,2)+1,iSet,iterI) = densityPlotAct(trials(iTrl,1)+1, trials(iTrl,2)+1,iSet,iterI)+ sum(actAll(:,iTrl)); %.^2 to make it look better?
+        end
+    end
+    
+    
 %     tsseAll(:,iterI)        = tsse;
 %     sseSpreadSd(:,iterI)    = stdAcrossClus;
 %     sseSpreadVar(:,iterI)   = varAcrossClus;
@@ -511,6 +537,8 @@ for iterI = 1:nIter
             densityPlot(:,:,iSet,iterI) = nansum(densityPlotClus(:,:,:,iSet,iterI),3); %save this
             densityPlotSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
         end
+    
+        densityPlotActSm = imgaussfilt(densityPlotAct(:,:,iSet,iterI),gaussSmooth);       
         
         if ~strcmp(dat,'cat') %if finding cats, won't be gridlike
             %compute autocorrmap, no need to save
@@ -521,6 +549,14 @@ for iterI = 1:nIter
             gA(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
             gW(iSet,iterI,:,1) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
             
+            %compute gridness over activation map
+            aCorrMap = ndautoCORR(densityPlotActSm);
+            [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+            [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+            gA_act(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
+            gW_act(iSet,iterI,:,1) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
+            
+            
             %split in half then compute gridness for each half
             if  strcmp(dat(1:5),'trapz')
                 
@@ -530,18 +566,31 @@ for iterI = 1:nIter
                 [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
                 gA(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
                 gW(iSet,iterI,:,2) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
+                
                 %right half of box
                 aCorrMap = ndautoCORR(densityPlotSm(:,length(spacing)/2+1:end));
                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
                 [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
                 gA(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
-                gW(iSet,iterI,:,3) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];                
+                gW(iSet,iterI,:,3) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];  
+                
+                %act
+                %left half of box
+                aCorrMap = ndautoCORR(densityPlotActSm(:,1:length(spacing)/2));
+                [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+                [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+                gA_act(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
+                gW_act(iSet,iterI,:,2) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
+                
+                %right half of box
+                aCorrMap = ndautoCORR(densityPlotActSm(:,length(spacing)/2+1:end));
+                [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+                [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+                gA_act(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
+                gW_act(iSet,iterI,:,3) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
             end
-            
         end
-        
     end
-    
 end
 end
 
