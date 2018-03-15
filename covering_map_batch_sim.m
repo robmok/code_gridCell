@@ -38,7 +38,7 @@ actAll               = nan(nClus,nTrials); %keep this trial by trial
 gA = nan(nSets,nIter,4);
 gW = nan(nSets,nIter,4);
 %if trapz - compute gridness of left/right half of boxes too
-if strcmp(dat(1:5),'trapz')
+if strcmp(dat(1:4),'trap')
     gA = nan(nSets,nIter,4,3);
     gW = nan(nSets,nIter,4,3);
 end
@@ -47,7 +47,7 @@ end
 trapzSpacing{1} = spacing(10:41);
 trapzSpacing{2} = spacing(7:44); 
 trapzSpacing{3} = spacing(4:47);
-if strcmp(dat(1:5),'trapz') && length(dat)>10
+if strcmp(dat(1:4),'trap') && length(dat)>10
     if strcmp(dat(1:11),'trapzScaled')
         spacingTrapz = trapzSpacing{str2double(dat(12))}; %trapzScaled1,2,3
         a=length(spacingTrapz); %trapz length1
@@ -558,7 +558,7 @@ for iterI = 1:nIter
             
             
             %split in half then compute gridness for each half
-            if  strcmp(dat(1:5),'trapz')
+            if  strcmp(dat(1:4),'trap')
                 
                 %left half of box
                 aCorrMap = ndautoCORR(densityPlotSm(:,1:length(spacing)/2));

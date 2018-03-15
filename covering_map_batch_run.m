@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-%   wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -15,7 +15,7 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 dat = 'square'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
-% dat = 'circ'; 
+dat = 'circ'; 
 % dat = 'trapz1'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
 % dat = 'trapz2';
 % dat = 'trapz3';
@@ -36,9 +36,9 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % clus2run = 12; %20, 30
 % clus2run = [10, 12]; % [11, 14] 
 clus2run = [20, 24]; 
-% clus2run = [24, 26]; 
-% clus2run = [16, 28]; 
-% clus2run = [18, 22]; 
+ clus2run = [24, 26]; 
+ clus2run = [16, 28]; 
+ clus2run = [18, 22]; 
 
 %trapz
 % clus2run = [18, 24, 26, 28, 16, 30, 20, 22];
@@ -117,9 +117,9 @@ c=0;
 % trialsUnique=allPts;
 % save([saveDir '/randTrialsBox_trialsUnique'],'trialsUnique');
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
-nIter=1;%200; %how many iterations (starting points)
+nIter=200;%200; %how many iterations (starting points)
 
 switch dat
         case 'randUnique'
