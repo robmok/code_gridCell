@@ -1,4 +1,4 @@
-function [densityPlot,clusMu,gA,gW,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE)
+function [densityPlot,clusMu,gA,gW,rSeed,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE)
 
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
 stepSize=diff(spacing(1:2)); nSteps = length(spacing);
@@ -16,12 +16,23 @@ batchSize = floor(batchSize); % when have decimal points, above needed
 % thing if just looking at some point in time, small batches = less stable.
 trlSel = ceil([nBatch*.25, nBatch*.5, nBatch*.67, nBatch*.75, nBatch*.9, nBatch+1]);
 
-if nargout > 4
+
+%also get a bunch of trials to plot activations from current trial (gauss
+%func of clus loc) - make it 6 like sets above
+%note that this is averaging over trials, not just batches though - might
+%be to show activations as clusters are stationary as well as move?
+
+fromTrlI = [nTrials*.24+1, nTrials*.49+1, nTrials*.66+1, nTrials*.74+1, nTrials*.89+1, nTrials*.99+1]; % 1% of trials, should have a handful of batch updates %+1 so not 1 trial extra
+toTrlN   = [nTrials*.25,   nTrials*.5,    nTrials*.67,   nTrials*.75,   nTrials*.9,    nTrials+1];%same prop to above batches; but show activations that lead up to this
+   
+
+if nargout > 5
     muAll            = nan(nClus,2,nBatch+1,nIter);
 end
 nSets                = length(trlSel);
 clusMu               = nan(nClus,2,nSets,nIter);
 % tsseAll              = nan(nBatch+1,nIter); %not sure if this is +1 or not; not tested
+% rSeed = struct(1,nIter); %how to initialise this struct?
 gA = nan(nSets,nIter,4);
 gW = nan(nSets,nIter,4);
 %if trapz - compute gridness of left/right half of boxes too
@@ -60,6 +71,9 @@ for iterI = 1:nIter
     epsMu = epsMuOrig; %revert learning rate back to original if reset
 
     if ~useSameTrls %if want training data to be different set of points
+        %make seed so can regenerate the trials later without saving - load up
+        %the seed using: rng(s); then run trials = ...
+        rSeed(iterI)=rng;
         switch dat
             case 'square' %square
                 trials      = [randsample(linspace(locRange(1),locRange(2),50),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),50),nTrials,'true')]';
@@ -451,7 +465,7 @@ for iterI = 1:nIter
 
 
     end
-    if nargout > 4
+    if nargout > 5
         muAll(:,:,:,iterI)      = mu;
     end
 %     tsseAll(:,iterI)        = tsse;

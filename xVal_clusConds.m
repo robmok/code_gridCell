@@ -106,7 +106,12 @@ for iDataSets = 1:nXvalDataSets
         sseXval   = nan(1,nClus);
         for iterI=1:nIter
             %compute distance of existing clusters with new datapoints
-            distXval=(mu{iClusCond}(:,1,iterI)-dataPtsTest(:,1,iDataSets)').^2+mu{iClusCond}(:,2,iterI)-dataPtsTest(:,2,iDataSets)'.^2;% vectorised - not sorted by SSE
+            distXval=(mu{iClusCond}(:,1,iterI)-dataPtsTest(:,1,iDataSets)').^2+(mu{iClusCond}(:,2,iterI)-dataPtsTest(:,2,iDataSets)').^2;% vectorised - not sorted by SSE
+            
+%             for iClus=1:3
+%             distXval2(iClus,:)=[(mu{iClusCond}(iClus,1,iterI)-dataPtsTest(:,1,iDataSets)').^2 + (mu{iClusCond}(iClus,2,iterI)-dataPtsTest(:,2,iDataSets)').^2];
+%             end
+%             
             [indValsTest, indTest]=min(distXval,[],1); % find which clusters are points closest to
             for iClus = 1:nClus
                 sseXval(iClus)=sum(sum([mu{iClusCond}(iClus,1,iterI)-dataPtsTest(indTest==iClus,1,iDataSets), mu{iClusCond}(iClus,2,iterI)-dataPtsTest(indTest==iClus,2,iDataSets)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster

@@ -11,24 +11,24 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed']));
 
-dat = 'square'; %'square', 'circ'
+dat = 'circ'; %'square', 'circ'
 
 kVals   = 3:30; 
-nKmeans = 1000;
-nPoints = 10000; %3k, 5k, 10k
+% nKmeans = 1000;
+nKmeans = 200;
+nSims = 5; % nIters=nKmeans*nSims;
+nPoints = 10000; %5k, 10k
 nKvals  = length(kVals);
 
-nDataPtsTest = 3000; %3k, 5k, 10k
+nDataPtsTest = 10000; %5k, 10k
 nXvalDataSets = 20;
 
 %load in data
-fname=[saveDir sprintf('/kmeans_nK_3-30_%s_nPoints%d_1000iters',dat,nPoints)];
-% fname=[saveDir sprintf('/kmeans_nK_3-30_%s_nPoints%d_1000iters_2',dat,nPoints)]; %circ only now
+fname = [saveDir, sprintf('/kmeans_nK_%d-%d_%s_nPoints%d_%diters_%dsims_merged',kVals(1),kVals(end),dat,nPoints,nKmeans,nSims)];
 load(fname);
 
 % load in xVal
-fname = [saveDir sprintf('/kmeans_xVal_nK_%d-%d_%s_%dtrainPts_%dtestPts_%diters_%ddatasets',kVals(1),kVals(end),dat,nPoints, nDataPtsTest,nKmeans,nXvalDataSets)];
-% fname = [saveDir sprintf('/kmeans_xVal_nK_%d-%d_%s_%dtrainPts_%dtestPts_%diters_%ddatasets_2',kVals(1),kVals(end),dat,nPoints, nDataPtsTest,nKmeans,nXvalDataSets)];
+fname = [saveDir sprintf('/kmeans_xVal_nK_%d-%d_%s_%dtrainPts_%dtestPts_%diters_%sims_%ddatasets',kVals(1),kVals(end),dat,nPoints,nDataPtsTest,nKmeans,nSims,nXvalDataSets)];
 load(fname);
 
 tsseXval=xVal_results.tsseXval;
@@ -138,16 +138,16 @@ iPlt=0;
 for iKvals = iToPlot
     iPlt=iPlt+1;
     subplot(6,5,iPlt)
-    [r p] = corr(g(:,1,iKvals),nanmean(xValErr(:,1:10,iKvals),2),'type','spearman');
-    r1(iKvals)=r;
-    p1(iKvals)=p;
-    p1corr(iKvals)=p*nKvals;
-    if p1corr(iKvals)>1, p1corr(iKvals)=1; end
+    [r p] = corr(g(:,1,iKvals),nanmean(xValErr(:,:,iKvals),2),'type','spearman');
+    rx1(iKvals)=r;
+    px1(iKvals)=p;
+    px1corr(iKvals)=p*nKvals;
+    if px1corr(iKvals)>1, px1corr(iKvals)=1; end
     scatter(nanmean(xValErr(:,:,iKvals),2),g(:,1,iKvals),'.');
-    title(sprintf('nK=%d, r = %.2f, p (crcted) = %.3f',kVals(iKvals),r,p1corr(iKvals)))
+    title(sprintf('nK=%d, r = %.2f, p (crcted) = %.3f',kVals(iKvals),r,px1corr(iKvals)))
 end
 
-[r1; p1corr]'
+[rx1; px1corr]'
 
 
 % are 30/60 degree orientations --> better gridness? nk=3 suggests so.

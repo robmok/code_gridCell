@@ -1,89 +1,107 @@
 %kmeans_merge
+
+clear all;
+
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 cd(wd);
 codeDir = [wd '/code_gridCell'];
 saveDir = [wd '/data_gridCell'];
 
-saveDat = 1;
+saveDat = 0;
 
 dat='circ'; %square, circ
-nPoints=3000; %3k, 5k, 10k
+nPoints = 5000; %3k, 5k, 10k
+nIters  = 200; %nKmeans
 
-fname=[saveDir sprintf('/kmeans_nK_3-17_%s_nPoints%d_1000iters',dat,nPoints)];
-d1=load(fname);
-fname=[saveDir sprintf('/kmeans_nK_18-25_%s_nPoints%d_1000iters',dat,nPoints)];
-d2=load(fname);
-fname=[saveDir sprintf('/kmeans_nK_26-30_%s_nPoints%d_1000iters',dat,nPoints)];
-d3=load(fname);
+mergeAcrossClus = 1; % if more than 2 files to merge, can edit below to use this as the value
 
-% % new - edit
-% fname=[saveDir sprintf('/kmeans_nK_3-17_%s_nPoints%d_1000iters_*',dat,nPoints)];
-% f=dir(fname);
-% d1=load([saveDir '/' f(1).name]); %need edit since can load in more than 1
-% fname=[saveDir sprintf('/kmeans_nK_18-25_%s_nPoints%d_1000iters_*',dat,nPoints)];
-% f=dir(fname);
-% d2=load([saveDir '/' f(1).name]);
-% fname=[saveDir sprintf('/kmeans_nK_26-30_%s_nPoints%d_1000iters_*',dat,nPoints)];
-% f=dir(fname);
-% d3=load([saveDir '/' f(1).name]);
-densityPlotCentres  = cat(4,d1.densityPlotCentres,d2.densityPlotCentres,d3.densityPlotCentres);
-gA                  = cat(3,d1.gA,d2.gA,d3.gA);
-gW                  = cat(3,d1.gW,d2.gW,d3.gW);
-indSSE1             = cat(1,d1.indSSE1,d2.indSSE1,d3.indSSE1);
-indSSE2             = cat(1,d1.indSSE2,d2.indSSE2,d3.indSSE2);
-kVals               = cat(2,d1.kVals,d2.kVals,d3.kVals);
-muAllkVals          = cat(2,d1.muAllkVals,d2.muAllkVals,d3.muAllkVals);
-tssekVals           = cat(1,d1.tssekVals,d2.tssekVals,d3.tssekVals);
-if saveDat
-    fname=[saveDir sprintf('/kmeans_nK_3-30_%s_nPoints%d_1000iters',dat,nPoints)];
-%     fname=[saveDir sprintf('/kmeans_nK_3-30_%s_nPoints%d_1000iters_2',dat,nPoints)];
-    save(fname,'muAllkVals','tssekVals', 'gA','gW','densityPlotCentres','indSSE1','indSSE2','kVals')
-end
+%% merge
 
-
-
-%% new - merge multiple same nclus conds then across multiple nclus conds
-
-
-%first set of nClus conds
-
-fname=[saveDir sprintf('/kmeans_nK_3-22_%s_nPoints%d_1000iters*',dat,nPoints)];
-f = dir(fname); 
-filesToLoad = cell(1,length(f));
-% d1=load(fname);
-%             muAllTmp={}; nIterCount=0;
-for iF = 1%:length(f)
-    filesToLoad{iF} = f(iF).name;
-    dTmp=load(f(iF).name);
-    d(iF)=load(f(iF).name); %would this work? or below
-%     d(iF) = dTmp;
+if ~mergeAcrossClus
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % merge across iters, but not clus%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   fname=[saveDir sprintf('/kmeans_nK_3-30_%s_nPoints%d_%diters*',dat,nPoints,nIters)];
+    f = dir(fname);
+    filesToLoad = cell(1,length(f));
+    for iF = 1:length(f)
+        filesToLoad{iF} = f(iF).name;
+        d(iF)=load(f(iF).name);
+    end
+    densityPlotCentres = cat(3,d.densityPlotCentres);
+    gA                 = cat(1,d.gA);
+    gW                 = cat(1,d.gW);
+    indSSE1            = cat(1,d.indSSE1);
+    indSSE2            = cat(1,d.indSSE2);
+    kVals              = d(1).kVals;
+    tssekVals          = cat(2,d.tssekVals);
+    muAllkVals         = cell(1,length(kVals)); %merge across iters, same nClus conds
+    for iK = 1:length(kVals)
+        for iBlk=1:length(f) %nFiles
+            muAllkVals{iK} = cat(3,muAllkVals{iK}, d(iBlk).muAllkVals{iK});
+        end
+    end
     
-
-
-
-%     need?
-%     nIterCount = [nIterCount, nIter+nIterCount(end)]; %count number of iters to index below when merging
+else 
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % merge multiple same nclus conds then across multiple nclus conds%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %first set of nClus conds
+    fname=[saveDir sprintf('/kmeans_nK_3-22_%s_nPoints%d_%diters*',dat,nPoints,nIters)];
+    f = dir(fname);
+    filesToLoad = cell(1,length(f));
+    for iF = 1:length(f)
+        filesToLoad{iF} = f(iF).name;
+        d(iF)=load(f(iF).name);
+    end
+    densityPlotCentres1 = cat(3,d.densityPlotCentres);
+    gA1                 = cat(1,d.gA);
+    gW1                 = cat(1,d.gW);
+    indSSE11            = cat(2,d.indSSE1);
+    indSSE21            = cat(2,d.indSSE2);
+    kVals1              = d(1).kVals;
+    tssekVals1          = cat(2,d.tssekVals);
+    muAllkVals1         = cell(1,length(kVals1)); %merge across iters, same nClus conds
+    for iK = 1:length(kVals1)
+        for iBlk=1:length(f) %nFiles
+            muAllkVals1{iK} = cat(3,muAllkVals1{iK}, d(iBlk).muAllkVals{iK});
+        end
+    end
+    
+    %second set of nClus conds
+    fname=[saveDir sprintf('/kmeans_nK_23-30_%s_nPoints%d_%diters*',dat,nPoints,nIters)];
+    f = dir(fname);
+    filesToLoad = cell(1,length(f));
+    for iF = 1:length(f)
+        filesToLoad{iF} = f(iF).name;
+        d(iF)=load(f(iF).name);
+    end
+    densityPlotCentres2 = cat(3,d.densityPlotCentres);
+    gA2                 = cat(1,d.gA);
+    gW2                 = cat(1,d.gW);
+    indSSE12            = cat(2,d.indSSE1);
+    indSSE22            = cat(2,d.indSSE2);
+    kVals2              = d(1).kVals;
+    tssekVals2          = cat(2,d.tssekVals);
+    muAllkVals2         = cell(1,length(kVals2)); %merge across iters, same nClus conds
+    for iK = 1:length(kVals2)
+        for iBlk=1:length(f) %nFiles
+            muAllkVals2{iK} = cat(3,muAllkVals2{iK}, d(iBlk).muAllkVals{iK});
+        end
+    end
+    
+    %then merge across clus
+    densityPlotCentres = cat(4,densityPlotCentres1,densityPlotCentres1);
+    gA                 = cat(3,gA1,gA2);
+    gW                 = cat(3,gW1,gW2);
+    indSSE1            = cat(1,indSSE11,indSSE12);
+    indSSE2            = cat(1,indSSE21,indSSE22);
+    kVals              = cat(2,kVals1,kVals2);
+    tssekVals          = cat(1,tssekVals1,tssekVals2);
+    muAllkVals         = cat(2,muAllkVals1,muAllkVals2);
+    
 end
 
-% merge here e.g. 
-% cat(2,d(:).gA); %consider which dim to cat over
-
-% note muAllkVals will be struct array
-
-
-
-
-
-
-
-
-%second set of nClus conds
-fname=[saveDir sprintf('/kmeans_nK_23-30_%s_nPoints%d_1000iters*',dat,nPoints)];
-f = dir(fname); 
-
-
-
-%then merge across clus (can use original code in above cell)
-
-
-
+if saveDat
+    fname=[saveDir sprintf('/kmeans_nK_3-30_%s_nPoints%d_%diters_%dsims_merged',dat,nPoints,nIters,length(f))]; %note assuming length(f) is the num of sims run (and same for set 1 and set 2)
+    save(fname,'densityPlotCentres','gA','gW','indSSE1','indSSE2','kVals','tssekVals','muAllkVals');
+end
