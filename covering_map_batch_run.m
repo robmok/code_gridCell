@@ -36,9 +36,9 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % clus2run = 12; %20, 30
 % clus2run = [10, 12]; % [11, 14] 
 clus2run = [20, 24]; 
-clus2run = [24, 26]; 
-clus2run = [16, 28]; 
-clus2run = [18, 22]; 
+% clus2run = [24, 26]; 
+% clus2run = [16, 28]; 
+% clus2run = [18, 22]; 
 
 %trapz
 % clus2run = [18, 24, 26, 28, 16, 30, 20, 22];
@@ -159,7 +159,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                 batchSize = batchSizeVals(iBvals); %fixed batch size
                 fprintf('Running %s, nClus=%d, epsMu=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000,batchSize)
 %                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(batchSize),nIter)];
-                fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_act',nClus,round(nTrials/1000),epsMuOrig1000,round(batchSize),nIter)];
+                fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_wAct',nClus,round(nTrials/1000),epsMuOrig1000,round(batchSize),nIter)];
             else % define batch size based on average number of updates per cluster 
                 batchSize = clus2run(iClus2run).*avgBatchUpdate(iBvals); % batch size depends on average updates per cluster (depends on nClus cond)
                 fprintf('Running %s, nClus=%d, epsMu=%d, avgBatchUpd=%d; batchSize=%d\n',dat,nClus,epsMuOrig1000,avgBatchUpdate(iBvals),batchSize)
