@@ -1,4 +1,4 @@
-function [muEnd,tsse] = kmeans_rm(mu,dataPts,nK,nUpdSteps)
+function [muEnd,tsse,sseSprdSd,sseSprdVar] = kmeans_rm(mu,dataPts,nK,nUpdSteps)
 %kmeans function 
 %first trial of mu has to be specified (e.g. by kmplusInit.m)
 
@@ -25,4 +25,7 @@ for iK = 1:nK
     sse(iK)=nansum(nansum([(muEnd(iK,1))-dataPts(ind==iK,1), (muEnd(iK,2))-dataPts(ind==iK,2)].^2,2));
 end
 tsse = nansum(sse);
+devAvgSSE  = sse-nanmean(sse);  % compute SSE per cluster (spreadoutness measure)
+sseSprdSd  = nanstd(devAvgSSE); % may be better since normalises by nK (?)
+sseSprdVar = nanvar(devAvgSSE);
 end

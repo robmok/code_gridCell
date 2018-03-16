@@ -15,14 +15,14 @@ kVals = 3:30;
 nKvals = length(kVals);
 dat='square'; %square, circ
 nKmeans = 200;
-nSims = 10; % 
+nSims = 5; % 5, 10
 nIters=nKmeans*nSims;
 nPointsVals = [5000, 10000]; % also did 3k before
 nPointsVals = 5000;
 nPointsVals = 10000;
 
 %xVal specs
-saveDat = 1;
+saveDat = 0;
 nXvalDataSets = 20; % specify how many datasets to generate
 nDataPtsTestVals = [5000, 10000]; %run over number of test points (e.g. compare trained of 3k, 5k, and 10k using SSE on 3k pts)
     

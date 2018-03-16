@@ -108,18 +108,19 @@ for iDataSets = 1:nXvalDataSets
             %compute distance of existing clusters with new datapoints
             distXval=(mu{iClusCond}(:,1,iterI)-dataPtsTest(:,1,iDataSets)').^2+(mu{iClusCond}(:,2,iterI)-dataPtsTest(:,2,iDataSets)').^2;% vectorised - not sorted by SSE
             
+            %checking
 %             for iClus=1:3
 %             distXval2(iClus,:)=[(mu{iClusCond}(iClus,1,iterI)-dataPtsTest(:,1,iDataSets)').^2 + (mu{iClusCond}(iClus,2,iterI)-dataPtsTest(:,2,iDataSets)').^2];
 %             end
 %             
             [indValsTest, indTest]=min(distXval,[],1); % find which clusters are points closest to
             for iClus = 1:nClus
-                sseXval(iClus)=sum(sum([mu{iClusCond}(iClus,1,iterI)-dataPtsTest(indTest==iClus,1,iDataSets), mu{iClusCond}(iClus,2,iterI)-dataPtsTest(indTest==iClus,2,iDataSets)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
+                sseXval(iClus)=nansum(nansum([mu{iClusCond}(iClus,1,iterI)-dataPtsTest(indTest==iClus,1,iDataSets), mu{iClusCond}(iClus,2,iterI)-dataPtsTest(indTest==iClus,2,iDataSets)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
             end
-            tsseXval(iterI,iDataSets,iClusCond)          = sum(sseXval);
+            tsseXval(iterI,iDataSets,iClusCond)          = nansum(sseXval);
             devAvgSSEXval                                = sseXval-mean(sseXval); % compute SSE per cluster (spreadoutness measure)
-            sseSprdSdXval(iterI,iDataSets,iClusCond)     = std(devAvgSSEXval); % may be better since normalises by nClus (?)
-            sseSprdVarXval(iterI,iDataSets,iClusCond)    = var(devAvgSSEXval);
+            sseSprdSdXval(iterI,iDataSets,iClusCond)     = nanstd(devAvgSSEXval); % may be better since normalises by nClus (?)
+            sseSprdVarXval(iterI,iDataSets,iClusCond)    = nanvar(devAvgSSEXval);
         end
     end
 end
