@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -24,8 +24,10 @@ dat = 'circ';
 % dat = 'trapzKrupic3';
 % dat = 'trapzScaled1';
 % dat = 'trapzScaled2';
-%  dat = 'trapzScaled3';
+ dat = 'trapzScaled3';
 % dat = 'trapzNorm';%not scaled, fit into square
+
+boxSize = 2; % 1=normal, 2=double size, 3=triple size
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
 nCats   = 2; %2 categories
@@ -41,8 +43,11 @@ clus2run = [20, 24];
  clus2run = [18, 22]; 
 
 %trapz
-% clus2run = [18, 24, 26, 28, 16, 30, 20, 22];
+clus2run = [18, 24, 26, 28]; %trapzScaled
+% clus2run = [16, 30, 20, 22]; %trapzScaled3 x2 size
 % clus2run = [28 22 14]; %krupic3
+
+% clus2run=24;
 
 % nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 
@@ -76,6 +81,12 @@ useSameTrls=0;
 nSteps = 50; %to define spacing beween each loc in box
 locRange = [0, nSteps-1]; %[-1, 1]; % from locRange(1) to locRange(2)
 stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %smallest diff between locs
+
+if boxSize==2 %double
+    locRange(2)= locRange(2)*2;
+elseif boxSize==3 %double
+    locRange(2)= locRange(2)*3;
+end
 
 % parameters
 % epsMuVals=[.01, .05, .075, .1, .2, .3];% %learning rate / starting learning rate 
@@ -117,9 +128,9 @@ c=0;
 % trialsUnique=allPts;
 % save([saveDir '/randTrialsBox_trialsUnique'],'trialsUnique');
 %%
-saveDat=1; %save simulations
+saveDat=0; %save simulations
 
-nIter=200;%200; %how many iterations (starting points)
+nIter=1; %how many iterations (starting points)
 
 switch dat
         case 'randUnique'
@@ -177,6 +188,9 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
 %                 if ~strcmp(dat,'square') %atm, only square not append name; later add to above fname
                  fname = [fname sprintf('_%s',dat)]; % for new sims (from adding activations, save name too)
 %                 end
+                if boxSize>1
+                    fname = [fname sprintf('_boxSizex%d',boxSize)];
+                end
                 cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
                 save(fname,'densityPlot','densityPlotAct','clusMu','gA','gW','gA_act','gW_act','nIter','rSeed','timeTaken'); %added trialsAll for xval - removed, too big.maybe compute at end of each sim? or at each set
             end

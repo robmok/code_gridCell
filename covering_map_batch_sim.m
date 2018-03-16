@@ -51,19 +51,21 @@ if strcmp(dat(1:4),'trap') && length(dat)>10
     if strcmp(dat(1:11),'trapzScaled')
         spacingTrapz = trapzSpacing{str2double(dat(12))}; %trapzScaled1,2,3
         a=length(spacingTrapz); %trapz length1
-        b=locRange(2)+1; %50 - trapz length2
-        h=round(((locRange(2)+1)^2)/((a+b)/2)); %trapz height (area = 50^2; like square)
-    elseif strcmp(dat,'trapzKrupic2')
-        b=length(spacing)*1.5; %make smaller; since datapoints dont reach out there
-        h=length(spacing)*2;
-    elseif strcmp(dat,'trapzKrupic3')
-        b=length(spacing)*2; %make smaller; since datapoints dont reach out there
-        h=length(spacing)*3;
+        b=locRange(2)+1; %50 - trapz length2 - +1 to let density plot go from 1:50 (rather than 0:49)
+        h=round(((locRange(2)+1)^2)/((a+b)/2))+1; %trapz height (area = 50^2; like square)
+%     elseif strcmp(dat,'trapzKrupic2')
+%         b=length(spacing)*1.5; %make smaller; since datapoints dont reach out there
+%         h=length(spacing)*2;
+%     elseif strcmp(dat,'trapzKrupic3')
+%         b=length(spacing)*2; %make smaller; since datapoints dont reach out there
+%         h=length(spacing)*3;
+        
     end
 else
     b=length(spacing);
     h=length(spacing);
 end
+
 densityPlotClus    = zeros(b,h,nClus,nSets,nIter);
 densityPlot        = zeros(b,h,nSets,nIter);
 densityPlotAct     = zeros(b,h,nSets,nIter);
@@ -79,8 +81,8 @@ for iterI = 1:nIter
         rSeed(iterI)=rng;
         switch dat
             case 'square' %square
-                trials      = [randsample(linspace(locRange(1),locRange(2),50),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),50),nTrials,'true')]';
-                dataPtsTest = [randsample(linspace(locRange(1),locRange(2),50),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),50),nTrials,'true')]';
+                trials      = [randsample(linspace(locRange(1),locRange(2),locRange(2)+1),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),locRange(2)+1),nTrials,'true')]';
+                dataPtsTest = [randsample(linspace(locRange(1),locRange(2),locRange(2)+1),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),locRange(2)+1),nTrials,'true')]';
             case 'cat'
                 % draw points from 2 categories (gaussian) from a 2D feature space
                 nTrials = floor(nTrials/nCats); % points to sample
@@ -208,7 +210,7 @@ for iterI = 1:nIter
                 
             case 'trapzScaled1' % new - scale differently - now loc > 50 though
 %                 spacingTrapz = spacing(10:41); 
-                trapY=h.*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
+                trapY=(h-1).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
                 trapX=spacingTrapz;
                 trapPts=[];
                 for i=1:length(trapY)
@@ -223,7 +225,7 @@ for iterI = 1:nIter
                           
             case 'trapzScaled2' % new - scale differently - now loc > 50 though
 %                 spacingTrapz = spacing(7:44); 
-                trapY=h.*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
+                trapY=(h-1).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
                 trapX=spacingTrapz;
                 trapPts=[];
                 for i=1:length(trapY)
@@ -238,7 +240,7 @@ for iterI = 1:nIter
                
             case 'trapzScaled3' % new - scale differently - now loc > 50 though
 %                 spacingTrapz = spacing(4:47); 
-                trapY=h.*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
+                trapY=(h-1).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
                 trapX=spacingTrapz;
                 trapPts=[];
                 for i=1:length(trapY)
@@ -561,14 +563,14 @@ for iterI = 1:nIter
             if  strcmp(dat(1:4),'trap')
                 
                 %left half of box
-                aCorrMap = ndautoCORR(densityPlotSm(:,1:length(spacing)/2));
+                aCorrMap = ndautoCORR(densityPlotSm(:,1:ceil(length(spacing)/2)));
                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
                 [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
                 gA(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
                 gW(iSet,iterI,:,2) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
                 
                 %right half of box
-                aCorrMap = ndautoCORR(densityPlotSm(:,length(spacing)/2+1:end));
+                aCorrMap = ndautoCORR(densityPlotSm(:,ceil(length(spacing)/2)+1:end));
                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
                 [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
                 gA(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
@@ -576,14 +578,14 @@ for iterI = 1:nIter
                 
                 %act
                 %left half of box
-                aCorrMap = ndautoCORR(densityPlotActSm(:,1:length(spacing)/2));
+                aCorrMap = ndautoCORR(densityPlotActSm(:,1:ceil(length(spacing)/2)));
                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
                 [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
                 gA_act(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
                 gW_act(iSet,iterI,:,2) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius];
                 
                 %right half of box
-                aCorrMap = ndautoCORR(densityPlotActSm(:,length(spacing)/2+1:end));
+                aCorrMap = ndautoCORR(densityPlotActSm(:,ceil(length(spacing)/2)+1:end));
                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
                 [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
                 gA_act(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius];
