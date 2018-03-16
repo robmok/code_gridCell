@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -24,7 +24,7 @@ dat = 'square'; % rand or cat; rand = uniform points in a box, cat = category le
 %  dat = 'trapzScaled3';
 % dat = 'trapzNorm';%not scaled, fit into square
 
-boxSize = 1; % 1=normal, 2=double size, 3=triple size
+boxSize = 2; % 1=normal, 2=double size, 3=triple size
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
 nCats   = 2; %2 categories
@@ -34,17 +34,17 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 %run multiple cluster numbers
 % clus2run = 12; %20, 30
 % % clus2run = [10, 12]; % [11, 14] 
-clus2run  = [20, 24]; 
-   clus2run = [24, 26]; 
-   clus2run = [16, 28]; 
-   clus2run = [18, 22]; 
+% clus2run  = [20, 24]; 
+%    clus2run = [24, 26]; 
+%    clus2run = [16, 28]; 
+%    clus2run = [18, 22]; 
 
 %trapz
 % clus2run = [18, 24, 26, 28, 16, 30, 20, 22]; %trapzScaled
 % clus2run = [24, 26, 30, 28, 20, 22]; %trapzScaled3 x2 size - note 16, 18 actplots dont work
 % clus2run = [28 22 14]; %krupic3
 
-% clus2run=20;
+clus2run=20;
 
 % nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 
@@ -64,7 +64,7 @@ if fixBatchSize
     nBatches = [2500, 5000, 20000, 50000];
     nBatches = [2500, 50000];
     nBatches = [5000, 20000];
-%     nBatches = 2500;
+    nBatches = 2500;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
 else % define batch size based on average number of updates per cluster
