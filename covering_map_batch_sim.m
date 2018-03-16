@@ -25,7 +25,7 @@ trlSel = ceil([nBatch*.25, nBatch*.5, nBatch*.67, nBatch*.75, nBatch*.9, nBatch+
 fromTrlI = round([nTrials*.20, nTrials*.45, nTrials*.62, nTrials*.70, nTrials*.85, nTrials*.95]); % 1% of trials, should have a handful of batch updates %+1 so not 1 trial extra
 toTrlN   = round([nTrials*.25,    nTrials*.5,     nTrials*.67,    nTrials*.75,    nTrials*.9,     nTrials]);%same prop to above batches; but show activations that lead up to this
    
-if nargout > 8
+if nargout > 11
     muAll            = nan(nClus,2,nBatch+1,nIter);
 end
 nSets                = length(trlSel);
@@ -492,7 +492,7 @@ for iterI = 1:nIter
 
 
     end
-    if nargout > 8
+    if nargout > 11
         muAll(:,:,:,iterI)      = mu;
     end
     actAll  = reshape(actTrlAll,nClus,nTrials); %save trial-by-trial act over blocks, here unrolling it
