@@ -35,9 +35,9 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % clus2run = 12; %20, 30
 % % clus2run = [10, 12]; % [11, 14] 
 clus2run  = [20, 24]; 
-%   clus2run = [24, 26]; 
-%   clus2run = [16, 28]; 
-%   clus2run = [18, 22]; 
+   clus2run = [24, 26]; 
+   clus2run = [16, 28]; 
+   clus2run = [18, 22]; 
 
 %trapz
 % clus2run = [18, 24, 26, 28, 16, 30, 20, 22]; %trapzScaled
@@ -62,8 +62,8 @@ if fixBatchSize
 
 % new select batchSizes
     nBatches = [2500, 5000, 20000, 50000];
-%     nBatches = [2500, 50000];
-%     nBatches = [5000, 20000];
+    nBatches = [2500, 50000];
+    nBatches = [5000, 20000];
 %     nBatches = 2500;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
