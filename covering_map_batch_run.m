@@ -61,10 +61,10 @@ if fixBatchSize
 %     nBatches = fliplr([20000, 30000, 100000, 200000, 500000]);
 
 % new select batchSizes
-%     nBatches = [2500, 5000, 20000, 50000];
+    nBatches = [2500, 5000, 20000, 50000];
 %     nBatches = [2500, 50000];
 %     nBatches = [5000, 20000];
-    nBatches = 2500;
+%     nBatches = 2500;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
 else % define batch size based on average number of updates per cluster
