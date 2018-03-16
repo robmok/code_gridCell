@@ -11,13 +11,14 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed']));
 
-dat = 'circ'; %'square', 'circ'
+dat = 'square'; %'square', 'circ'
 
 kVals   = 3:30; 
 % nKmeans = 1000;
 nKmeans = 200;
 nSims = 5; % nIters=nKmeans*nSims;
-nPoints = 10000; %5k, 10k
+nSims = 10;
+nPoints = 5000; %5k, 10k
 nKvals  = length(kVals);
 
 nDataPtsTest = 10000; %5k, 10k

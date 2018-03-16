@@ -13,13 +13,13 @@ locRange = [0, 49]; %box dims
 %load
 kVals = 3:30; 
 nKvals = length(kVals);
-dat='circ'; %square, circ
+dat='square'; %square, circ
 nKmeans = 200;
-nSims = 5; % 
+nSims = 10; % 
 nIters=nKmeans*nSims;
 nPointsVals = [5000, 10000]; % also did 3k before
 nPointsVals = 5000;
-% nPointsVals = 10000;
+nPointsVals = 10000;
 
 %xVal specs
 saveDat = 1;

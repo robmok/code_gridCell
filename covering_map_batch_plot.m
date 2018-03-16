@@ -14,7 +14,7 @@ nSet        = 6;
 gaussSmooth = 1; 
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
-dat='circ';
+dat='square';
 
 % clus2run = [7,8,10,12]; 
 % nTrials = 100000; 
@@ -35,6 +35,9 @@ clus2run = [10:2:28]; % also have 11 but left out plot
 % clus2run = 28; % plotting one nClus cond over sets
 nTrials=2500000;
 batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
+%wAct
+clus2run = [16 18 20 24];
+batchSizeVals=[1000, 2000];
 
 % new 3 - fixed batch sizes across clusters
 % nTrials=2500000;
@@ -48,23 +51,32 @@ batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
 % batchSizeVals=[1, 2, 5, 10, 25, 35, 50]; %avgBatchVals - 1,2,5 new
 
 %new 5 - circ
-fixBatchSize = 1;
-clus2run = [10:2:20, 22:26, 28, 30];
-% clus2run = 14; % plotting one nClus cond over sets
-nTrials=2500000;
-% batchSizeVals=[125, 167, 250, 333, 500, 1000, 2000];
-batchSizeVals=[167, 250, 333, 500, 1000, 2000];
-dat='circ';
+% fixBatchSize = 1;
+% clus2run = [10:2:20, 22:26, 28, 30];
+% % clus2run = 14; % plotting one nClus cond over sets
+% nTrials=2500000;
+% % batchSizeVals=[125, 167, 250, 333, 500, 1000, 2000];
+% batchSizeVals=[167, 250, 333, 500, 1000, 2000];
+% %wAct
+% clus2run = [16 18 20 24];
+% batchSizeVals=[1000, 2000];
+% dat='circ';
 
 %new 5 - trapz
-fixBatchSize = 1;
-clus2run = [12:2:18 22, 26]; % trapz1-3, krupic
-clus2run = [16, 18, 20, 22, 24, 26, 28, 30]; %new - more clusters (trapzScaled1-3, krupic2,3)
-clus2run = [16, 18, 20, 24, 26, 30]; %krupic3 done
-nTrials=2500000;
-batchSizeVals=1000;
-dat='trapzKrupic3'; %trapz1, trapz2, trapz3, trapzKrupic, trapzNorm (or rename to trapz)
+% fixBatchSize = 1;
+% clus2run = [12:2:18 22, 26]; % trapz1-3, krupic
+% clus2run = [16, 18, 20, 22, 24, 26, 28, 30]; %new - more clusters (trapzScaled1-3, krupic2,3)
+% clus2run = [16, 18, 20, 24, 26, 30]; %krupic3 done
+% nTrials=2500000;
+% batchSizeVals=1000;
+% dat='trapzKrupic3'; %trapz1, trapz2, trapz3, trapzKrupic, trapzNorm (or rename to trapz)
 
+%trapz size x2
+% clus2run = [16, 18]; 
+% nTrials=2500000;
+% batchSizeVals=1000;
+% dat='trapzScaled3'; %trapz1, trapz2, trapz3, trapzKrupic, trapzNorm (or rename to trapz)
+% boxSize=2;
 
 
 
@@ -76,24 +88,31 @@ for iClus2run = 1:length(clus2run)
         epsMuOrig1000=epsMuOrig*1000;
         for iBvals = 1:length(batchSizeVals)
             
-            %fixed batch
-            if fixBatchSize
-                batchSize = batchSizeVals(iBvals);
-                fprintf('Loading nClus=%d, epsMu=%d, batchSize=%d\n',nClus,epsMuOrig1000,batchSize)
-                if ~strcmp(dat,'square')
-                    fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
-                else
-                    fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter)];
-                end
-            else %avgBatch
-                avgBatch = batchSizeVals(iBvals);
-                fprintf('Loading nClus=%d, epsMu=%d, avgBatchSize=%d\n',nClus,epsMuOrig1000,avgBatch)
-                if ~strcmp(dat,'square')
-                    fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz*_%diters*_%s',nClus,round(nTrials/1000),epsMuOrig1000,avgBatch,nIter,dat)];
-                else
-                    fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz*_%diters*',nClus,round(nTrials/1000),epsMuOrig1000,avgBatch,nIter)];
-                end
-            end
+%             %fixed batch
+%             if fixBatchSize
+%                 batchSize = batchSizeVals(iBvals);
+%                 fprintf('Loading nClus=%d, epsMu=%d, batchSize=%d\n',nClus,epsMuOrig1000,batchSize)
+%                 if ~strcmp(dat,'square')
+%                     fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+%                 else
+%                     fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter)];
+%                 end
+%             else %avgBatch
+%                 avgBatch = batchSizeVals(iBvals);
+%                 fprintf('Loading nClus=%d, epsMu=%d, avgBatchSize=%d\n',nClus,epsMuOrig1000,avgBatch)
+%                 if ~strcmp(dat,'square')
+%                     fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz*_%diters*_%s',nClus,round(nTrials/1000),epsMuOrig1000,avgBatch,nIter,dat)];
+%                 else
+%                     fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz*_%diters*',nClus,round(nTrials/1000),epsMuOrig1000,avgBatch,nIter)];
+%                 end
+%             end
+            
+
+            %tmp - wAct and boxSizex2
+            batchSize = batchSizeVals(iBvals);
+            fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_wAct_%s*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+%             fname = [fname '_boxSizex2*'];
+            
             
             
             %edit if want to load more than one file per sim, merge
@@ -118,28 +137,64 @@ for iClus2run = 1:length(clus2run)
             gW_radAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,3,:);
             gW_wavAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,4,:);
             
+            if exist('gA_act','var') %if have gridness on gauss act
+                for iterI = 1:nIter
+                    for iSet=1:nSet
+                        densityPlotActAll(:,:,iSet,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlotAct(:,:,iSet,iterI),gaussSmooth);
+                    end
+                end
+                
+                gA_gAll_act(:,:,iEps,iBvals,iClus2run,:)   = gA_act(:,:,1,:);
+                gA_oAll_act(:,:,iEps,iBvals,iClus2run,:)   = gA_act(:,:,2,:);
+                gA_radAll_act(:,:,iEps,iBvals,iClus2run,:) = gA_act(:,:,3,:);
+                gA_wavAll_act(:,:,iEps,iBvals,iClus2run,:) = gA_act(:,:,4,:);
+                gW_gAll_act(:,:,iEps,iBvals,iClus2run,:) = gW_act(:,:,1,:);
+                gW_oAll_act(:,:,iEps,iBvals,iClus2run,:) = gW_act(:,:,2,:);
+                gW_radAll_act(:,:,iEps,iBvals,iClus2run,:) = gW_act(:,:,3,:);
+                gW_wavAll_act(:,:,iEps,iBvals,iClus2run,:) = gW_act(:,:,4,:);
+            end
 
         end
     end
 end
 %% plot univar scatters
 
+clusPosAct = 'act'; %'clus' or 'act'
+
 gridMsrType = 'a'; % 'a' or 'w' for allen or willis method
 
 gridMeasure = 'grid';
 
-switch gridMsrType
-    case 'a'
-        gridness    = gA_gAll;
-        orientation = gA_oAll;
-        rad         = gA_radAll;
-        wav         = gA_wavAll;
-    case 'w'
-        gridness    = gW_gAll;
-        orientation = gW_oAll;
-        rad         = gW_radAll;
-        wav         = gW_wavAll;
+switch clusPosAct
+case 'clus'
+    switch gridMsrType
+        case 'a'
+            gridness    = gA_gAll;
+            orientation = gA_oAll;
+            rad         = gA_radAll;
+            wav         = gA_wavAll;
+        case 'w'
+            gridness    = gW_gAll;
+            orientation = gW_oAll;
+            rad         = gW_radAll;
+            wav         = gW_wavAll;
+    end
+    case 'act'
+        switch gridMsrType
+            case 'a'
+                gridness    = gA_gAll_act;
+                orientation = gA_oAll_act;
+                rad         = gA_radAll_act;
+                wav         = gA_wavAll_act;
+            case 'w'
+                gridness    = gW_gAll_act;
+                orientation = gW_oAll_act;
+                rad         = gW_radAll_act;
+                wav         = gW_wavAll_act;
+        end
 end
+
+
 switch gridMeasure
     case 'grid'
         datTmp=gridness;
@@ -253,7 +308,7 @@ for iClus2Run = 1:length(clus2run)
         scatter(barpos,mu,750,colors,'x');
         xlim([barpos(1)-.5, barpos(end)+.5]);
 %         ylim([0,1]);
-%         ylim([-.5,1.5]);
+        ylim([-.5,1.5]);
         title(sprintf('%s - eps=%d, nClus=%d',gridMeasure,epsMuVals(iEps)*1000,clus2run(iClus2Run)))
     end
    
@@ -429,14 +484,15 @@ else
 end
 
 %set
-iClus2run = 5;
+iClus2run = 4;
 iBvals    = 1;
 
-iters2plot = 40:60;
+iters2plot = 40:45;
 
 fprintf(sprintf('clus %d batchSizeVals %d\n',clus2run(iClus2run),batchSizeVals(iBvals)));
 for iterI = iters2plot
-    densityPlotCentresSm = imgaussfilt(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
+%     densityPlotCentresSm = imgaussfilt(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
+    densityPlotCentresSm = imgaussfilt(densityPlotActAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
     
     figure; hold on;
     subplot(subPlt(1),subPlt(2),1)
