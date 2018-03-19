@@ -14,7 +14,7 @@ nSet        = 6;
 gaussSmooth = 1; 
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
-dat='square';
+dat='circ';
 
 % clus2run = [7,8,10,12]; 
 % nTrials = 100000; 
@@ -31,13 +31,14 @@ epsMuVals=.075;
 
 % sims 2 - a smaller val of trials; testing batch sizes (works fine) - also
 % have some sims with ntrials = 5000000 (less batchSizeVals)
-clus2run = [10:2:28]; % also have 11 but left out plot
+% clus2run = [10:2:28]; % also have 11 but left out plot
 % clus2run = 28; % plotting one nClus cond over sets
 nTrials=2500000;
-batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
+% batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
 %wAct
-clus2run = [16 18 20 24];
-batchSizeVals=[1000, 2000];
+clus2run = [16 18 20 24 26  28];
+% batchSizeVals=[1000, 2000];
+batchSizeVals = [1000, 500, 125, 50];
 
 % new 3 - fixed batch sizes across clusters
 % nTrials=2500000;
@@ -110,7 +111,9 @@ for iClus2run = 1:length(clus2run)
 
             %tmp - wAct and boxSizex2
             batchSize = batchSizeVals(iBvals);
-            fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_wAct_%s*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+            fprintf('Loading nClus=%d, epsMu=%d, batchSize=%d\n',nClus,epsMuOrig1000,batchSize)
+%             fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_wAct_%s*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+            fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_%s*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,dat)];
 %             fname = [fname '_boxSizex2*'];
             
             
@@ -141,6 +144,7 @@ for iClus2run = 1:length(clus2run)
                 for iterI = 1:nIter
                     for iSet=1:nSet
                         densityPlotActAll(:,:,iSet,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlotAct(:,:,iSet,iterI),gaussSmooth);
+                        densityPlotActNormAll(:,:,iSet,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);
                     end
                 end
                 
@@ -152,6 +156,15 @@ for iClus2run = 1:length(clus2run)
                 gW_oAll_act(:,:,iEps,iBvals,iClus2run,:) = gW_act(:,:,2,:);
                 gW_radAll_act(:,:,iEps,iBvals,iClus2run,:) = gW_act(:,:,3,:);
                 gW_wavAll_act(:,:,iEps,iBvals,iClus2run,:) = gW_act(:,:,4,:);
+                
+                gA_gAll_actNorm(:,:,iEps,iBvals,iClus2run,:)   = gA_actNorm(:,:,1,:);
+                gA_oAll_actNorm(:,:,iEps,iBvals,iClus2run,:)   = gA_actNorm(:,:,2,:);
+                gA_radAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gA_actNorm(:,:,3,:);
+                gA_wavAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gA_actNorm(:,:,4,:);
+                gW_gAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,1,:);
+                gW_oAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,2,:);
+                gW_radAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,3,:);
+                gW_wavAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,4,:);
             end
 
         end
@@ -159,7 +172,7 @@ for iClus2run = 1:length(clus2run)
 end
 %% plot univar scatters
 
-clusPosAct = 'act'; %'clus' or 'act'
+clusPosAct = 'actNorm'; %'clus' or 'act'
 
 gridMsrType = 'a'; % 'a' or 'w' for allen or willis method
 
@@ -191,6 +204,19 @@ case 'clus'
                 orientation = gW_oAll_act;
                 rad         = gW_radAll_act;
                 wav         = gW_wavAll_act;
+        end
+    case 'actNorm'
+        switch gridMsrType
+            case 'a'
+                gridness    = gA_gAll_actNorm;
+                orientation = gA_oAll_actNorm;
+                rad         = gA_radAll_actNorm;
+                wav         = gA_wavAll_actNorm;
+            case 'w'
+                gridness    = gW_gAll_actNorm;
+                orientation = gW_oAll_act;
+                rad         = gW_radAll_actNorm;
+                wav         = gW_wavAll_actNorm;
         end
 end
 
@@ -484,15 +510,16 @@ else
 end
 
 %set
-iClus2run = 4;
+iClus2run = 1;
 iBvals    = 1;
 
 iters2plot = 40:45;
 
 fprintf(sprintf('clus %d batchSizeVals %d\n',clus2run(iClus2run),batchSizeVals(iBvals)));
 for iterI = iters2plot
-%     densityPlotCentresSm = imgaussfilt(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
-    densityPlotCentresSm = imgaussfilt(densityPlotActAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
+    densityPlotCentresSm = imgaussfilt(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
+%     densityPlotCentresSm = imgaussfilt(densityPlotActAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
+    densityPlotCentresSm = imgaussfilt(densityPlotActNormAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
     
     figure; hold on;
     subplot(subPlt(1),subPlt(2),1)

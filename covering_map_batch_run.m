@@ -24,7 +24,7 @@ dat = 'square'; % rand or cat; rand = uniform points in a box, cat = category le
 %  dat = 'trapzScaled3';
 % dat = 'trapzNorm';%not scaled, fit into square
 
-boxSize = 2; % 1=normal, 2=double size, 3=triple size
+boxSize = 1; % 1=normal, 2=double size, 3=triple size
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
 nCats   = 2; %2 categories
@@ -39,12 +39,24 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 %    clus2run = [16, 28]; 
 %    clus2run = [18, 22]; 
 
+%odd numbers, and smaller numbers
+%love01    
+clus2run = [19, 25, 15];
+clus2run = [17, 21, 14];
+clus2run = [29, 27, 9];
+    
+%love06
+% clus2run = [3, 7, 11];
+% clus2run = [4, 8, 12];
+% clus2run = [6, 10, 5];
+
+
 %trapz
 % clus2run = [18, 24, 26, 28, 16, 30, 20, 22]; %trapzScaled
 % clus2run = [24, 26, 30, 28, 20, 22]; %trapzScaled3 x2 size - note 16, 18 actplots dont work
 % clus2run = [28 22 14]; %krupic3
 
-clus2run=20;
+% clus2run=20;
 
 % nTrials = 5000000; %how many locations in the box / trials 
 nTrials = 2500000; 
@@ -62,9 +74,9 @@ if fixBatchSize
 
 % new select batchSizes
     nBatches = [2500, 5000, 20000, 50000];
-    nBatches = [2500, 50000];
-    nBatches = [5000, 20000];
-    nBatches = 2500;
+%     nBatches = [2500, 50000];
+%     nBatches = [5000, 20000];
+%     nBatches = 2500;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
 else % define batch size based on average number of updates per cluster
