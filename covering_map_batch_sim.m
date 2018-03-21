@@ -391,7 +391,7 @@ for iterI = 1:nIter
                 end
                 
                 %compute activation
-                sigmaGauss = stepSize;%/3.5; %move up later - 1 seems to be fine
+                sigmaGauss = stepSize/2;%/3.5; %move up later - 1 seems to be fine
                 actTrl(closestC(iTrlBatch),iTrlBatch)=mvnpdf(trls2Upd(iTrlBatch,:),mu(closestC(iTrlBatch),:,iBatch),eye(2)*sigmaGauss); % save only the winner
                 
                 
@@ -533,7 +533,7 @@ for iterI = 1:nIter
             end
         end
         
-        %now also compute clus means
+        %now also compute clus means - now only taking at a time pt (not averaging over time points
         densityPlotClusSmth = zeros(size(densityPlot,1),size(densityPlot,2),nClus);
         for iClus=1:nClus
             %find peaks

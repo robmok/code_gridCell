@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -14,8 +14,8 @@ addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in codeDir now not wd
 
 %define box / environment - random points in a box
-dat = 'square'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
-% dat = 'circ'; 
+dat = 'circ'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
+% dat = 'square'; 
 % dat = 'trapz1'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
 % dat = 'trapz2';% dat = 'trapz3';
 % dat = 'trapzKrupic'; % dat = 'trapzKrupic2'; % dat = 'trapzKrupic3';
@@ -41,15 +41,14 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 
 %odd numbers, and smaller numbers
 %love01    
-clus2run = [19, 25, 15];
-clus2run = [17, 21, 14];
-clus2run = [29, 27, 9];
-    
-%love06
-% clus2run = [3, 7, 11];
-% clus2run = [4, 8, 12];
-% clus2run = [6, 10, 5];
-
+% clus2run = [19, 25, 15];
+% clus2run = [17, 21, 14];
+% clus2run = [29, 27, 9];
+% %love06
+clus2run = [5, 12];
+% clus2run = [7, 11];
+% clus2run = [8, 10];
+% clus2run = [3, 4, 6];
 
 %trapz
 % clus2run = [18, 24, 26, 28, 16, 30, 20, 22]; %trapzScaled
@@ -67,15 +66,12 @@ fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
 % 13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000
 if fixBatchSize
 %     nBatches = [1250, 2500, 5000, 7500, 10000, 15000, 20000];
-%     nBatches = [30000, 100000, 200000, 500000];
 %     nBatches = [30000, 100000, 200000, 500000, 1250, 2500, 5000, 7500, 10000, 15000, 20000];
-%     nBatches = [2500, 1250];
-%     nBatches = fliplr([20000, 30000, 100000, 200000, 500000]);
 
 % new select batchSizes
     nBatches = [2500, 5000, 20000, 50000];
-     nBatches = [2500, 50000];
-     nBatches = [5000, 20000];
+%      nBatches = [2500, 50000];
+%      nBatches = [5000, 20000];
 %     nBatches = 2500;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)

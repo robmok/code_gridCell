@@ -37,6 +37,7 @@ nTrials=2500000;
 % batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
 %wAct
 clus2run = [16 18 20 24 26  28];
+% clus2run = [20 24];
 % batchSizeVals=[1000, 2000];
 batchSizeVals = [1000, 500, 125, 50];
 
@@ -140,6 +141,11 @@ for iClus2run = 1:length(clus2run)
             gW_radAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,3,:);
             gW_wavAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,4,:);
             
+                        
+            if exist('rSeed','var')
+                rSeedAll(:,iEps,iBvals,iClus2run) = rSeed;
+            end
+            
             if exist('gA_act','var') %if have gridness on gauss act
                 for iterI = 1:nIter
                     for iSet=1:nSet
@@ -167,6 +173,7 @@ for iClus2run = 1:length(clus2run)
                 gW_wavAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,4,:);
             end
 
+            
         end
     end
 end
@@ -510,16 +517,16 @@ else
 end
 
 %set
-iClus2run = 1;
-iBvals    = 1;
+iClus2run = 2;
+iBvals    = 3;
 
 iters2plot = 40:45;
 
 fprintf(sprintf('clus %d batchSizeVals %d\n',clus2run(iClus2run),batchSizeVals(iBvals)));
 for iterI = iters2plot
-    densityPlotCentresSm = imgaussfilt(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
-%     densityPlotCentresSm = imgaussfilt(densityPlotActAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
-    densityPlotCentresSm = imgaussfilt(densityPlotActNormAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
+%     densityPlotCentresSm = imgaussfilt(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
+    densityPlotCentresSm = imgaussfilt(densityPlotActAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
+%     densityPlotCentresSm = imgaussfilt(densityPlotActNormAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
     
     figure; hold on;
     subplot(subPlt(1),subPlt(2),1)
@@ -544,8 +551,44 @@ for iterI = iters2plot
     
 end
 
-
-
-
-
-
+%% regen trials and activation?
+% 
+% 
+% %set
+% iClus2run = 3;
+% iBvals    = 3;
+% 
+% iters2plot = 40:45;
+% 
+% locRange = [0 49];
+% 
+% % fprintf(sprintf('clus %d batchSizeVals %d\n',clus2run(iClus2run),batchSizeVals(iBvals)));
+% for iterI = iters2plot
+% 
+%     rng(rSeedAll(iterI,iEps,iBvals,iClus2run));
+%     
+%     trials = [randsample(linspace(locRange(1),locRange(2),50),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),50),nTrials,'true')]';
+%     
+%     
+%     %need mu starting points
+%     
+%     
+%     %for each trial, compute closest cluster and save activation + location
+%     
+%     
+%     %need also to update the cluster means over batches...
+%     
+%     
+%     
+%     
+%     
+%     
+%     
+%     
+%     
+%     
+% end
+% 
+% 
+%         
+% 
