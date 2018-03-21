@@ -37,7 +37,7 @@ nTrials=2500000;
 % batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
 %wAct
 clus2run = [16 18 20 24 26  28];
-% clus2run = [20 24];
+clus2run = [20 24];
 % batchSizeVals=[1000, 2000];
 batchSizeVals = [1000, 500, 125, 50];
 
@@ -518,15 +518,15 @@ end
 
 %set
 iClus2run = 2;
-iBvals    = 3;
+iBvals    = 1;
 
 iters2plot = 40:45;
 
 fprintf(sprintf('clus %d batchSizeVals %d\n',clus2run(iClus2run),batchSizeVals(iBvals)));
 for iterI = iters2plot
 %     densityPlotCentresSm = imgaussfilt(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
-    densityPlotCentresSm = imgaussfilt(densityPlotActAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
-%     densityPlotCentresSm = imgaussfilt(densityPlotActNormAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
+%     densityPlotCentresSm = imgaussfilt(densityPlotActAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
+    densityPlotCentresSm = imgaussfilt(densityPlotActNormAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
     
     figure; hold on;
     subplot(subPlt(1),subPlt(2),1)
