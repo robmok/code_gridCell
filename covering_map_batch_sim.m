@@ -391,7 +391,7 @@ for iterI = 1:nIter
                 end
                 
                 %compute activation
-                sigmaGauss = stepSize/2;%/3.5; %move up later - 1 seems to be fine
+                sigmaGauss = stepSize;%/3.5; %move up later - 1 seems to be fine
                 actTrl(closestC(iTrlBatch),iTrlBatch)=mvnpdf(trls2Upd(iTrlBatch,:),mu(closestC(iTrlBatch),:,iBatch),eye(2)*sigmaGauss); % save only the winner
                 
                 
