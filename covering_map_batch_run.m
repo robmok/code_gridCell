@@ -43,8 +43,8 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 %ones to run on love06)
 %love01    
 clus2run = [19, 15];
-% clus2run = [29, 27];
-% clus2run = [5, 12];
+ clus2run = [29, 12];
+% clus2run = [5, 27];
 
 %love06
 % clus2run = [11, 25, 9];
@@ -74,7 +74,7 @@ if fixBatchSize
 % new select batchSizes
     nBatches = [2500, 5000, 20000, 50000];
       nBatches = [2500, 50000];
-%       nBatches = [5000, 20000];
+       nBatches = [5000, 20000];
 %     nBatches = 2500;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
