@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+%wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -39,13 +39,14 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 %    clus2run = [16, 28]; 
 %    clus2run = [18, 22]; 
 
-%odd numbers, and smaller numbers
+%odd numbers, and smaller numbers - ran sq, now circ
 %love01    
-% clus2run = [19, 25, 15];
-% clus2run = [17, 21, 14];
-% clus2run = [29, 27, 9];
-% %love06
-clus2run = [5, 12];
+clus2run = [19, 25, 15];
+clus2run = [17, 21, 14];
+clus2run = [29, 27, 9];
+
+%love06
+%clus2run = [5, 12];
 % clus2run = [7, 11];
 % clus2run = [8, 10];
 % clus2run = [3, 4, 6];
@@ -70,8 +71,8 @@ if fixBatchSize
 
 % new select batchSizes
     nBatches = [2500, 5000, 20000, 50000];
-%      nBatches = [2500, 50000];
-%      nBatches = [5000, 20000];
+      nBatches = [2500, 50000];
+      nBatches = [5000, 20000];
 %     nBatches = 2500;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
