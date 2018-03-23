@@ -119,7 +119,7 @@ switch method
             end
         end
         g = ((rs(2)+rs(4))/2) - ((rs(1)+rs(3)+rs(5))/3);
-
+        
         % collect data
         gdata.mid_peak = blobs(1).Centroid;
         gdata.near_peaks = cell2mat({blobs(2:end).Centroid}.');
@@ -137,6 +137,9 @@ switch method
         msk = ones(size(im)).*0.2;
         msk(dmat<dcut & dmat>dcuti) = 1;
         gdata.central_mask = msk;
+        
+        %save the correlations for each angle too %RM edited 180322
+        gdata.r = rs;
 
         % create figure if required
         if doPlot %1 %RM edited 171127
@@ -145,7 +148,8 @@ switch method
             set(imc,'alphadata',msk);    
             hold on
             plot(gdata.near_peaks(:,1),gdata.near_peaks(:,2),'kx','MarkerSize',10);
-            title(sprintf('g = %.2f, s = %.2f, r = %.2f, o = %.2f',g,gdata.wavelength,gdata.radius,gdata.orientation));   
+%             title(sprintf('g = %.2f, s = %.2f, r = %.2f, o = %.2f',g,gdata.wavelength,gdata.radius,gdata.orientation));   
+            title(sprintf('g = %.2f, s = %.2f, r = %.2f, o = %.2f, rHex=%.2f',g,gdata.wavelength,gdata.radius,gdata.orientation,(gdata.r(2)+gdata.r(4))/2));   %RM edited
             drawLine(L);
             caxis([0 nanmax(imcent(:))])
             daspect([1 1 1]);
@@ -243,7 +247,8 @@ switch method
             set(imc,'alphadata',msk);    
             hold on
             plot(gdata.near_peaks(:,1),gdata.near_peaks(:,2),'kx','MarkerSize',10);
-            title(sprintf('g = %.2f, s = %.2f, r = %.2f, o = %.2f',g,gdata.wavelength,gdata.radius,gdata.orientation));   
+%             title(sprintf('g = %.2f, s = %.2f, r = %.2f, o = %.2f',g,gdata.wavelength,gdata.radius,gdata.orientation));   
+            title(sprintf('g = %.2f, s = %.2f, r = %.2f, o = %.2f, rHex=%.2f',g,gdata.wavelength,gdata.radius,gdata.orientation,(gdata.r(2)+gdata.r(4))/2));   %RM edited
             drawLine(L);
             caxis([0 nanmax(imcent(:))])
             daspect([1 1 1]);
