@@ -4,7 +4,7 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -75,8 +75,8 @@ if fixBatchSize
 
 % new select batchSizes
     nBatches = [2500, 5000, 20000, 50000];
-      nBatches = [2500, 50000];
-       nBatches = [5000, 20000];
+%     nBatches = [2500, 50000];
+%     nBatches = [5000, 20000];
     nBatches = 5000;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
@@ -104,8 +104,8 @@ end
 
 % parameters
 % epsMuVals=[.01, .05, .075, .1, .2, .3];% %learning rate / starting learning rate 
-epsMuVals = 0.075; 
-epsMuVals = 0.007; 
+% epsMuVals = 0.075; 
+% epsMuVals = 0.007; 
 epsMuVals = 0.01; 
 
 % %tesing 60+clusters
@@ -193,7 +193,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
 %                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(avgBatchUpdate(iBvals)),round(batchSize),nIter)];
             end
 %             [densityPlot,densityPlotAct,densityPlotActNorm,clusMu,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,rSeed] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
-            [densityPlot,densityPlotT,densityPlotActNorm,densityPlotActTNorm,gA,gA_actNorm,gA_t,gA_actNorm_t,muInit,rSeed,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
+            [densityPlot,densityPlotT,densityPlotActNorm,densityPlotActTNorm,gA,gA_actNorm,gA_t,gA_actNorm_t,muInit,rSeed,clusDistB,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
 
             timeTaken=toc;
             if saveDat

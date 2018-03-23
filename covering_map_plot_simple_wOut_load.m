@@ -19,15 +19,15 @@ xlim(locRange); ylim(locRange);
 
 %% gridness, autocorrelogram
 
-gaussSmooth=1.5;
-for iSet=1:size(densityPlotActTNorm,3)
-for iterI = 1%:3%:10
+gaussSmooth=1;
+for iSet=1:10%size(densityPlotActTNorm,3)
+for iterI = 1%:3%:10 
     
-% densityPlotCentresSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
+densityPlotCentresSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
 % densityPlotCentresSm = imgaussfilt(densityPlotAct(:,:,iSet,iterI),gaussSmooth);
 % densityPlotCentresSm = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);
 % densityPlotCentresSm = imgaussfilt(densityPlotT(:,:,iSet,iterI),gaussSmooth);
-densityPlotCentresSm = imgaussfilt(densityPlotActTNorm(:,:,iSet,iterI),gaussSmooth);
+% densityPlotCentresSm = imgaussfilt(densityPlotActTNorm(:,:,iSet,iterI),gaussSmooth);
 
 figure; hold on;
 subplot(1,2,1)
@@ -121,7 +121,7 @@ colors = distinguishable_colors(nClus); %function for making distinguishable col
 
 figure;
 % figure('units','normalized','outerposition',[0 0 1 1]);
-for iTrl = 2500:nTrials
+for iTrl = 1:nTrials
 %     if mod(iTrl,500)==0
 % %         iPlot=iPlot+1;
 % %         voronoi(muAll(:,1,iTrl,iterI),muAll(:,2,iTrl,iterI),'k')

@@ -26,18 +26,6 @@ clus2run = [20, 18];
 %clus2run = [16, 28];
 %clus2run = [24, 14];
 
-%love01
-% clus2run=18;
-% clus2run=28;
-% clus2run=14;
-
-%love06 circ
-% clus2run = [20, 16, 24];
-clus2run = [18, 28, 14]; % love06
-
-%love 06 square; sigmaGauss 3 - later
-% clus2run = [20, 16, 24]; 
-
 clus2run = 20;
 
 nTrials = 2500000; 
@@ -58,10 +46,11 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 
 % parameters
 % learning rate - 
-epsMuVals = [.0075, .01, .02]; 
-epsMuVals = .0075; %atm .01 works well-ish but a bit fast, could be slower; .0075, 005
+% epsMuVals = [.0075, .01, .02]; 
+% epsMuVals = .0075; %atm .01 works well-ish but a bit fast, could be slower; .0075, 005
 % epsMuVals = .01;
-% epsMuVals = .02;
+% with repel
+epsMuVals = 0.8;
 
 
 %weight learning rate by SSE 
@@ -72,6 +61,10 @@ weightEpsSSE = 0; %1 or 0
 sigmaGaussVals = stepSize/3.5;
 % sigmaGaussVals = stepSize/3; %with smaller sigmaGauss, need faster learning rate ; e.g. 0.075 was too slow (though ok for sigmaGauss=3.5); 0.01 still slow; 0.05 is gd but fast
 % sigmaGaussVals = stepSize/4;
+
+
+sigmaGaussVals = 5;
+
 
 %define box / environement - random points in a box
 box = 'square'; %square, rect, trapz, trapzSq (trapz and a square box attached)
@@ -86,7 +79,7 @@ warpType = 'sq2rect';
 alphaVals = 0;
 
 sTypes = 0;%:1;% :3; %0, 1 ,2, 3
-cValsOrig = [1/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]; %just edited 2/nTrials --> 1/nTrials
+% cValsOrig = [1/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]; %just edited 2/nTrials --> 1/nTrials
 % cValsOrig = [2/(nTrials/2), 5/nTrials, 10/(nTrials/2), 20/(nTrials/2)];% if 80k trials...
 cValsOrig = 2/nTrials;
 
@@ -175,8 +168,8 @@ if ~neigh %separating neigh and stoch/momentum params
                                 tic
 %                                 [actAll,densityPlot,densityPlotAct,clusMu,muAvg,nTrlsUpd,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,muAll] = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat,weightEpsSSE);
                                 fprintf('Running %s, nClus=%d, epsMu=%d, sigmaGauss=%d, batchSize=%d\n',dat,nClus,epsMuOrig10000,sigmaGauss100,batchSize)
-                                [densityPlot,clusMu,gA,gW,rSeed,muAll] = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat,weightEpsSSE);
-%                                 [actAll, densityPlot,clusMu,gA,gW,rSeed,muAll] = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat,weightEpsSSE);
+                                [densityPlot,gA,gA_act,gA_actNorm,rSeed,muAll]  = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat,weightEpsSSE);
+%                                 [actAll, densityPlot,gA,gW,rSeed,muAll] = gauss_2d_batch_sim(nClus,locRange,box,warpType,epsMuOrig,sigmaGauss,nTrials,batchSize,nIter,warpBox,alpha,trials,stochasticType,c,plotGrids,dat,weightEpsSSE);
 %                                 fname = [saveDir, sprintf('/gauss_batch_%dclus__%dsigma_%dktrls_eps%d_alpha%d_stype%d_cVal%d_sseW%d_batchSiz%d_%diters',nClus,sigmaGauss100,round(nTrials/1000),epsMuOrig10000,alpha10,stochasticType,c1m,weightEpsSSE,round(batchSize),nIter)];
                                 fname = [saveDir, sprintf('/gauss_batch_%dclus_%dsigma_%dktrls_eps%d_batchSiz%d_%diters_%s',nClus,sigmaGauss100,round(nTrials/1000),epsMuOrig10000,round(batchSize),nIter,dat)];                                
                                 timeTaken=toc;
@@ -184,6 +177,11 @@ if ~neigh %separating neigh and stoch/momentum params
                                     if warpBox
                                         fname = [fname '_warpBox'];
                                     end
+                                    
+                                    if 1
+                                        fname = [fname '_CE']; %crossentropy - testing out
+                                    end
+                                    
                                     cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
 %                                     save(fname,'densityPlot','densityPlotAct','clusMu','gA','gW','gA_act','gW_act','gA_actNorm','gW_actNorm','muAvg','nIter','timeTaken');
                                     save(fname,'densityPlot','clusMu','gA','gW','nIter','rSeed','timeTaken');

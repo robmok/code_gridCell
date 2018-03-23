@@ -1,9 +1,8 @@
 % function [densityPlot,densityPlotAct,densityPlotActNorm,clusMu,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,rSeed,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE)
-function [densityPlot,densityPlotT,densityPlotActNorm,densityPlotActTNorm,gA,gA_actNorm,gA_t,gA_actNorm_t,muInit,rSeed, muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE)
+function [densityPlot,densityPlotT,densityPlotActNorm,densityPlotActTNorm,gA,gA_actNorm,gA_t,gA_actNorm_t,muInit,rSeed,clusDistB, muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE)
 
 %if end up not using desityPlotAct and gA_act - edit out below, or no need
 %to save the iters, etc.
-
 
 
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
@@ -39,15 +38,14 @@ toTrlN   = round([nTrials*.25,    nTrials*.5,     nTrials*.67,    nTrials*.75,  
 % toTrlN2    = round([nTrials.*.045+1,    nTrials.*.145+1,  nTrials.*.295+1,  nTrials.*.345+1, nTrials.*.445+1, nTrials.*.545+1, nTrials.*.795+1, nTrials.*.945+1]);%
 % toTrlN2    = round([nTrials.*.1+1,    nTrials.*.2+1,  nTrials.*.35+1,  nTrials.*.4+1, nTrials.*.5+1, nTrials.*.6+1, nTrials.*.85+1, nTrials]);%
 
-fromTrlI2  = round([1,                nTrials.*.1+1,  nTrials.*.2+1,   nTrials.*.30+1,  nTrials.*.4+1,  nTrials.*.5+1, nTrials.*.6+1, nTrials.*.7+1, nTrials.*.8+1, nTrials.*.9+1]);
-toTrlN2    = round([nTrials.*.05+1,    nTrials.*.15+1,  nTrials.*.25+1,   nTrials.*.35+1,   nTrials.*.45+1,  nTrials.*.55+1, nTrials.*.65+1, nTrials.*.75+1, nTrials.*.85+1, nTrials.*.95+1]);%
+% fromTrlI2  = round([1,                nTrials.*.1+1,  nTrials.*.2+1,   nTrials.*.30+1,  nTrials.*.4+1,  nTrials.*.5+1, nTrials.*.6+1, nTrials.*.7+1, nTrials.*.8+1, nTrials.*.9+1]);
+% toTrlN2    = round([nTrials.*.05+1,    nTrials.*.15+1,  nTrials.*.25+1,   nTrials.*.35+1,   nTrials.*.45+1,  nTrials.*.55+1, nTrials.*.65+1, nTrials.*.75+1, nTrials.*.85+1, nTrials.*.95+1]);%
 % toTrlN2    = round([nTrials.*.1+1,    nTrials.*.2+1,  nTrials.*.3+1,   nTrials.*.4+1,   nTrials.*.5+1,  nTrials.*.6+1, nTrials.*.7+1, nTrials.*.8+1, nTrials.*.9+1, nTrials]);%
 
-% fromTrlI2  = round([1,                nTrials.*.1+1,   nTrials.*.2+1,    nTrials.*.30+1,   nTrials.*.4+1,   nTrials.*.5+1,  nTrials.*.6+1,  nTrials.*.7+1,  nTrials.*.75+1, nTrials.*.8+1,  nTrials.*.85+1, nTrials.*.9+1, nTrials.*.95+1]);
-% toTrlN2    = round([nTrials.*.05+1,   nTrials.*.15+1,  nTrials.*.25+1,   nTrials.*.35+1,   nTrials.*.45+1,  nTrials.*.55+1, nTrials.*.65+1, nTrials.*.75+1, nTrials.*.8+1,  nTrials.*.85+1, nTrials.*.9+1, nTrials.*.95+1, nTrials]);%
+fromTrlI2  = round([1,                nTrials.*.1+1,   nTrials.*.2+1,    nTrials.*.30+1,   nTrials.*.4+1,   nTrials.*.5+1,  nTrials.*.6+1,  nTrials.*.7+1,  nTrials.*.75+1, nTrials.*.8+1,  nTrials.*.85+1, nTrials.*.9+1, nTrials.*.95+1]);
+toTrlN2    = round([nTrials.*.05+1,   nTrials.*.15+1,  nTrials.*.25+1,   nTrials.*.35+1,   nTrials.*.45+1,  nTrials.*.55+1, nTrials.*.65+1, nTrials.*.75+1, nTrials.*.8+1,  nTrials.*.85+1, nTrials.*.9+1, nTrials.*.95+1, nTrials]);%
 
-
-if nargout > 10
+if nargout > 11
     muAll            = nan(nClus,2,nBatch+1,nIter);
 end
 nSets                = length(trlSel);
@@ -78,6 +76,9 @@ if strcmp(dat(1:4),'trap')
     gA_actNorm_t = nan(nSets_t,nIter,1,4,3);
 
 end
+
+%compute distance of each cluster to itself over time (batches)
+clusDistB = nan(nSets_t-1,nIter);
 
 %set densityPlot array size
 trapzSpacing{1} = spacing(10:41);
@@ -530,7 +531,7 @@ for iterI = 1:nIter
 
 
     end
-    if nargout > 10
+    if nargout > 11
         muAll(:,:,:,iterI)      = mu;
     end
     actAll  = reshape(actTrlAll,nClus,nTrials); %save trial-by-trial act over blocks, here unrolling it
@@ -683,7 +684,12 @@ for iterI = 1:nIter
         % smooth
         densityPlotTSm = imgaussfilt(densityPlotT(:,:,iSet,iterI),gaussSmooth);
 %         densityPlotActTSm     = imgaussfilt(densityPlotAct(:,:,iSet,iterI),gaussSmooth);       
-        densityPlotActTNormSm = imgaussfilt(densityPlotActTNorm(:,:,iSet,iterI),gaussSmooth);     
+        densityPlotActTNormSm = imgaussfilt(densityPlotActTNorm(:,:,iSet,iterI),gaussSmooth);   
+        
+        %compute the sum of the distances between each cluster and itself over batches 
+        if iSet>1 
+           clusDistB(iSet-1,iterI)=sum(sqrt(sum([(mu(:,1,round(toTrlN2(iSet)./batchSize)))-(mu(:,1,round(toTrlN2(iSet-1)./batchSize))),(mu(:,2,round(toTrlN2(iSet)./batchSize)))-(mu(:,2,round(toTrlN2(iSet-1)./batchSize)))].^2,2)));
+        end
     end
     
      
