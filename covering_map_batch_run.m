@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -14,8 +14,8 @@ addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in codeDir now not wd
 
 %define box / environment - random points in a box
-% dat = 'circ'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
-dat = 'square'; 
+dat = 'circ'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
+% dat = 'square'; 
 % dat = 'trapz1'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
 % dat = 'trapz2';% dat = 'trapz3';
 % dat = 'trapzKrupic'; % dat = 'trapzKrupic2'; % dat = 'trapzKrupic3';
@@ -33,20 +33,19 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 
 %run multiple cluster numbers
 % clus2run = 12; %20, 30
-% % clus2run = [10, 12]; % [11, 14] 
-% clus2run  = [20, 24]; 
-%    clus2run = [24, 26]; 
-%    clus2run = [16, 28]; 
-%    clus2run = [18, 22]; 
+
+% love06 sq; love01 circ
+clus2run = [20, 24, 10];
+% clus2run = [24, 26, 12];
+% clus2run = [22, 28, 14];
+% clus2run = [18, 16, 30];
+
 
 %odd numbers, and smaller numbers - ran sq, now circ (swapping some larger
 %ones to run on love06)
-%love01    
-clus2run = [19, 15];
- clus2run = [29, 12];
+% clus2run = [19, 15];
+%  clus2run = [29, 12];
 % clus2run = [5, 27];
-
-%love06
 % clus2run = [11, 25, 9];
 % clus2run = [8, 21, 7];
 % clus2run = [3, 17, 4];
@@ -58,12 +57,8 @@ clus2run = [19, 15];
 % clus2run = [24, 26, 30, 28, 20, 22]; %trapzScaled3 x2 size - note 16, 18 actplots dont work
 % clus2run = [28 22 14]; %krupic3
 
-clus2run=22;
-
 % nTrials = 5000000; %how many locations in the box / trials 
-% nTrials = 2500000;
 nTrials = 2500000;
-
 
 %batch size
 fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
@@ -75,9 +70,9 @@ if fixBatchSize
 
 % new select batchSizes
     nBatches = [2500, 5000, 20000, 50000];
-%     nBatches = [2500, 50000];
+    nBatches = [2500, 50000];
 %     nBatches = [5000, 20000];
-    nBatches = 5000;
+%     nBatches = 5000;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
 else % define batch size based on average number of updates per cluster
@@ -105,8 +100,9 @@ end
 % parameters
 % epsMuVals=[.01, .05, .075, .1, .2, .3];% %learning rate / starting learning rate 
 % epsMuVals = 0.075; 
-% epsMuVals = 0.007; 
-epsMuVals = 0.01; 
+% epsMuVals = 0.05; 
+epsMuVals = 0.02; 
+epsMuVals = 0.015; 
 
 % %tesing 60+clusters
 % nTrials = 1000000; 
@@ -144,9 +140,9 @@ c=0;
 % trialsUnique=allPts;
 % save([saveDir '/randTrialsBox_trialsUnique'],'trialsUnique');
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
-nIter=1; %how many iterations (starting points)
+nIter=200; %how many iterations (starting points)
 
 switch dat
         case 'randUnique'
@@ -211,7 +207,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                 end
                 cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
 %                 save(fname,'densityPlot','densityPlotAct','clusMu','gA','gW','gA_act','gW_act','nIter','rSeed','timeTaken'); %added trialsAll for xval - removed, too big.maybe compute at end of each sim? or at each set
-                save(fname,'densityPlot','densityPlotAct','densityPlotActNorm','clusMu','gA','gW','gA_act','gW_act','gA_actNorm','gW_actNorm','nIter','rSeed','timeTaken'); %added trialsAll for xval - removed, too big.maybe compute at end of each sim? or at each set
+                save(fname,'densityPlot','densityPlotT','densityPlotActNorm','densityPlotActTNorm','gA','gA_actNorm','gA_actNorm_t','rSeed','muInit','clusDistB','timeTaken'); 
             end
         end
         
