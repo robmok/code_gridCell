@@ -36,9 +36,9 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 
 % love06 sq; love01 circ
 clus2run = [20, 24, 10];
-% clus2run = [24, 26, 12];
-% clus2run = [22, 28, 14];
-% clus2run = [18, 16, 30];
+ clus2run = [24, 26, 12];
+ clus2run = [22, 28, 14];
+clus2run = [18, 16, 30];
 
 
 %odd numbers, and smaller numbers - ran sq, now circ (swapping some larger
@@ -71,7 +71,7 @@ if fixBatchSize
 % new select batchSizes
     nBatches = [2500, 5000, 20000, 50000];
     nBatches = [2500, 50000];
-%     nBatches = [5000, 20000];
+  nBatches = [5000, 20000];
 %     nBatches = 5000;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
