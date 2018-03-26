@@ -14,7 +14,7 @@ nSet        = 6;
 gaussSmooth = 1; 
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
-dat='circ';
+dat='square';
 
 % clus2run = [7,8,10,12]; 
 % nTrials = 100000; 
@@ -23,23 +23,26 @@ dat='circ';
 % epsMuVals=[.01, .05, .075, .1, .2, .3];% learning rate / starting learning rate 
 
 % sims 1 - one single LARGE batchSize, large nTrials, all nClus conds
-clus2run = 3:30;%[7,8,10,12]; 
-nTrials=10000000;
-batchSizeVals=1000;
-nIter=200;
-epsMuVals=.075;
+% clus2run = 3:30;%[7,8,10,12]; 
+% nTrials=10000000;
+% batchSizeVals=1000;
+% nIter=200;
+% epsMuVals=.075;
 
 % sims 2 - a smaller val of trials; testing batch sizes (works fine) - also
 % have some sims with ntrials = 5000000 (less batchSizeVals)
 % clus2run = [10:2:28]; % also have 11 but left out plot
 % clus2run = 28; % plotting one nClus cond over sets
 nTrials=2500000;
+nIter=200;
 % batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
 %wAct
 clus2run = [16 18 20 24 26  28];
-clus2run = [20 24];
+clus2run = [10:2:28];
 % batchSizeVals=[1000, 2000];
 batchSizeVals = [1000, 500, 125, 50];
+% epsMuVals=.075;
+epsMuVals=.015;
 
 % new 3 - fixed batch sizes across clusters
 % nTrials=2500000;
@@ -136,41 +139,47 @@ for iClus2run = 1:length(clus2run)
             gA_oAll(:,:,iEps,iBvals,iClus2run,:)   = gA(:,:,2,:);
             gA_radAll(:,:,iEps,iBvals,iClus2run,:) = gA(:,:,3,:);
             gA_wavAll(:,:,iEps,iBvals,iClus2run,:) = gA(:,:,4,:);
-            gW_gAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,1,:);
-            gW_oAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,2,:);
-            gW_radAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,3,:);
-            gW_wavAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,4,:);
+%             gW_gAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,1,:);
+%             gW_oAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,2,:);
+%             gW_radAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,3,:);
+%             gW_wavAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,4,:);
             
                         
             if exist('rSeed','var')
                 rSeedAll(:,iEps,iBvals,iClus2run) = rSeed;
             end
             
-            if exist('gA_act','var') %if have gridness on gauss act
+            if exist('gA_actNorm','var') %if have gridness on gauss act
                 for iterI = 1:nIter
                     for iSet=1:nSet
-                        densityPlotActAll(:,:,iSet,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlotAct(:,:,iSet,iterI),gaussSmooth);
+%                         densityPlotActAll(:,:,iSet,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlotAct(:,:,iSet,iterI),gaussSmooth);
                         densityPlotActNormAll(:,:,iSet,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);
                     end
                 end
                 
-                gA_gAll_act(:,:,iEps,iBvals,iClus2run,:)   = gA_act(:,:,1,:);
-                gA_oAll_act(:,:,iEps,iBvals,iClus2run,:)   = gA_act(:,:,2,:);
-                gA_radAll_act(:,:,iEps,iBvals,iClus2run,:) = gA_act(:,:,3,:);
-                gA_wavAll_act(:,:,iEps,iBvals,iClus2run,:) = gA_act(:,:,4,:);
-                gW_gAll_act(:,:,iEps,iBvals,iClus2run,:) = gW_act(:,:,1,:);
-                gW_oAll_act(:,:,iEps,iBvals,iClus2run,:) = gW_act(:,:,2,:);
-                gW_radAll_act(:,:,iEps,iBvals,iClus2run,:) = gW_act(:,:,3,:);
-                gW_wavAll_act(:,:,iEps,iBvals,iClus2run,:) = gW_act(:,:,4,:);
-                
+%                 gA_gAll_act(:,:,iEps,iBvals,iClus2run,:)   = gA_act(:,:,1,:);
+%                 gA_oAll_act(:,:,iEps,iBvals,iClus2run,:)   = gA_act(:,:,2,:);
+%                 gA_radAll_act(:,:,iEps,iBvals,iClus2run,:) = gA_act(:,:,3,:);
+%                 gA_wavAll_act(:,:,iEps,iBvals,iClus2run,:) = gA_act(:,:,4,:);
+%                 gW_gAll_act(:,:,iEps,iBvals,iClus2run,:) = gW_act(:,:,1,:);
+%                 gW_oAll_act(:,:,iEps,iBvals,iClus2run,:) = gW_act(:,:,2,:);
+%                 gW_radAll_act(:,:,iEps,iBvals,iClus2run,:) = gW_act(:,:,3,:);
+%                 gW_wavAll_act(:,:,iEps,iBvals,iClus2run,:) = gW_act(:,:,4,:);
+%                 
                 gA_gAll_actNorm(:,:,iEps,iBvals,iClus2run,:)   = gA_actNorm(:,:,1,:);
                 gA_oAll_actNorm(:,:,iEps,iBvals,iClus2run,:)   = gA_actNorm(:,:,2,:);
                 gA_radAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gA_actNorm(:,:,3,:);
                 gA_wavAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gA_actNorm(:,:,4,:);
-                gW_gAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,1,:);
-                gW_oAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,2,:);
-                gW_radAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,3,:);
-                gW_wavAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,4,:);
+%                 gW_gAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,1,:);
+%                 gW_oAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,2,:);
+%                 gW_radAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,3,:);
+%                 gW_wavAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,4,:);
+
+                gA_gAll_actNorm(:,:,iEps,iBvals,iClus2run,:)   = gA_actNorm(:,:,1,:);
+                gA_oAll_actNorm(:,:,iEps,iBvals,iClus2run,:)   = gA_actNorm(:,:,2,:);
+                gA_radAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gA_actNorm(:,:,3,:);
+                gA_wavAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gA_actNorm(:,:,4,:);
+
             end
 
             
@@ -373,12 +382,14 @@ end
 
 
 %plot over sets
-if 0
+if 1
+    
 if size(gridness,4)>1 
+    for iClus = 1:length(clus2run)
     figure; hold on;
     for iBatchVals = 1:length(batchSizeVals)        
         subplot(ceil(length(batchSizeVals)/2),2,iBatchVals); hold on;
-        dat1     = squeeze(datTmp(:,:,:,iBatchVals,:,:))';
+        dat1     = squeeze(datTmp(:,:,:,iBatchVals,iClus,:))';
         barpos  = .25:.5:.5*size(dat1,2);
         colors  = distinguishable_colors(size(dat1,2));
         colgrey = [.5, .5, .5];
@@ -390,7 +401,8 @@ if size(gridness,4)>1
         scatter(barpos,mu,100,colors,'d','filled');
         xlim([barpos(1)-.5, barpos(end)+.5]);
         ylim([-.5,1.25]);
-        title(sprintf('%s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
+%         title(sprintf('%s - nClus=%d, eps=%d, batchSize=%d',gridMeasure,clus2run(iClus),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals)))
+        title(sprintf('nClus=%d, batchSize=%d',clus2run(iClus),batchSizeVals(iBatchVals)))
     end
     
 %     if strcmp(dat,'trapz') || strcmp(dat,'trapzNorm')
@@ -418,6 +430,7 @@ if size(gridness,4)>1
 %         ylim([-.5,1.25]);
 %         title(sprintf('Right half of box %s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
 %     end
+    end
 end
 end
 

@@ -36,10 +36,11 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 
 % love06 sq; love01 circ
 clus2run = [20, 24, 10];
- clus2run = [24, 26, 12];
- clus2run = [22, 28, 14];
-clus2run = [18, 16, 30];
+%  clus2run = [24, 26, 12];
+%  clus2run = [22, 28, 14];
+% clus2run = [18, 16, 30];
 
+% clus2run = 14;
 
 %odd numbers, and smaller numbers - ran sq, now circ (swapping some larger
 %ones to run on love06)
@@ -58,7 +59,7 @@ clus2run = [18, 16, 30];
 % clus2run = [28 22 14]; %krupic3
 
 % nTrials = 5000000; %how many locations in the box / trials 
-nTrials = 2500000;
+nTrials = 2000000;
 
 %batch size
 fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
@@ -71,8 +72,8 @@ if fixBatchSize
 % new select batchSizes
     nBatches = [2500, 5000, 20000, 50000];
     nBatches = [2500, 50000];
-  nBatches = [5000, 20000];
-%     nBatches = 5000;
+%   nBatches = [5000, 20000];
+%     nBatches = 2500;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
 else % define batch size based on average number of updates per cluster
@@ -101,7 +102,7 @@ end
 % epsMuVals=[.01, .05, .075, .1, .2, .3];% %learning rate / starting learning rate 
 % epsMuVals = 0.075; 
 % epsMuVals = 0.05; 
-epsMuVals = 0.02; 
+% epsMuVals = 0.02; 
 epsMuVals = 0.015; 
 
 % %tesing 60+clusters
@@ -189,7 +190,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
 %                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(avgBatchUpdate(iBvals)),round(batchSize),nIter)];
             end
 %             [densityPlot,densityPlotAct,densityPlotActNorm,clusMu,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,rSeed] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
-            [densityPlot,densityPlotT,densityPlotActNorm,densityPlotActTNorm,gA,gA_actNorm,gA_t,gA_actNorm_t,muInit,rSeed,clusDistB,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
+            [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
 
             timeTaken=toc;
             if saveDat
@@ -207,7 +208,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                 end
                 cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
 %                 save(fname,'densityPlot','densityPlotAct','clusMu','gA','gW','gA_act','gW_act','nIter','rSeed','timeTaken'); %added trialsAll for xval - removed, too big.maybe compute at end of each sim? or at each set
-                save(fname,'densityPlot','densityPlotT','densityPlotActNorm','densityPlotActTNorm','gA','gA_actNorm','gA_actNorm_t','rSeed','muInit','clusDistB','timeTaken'); 
+                save(fname,'densityPlot','densityPlotActNorm','gA','gA_actNorm','rSeed','muInit','clusDistB','timeTaken'); 
             end
         end
         
