@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -14,8 +14,8 @@ addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in codeDir now not wd
 
 %define box / environment - random points in a box
-dat = 'circ'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
-% dat = 'square'; 
+% dat = 'circ'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
+dat = 'square'; 
 % dat = 'trapz1'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
 % dat = 'trapz2';% dat = 'trapz3';
 % dat = 'trapzKrupic'; % dat = 'trapzKrupic2'; % dat = 'trapzKrupic3';
@@ -34,11 +34,10 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 %run multiple cluster numbers
 % clus2run = 12; %20, 30
 
-% love06 sq; love01 circ
-clus2run = [20, 24, 10];
-%  clus2run = [24, 26, 12];
-%  clus2run = [22, 28, 14];
-% clus2run = [18, 16, 30];
+% love06 sq; love01 circ - NOTE looks like ran 24 twice - love01 delete
+clus2run = [28, 26, 10];
+ clus2run = [12, 14, 16, 30];
+% clus2run = [18,22,24,20]; %sq love06; ran first 2 batches then restarted
 
 % clus2run = 14;
 
@@ -70,8 +69,8 @@ if fixBatchSize
 %     nBatches = [30000, 100000, 200000, 500000, 1250, 2500, 5000, 7500, 10000, 15000, 20000];
 
 % new select batchSizes
-    nBatches = [2500, 5000, 20000, 50000];
-    nBatches = [2500, 50000];
+    nBatches = [2500, 20000,5000 50000];
+%     nBatches = [2500, 50000];
 %   nBatches = [5000, 20000];
 %     nBatches = 2500;
     batchSizeVals = nTrials./nBatches;

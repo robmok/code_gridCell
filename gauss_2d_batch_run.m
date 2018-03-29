@@ -28,13 +28,13 @@ clus2run = [20, 18];
 
 clus2run = 20;
 
-nTrials = 2500000; 
+nTrials = 250000; 
 
 %batch size
 fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
 % nBatches = [1250, 2500, 5000, 7500, 10000, 15000, 20000];% nBatches = [30000, 100000, 200000, 500000];
 nBatches = [1250, 2500, 5000, 10000];
-nBatches = 1250;
+nBatches = 5000;
 % nBatches = 1250; %2500
 batchSizeVals = nTrials./nBatches;
 nBvals = length(batchSizeVals); %length(avgBatchUpdate)
@@ -51,6 +51,7 @@ stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %
 % epsMuVals = .01;
 % with repel
 epsMuVals = 0.8;
+epsMuVals = 250;
 
 
 %weight learning rate by SSE 
@@ -63,7 +64,7 @@ sigmaGaussVals = stepSize/3.5;
 % sigmaGaussVals = stepSize/4;
 
 
-sigmaGaussVals = 5;
+sigmaGaussVals = 1;
 
 
 %define box / environement - random points in a box

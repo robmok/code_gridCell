@@ -18,8 +18,8 @@ gaussSmooth=1; %smoothing for density map
 % sigmaGauss = stepSize/4; 
 
 %sse
-% fitDeltaMuX=@(epsMuVec,x,y,fdbck,act)(epsMuVec.*(fdbck-act).*exp(-(x.^2+y.^2)./2.*sigmaGauss.^2).*(x./(2.*pi.*sigmaGauss.^4)));
-% fitDeltaMuY=@(epsMuVec,x,y,fdbck,act)(epsMuVec.*(fdbck-act).*exp(-(x.^2+y.^2)./2.*sigmaGauss.^2).*(y./(2.*pi.*sigmaGauss.^4)));
+fitDeltaMuX=@(epsMuVec,x,y,fdbck,act)(epsMuVec.*(fdbck-act).*(exp(-(x.^2+y.^2)./(2.*sigmaGauss.^2))).*(x./(2.*pi.*sigmaGauss.^4)));
+fitDeltaMuY=@(epsMuVec,x,y,fdbck,act)(epsMuVec.*(fdbck-act).*(exp(-(x.^2+y.^2)./(2.*sigmaGauss.^2))).*(y./(2.*pi.*sigmaGauss.^4)));
 
 % % cross entropy - X and y same
 fitDeltaMu=@(epsMuVec,x,fdbck,act)epsMuVec.*x.*(fdbck-act);
@@ -294,6 +294,8 @@ for iterI = 1:nIter
                 closestTmp = find(min(dist2Clus(iTrlBatch,:))==dist2Clus(iTrlBatch,:));
                 if numel(closestTmp)>1
                     closestC(iTrlBatch) = randsample(closestTmp,1);
+                elseif numel(closestTmp)<1
+                    a=1;
                 else
                     closestC(iTrlBatch) = closestTmp;
                 end
@@ -302,7 +304,10 @@ for iterI = 1:nIter
                 fbk(closestC(iTrlBatch))=1;
                 
                 %save the activation for each trial to update
-                actUpd(:,iTrlBatch)=mvnpdf(trls2Upd(iTrlBatch,:),mu(:,:,iBatch),eye(2)*sigmaGauss); % compute act for all clusters
+%                 actUpd(:,iTrlBatch)=mvnpdf(trls2Upd(iTrlBatch,:),mu(:,:,iBatch),eye(2)*sigmaGauss); % compute act for all clusters
+                actUpdTmp              = mvnpdf(trls2Upd(iTrlBatch,:),mu(:,:,iBatch),eye(2)*sigmaGauss); % normalise
+                actUpd(:,iTrlBatch)    = actUpdTmp./sum(actUpdTmp); %normalised
+                
                 
                 %compute update for each trial, fbk 1 for closest, 0 for
                 %others
@@ -313,7 +318,7 @@ for iterI = 1:nIter
 %                 deltaMuBatch(:,1,iTrlBatch)=fitDeltaMuX(epsMuVec,trls2Upd(iTrlBatch,1)-mu(:,1,iBatch),trls2Upd(iTrlBatch,2)-mu(:,2,iBatch),fbk,actUpd(:,iTrlBatch));
 %                 deltaMuBatch(:,2,iTrlBatch)=fitDeltaMuY(epsMuVec,trls2Upd(iTrlBatch,1)-mu(:,1,iBatch),trls2Upd(iTrlBatch,2)-mu(:,2,iBatch),fbk,actUpd(:,iTrlBatch));
                 
-                %CE
+%                 %CE
                 deltaMuBatch(:,1,iTrlBatch)=fitDeltaMu(epsMuVec,trls2Upd(iTrlBatch,1)-mu(:,1,iBatch),fbk,actUpd(:,iTrlBatch));
                 deltaMuBatch(:,2,iTrlBatch)=fitDeltaMu(epsMuVec,trls2Upd(iTrlBatch,2)-mu(:,2,iBatch),fbk,actUpd(:,iTrlBatch));
                 
@@ -378,8 +383,8 @@ for iterI = 1:nIter
 
 
             % update mean estimates
-            mu(:,1,iBatch+1) = mu(:,1,iBatch) + mean(squeeze(deltaMuBatch(:,1,:)),2);
-            mu(:,2,iBatch+1) = mu(:,2,iBatch) + mean(squeeze(deltaMuBatch(:,2,:)),2);
+            mu(:,1,iBatch+1) = mu(:,1,iBatch) + nanmean(squeeze(deltaMuBatch(:,1,:)),2);
+            mu(:,2,iBatch+1) = mu(:,2,iBatch) + nanmean(squeeze(deltaMuBatch(:,2,:)),2);
                                   
             %%%%
             

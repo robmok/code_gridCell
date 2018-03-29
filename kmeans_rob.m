@@ -4,7 +4,7 @@ clear all;
 
 wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -13,18 +13,19 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed']));
 
-runScriptTimes=2; %rerun whole script x times
+runScriptTimes=5; %rerun whole script x times
 saveDat = 1;
 
 kVals = 3:30; 
 %  kVals = 23:30; 
+% kVals = 31:50; 
 % kVals = 10;
 nKvals = length(kVals);
 
-dat = 'circ'; %'rand' points in a box, randUnique (all unique points in box), or 'cat'
+dat = 'square'; %'rand' points in a box, randUnique (all unique points in box), or 'cat'
 nKmeans = 200;  % run k means n times 
 % nPoints = 5000;  %how many locations/datapoints - not used for 'randUnique'
-nPointsVals = [10000, 5000]; % also did 3000 before
+nPointsVals = 100000;%50000; %[10000, 5000]; % also did 3000 before
 
 %%%%
 locRange  = [0, 49];
@@ -42,11 +43,14 @@ R = chol(sigmaG);
 nUpdSteps   =  30;    % update steps in the k means algorithm - 40 for random init, 25 for forgy; kmeans++ 20 fine, 22 safe
 
 for iRun=1:runScriptTimes
+    clear muAllkVals tssekVals sseSprdSdkVals sseSprdVarkVals gA gW densityPlotCentres indSSE1 indSSE2 %clear some ram
 for iNpts = 1:length(nPointsVals)
     nPoints = nPointsVals(iNpts);
     %start
     densityPlotCentres = zeros(length(spacing),length(spacing),nKmeans,nKvals);
     tssekVals = nan(nKvals,nKmeans);
+    sseSprdSdkVals  = nan(nKvals,nKmeans);
+    sseSprdVarkVals = nan(nKvals,nKmeans);
     indSSE1 = nan(nKvals,nKmeans);
     indSSE2 = nan(nKvals,nKmeans);
     muAllkVals = cell(1,nKvals);
@@ -54,8 +58,10 @@ for iNpts = 1:length(nPointsVals)
     gW = nan(nKmeans,4,nKvals);
     for iKvals = 1:nKvals
         nK=kVals(iKvals);
-        muAll=nan(nK,2,nKmeans);
+        muAll = nan(nK,2,nKmeans);
         tsseAll = nan(1,nKmeans);
+        sseSprdSdAll  = nan(1,nKmeans);
+        sseSprdVarAll = nan(1,nKmeans);
         fprintf('nK = %d \n',nK);
         
         %generate/sample data
@@ -106,9 +112,11 @@ for iNpts = 1:length(nPointsVals)
             end
             
             %run kmeans
-            [muEnd,tsse] = kmeans_rm(mu,dataPts,nK,nUpdSteps);
+            [muEnd,tsse,sseSprdSd,sseSprdVar] = kmeans_rm(mu,dataPts,nK,nUpdSteps);
             muAll(:,:,kMeansIter) = muEnd;
             tsseAll(kMeansIter)   = tsse;
+            sseSprdSdAll(kMeansIter) = sseSprdSd;
+            sseSprdVarAll(kMeansIter) = sseSprdVar;
             
             %compute gridness
             if ~strcmp(dat,'cat') %if cat learning, no need to compute gridness
@@ -131,6 +139,8 @@ for iNpts = 1:length(nPointsVals)
         toc
         muAllkVals{iKvals}=muAll; %need this since number of k increases; see if better way to code this
         tssekVals(iKvals,:)=tsseAll;
+        sseSprdSdkVals(iKvals,:)=sseSprdSdAll;
+        sseSprdVarkVals(iKvals,:)=sseSprdVarAll;
         
         %compute sse
         [indVal, indSSE] = sort(tsseAll);
@@ -141,7 +151,7 @@ for iNpts = 1:length(nPointsVals)
     if saveDat
         fname = [saveDir, sprintf('/kmeans_nK_%d-%d_%s_nPoints%d_%diters',kVals(1),kVals(end),dat,nPoints,nKmeans)];
         cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
-        save(fname,'muAllkVals','tssekVals', 'gA','gW','densityPlotCentres','indSSE1','indSSE2','kVals')
+        save(fname,'muAllkVals','tssekVals','sseSprdSdkVals','sseSprdVarkVals', 'gA','gW','densityPlotCentres','indSSE1','indSSE2','kVals')
     end
 end
 end
