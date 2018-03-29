@@ -1,5 +1,5 @@
 % function [densityPlot,densityPlotAct,densityPlotActNorm,clusMu,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,rSeed,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE)
-function [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE)
+function [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,annEps)
 
 %if end up not using desityPlotAct and gA_act - edit out below, or no need
 %to save the iters, etc.
@@ -15,6 +15,12 @@ gaussSmooth=1; %smoothing for density map
 nBatch=floor(nTrials/batchSize);
 batchSize = floor(batchSize); % when have decimal points, above needed
 
+%if decrease learning rate over time: 1/(1+decay+timestep); Decay - set a param
+if annEps
+    nBatches = nTrials./batchSize; %2500, 5000, 250000, 50000
+    epsMuOrig = nBatches/100;
+    annEpsDecay = nBatches/40;
+end
 % trlSel = ceil([nBatch*.25, nBatch*.5, nBatch*.67, nBatch*.75, nBatch*.9, nBatch+1]);
 
 %also get a bunch of trials to plot activations from current trial (gauss
@@ -347,8 +353,6 @@ for iterI = 1:nIter
 %     epsMuAll = nan(nTrials,2);
     deltaMu  = zeros(nClus,2,nBatch);
 %     clusUpdates = zeros(nClus,2); %acutally starting at 0 is OK, since there was no momentum from last trial
-    tsse            = nan(nBatch,1);
-    sseW            = ones(nBatch,1);
     
     actTrlAll = nan(nClus,batchSize,nBatch); %check
 
@@ -435,8 +439,15 @@ for iterI = 1:nIter
 %             updatedC(iTrl) = closestC;
             
             %learning rate
-            epsMu = epsMuOrig;
-%             epsMu = epsMuOrig*sseW(iTrl); %weight learning rate by prop SSE reduce from start
+            if annEps %if use annealed learning rate
+                epsMu = epsMuOrig./(1+annEpsDecay+iBatch); %need to check if it's actually epsMuOrig*(1/(1+annEpsDecay+iBatch);
+                %                     clear epsAll
+                %                     for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+annEpsDecay+iBatch); end
+                %                     figure; plot(epsAll);
+                %                     epsAll(nBatches.*[.25, .5, .75]) % eps at 25%, 50%, 75% of trials: 0.0396    0.0199    0.0133
+            else
+                epsMu = epsMuOrig;
+            end
 %             epsMuAll(iTrl,:) = [epsMu,closestC]; 
             
             %batch update - save all updates for each cluster for X
@@ -463,56 +474,7 @@ for iterI = 1:nIter
             % update mean estimates
             mu(:,1,iBatch+1) = mu(:,1,iBatch) + deltaMu(:,1,iBatch);
             mu(:,2,iBatch+1) = mu(:,2,iBatch) + deltaMu(:,2,iBatch);
-            
-            
-            % compute sse on each trial with respect to 'all trials' 
-            % trials - since values are all points in the box, no need to use a
-            % trialsTest, juse use all unique locations (unique pairs of xy) from trials
-            
-            
-            %weight learning rate by SSE - 
-            %%%%%%
-            % - atm SSE goes down really quick with batch - shouldn't weigh
-            % by initial SSE!(even more so than before)
-            %%%%%%
-            if weightEpsSSE
-                sse=nan(1,nClus);
-                distTrl=(mu(:,1,iBatch)'-trialsUnique(:,1)).^2+(mu(:,2,iBatch)'-trialsUnique(:,2)).^2; % vectorised
-                [indValsTrl, indTmp]=min(distTrl,[],2); % find which clusters are points closest to
-                
-                %any way to vectorize this?
-                for iClus = 1:nClus
-                    sse(iClus)=sum(sum([mu(iClus,1,iBatch)-trialsUnique(indTmp==iClus,1), mu(iClus,2,iBatch)-trialsUnique(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
-                    % sse(iClus)=sum(sum([clusMu(iClus,1,iSet,iterI)-dataPtsTest(indTmp==iClus,1), clusMu(iClus,2,iSet,iterI)-dataPtsTest(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
-                end
-                tsse(iBatch)=sum(sse);
-                sseW(iBatch+1) = tsse(iBatch)./tsse(1);% weight next learning rate by prop of sse from the start
-                
-%                 devAvgSSE             = sse-mean(sse);
-%                 stdAcrossClus(iBatch) = std(devAvgSSE); % may be better since normalises by nClus?
-%                 varAcrossClus(iBatch) = var(devAvgSSE);
-            end
-            
-%             %compute SSE and save - don't do if run above. consider only
-%             %running this outside of the sim? - yes; in xVal_clus.m. Also
-%             not sure if this works here
-
-%             sse=nan(1,nClus);
-%             distTrl=(mu(:,1,iBatch)'-trialsUnique(:,1)).^2+(mu(:,2,iBatch)'-trialsUnique(:,2)).^2; % vectorised
-%             [indValsTrl, indTmp]=min(distTrl,[],2); % find which clusters are points closest to
-%             
-%             %any way to vectorize this?
-%             for iClus = 1:size(clusMu,1)
-%                 sse(iClus)=sum(sum([mu(iClus,1,iBatch)-trialsUnique(indTmp==iClus,1), mu(iClus,2,iBatch)-trialsUnique(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
-%                 % sse(iClus)=sum(sum([clusMu(iClus,1,iSet,iterI)-dataPtsTest(indTmp==iClus,1), clusMu(iClus,2,iSet,iterI)-dataPtsTest(indTmp==iClus,2)].^2,2)); %distance from each cluster from training set to datapoints closest to that cluster
-%             end
-%             tsse(iBatch)=sum(sse);
-%             sseW(iBatch+1) = tsse(iBatch)./tsse(1);% weight next learning rate by prop of sse from the start
-%             devAvgSSE             = sse-mean(sse);
-%             stdAcrossClus(iBatch) = std(devAvgSSE); % may be better since normalises by nClus?
-%             varAcrossClus(iBatch) = var(devAvgSSE);
-
-
+          
     end
     if nargout > 7
         muAll(:,:,:,iterI)      = mu;
