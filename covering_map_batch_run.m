@@ -14,8 +14,8 @@ addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in codeDir now not wd
 
 %define box / environment - random points in a box
-dat = 'circ'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
-% dat = 'square'; 
+%dat = 'circ'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
+dat = 'square'; 
 % dat = 'trapz1'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
 % dat = 'trapz2';% dat = 'trapz3';
 % dat = 'trapzKrupic'; % dat = 'trapzKrupic2'; % dat = 'trapzKrupic3';
@@ -42,8 +42,8 @@ clus2run = [18,22,24,20]; %sq love06; ran first 2 batches then restarted
 %annealed learning rate
 % love01 square + 3rd set of circ; love06 1st 2 sets of circ
 clus2run = [18, 26, 16];
-% clus2run = [12, 20, 10, 22];
-clus2run = [28, 24,14,30]; %sq love06; ran first 2 batches then restarted
+clus2run = [12, 20, 10, 22];
+clus2run = [28, 24,14,30];
 
 % clus2run = 20;
 
