@@ -4,8 +4,8 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -14,8 +14,8 @@ addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in codeDir now not wd
 
 %define box / environment - random points in a box
-% dat = 'circ'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
-dat = 'square'; 
+dat = 'circ'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
+% dat = 'square'; 
 % dat = 'trapz1'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
 % dat = 'trapz2';% dat = 'trapz3';
 % dat = 'trapzKrupic'; % dat = 'trapzKrupic2'; % dat = 'trapzKrupic3';
@@ -37,9 +37,15 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % love06 sq; love01 circ - NOTE looks like ran 24 twice - love01 delete
 clus2run = [28, 26, 10];
  clus2run = [12, 14, 16, 30];
-% clus2run = [18,22,24,20]; %sq love06; ran first 2 batches then restarted
+clus2run = [18,22,24,20]; %sq love06; ran first 2 batches then restarted
 
-clus2run = 20;
+%annealed learning rate
+% love01 square + 3rd set of circ; love06 1st 2 sets of circ
+clus2run = [18, 26, 16];
+% clus2run = [12, 20, 10, 22];
+clus2run = [28, 24,14,30]; %sq love06; ran first 2 batches then restarted
+
+% clus2run = 20;
 
 %odd numbers, and smaller numbers - ran sq, now circ (swapping some larger
 %ones to run on love06)
@@ -134,9 +140,9 @@ stochasticType=0;
 c=0;
 
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
-nIter=1; %how many iterations (starting points)
+nIter=200; %how many iterations (starting points)
 
 switch dat
         case 'randUnique'
