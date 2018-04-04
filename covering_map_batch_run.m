@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -42,8 +42,8 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 %annealed learning rate
 % love01 - all for 50k batches
 clus2run = [28, 26, 30];
-clus2run = [12, 20, 10, 22];
-clus2run = [18, 14, 24, 16];
+%clus2run = [12, 20, 10, 22];
+%clus2run = [18, 14, 24, 16];
 
 % clus2run = 12;
 
@@ -141,9 +141,9 @@ stochasticType=0;
 c=0;
 
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
-nIter=1; %how many iterations (starting points)
+nIter=200; %how many iterations (starting points)
 
 switch dat
         case 'randUnique'
