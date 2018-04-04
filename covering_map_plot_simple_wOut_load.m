@@ -31,7 +31,7 @@ densityPlotCentresSm = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmoot
 figure; hold on;
 subplot(1,2,1)
 imagesc(densityPlotCentresSm);
-% 
+% clos
 aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram
 % subplot(1,3,2)
 % imagesc(aCorrMap,[-.45 .45]);

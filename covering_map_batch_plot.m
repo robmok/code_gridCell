@@ -15,6 +15,7 @@ gaussSmooth = 1;
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='square';
+annEps=1;
 
 % clus2run = [7,8,10,12]; 
 % nTrials = 100000; 
@@ -37,12 +38,16 @@ nTrials=2500000;
 nIter=200;
 % batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
 %wAct
-clus2run = [16 18 20 24 26  28];
-clus2run = [10:2:28];
+clus2run = [10, 12, 16:2:28]; %no 14? 30?
 % batchSizeVals=[1000, 2000];
 batchSizeVals = [1000, 500, 125, 50];
-% epsMuVals=.075;
-epsMuVals=.015;
+epsMuVals=.075;
+
+ %new
+% epsMuVals=.015;
+% nTrials=2000000; %new
+% batchSizeVals = [800, 400, 100, 40];
+
 
 % new 3 - fixed batch sizes across clusters
 % nTrials=2500000;
@@ -84,6 +89,15 @@ epsMuVals=.015;
 % boxSize=2;
 
 
+%new - annealed learning rate
+clus2run = [10:2:30]; 
+epsMuVals=[.2, .05]; %"starting" learning rate - actually these are just numbers, not actualy starting eps
+nTrials=2000000; %new
+% batchSizeVals = [400, 100]; % only 1 batchsize val per learning rate
+batchSizeVals = 0;
+annEps=1;
+% covering_map_batch_dat_22clus_2000ktrls_eps200_batchSiz100_200iters_circ_wAct_annEps_132454
+
 
 %load loop
 for iClus2run = 1:length(clus2run) 
@@ -120,7 +134,11 @@ for iClus2run = 1:length(clus2run)
             fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_%s*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,dat)];
 %             fname = [fname '_boxSizex2*'];
             
-            
+            if annEps
+                fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz*_%diters_%s_wAct_annEps*',nClus,round(nTrials/1000),epsMuOrig1000,nIter,dat)];
+            end
+
+
             
             %edit if want to load more than one file per sim, merge
             f = dir(fname); filesToLoad = cell(1,length(f));
@@ -249,12 +267,14 @@ switch gridMeasure
 end
 
 
-iSet=6;
+iSet=size(datTmp,1);
+
+iEps=1;
 
 %plot univar scatters - over clusters (e.g. one batch size)
 if size(gridness,4)==1 %only 1 batchSize
     figure; hold on;
-    dat1     = squeeze(datTmp(iSet,:,:,:,:,1));
+    dat1     = squeeze(datTmp(iSet,:,iEps,:,:,1));
     barpos  = .25:.5:.5*size(dat1,2);
     colors  = distinguishable_colors(size(dat1,2));
     colgrey = [.5, .5, .5];
@@ -270,7 +290,7 @@ if size(gridness,4)==1 %only 1 batchSize
     ylim([-.5,1.25]);
     title(sprintf('%s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
     
-    if strcmp(dat(1:5),'trapz')
+    if strcmp(dat(1:4),'trap')
         figure; hold on;
         dat1    = squeeze(datTmp(iSet,:,:,:,:,2));
         mu      = nanmean(dat1,1);
@@ -383,13 +403,13 @@ end
 
 %plot over sets
 if 1
-    
-if size(gridness,4)>1 
+   
+if size(gridness,3)>1 || size(gridness,4)>1 
     for iClus = 1:length(clus2run)
     figure; hold on;
     for iBatchVals = 1:length(batchSizeVals)        
         subplot(ceil(length(batchSizeVals)/2),2,iBatchVals); hold on;
-        dat1     = squeeze(datTmp(:,:,:,iBatchVals,iClus,:))';
+        dat1     = squeeze(datTmp(:,:,iEps,iBatchVals,iClus,:))';
         barpos  = .25:.5:.5*size(dat1,2);
         colors  = distinguishable_colors(size(dat1,2));
         colgrey = [.5, .5, .5];

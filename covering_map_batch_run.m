@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -35,17 +35,17 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 % clus2run = 12; %20, 30
 
 % love06 sq; love01 circ - NOTE looks like ran 24 twice - love01 delete
-clus2run = [28, 26, 10];
- clus2run = [12, 14, 16, 30];
-clus2run = [18,22,24,20]; %sq love06; ran first 2 batches then restarted
+% clus2run = [28, 26, 10];
+%  clus2run = [12, 14, 16, 30];
+% clus2run = [18,22,24,20]; %sq love06; ran first 2 batches then restarted
 
 %annealed learning rate
-% love01 square + 3rd set of circ; love06 1st 2 sets of circ
-clus2run = [18, 26, 16];
+% love01 - all for 50k batches
+clus2run = [28, 26, 30];
 clus2run = [12, 20, 10, 22];
-clus2run = [28, 24,14,30];
+clus2run = [18, 14, 24, 16];
 
-% clus2run = 20;
+% clus2run = 12;
 
 %odd numbers, and smaller numbers - ran sq, now circ (swapping some larger
 %ones to run on love06)
@@ -77,7 +77,8 @@ if fixBatchSize
 % new select batchSizes
     nBatches = [2500, 20000,5000 50000];
 %     nBatches = [2500, 50000];
-  nBatches = [5000, 20000]; % just run these for annealed learning rate (for now)
+%   nBatches = [5000, 20000]; % just run these for annealed learning rate (for now)
+    nBatches = 50000; %even smaller batch size for annealed eps?
 %     nBatches = 5000;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
@@ -140,9 +141,9 @@ stochasticType=0;
 c=0;
 
 %%
-saveDat=1; %save simulations
+saveDat=0; %save simulations
 
-nIter=200; %how many iterations (starting points)
+nIter=1; %how many iterations (starting points)
 
 switch dat
         case 'randUnique'
