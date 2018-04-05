@@ -1,5 +1,5 @@
 % function [densityPlot,densityPlotAct,densityPlotActNorm,clusMu,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,rSeed,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE)
-function [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,annEps)
+function [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB,muTrlsPerm,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,annEps)
 
 %if end up not using desityPlotAct and gA_act - edit out below, or no need
 %to save the iters, etc.
@@ -46,7 +46,7 @@ end
 fromTrlI  = round([1,               nTrials.*.05+1,  nTrials.*.1+1,  nTrials.*.15+1,  nTrials.*.2+1,  nTrials.*.25+1,   nTrials.*.3+1,  nTrials.*.35+1,  nTrials.*.4+1,  nTrials.*.45+1,  nTrials.*.5+1,  nTrials.*.55+1, nTrials.*.6+1,  nTrials.*.65+1, nTrials.*.7+1, nTrials.*.75+1, nTrials.*.8+1,  nTrials.*.85+1,  nTrials.*.9+1,  nTrials.*.95+1]);
 toTrlN    = round([nTrials.*.05,    nTrials.*.1,     nTrials.*.15,   nTrials.*.2,     nTrials.*.25,   nTrials.*.3,      nTrials.*.35,   nTrials.*.4,     nTrials.*.45,   nTrials.*.5,     nTrials.*.55,   nTrials.*.6,    nTrials.*.65,   nTrials.*.7,    nTrials.*.75,  nTrials.*.8,    nTrials.*.85,   nTrials.*.9,     nTrials.*.95,   nTrials]);
 
-if nargout > 7
+if nargout > 8
     muAll            = nan(nClus,2,nBatch+1,nIter);
 end
 % nSets                = length(trlSel);
@@ -71,6 +71,10 @@ if strcmp(dat(1:4),'trap')
     gA_actNorm = nan(nSets,nIter,1,4,3);
 
 end
+
+%perm testing
+nPerm = 1000;
+gA_actNormPerm = nan(nPerm,nIter,9,1);
 
 %compute distance of each cluster to itself over time (batches)
 clusDistB = nan(nSets-1,nIter);
@@ -461,22 +465,13 @@ for iterI = 1:nIter
                 deltaMu(iClus,2,iBatch) = nanmean(epsMu*(trls2Upd(updInd,2)-mu(iClus,2,iBatch)));
                 end
             end
-            
-%             %update (with momemtum-like parameter)
-%             deltaMu(closestC,1,iTrl) = ((1-alpha)*(epsMu*(trials(iTrl,1)-mu(closestC,1,iTrl))))+(alpha*clusUpdates(closestC,1));
-%             deltaMu(closestC,2,iTrl) = ((1-alpha)*(epsMu*(trials(iTrl,2)-mu(closestC,2,iTrl))))+(alpha*clusUpdates(closestC,2));
-%             
-%             %for momentum - consider not using this, or switch to a
-%             %'batch-like' momentum later?
-%             clusUpdates(closestC,1)=deltaMu(closestC,1,iTrl);
-%             clusUpdates(closestC,2)=deltaMu(closestC,2,iTrl);
 
             % update mean estimates
             mu(:,1,iBatch+1) = mu(:,1,iBatch) + deltaMu(:,1,iBatch);
             mu(:,2,iBatch+1) = mu(:,2,iBatch) + deltaMu(:,2,iBatch);
           
     end
-    if nargout > 7
+    if nargout > 8
         muAll(:,:,:,iterI)      = mu;
     end
     actAll  = reshape(actTrlAll,nClus,nTrials); %save trial-by-trial act over blocks, here unrolling it
@@ -489,8 +484,6 @@ for iterI = 1:nIter
     % a place cell map - use to find clusMu (clus centres) - leave it out
     % here so can use diff smoothing values outside . also then use to make
     % it a gridcell map: densityPlot=sum(densityPlotClus,3); - to compute autocorrelogram
-    % muAvg - also save cluster positions averaged over to plot average cluster
-    %positions
     
     %densityplot over time (more samples)
     for iSet = 1:nSets
@@ -536,6 +529,7 @@ for iterI = 1:nIter
             %             aCorrMap = ndautoCORR(densityPlotActTSm);
             %             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
             %             gA_act_t(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+            
             %normalised by times loc visited
             aCorrMap = ndautoCORR(densityPlotActNormSm);
             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
@@ -585,6 +579,58 @@ for iterI = 1:nIter
         end
         
     end
+    
+    
+    % for perm test, need actAll (nClus x nTrials), and mu (nClus x 2 x
+    % nBatch). 
+    % - note that since size of mu is nBatch, not nTrials, need to reformat
+    % this so the it is nTrials size (so each mu cluster value is repeated
+    % batchSize times).
+    % - need to permulate the activations, then map them onto mu
+    % (positions) or vice versal; make 1k/5k/10k
+    % - then make the firing maps (with fromTrlI toTrlN) - assess gridness;
+    % 95% percentile; i suppose only from positive side?
+    
+    %for now: shuffle is fine since not temporal dependencies between the
+    %trials. 
+    % LATER, with connected trials: need to cut "20s" periods, maybe longer than 20 timesteps
+    % here (even 100/200?) and permute those
+    
+    muTrls = nan(nClus,2,nTrials);
+    for iBatch = 1:nBatch
+        muTrls(:,1,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(mu(:,1,iBatch),1,batchSize);
+        muTrls(:,2,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(mu(:,2,iBatch),1,batchSize);
+    end    
+    
+    for iPerm = 1:nPerm
+        fprintf('Perm %d\n',iPerm);
+        randInd=randperm(length(muTrls));
+%         muTrlsPerm = muTrls(:,:,randInd); % check
+        actAllPerm = actAll(:,randInd); % check
+        
+        iSet = 20; %just final set enough?
+        
+        densityPlotActPerm       = zeros(b,h);
+        densityPlotActUpdPerm    = zeros(b,h);
+        % just permuted activations make more sense
+        for iTrl = fromTrlI(iSet):toTrlN(iSet)
+            densityPlotActPerm(trials(iTrl,1)+1, trials(iTrl,2)+1) = densityPlotActPerm(trials(iTrl,1)+1, trials(iTrl,2)+1)+ sum(actAllPerm(:,iTrl)); %.^2 to make it look better?
+            densityPlotActUpdPerm(trials(iTrl,1)+1, trials(iTrl,2)+1) = densityPlotActUpdPerm(trials(iTrl,1)+1, trials(iTrl,2)+1)+1; %log nTimes loc was visited
+        end
+        densityPlotActNormPerm(:,:,iterI) = densityPlotActPerm./densityPlotActUpdPerm; %divide by number of times that location was visited
+        % smooth
+        %         densityPlotTSmPerm = imgaussfilt(densityPlotPerm(:,:,iSet,iterI),gaussSmooth);
+        %         densityPlotActTSm     = imgaussfilt(densityPlotAct(:,:,iSet,iterI),gaussSmooth);
+        densityPlotActNormSmPerm = imgaussfilt(densityPlotActNormPerm(:,:,iterI),gaussSmooth);
+        
+        %compute gridness
+        aCorrMap = ndautoCORR(densityPlotActNormSmPerm);
+        [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+        gA_actNormPerm(iPerm,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+    end
+    
+    
+    
 end
 end
 

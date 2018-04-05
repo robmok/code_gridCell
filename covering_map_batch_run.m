@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -15,7 +15,7 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 %dat = 'circ'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
-dat = 'square'; 
+dat = 'circ'; 
 % dat = 'trapz1'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
 % dat = 'trapz2';% dat = 'trapz3';
 % dat = 'trapzKrupic'; % dat = 'trapzKrupic2'; % dat = 'trapzKrupic3';
@@ -34,18 +34,13 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 %run multiple cluster numbers
 % clus2run = 12; %20, 30
 
-% love06 sq; love01 circ - NOTE looks like ran 24 twice - love01 delete
-% clus2run = [28, 26, 10];
-%  clus2run = [12, 14, 16, 30];
-% clus2run = [18,22,24,20]; %sq love06; ran first 2 batches then restarted
-
 %annealed learning rate
 % love01 - all for 50k batches
 clus2run = [28, 26, 30];
 %clus2run = [12, 20, 10, 22];
 %clus2run = [18, 14, 24, 16];
 
-% clus2run = 12;
+clus2run = 16;
 
 %odd numbers, and smaller numbers - ran sq, now circ (swapping some larger
 %ones to run on love06)
@@ -64,7 +59,7 @@ clus2run = [28, 26, 30];
 % clus2run = [28 22 14]; %krupic3
 
 % nTrials = 5000000; %how many locations in the box / trials 
-nTrials = 2000000;
+nTrials = 2000000/2;
 
 %batch size
 fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
@@ -79,7 +74,7 @@ if fixBatchSize
 %     nBatches = [2500, 50000];
 %   nBatches = [5000, 20000]; % just run these for annealed learning rate (for now)
     nBatches = 50000; %even smaller batch size for annealed eps?
-%     nBatches = 5000;
+    nBatches = 5000;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
 else % define batch size based on average number of updates per cluster
@@ -141,9 +136,9 @@ stochasticType=0;
 c=0;
 
 %%
-saveDat=1; %save simulations
+saveDat=0; %save simulations
 
-nIter=200; %how many iterations (starting points)
+nIter=1; %how many iterations (starting points)
 
 switch dat
         case 'randUnique'
@@ -193,7 +188,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
 %                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(avgBatchUpdate(iBvals)),round(batchSize),nIter)];
             end
 %             [densityPlot,densityPlotAct,densityPlotActNorm,clusMu,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,rSeed] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
-            [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB, muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,annEps);
+            [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB, muTrlsPerm, muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,annEps);
 
             timeTaken=toc;
             if saveDat

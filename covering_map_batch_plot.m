@@ -14,7 +14,7 @@ nSet        = 6;
 gaussSmooth = 1; 
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
-dat='square';
+dat='circ';
 annEps=1;
 
 % clus2run = [7,8,10,12]; 
@@ -206,9 +206,9 @@ for iClus2run = 1:length(clus2run)
 end
 %% plot univar scatters
 
-clusPosAct = 'actNorm'; %'clus' or 'act'
+clusPosAct = 'clus'; %'clus' or 'actNorm'
 
-gridMsrType = 'a'; % 'a' or 'w' for allen or willis method
+gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
 
 gridMeasure = 'grid';
 
