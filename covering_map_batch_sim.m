@@ -1,5 +1,5 @@
 % function [densityPlot,densityPlotAct,densityPlotActNorm,clusMu,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,rSeed,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE)
-function [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB,muTrlsPerm,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,annEps)
+function [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB,permPrc,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,annEps)
 
 %if end up not using desityPlotAct and gA_act - edit out below, or no need
 %to save the iters, etc.
@@ -74,7 +74,8 @@ end
 
 %perm testing
 nPerm = 1000;
-gA_actNormPerm = nan(nPerm,nIter,9,1);
+permPrc = nan(nIter,4);
+% gA_actNormPerm = nan(nPerm,nIter,9,1);
 
 %compute distance of each cluster to itself over time (batches)
 clusDistB = nan(nSets-1,nIter);
@@ -596,12 +597,18 @@ for iterI = 1:nIter
     % LATER, with connected trials: need to cut "20s" periods, maybe longer than 20 timesteps
     % here (even 100/200?) and permute those
     
+    
+    
+    % Reformat mu (batchSize long) so it is nTrials long (so
+    % each mu cluster value is repeated batchSize times) 
     muTrls = nan(nClus,2,nTrials);
     for iBatch = 1:nBatch
         muTrls(:,1,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(mu(:,1,iBatch),1,batchSize);
         muTrls(:,2,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(mu(:,2,iBatch),1,batchSize);
     end    
-    
+    %perm testing
+    gA_actNormPerm = nan(1,nPerm);
+
     for iPerm = 1:nPerm
         fprintf('Perm %d\n',iPerm);
         randInd=randperm(length(muTrls));
@@ -617,20 +624,19 @@ for iterI = 1:nIter
             densityPlotActPerm(trials(iTrl,1)+1, trials(iTrl,2)+1) = densityPlotActPerm(trials(iTrl,1)+1, trials(iTrl,2)+1)+ sum(actAllPerm(:,iTrl)); %.^2 to make it look better?
             densityPlotActUpdPerm(trials(iTrl,1)+1, trials(iTrl,2)+1) = densityPlotActUpdPerm(trials(iTrl,1)+1, trials(iTrl,2)+1)+1; %log nTimes loc was visited
         end
-        densityPlotActNormPerm(:,:,iterI) = densityPlotActPerm./densityPlotActUpdPerm; %divide by number of times that location was visited
+        densityPlotActNormPerm = densityPlotActPerm./densityPlotActUpdPerm; %divide by number of times that location was visited
         % smooth
         %         densityPlotTSmPerm = imgaussfilt(densityPlotPerm(:,:,iSet,iterI),gaussSmooth);
         %         densityPlotActTSm     = imgaussfilt(densityPlotAct(:,:,iSet,iterI),gaussSmooth);
-        densityPlotActNormSmPerm = imgaussfilt(densityPlotActNormPerm(:,:,iterI),gaussSmooth);
+        densityPlotActNormSmPerm = imgaussfilt(densityPlotActNormPerm,gaussSmooth);
         
         %compute gridness
         aCorrMap = ndautoCORR(densityPlotActNormSmPerm);
         [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-        gA_actNormPerm(iPerm,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+        gA_actNormPerm(iPerm) = gdataA.g_score;
     end
-    
-    
-    
+    permPrc(iterI,:) = prctile(gA_actNormPerm,[2.5, 5, 95, 97.5]);
+ 
 end
 end
 

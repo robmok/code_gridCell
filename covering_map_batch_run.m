@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -34,24 +34,20 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 %run multiple cluster numbers
 % clus2run = 12; %20, 30
 
+
+%annealed learning rate
+annEps = 1; %1 or 0
+
 %annealed learning rate
 % love01 - all for 50k batches
 clus2run = [28, 26, 30];
 %clus2run = [12, 20, 10, 22];
 %clus2run = [18, 14, 24, 16];
 
-clus2run = 16;
 
-%odd numbers, and smaller numbers - ran sq, now circ (swapping some larger
-%ones to run on love06)
-% clus2run = [19, 15];
-%  clus2run = [29, 12];
-% clus2run = [5, 27];
-% clus2run = [11, 25, 9];
-% clus2run = [8, 21, 7];
-% clus2run = [3, 17, 4];
-% clus2run = [10, 6, 14];
+clus2run = [16:2:26];
 
+% clus2run = 22;
 
 %trapz
 % clus2run = [18, 24, 26, 28, 16, 30, 20, 22]; %trapzScaled
@@ -59,7 +55,7 @@ clus2run = 16;
 % clus2run = [28 22 14]; %krupic3
 
 % nTrials = 5000000; %how many locations in the box / trials 
-nTrials = 2000000/2;
+nTrials = 2000000;
 
 %batch size
 fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
@@ -68,12 +64,11 @@ fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
 if fixBatchSize
 %     nBatches = [1250, 2500, 5000, 7500, 10000, 15000, 20000];
 %     nBatches = [30000, 100000, 200000, 500000, 1250, 2500, 5000, 7500, 10000, 15000, 20000];
-
 % new select batchSizes
     nBatches = [2500, 20000,5000 50000];
 %     nBatches = [2500, 50000];
 %   nBatches = [5000, 20000]; % just run these for annealed learning rate (for now)
-    nBatches = 50000; %even smaller batch size for annealed eps?
+%     nBatches = 50000; %even smaller batch size for annealed eps?
     nBatches = 5000;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals); %length(avgBatchUpdate)
@@ -106,10 +101,6 @@ end
 % epsMuVals = 0.02; 
 epsMuVals = 0.015; 
 
-%annealed learning rate
-annEps = 1; %1 or 0
-
-
 % learning rate - annealed (reduced over time)  -actually beter to compute
 % inside?
 % if annEps
@@ -136,9 +127,9 @@ stochasticType=0;
 c=0;
 
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
-nIter=1; %how many iterations (starting points)
+nIter=5; %how many iterations (starting points)
 
 switch dat
         case 'randUnique'
@@ -188,7 +179,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
 %                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(avgBatchUpdate(iBvals)),round(batchSize),nIter)];
             end
 %             [densityPlot,densityPlotAct,densityPlotActNorm,clusMu,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,rSeed] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
-            [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB, muTrlsPerm, muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,annEps);
+            [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB, permPrc, muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,annEps);
 
             timeTaken=toc;
             if saveDat
@@ -206,7 +197,13 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                 end
                 cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
 %                 save(fname,'densityPlot','densityPlotAct','clusMu','gA','gW','gA_act','gW_act','nIter','rSeed','timeTaken'); %added trialsAll for xval - removed, too big.maybe compute at end of each sim? or at each set
-                save(fname,'densityPlot','densityPlotActNorm','gA','gA_actNorm','rSeed','muInit','clusDistB','timeTaken'); 
+%                 save(fname,'densityPlot','densityPlotActNorm','gA','gA_actNorm','rSeed','muInit','clusDistB','timeTaken'); 
+
+                if doPerm
+                    fname = [fname '_doPerm'];
+                end
+                save(fname,'densityPlot','densityPlotActNorm','gA','gA_actNorm','rSeed','muInit','clusDistB','permPrc','timeTaken'); 
+
             end
         end
         
