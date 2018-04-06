@@ -6,11 +6,13 @@ wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 cd(wd);
 codeDir = [wd '/code_gridCell'];
 saveDir = [wd '/data_gridCell'];
+addpath(codeDir);
+addpath(saveDir);
 
-saveDat = 0;
+saveDat = 1;
 
-dat='square'; %square, circ
-nPoints = 10000; %3k, 5k, 10k
+dat='circ'; %square, circ
+nPoints = 50000; % 5k, 10k, 50k
 nIters  = 200; %nKmeans
 
 mergeAcrossClus = 0; % if more than 2 files to merge, can edit below to use this as the value
@@ -103,7 +105,7 @@ else
 end
 
 if saveDat
-    fname=[saveDir sprintf('/kmeans_nK_3-30_%s_nPoints%d_%diters_%dsims_merged_2',dat,nPoints,nIters,length(f))]; %note assuming length(f) is the num of sims run (and same for set 1 and set 2)
+    fname=[saveDir sprintf('/kmeans_nK_3-30_%s_nPoints%d_%diters_%dsims_merged',dat,nPoints,nIters,length(f))]; %note assuming length(f) is the num of sims run (and same for set 1 and set 2)
     save(fname,'densityPlotCentres','gA','gW','indSSE1','indSSE2','kVals','tssekVals','muAllkVals');
 end
 

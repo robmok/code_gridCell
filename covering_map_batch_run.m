@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -28,11 +28,7 @@ boxSize = 1; % 1=normal, 2=double size, 3=triple size
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
 nCats   = 2; %2 categories
-sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
-% sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
-
-%run multiple cluster numbers
-% clus2run = 12; %20, 30
+sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 
 
 %annealed learning rate
@@ -42,7 +38,7 @@ annEps = 0; %1 or 0
 doPerm = 0;
 
 %epsMu 0.015; didn't run through 
-clus2run = [28, 14];
+% clus2run = [28, 14];
 
 %annealed learning rate
 % love01 - all for 50k batches
@@ -52,7 +48,7 @@ clus2run = [28, 14];
 
 % clus2run = [16:2:26];
 
-% clus2run = 22;
+clus2run = 20;
 
 %trapz
 % clus2run = [18, 24, 26, 28, 16, 30, 20, 22]; %trapzScaled
@@ -60,7 +56,7 @@ clus2run = [28, 14];
 % clus2run = [28 22 14]; %krupic3
 
 % nTrials = 5000000; %how many locations in the box / trials 
-nTrials = 2000000;
+nTrials = 2000000/2;
 
 %batch size
 fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
@@ -102,9 +98,10 @@ end
 % parameters
 % epsMuVals=[.01, .05, .075, .1, .2, .3];% %learning rate / starting learning rate 
 % epsMuVals = 0.075; 
-% epsMuVals = 0.05; 
-% epsMuVals = 0.02; 
-epsMuVals = 0.015; 
+epsMuVals = 0.05; 
+epsMuVals = 0.025;
+
+% epsMuVals = 0.015; 
 
 % learning rate - annealed (reduced over time)  -actually beter to compute
 % inside?
@@ -132,9 +129,9 @@ stochasticType=0;
 c=0;
 
 %%
-saveDat=1; %save simulations
+saveDat=0; %save simulations
 
-nIter=200; %how many iterations (starting points)
+nIter=1; %how many iterations (starting points)
 
 switch dat
         case 'randUnique'

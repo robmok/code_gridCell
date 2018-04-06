@@ -14,8 +14,8 @@ nSet        = 6;
 gaussSmooth = 1; 
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
-dat='circ';
-annEps=1;
+dat='square';
+annEps=0;
 
 % clus2run = [7,8,10,12]; 
 % nTrials = 100000; 
@@ -38,12 +38,14 @@ nTrials=2500000;
 nIter=200;
 % batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
 %wAct
-clus2run = [10, 12, 16:2:28]; %no 14? 30?
+clus2run = [10:2:30];
+clus2run = [10, 12 16:2:28]; %no 14 and 30 for sq, no 12, 30 for circ; epsmu=00.75
 % batchSizeVals=[1000, 2000];
 batchSizeVals = [1000, 500, 125, 50];
 epsMuVals=.075;
 
  %new
+%  clus2run = [10, 12, 16:2:26]; %no 14? 28? - errored, running (0.15, circ)
 % epsMuVals=.015;
 % nTrials=2000000; %new
 % batchSizeVals = [800, 400, 100, 40];
@@ -90,12 +92,12 @@ epsMuVals=.075;
 
 
 %new - annealed learning rate
-clus2run = [10:2:30]; 
-epsMuVals=[.2, .05]; %"starting" learning rate - actually these are just numbers, not actualy starting eps
-nTrials=2000000; %new
-% batchSizeVals = [400, 100]; % only 1 batchsize val per learning rate
-batchSizeVals = 0;
-annEps=1;
+% clus2run = [10:2:30]; 
+% epsMuVals=[.2, .05]; %"starting" learning rate - actually these are just numbers, not actualy starting eps
+% nTrials=2000000; %new
+% % batchSizeVals = [400, 100]; % only 1 batchsize val per learning rate
+% batchSizeVals = 0;
+% annEps=1;
 % covering_map_batch_dat_22clus_2000ktrls_eps200_batchSiz100_200iters_circ_wAct_annEps_132454
 
 
