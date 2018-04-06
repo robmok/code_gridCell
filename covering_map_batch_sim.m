@@ -597,46 +597,45 @@ for iterI = 1:nIter
     % LATER, with connected trials: need to cut "20s" periods, maybe longer than 20 timesteps
     % here (even 100/200?) and permute those
     
-    
-    
+    if doPerm
     % Reformat mu (batchSize long) so it is nTrials long (so
     % each mu cluster value is repeated batchSize times) 
     muTrls = nan(nClus,2,nTrials);
-    for iBatch = 1:nBatch
-        muTrls(:,1,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(mu(:,1,iBatch),1,batchSize);
-        muTrls(:,2,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(mu(:,2,iBatch),1,batchSize);
-    end    
-    %perm testing
-    gA_actNormPerm = nan(1,nPerm);
-
-    for iPerm = 1:nPerm
-        fprintf('Perm %d\n',iPerm);
-        randInd=randperm(length(muTrls));
-%         muTrlsPerm = muTrls(:,:,randInd); % check
-        actAllPerm = actAll(:,randInd); % check
-        
-        iSet = 20; %just final set enough?
-        
-        densityPlotActPerm       = zeros(b,h);
-        densityPlotActUpdPerm    = zeros(b,h);
-        % just permuted activations make more sense
-        for iTrl = fromTrlI(iSet):toTrlN(iSet)
-            densityPlotActPerm(trials(iTrl,1)+1, trials(iTrl,2)+1) = densityPlotActPerm(trials(iTrl,1)+1, trials(iTrl,2)+1)+ sum(actAllPerm(:,iTrl)); %.^2 to make it look better?
-            densityPlotActUpdPerm(trials(iTrl,1)+1, trials(iTrl,2)+1) = densityPlotActUpdPerm(trials(iTrl,1)+1, trials(iTrl,2)+1)+1; %log nTimes loc was visited
+        for iBatch = 1:nBatch
+            muTrls(:,1,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(mu(:,1,iBatch),1,batchSize);
+            muTrls(:,2,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(mu(:,2,iBatch),1,batchSize);
         end
-        densityPlotActNormPerm = densityPlotActPerm./densityPlotActUpdPerm; %divide by number of times that location was visited
-        % smooth
-        %         densityPlotTSmPerm = imgaussfilt(densityPlotPerm(:,:,iSet,iterI),gaussSmooth);
-        %         densityPlotActTSm     = imgaussfilt(densityPlotAct(:,:,iSet,iterI),gaussSmooth);
-        densityPlotActNormSmPerm = imgaussfilt(densityPlotActNormPerm,gaussSmooth);
+        %perm testing
+        gA_actNormPerm = nan(1,nPerm);
         
-        %compute gridness
-        aCorrMap = ndautoCORR(densityPlotActNormSmPerm);
-        [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-        gA_actNormPerm(iPerm) = gdataA.g_score;
+        for iPerm = 1:nPerm
+            fprintf('Perm %d\n',iPerm);
+            randInd=randperm(length(muTrls));
+            %         muTrlsPerm = muTrls(:,:,randInd); % check
+            actAllPerm = actAll(:,randInd); % check
+            
+            iSet = 20; %just final set enough?
+            
+            densityPlotActPerm       = zeros(b,h);
+            densityPlotActUpdPerm    = zeros(b,h);
+            % just permuted activations make more sense
+            for iTrl = fromTrlI(iSet):toTrlN(iSet)
+                densityPlotActPerm(trials(iTrl,1)+1, trials(iTrl,2)+1) = densityPlotActPerm(trials(iTrl,1)+1, trials(iTrl,2)+1)+ sum(actAllPerm(:,iTrl)); %.^2 to make it look better?
+                densityPlotActUpdPerm(trials(iTrl,1)+1, trials(iTrl,2)+1) = densityPlotActUpdPerm(trials(iTrl,1)+1, trials(iTrl,2)+1)+1; %log nTimes loc was visited
+            end
+            densityPlotActNormPerm = densityPlotActPerm./densityPlotActUpdPerm; %divide by number of times that location was visited
+            % smooth
+            %         densityPlotTSmPerm = imgaussfilt(densityPlotPerm(:,:,iSet,iterI),gaussSmooth);
+            %         densityPlotActTSm     = imgaussfilt(densityPlotAct(:,:,iSet,iterI),gaussSmooth);
+            densityPlotActNormSmPerm = imgaussfilt(densityPlotActNormPerm,gaussSmooth);
+            
+            %compute gridness
+            aCorrMap = ndautoCORR(densityPlotActNormSmPerm);
+            [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+            gA_actNormPerm(iPerm) = gdataA.g_score;
+        end
+        permPrc(iterI,:) = prctile(gA_actNormPerm,[2.5, 5, 95, 97.5]);
     end
-    permPrc(iterI,:) = prctile(gA_actNormPerm,[2.5, 5, 95, 97.5]);
- 
 end
 end
 

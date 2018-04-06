@@ -36,20 +36,21 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 
 
 %annealed learning rate
-annEps = 1; %1 or 0
+annEps = 0; %1 or 0
 
 %perm testing
-doPerm = 1;
+doPerm = 0;
 
+%epsMu 0.015; didn't run through 
+clus2run = [28, 14];
 
 %annealed learning rate
 % love01 - all for 50k batches
-clus2run = [28, 26, 30];
+% clus2run = [28, 26, 30];
 %clus2run = [12, 20, 10, 22];
 %clus2run = [18, 14, 24, 16];
 
-
-clus2run = [16:2:26];
+% clus2run = [16:2:26];
 
 % clus2run = 22;
 
@@ -133,7 +134,7 @@ c=0;
 %%
 saveDat=1; %save simulations
 
-nIter=5; %how many iterations (starting points)
+nIter=200; %how many iterations (starting points)
 
 switch dat
         case 'randUnique'
