@@ -17,11 +17,11 @@ kVals   = 3:30;
 % nKmeans = 1000;
 nKmeans = 200;
 nSims = 5; % nIters=nKmeans*nSims;
-nSims = 10;
-nPoints = 5000; %5k, 10k
+% nSims = 10;
+nPoints = 10000; %5k, 10k
 nKvals  = length(kVals);
 
-nDataPtsTest = 50000; %5k, 10k, 50k
+nDataPtsTest = 10000; %5k, 10k, 50k
 nXvalDataSets = 20;
 
 %load in data
@@ -65,6 +65,15 @@ errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
 scatter(barpos,mu,750,colors,'x','LineWidth',1);
 xlim([barpos(1)-.5, barpos(end)+.5]);
 ylim([-.5,1.25]);
+% 
+% for i=1:length(kVals)
+%    xLab{i}=num2str(kVals(i));
+% end
+xticks(gca,barpos,kVals)
+
+
+xlabel('Number of Clusters');
+ylabel('Gridness score');
 
 %plot some grids
 
@@ -186,7 +195,14 @@ spacing                 = linspace(locRange(1),locRange(2),locRange(2)+1);
 densityPlotCentresBest  = zeros(length(spacing),length(spacing),nSets,nKvals);
 
 %sort top/bottom 3
-bestWorst = [1,2,3,nKmeans-3,nKmeans-2,nKmeans-1];
+
+
+%PROBLEM - ranked SSE seperately over several sims; so multiple ranked 1st/last. rerank by the SSE? tsseXval
+
+
+
+bestWorst = [1,2,3,nKmeans*nSims-3,nKmeans*nSims-2,nKmeans*nSims-1]; 
+% bestWorst = [1,1,1,nKmeans*nSims,nKmeans*nSims,nKmeans*nSims];
 muBest = cell(1,4);
 for iKvals = 1:nKvals
     for iterI=1:length(bestWorst)
@@ -225,16 +241,27 @@ for iKvals = iToPlot%:nKvals %prob don't want to plot all at once...
 end
 %% plot cluster centres
 
+% for kmeans, thinking to use this; nice colours. but for circ - need draw
+% a circ to show its a circ box, trapz for trapz, etc.
+
+
+
+% plot best/worse 3. or best and worse for each nClus cond (since so many);
+% or just plot a selection
+
+
 saveplots=0;
 
-iToPlot = 25:28;
+locRange = [0, 49];
+
+iToPlot = [5, 8, 15, 17, 19, 24, 26, 28];
 
 colgrey = [.5, .5, .5];
 
 for iKvals = iToPlot %nKvals - don't plot all if too many loaded up
     nK=kVals(iKvals);
     colors = distinguishable_colors(nK); %function for making distinguishable colors for plotting
-    muAll = muBest{iKvals};
+    muAll = muAllkVals{iKvals};
     
     %%%%%%%%%
     %edit this bit? currently just taking from above (computed muBest from
@@ -243,7 +270,7 @@ for iKvals = iToPlot %nKvals - don't plot all if too many loaded up
     
     
     figure;
-    for i = 1:6
+    for i = 1:6 %currently not best/worst 6
         subplot(2,3,i); hold on;
         
         voronoi(muAll(:,1,i),muAll(:,2,i),'k');
@@ -253,9 +280,9 @@ for iKvals = iToPlot %nKvals - don't plot all if too many loaded up
         end
         xlim([locRange(1),locRange(2)]); ylim([locRange(1),locRange(2)]);
         hold on;
-        if i==2
-            title(sprintf('Lowest 3 and Highest 3 SSE cluster locations (k=%d)',nK));
-        end
+%         if i==2
+%             title(sprintf('Lowest 3 and Highest 3 SSE cluster locations (k=%d)',nK));
+%         end
     end
     % if saveplots
     %     fname=[wd, sprintf('/kmeans_clus_k_%d_locs_top_bottom_3_datPts%dk',nK,nPoints/1000)];

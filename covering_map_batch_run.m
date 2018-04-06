@@ -15,7 +15,7 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 %dat = 'circ'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
-dat = 'circ'; 
+dat = 'square'; 
 % dat = 'trapz1'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
 % dat = 'trapz2';% dat = 'trapz3';
 % dat = 'trapzKrupic'; % dat = 'trapzKrupic2'; % dat = 'trapzKrupic3';
@@ -46,9 +46,13 @@ doPerm = 0;
 %clus2run = [12, 20, 10, 22];
 %clus2run = [18, 14, 24, 16];
 
-% clus2run = [16:2:26];
+% clus2run = [16:2:30];
 
-clus2run = 20;
+% fewer trials, lower learning rate
+clus2run = [16, 20, 18, 30];
+clus2run = [22, 28, 26, 14];
+
+clus2run = 12;
 
 %trapz
 % clus2run = [18, 24, 26, 28, 16, 30, 20, 22]; %trapzScaled
@@ -56,7 +60,8 @@ clus2run = 20;
 % clus2run = [28 22 14]; %krupic3
 
 % nTrials = 5000000; %how many locations in the box / trials 
-nTrials = 2000000/2;
+% nTrials = 2000000;
+nTrials = 1000000; %new
 
 %batch size
 fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
@@ -66,13 +71,18 @@ if fixBatchSize
 %     nBatches = [1250, 2500, 5000, 7500, 10000, 15000, 20000];
 %     nBatches = [30000, 100000, 200000, 500000, 1250, 2500, 5000, 7500, 10000, 15000, 20000];
 % new select batchSizes
-    nBatches = [2500, 20000,5000 50000];
+%     nBatches = [2500, 20000,5000 50000];
 %     nBatches = [2500, 50000];
 %   nBatches = [5000, 20000]; % just run these for annealed learning rate (for now)
 %     nBatches = 50000; %even smaller batch size for annealed eps?
-    nBatches = 5000;
+    
+    %new - for 100k trials, half nBatches for same batchsize
+    nBatches = [20000, 5000, 50000]./2; %half nBatches
+    
+    nBatches = 5000/2;
     batchSizeVals = nTrials./nBatches;
-    nBvals = length(batchSizeVals); %length(avgBatchUpdate)
+    nBvals = length(batchSizeVals);
+    
 else % define batch size based on average number of updates per cluster
     avgBatchUpdate = [10, 25, 35, 50]; % 
     avgBatchUpdate = [1, 2, 5]; % avgBatchUpdate = 25;
@@ -80,6 +90,26 @@ else % define batch size based on average number of updates per cluster
 %     batchSizePerClus = clus2run.*avgBatchUpdate %just to check
     % nBatches = nTrials./batchSizePerClus; %per clus cond %this is not used..
 end
+
+% parameters
+% epsMuVals=[.01, .05, .075, .1, .2, .3];% %learning rate / starting learning rate 
+% epsMuVals = 0.075; 
+epsMuVals = [0.05, 0.025]; 
+% epsMuVals = 0.025;
+% epsMuVals = 0.015; 
+
+
+% learning rate - annealed (reduced over time)  -actually beter to compute
+% inside?
+% if annEps
+%     epsMuVals = nBatches/100;
+% end
+
+% %tesing 60+clusters
+% nTrials = 1000000; 
+% nBatches = 1000;
+% batchSizeVals = nTrials/nBatches; 
+% epsMuVals = 0.025; 
 
 % use the same training data (trials) across current sims or gen new data
 useSameTrls=0;
@@ -95,52 +125,43 @@ elseif boxSize==3 %triple
     locRange(2)= locRange(2)*3;
 end
 
-% parameters
-% epsMuVals=[.01, .05, .075, .1, .2, .3];% %learning rate / starting learning rate 
-% epsMuVals = 0.075; 
-epsMuVals = 0.05; 
-epsMuVals = 0.025;
-
-% epsMuVals = 0.015; 
-
-% learning rate - annealed (reduced over time)  -actually beter to compute
-% inside?
-% if annEps
-%     epsMuVals = nBatches/100;
-% end
-
-% %tesing 60+clusters
-% nTrials = 1000000; 
-% nBatches = 1000;
-% batchSizeVals = nTrials/nBatches; 
-% epsMuVals = 0.025; 
 
 % change box shape during learning rectangle
 warpBox = 0; %1 or 0
 warpType = 'sq2rect';
 
-%mometum-like adaptive learning rate - define alpha (higher = weight
-%previous update (direction and magnitude) more; 0 = don't weight previous at all)
-alphaVals = 0;
-alpha=0;
-
 sTypes = 0;%:1;% :3; %0, 1 ,2, 3
 stochasticType=0;
 c=0;
 
+
+
+% points on a path, like a mouse in a box
+%in a box
+% trials = nan(nTrials,2);
+% trials(1,:)=[randsample(linspace(locRange(1),locRange(2),50),1,'true'), randsample(linspace(locRange(1),locRange(2),50),1,'true')];
+% for i=2:nTrials
+%     moveDir=randsample([-stepSize*5,-stepSize*3,-stepSize,0,stepSize,stepSize*3,stepSize*5],2); %move in a random direction or stay
+%     %if edge, stay or move
+%     while trials(i-1,1)+moveDir(1) < locRange(1) || trials(i-1,2)+moveDir(2) < locRange(1) || trials(i-1,1)+moveDir(1) > locRange(2) || trials(i-1,2)+moveDir(2) > locRange(2)
+%         if trials(i-1,1)+moveDir(1) < locRange(1)
+%             moveDir(1) = randsample([0,stepSize,stepSize*3,stepSize*5],1);
+%         elseif trials(i-1,2)+moveDir(2) < locRange(1)
+%             moveDir(2) = randsample([0,stepSize,stepSize*3,stepSize*5],1);
+%         elseif trials(i-1,1)+moveDir(1) > locRange(2)
+%             moveDir(1) = randsample([0,-stepSize,-stepSize*3,-stepSize*5],1);
+%         elseif trials(i-1,2)+moveDir(2) > locRange(2)
+%             moveDir(2) = randsample([0,-stepSize,-stepSize*3,-stepSize*5],1);
+%         end
+%     end
+%     trials(i,:)=trials(i-1,:)+moveDir;% add 1 or -1 
+% end
 %%
 saveDat=0; %save simulations
 
 nIter=1; %how many iterations (starting points)
 
 switch dat
-        case 'randUnique'
-        %all unique points in box
-        load([saveDir '/randTrialsBox_trialsUnique']);
-        trials = trialsUnique;
-        % does it matter how many points there are if all the same points? e.g.
-        % same if just have each trialsUnique twice/x10? - i think not
-        % trials = repmat(dataPts,50,1);
     case 'square'
         trials = [randsample(linspace(locRange(1),locRange(2),50),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),50),nTrials,'true')]';
         %for computing sse over trials

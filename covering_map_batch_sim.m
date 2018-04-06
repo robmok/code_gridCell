@@ -337,6 +337,36 @@ for iterI = 1:nIter
         %trialsAll(:,:,iterI) = trials;
     end
     
+    
+    
+    
+    
+    % TEMP - joined trials
+    trials = nan(nTrials,2);
+    trials(1,:)=[randsample(linspace(locRange(1),locRange(2),50),1,'true'), randsample(linspace(locRange(1),locRange(2),50),1,'true')];
+    for i=2:nTrials
+        moveDir=randsample([-stepSize*5,-stepSize*3,-stepSize,0,stepSize,stepSize*3,stepSize*5],2); %move in a random direction or stay
+        %if edge, stay or move
+        while trials(i-1,1)+moveDir(1) < locRange(1) || trials(i-1,2)+moveDir(2) < locRange(1) || trials(i-1,1)+moveDir(1) > locRange(2) || trials(i-1,2)+moveDir(2) > locRange(2)
+            if trials(i-1,1)+moveDir(1) < locRange(1)
+                moveDir(1) = randsample([0,stepSize,stepSize*3,stepSize*5],1);
+            elseif trials(i-1,2)+moveDir(2) < locRange(1)
+                moveDir(2) = randsample([0,stepSize,stepSize*3,stepSize*5],1);
+            elseif trials(i-1,1)+moveDir(1) > locRange(2)
+                moveDir(1) = randsample([0,-stepSize,-stepSize*3,-stepSize*5],1);
+            elseif trials(i-1,2)+moveDir(2) > locRange(2)
+                moveDir(2) = randsample([0,-stepSize,-stepSize*3,-stepSize*5],1);
+            end
+        end
+        trials(i,:)=trials(i-1,:)+moveDir;% add 1 or -1
+    end
+    
+    
+    
+    
+    
+    
+    
     % if expand box
     switch warpType
         case 'sq2rect'
