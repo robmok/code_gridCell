@@ -1,5 +1,5 @@
 % function [densityPlot,densityPlotAct,densityPlotActNorm,clusMu,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,rSeed,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE)
-function [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB,permPrc,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,annEps)
+function [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB,permPrc,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stochasticType,c,dat,annEps,doPerm)
 
 %if end up not using desityPlotAct and gA_act - edit out below, or no need
 %to save the iters, etc.

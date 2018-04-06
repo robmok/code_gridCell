@@ -38,6 +38,10 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic
 %annealed learning rate
 annEps = 1; %1 or 0
 
+%perm testing
+doPerm = 1;
+
+
 %annealed learning rate
 % love01 - all for 50k batches
 clus2run = [28, 26, 30];
@@ -179,7 +183,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
 %                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(avgBatchUpdate(iBvals)),round(batchSize),nIter)];
             end
 %             [densityPlot,densityPlotAct,densityPlotActNorm,clusMu,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,rSeed] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
-            [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB, permPrc, muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,annEps);
+            [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB, permPrc, muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stochasticType,c,dat,annEps,doPerm);
 
             timeTaken=toc;
             if saveDat
