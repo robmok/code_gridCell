@@ -1,5 +1,5 @@
 % function [densityPlot,densityPlotAct,densityPlotActNorm,clusMu,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,rSeed,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE)
-function [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB,permPrc,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stochasticType,c,dat,annEps,doPerm)
+function [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB,permPrc,muAll, trials] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stochasticType,c,dat,annEps,doPerm)
 
 %if end up not using desityPlotAct and gA_act - edit out below, or no need
 %to save the iters, etc.
@@ -42,9 +42,10 @@ end
 % fromTrlI  = round([1,                nTrials.*.1+1,   nTrials.*.2+1,    nTrials.*.30+1,   nTrials.*.4+1,   nTrials.*.5+1,  nTrials.*.6+1,  nTrials.*.7+1,  nTrials.*.75+1, nTrials.*.8+1,  nTrials.*.85+1, nTrials.*.9+1, nTrials.*.95+1]);
 % toTrlN    = round([nTrials.*.05+1,   nTrials.*.15+1,  nTrials.*.25+1,   nTrials.*.35+1,   nTrials.*.45+1,  nTrials.*.55+1, nTrials.*.65+1, nTrials.*.75+1, nTrials.*.8+1,  nTrials.*.85+1, nTrials.*.9+1, nTrials.*.95+1, nTrials]);%
 
-%20 timepoints
-fromTrlI  = round([1,               nTrials.*.05+1,  nTrials.*.1+1,  nTrials.*.15+1,  nTrials.*.2+1,  nTrials.*.25+1,   nTrials.*.3+1,  nTrials.*.35+1,  nTrials.*.4+1,  nTrials.*.45+1,  nTrials.*.5+1,  nTrials.*.55+1, nTrials.*.6+1,  nTrials.*.65+1, nTrials.*.7+1, nTrials.*.75+1, nTrials.*.8+1,  nTrials.*.85+1,  nTrials.*.9+1,  nTrials.*.95+1]);
-toTrlN    = round([nTrials.*.05,    nTrials.*.1,     nTrials.*.15,   nTrials.*.2,     nTrials.*.25,   nTrials.*.3,      nTrials.*.35,   nTrials.*.4,     nTrials.*.45,   nTrials.*.5,     nTrials.*.55,   nTrials.*.6,    nTrials.*.65,   nTrials.*.7,    nTrials.*.75,  nTrials.*.8,    nTrials.*.85,   nTrials.*.9,     nTrials.*.95,   nTrials]);
+%20 timepoints; last 2: first quarter, last quarter
+%half, last quarter
+fromTrlI  = round([1,               nTrials.*.05+1,  nTrials.*.1+1,  nTrials.*.15+1,  nTrials.*.2+1,  nTrials.*.25+1,   nTrials.*.3+1,  nTrials.*.35+1,  nTrials.*.4+1,  nTrials.*.45+1,  nTrials.*.5+1,  nTrials.*.55+1, nTrials.*.6+1,  nTrials.*.65+1, nTrials.*.7+1, nTrials.*.75+1, nTrials.*.8+1,  nTrials.*.85+1,  nTrials.*.9+1,  nTrials.*.95+1, nTrials.*.5, nTrials.*.75]);
+toTrlN    = round([nTrials.*.05,    nTrials.*.1,     nTrials.*.15,   nTrials.*.2,     nTrials.*.25,   nTrials.*.3,      nTrials.*.35,   nTrials.*.4,     nTrials.*.45,   nTrials.*.5,     nTrials.*.55,   nTrials.*.6,    nTrials.*.65,   nTrials.*.7,    nTrials.*.75,  nTrials.*.8,    nTrials.*.85,   nTrials.*.9,     nTrials.*.95,   nTrials,        nTrials,      nTrials]);
 
 if nargout > 8
     muAll            = nan(nClus,2,nBatch+1,nIter);
@@ -68,7 +69,7 @@ if strcmp(dat(1:4),'trap')
     gA = nan(nSets,nIter,9,3);
 %     gW = nan(nSets,nIter,9,3);
 %     gA_act = nan(nSets,nIter,9,3);
-    gA_actNorm = nan(nSets,nIter,1,4,3);
+    gA_actNorm = nan(nSets,nIter,9,3);
 
 end
 
@@ -96,8 +97,16 @@ if strcmp(dat(1:4),'trap') && length(dat)>10
 %     elseif strcmp(dat,'trapzKrupic3')
 %         b=length(spacing)*2; %make smaller; since datapoints dont reach out there
 %         h=length(spacing)*3;
+    elseif strcmp(dat(1:11),'trapzKrupic')
+%         %INCORRECT NOW
+%         a=length(spacing(14:37));
+%         b=locRange(2)+1; %50 - trapz length2 - +1 to let density plot go from 1:50 (rather than 0:49)
+%         h=round(((locRange(2)+1)^2)/((a+b)/2))+1; %trapz height (area = 50^2; like square)
+        b=length(spacing);
+        h=length(spacing);
         
     end
+    
 else
     b=length(spacing);
     h=length(spacing);
@@ -133,14 +142,12 @@ for iterI = 1:nIter
                 trials = reshape(datPtsGauss,nTrials,2);
                 trials = trials(randperm(length(trials)),:);
                 trialsUnique=[];
-                
                 for iCat = 1:nCats
                     mu(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % ±10 so category centres are not on the edge
                     datPtsGauss(:,:,iCat) = round(repmat(mu(iCat,:),nTrials,1) + randn(nTrials,2)*R); % key - these are the coordinates of the points
                 end
                 dataPtsTest = reshape(datPtsGauss,nTrials,2);
                 dataPtsTest = dataPtsTest(randperm(length(dataPtsTest)),:);
-                
             case 'rect'
                 trials      = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)/1.5,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
                 dataPtsTest = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)/1.5,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
@@ -342,26 +349,75 @@ for iterI = 1:nIter
     
     
     % TEMP - joined trials
-    trials = nan(nTrials,2);
-    trials(1,:)=[randsample(linspace(locRange(1),locRange(2),50),1,'true'), randsample(linspace(locRange(1),locRange(2),50),1,'true')];
+    % first get points in the shape
+    switch dat
+        case 'square'
+            trials = nan(nTrials,2);
+%             trials(1,:)=[randsample(linspace(locRange(1),locRange(2),50),1,'true'), randsample(linspace(locRange(1),locRange(2),50),1,'true')];
+            sq=linspace(locRange(1),locRange(2),nSteps);
+            sqPts=[];
+            for i=1:length(sq)
+                for j=1:length(sq)
+                    sqPts = [sqPts; [sq(i), sq(j)]];
+                end
+            end
+            shapePts = sqPts;
+        case 'circ'
+            imageSizeX = nSteps;
+            [columnsInImage, rowsInImage] = meshgrid(1:imageSizeX, 1:imageSizeX);
+            centerX = nSteps/2; centerY = nSteps/2;
+            radius = nSteps/2-1;
+            circIm = (rowsInImage - centerY).^2 ...
+                + (columnsInImage - centerX).^2 <= radius.^2;
+            circPts=[]; % find circle points in XY coords
+            for iX=1:length(circIm)
+                yVals = find(circIm(iX,:));
+                circPts = [circPts; ones(length(yVals),1)*iX, yVals'];
+            end
+            shapePts = circPts;
+            case 'trapzNorm' % not scale - fit into square 
+                spacingTrapz = spacing; 
+                trapY=locRange(2).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
+                trapX=spacingTrapz;
+                trapPts=[];
+                for i=1:length(trapY)
+                    trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
+                end
+                shapePts = trapPts';
+        case 'trapzKrupic'
+            spacingTrapz = spacing(14:37); %23.7 would be right, here 24; krupic (relative): [5.26, 23.68, 50]
+            trapY=locRange(2).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
+            trapX=spacingTrapz;
+            trapPts=[];
+            for i=1:length(trapY)
+                trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
+            end
+            shapePts = trapPts';
+
+    end
+    
+    % select points trial by trial, if not in shape go back into the shape
+    trials      = nan(nTrials,2);
+    trials(1,:) = shapePts(randi(length(shapePts),1,1),:);
     for i=2:nTrials
         moveDir=randsample([-stepSize*5,-stepSize*3,-stepSize,0,stepSize,stepSize*3,stepSize*5],2); %move in a random direction or stay
         %if edge, stay or move
-        while trials(i-1,1)+moveDir(1) < locRange(1) || trials(i-1,2)+moveDir(2) < locRange(1) || trials(i-1,1)+moveDir(1) > locRange(2) || trials(i-1,2)+moveDir(2) > locRange(2)
-            if trials(i-1,1)+moveDir(1) < locRange(1)
+        if ~any(trials(i-1,1)+moveDir(1)==shapePts(:,1) & trials(i-1,2)+moveDir(2)==shapePts(:,2)) % if not in the shape
+            if trials(i-1,1)+moveDir(1) < length(locRange(1):locRange(2))/2 %if less than half the box, +
                 moveDir(1) = randsample([0,stepSize,stepSize*3,stepSize*5],1);
-            elseif trials(i-1,2)+moveDir(2) < locRange(1)
+            end
+            if trials(i-1,2)+moveDir(2) < length(locRange(1):locRange(2))/2
                 moveDir(2) = randsample([0,stepSize,stepSize*3,stepSize*5],1);
-            elseif trials(i-1,1)+moveDir(1) > locRange(2)
+            end
+            if trials(i-1,1)+moveDir(1) > length(locRange(1):locRange(2))/2
                 moveDir(1) = randsample([0,-stepSize,-stepSize*3,-stepSize*5],1);
-            elseif trials(i-1,2)+moveDir(2) > locRange(2)
+            end
+            if trials(i-1,2)+moveDir(2) > length(locRange(1):locRange(2))/2
                 moveDir(2) = randsample([0,-stepSize,-stepSize*3,-stepSize*5],1);
             end
         end
         trials(i,:)=trials(i-1,:)+moveDir;% add 1 or -1
     end
-    
-    
     
     
     
@@ -447,8 +503,11 @@ for iterI = 1:nIter
                 closestTmp = find(min(dist2Clus(iTrlBatch,:))==dist2Clus(iTrlBatch,:));
                 if numel(closestTmp)>1
                     closestC(iTrlBatch) = randsample(closestTmp,1);
+                elseif numel(closestTmp)<1
+                    a=1;
                 else
                     closestC(iTrlBatch) = closestTmp;
+                    
                 end
                 
                 %compute activation
@@ -541,8 +600,7 @@ for iterI = 1:nIter
         end
         densityPlotActNorm(:,:,iSet,iterI) = densityPlotAct./densityPlotActUpd; %divide by number of times that location was visited
         % smooth
-        densityPlotTSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
-%         densityPlotActTSm     = imgaussfilt(densityPlotAct(:,:,iSet,iterI),gaussSmooth);       
+        densityPlotSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
         densityPlotActNormSm = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);   
         
         %compute the sum of the distances between each cluster and itself over batches 
@@ -552,7 +610,7 @@ for iterI = 1:nIter
         
         if ~strcmp(dat,'cat') %if finding cats, won't be gridlike
             %compute autocorrmap, no need to save
-            aCorrMap = ndautoCORR(densityPlotTSm);
+            aCorrMap = ndautoCORR(densityPlotSm);
             %compute gridness
             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
             gA(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
@@ -566,47 +624,38 @@ for iterI = 1:nIter
             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
             gA_actNorm(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
             
-            %no trapz yet ++
-            %from above; need edit
+            %trapz left right of box
             %split in half then compute gridness for each half
-%             if  strcmp(dat(1:4),'trap')
+            if  strcmp(dat(1:4),'trap')
                 
-%                 %left half of box
+                %left half of box
 %                 aCorrMap = ndautoCORR(densityPlotSm(:,1:ceil(length(spacing)/2)));
-%                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-% %                 [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
-%                 gA(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
-% %                 gW(iSet,iterI,:,2) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius, gdataW.radius, gdataW.r'];
-%                 
-%                 %right half of box
-%                 aCorrMap = ndautoCORR(densityPlotSm(:,ceil(length(spacing)/2)+1:end));
-%                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-% %                 [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
-%                 gA(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
-% %                 gW(iSet,iterI,:,3) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius, gdataW.radius, gdataW.r'];  
-%                 
-%                 %act
-%                 %left half of box
-%                 aCorrMap = ndautoCORR(densityPlotActSm(:,1:ceil(length(spacing)/2)));
-%                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-% %                 [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
-%                 gA_act(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
-% %                 gW_act(iSet,iterI,:,2) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius, gdataW.radius, gdataW.r'];
-%                 aCorrMap = ndautoCORR(densityPlotActNormSm(:,1:ceil(length(spacing)/2)));
-%                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-% %                 [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
-%                 gA_actNorm(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
-% %                 gW_actNorm(iSet,iterI,:,2) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius, gdataW.radius, gdataW.r'];
-%                 
-%                 %right half of box
-%                 aCorrMap = ndautoCORR(densityPlotActNormSm(:,ceil(length(spacing)/2)+1:end));
-%                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-% %                 [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
-%                 gA_actNorm(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
-% %                 gW_actNorm(iSet,iterI,:,3) = [gdataW.g_score, gdataW.orientation, gdataW.wavelength, gdataW.radius, gdataW.radius, gdataW.r'];
+                aCorrMap = ndautoCORR(densityPlotSm(:,spacingTrapz(1):spacingTrapz(ceil(length(spacingTrapz)/2))));
+                [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+                gA(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+                
+                %right half of box
+                aCorrMap = ndautoCORR(densityPlotSm(:,spacingTrapz(ceil(length(spacingTrapz)/2))+1:spacingTrapz(end)));
+                [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+                gA(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+                
+                %act
+                %left half of box
+                aCorrMap = ndautoCORR(densityPlotActNormSm(:,spacingTrapz(1):spacingTrapz(ceil(length(spacingTrapz)/2))));
+                [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+                gA_act(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+                aCorrMap = ndautoCORR(densityPlotActNormSm(:,spacingTrapz(ceil(length(spacingTrapz)/2))+1:spacingTrapz(end)));
 
-%         end
-
+                [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+                gA_actNorm(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+                
+                %right half of box
+                aCorrMap = ndautoCORR(densityPlotActNormSm(:,ceil(length(spacing)/2)+1:end));
+                [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+                gA_actNorm(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+                
+            end
+            
         end
         
     end

@@ -43,6 +43,7 @@ gdata.central_mask = NaN;
 gdata.mean_inner_angle = NaN;
 gdata.orientation = NaN;
 gdata.method = method;
+gdata.r = NaN(5,1);
 
 im = single(im);
 if all(isnan(im(:)))

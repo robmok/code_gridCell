@@ -20,11 +20,11 @@ xlim(locRange); ylim(locRange);
 %% gridness, autocorrelogram
 
 gaussSmooth=1;
-for iSet=1:20%size(densityPlotActTNorm,3)
+for iSet=1:20+2 %size(densityPlotActTNorm,3)
     
 for iterI = 1%:3%:10 
     
-densityPlotCentresSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
+% densityPlotCentresSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
 % densityPlotCentresSm = imgaussfilt(densityPlotAct(:,:,iSet,iterI),gaussSmooth);
 densityPlotCentresSm = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);
 
@@ -46,11 +46,15 @@ end
 
 %% gridness - left vs right half
 
+%temp for krupic
+% spacing=linspace(locRange(1),locRange(2),locRange(2)+1);
+% spacingTrapz = spacing(14:37);
+
 gaussSmooth=1;
-for iSet=6
+for iSet=15:20
 for iterI = 1%:10
     
-    densityPlotCentresSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
+    densityPlotCentresSm = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);
     
     figure; hold on;
     subplot(1,3,1)
@@ -58,14 +62,14 @@ for iterI = 1%:10
     
     %left half of box
     subplot(1,3,2)
-    aCorrMap = ndautoCORR(densityPlotCentresSm(:,1:length(densityPlot)/2));
+    aCorrMap = ndautoCORR(densityPlotCentresSm(:,spacingTrapz(1):spacingTrapz(ceil(length(spacingTrapz)/2))));
     [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
     % [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
     gdataA
     
     %right half of box
     subplot(1,3,3)
-    aCorrMap = ndautoCORR(densityPlotCentresSm(:,length(densityPlot)/2+1:end));
+    aCorrMap = ndautoCORR(densityPlotCentresSm(:,spacingTrapz(ceil(length(spacingTrapz)/2))+1:spacingTrapz(end)));
     [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
     % [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
     gdataA
@@ -113,24 +117,42 @@ end
 
 %% over time - one plot
 
+%if plotAgent, need trials as an output argument
+plotAgent = 1;
+
+
 nClus = size(muAll,1);
 
 iterI = 1;
 colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
+colAgent = [.75, .75, .75];
+
+% colAgent gets darker over time? also clear the lines?
+colAgentCh = fliplr(linspace(0,.9,nTrials));
+
+%if plotting agent over batches - need make cluster positions same over
+%trials in a batch
+if plotAgent
+muTrls = nan(nClus,2,nTrials);
+for iBatch = 1:nBatches
+    muTrls(:,1,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(muAll(:,1,iBatch),1,batchSize);
+    muTrls(:,2,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(muAll(:,2,iBatch),1,batchSize);
+end
+end
 
 figure;
 % figure('units','normalized','outerposition',[0 0 1 1]);
 for iTrl = 1:nTrials
-%     if mod(iTrl,500)==0
-% %         iPlot=iPlot+1;
-% %         voronoi(muAll(:,1,iTrl,iterI),muAll(:,2,iTrl,iterI),'k')
-%     end
-%     xlim(locRange); ylim(locRange);
+    if mod(iTrl,20)==0 %plot centers after x trials
+        %agent
+%         scatter(trials(iTrl,1),trials(iTrl,2),1000,colAgent,'.');
+%         plot(trials(1:iTrl,1),trials(1:iTrl,2),'Color',colAgent); 
+%         scatter1 = scatter(trials(iTrl,1),trials(iTrl,2),'MarkerFaceColor',colAgent,'MarkerEdgeColor',colAgent);alpha(scatter1,.2)
+        plot(trials(1:iTrl,1),trials(1:iTrl,2),'Color',repmat(colAgentCh(iTrl),1,3)); % make it darker over time 
 
-    if mod(iTrl,10)==0 %plot centers after x trials
-        for i=1:nClus
-            plot(squeeze(muAll(i,1,iTrl,iterI)),squeeze(muAll(i,2,iTrl,iterI)),'.','Color',colors(i,:),'MarkerSize',10); hold on; %make marker size bigger - larger/smoother firing field!
-        end
+        %clusters
+%         scatter(squeeze(muAll(:,1,iTrl,iterI)),squeeze(muAll(:,2,iTrl,iterI)),200,colors,'.'); hold on;
+        scatter(squeeze(muTrls(:,1,iTrl)),squeeze(muTrls(:,2,iTrl)),2000,colors,'.'); hold on;
         drawnow;
     end
 end
