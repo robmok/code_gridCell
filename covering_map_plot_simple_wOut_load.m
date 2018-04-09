@@ -46,12 +46,14 @@ end
 
 %% gridness - left vs right half
 
+spacing=linspace(locRange(1),locRange(2),locRange(2)+1);
+
 %temp for krupic
-% spacing=linspace(locRange(1),locRange(2),locRange(2)+1);
 % spacingTrapz = spacing(14:37);
+% spacing=spacingTrapz;
 
 gaussSmooth=1;
-for iSet=15:20
+for iSet=22
 for iterI = 1%:10
     
     densityPlotCentresSm = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);
@@ -62,14 +64,14 @@ for iterI = 1%:10
     
     %left half of box
     subplot(1,3,2)
-    aCorrMap = ndautoCORR(densityPlotCentresSm(:,spacingTrapz(1):spacingTrapz(ceil(length(spacingTrapz)/2))));
+    aCorrMap = ndautoCORR(densityPlotCentresSm(:,spacing(1):spacing(ceil(length(spacing)/2))));
     [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
     % [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
     gdataA
     
     %right half of box
     subplot(1,3,3)
-    aCorrMap = ndautoCORR(densityPlotCentresSm(:,spacingTrapz(ceil(length(spacingTrapz)/2))+1:spacingTrapz(end)));
+    aCorrMap = ndautoCORR(densityPlotCentresSm(:,spacing(ceil(length(spacing)/2))+1:spacing(end)));
     [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
     % [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
     gdataA
@@ -118,7 +120,7 @@ end
 %% over time - one plot
 
 %if plotAgent, need trials as an output argument
-plotAgent = 1;
+plotAgent = 0;
 
 
 nClus = size(muAll,1);
@@ -132,24 +134,26 @@ colAgentCh = fliplr(linspace(0,.9,nTrials));
 
 %if plotting agent over batches - need make cluster positions same over
 %trials in a batch
-if plotAgent
+% if plotAgent
 muTrls = nan(nClus,2,nTrials);
 for iBatch = 1:nBatches
     muTrls(:,1,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(muAll(:,1,iBatch),1,batchSize);
     muTrls(:,2,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(muAll(:,2,iBatch),1,batchSize);
 end
-end
+% end
 
 figure;
 % figure('units','normalized','outerposition',[0 0 1 1]);
 for iTrl = 1:nTrials
     if mod(iTrl,20)==0 %plot centers after x trials
         %agent
+        if plotAgent
 %         scatter(trials(iTrl,1),trials(iTrl,2),1000,colAgent,'.');
 %         plot(trials(1:iTrl,1),trials(1:iTrl,2),'Color',colAgent); 
 %         scatter1 = scatter(trials(iTrl,1),trials(iTrl,2),'MarkerFaceColor',colAgent,'MarkerEdgeColor',colAgent);alpha(scatter1,.2)
         plot(trials(1:iTrl,1),trials(1:iTrl,2),'Color',repmat(colAgentCh(iTrl),1,3)); % make it darker over time 
-
+        end
+        
         %clusters
 %         scatter(squeeze(muAll(:,1,iTrl,iterI)),squeeze(muAll(:,2,iTrl,iterI)),200,colors,'.'); hold on;
         scatter(squeeze(muTrls(:,1,iTrl)),squeeze(muTrls(:,2,iTrl)),2000,colors,'.'); hold on;

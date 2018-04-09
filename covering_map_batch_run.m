@@ -4,8 +4,8 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -14,11 +14,11 @@ addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in codeDir now not wd
 
 %define box / environment - random points in a box
-%dat = 'circ'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
-dat = 'square'; 
+dat = 'circ'; % rand or cat; rand = uniform points in a box, cat = category learning in a 2D feature space
+% dat = 'square'; 
 % dat = 'trapz1'; %square rect, trapz, trapzNorm (without Krupic scaling) trapzSqs, or cat (cat learning)
 % dat = 'trapz2';% dat = 'trapz3';
-dat = 'trapzKrupic'; % dat = 'trapzKrupic2'; % dat = 'trapzKrupic3';
+% dat = 'trapzKrupic'; % dat = 'trapzKrupic2'; % dat = 'trapzKrupic3';
 % dat = 'trapzScaled1';
 % dat = 'trapzScaled2';
 %  dat = 'trapzScaled3';
@@ -32,30 +32,27 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic % sigmaG = [1 .5; .5 2]; R
 
 
 %annealed learning rate
-annEps = 1; %1 or 0
+annEps = 0; %1 or 0
 
 %perm testing
 doPerm = 0;
 
 jointTrls = 1;
 
-%epsMu 0.015; didn't run through 
-% clus2run = [28, 14];
-
-%annealed learning rate
-% love01 - all for 50k batches
-% clus2run = [28, 26, 30];
-%clus2run = [12, 20, 10, 22];
-%clus2run = [18, 14, 24, 16];
 
 % clus2run = [16:2:30];
 
 % fewer trials, lower learning rate
-clus2run = [16, 20, 18, 30];
-clus2run = [22, 28, 26, 14];
+% clus2run = [16, 20, 18, 30];
+% clus2run = [22, 28, 26, 14];
 
-%joint trials
-clus2run = 22;
+%joint trials; 8, 12, 16, 20, 24, 28;    then 6, 10, 14, 18, 22, 26, 28
+clus2run = [8,24];
+% clus2run = [28,16];
+% clus2run = [20,12];
+
+% clus2run = 20;
+
 
 %trapz
 % clus2run = [18, 24, 26, 28, 16, 30, 20, 22]; %trapzScaled
@@ -64,7 +61,7 @@ clus2run = 22;
 
 % nTrials = 5000000; %how many locations in the box / trials 
 % nTrials = 2000000;
-nTrials = 1000000/2; %new
+nTrials = 1000000; %new
 
 %batch size
 fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
@@ -80,9 +77,10 @@ if fixBatchSize
 %     nBatches = 50000; %even smaller batch size for annealed eps?
     
     %new - for 100k trials, half nBatches for same batchsize
-    nBatches = [20000, 5000, 50000]./2; %half nBatches
-    
-    nBatches = 2000/2;
+%     nBatches = [20000, 5000, 50000]./2; %half nBatches
+    %joint trials
+    nBatches = [1000, 10000, 2500]; 
+%     nBatches = 2500;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals);
     
@@ -137,33 +135,10 @@ warpType = 'sq2rect';
 sTypes = 0;%:1;% :3; %0, 1 ,2, 3
 stochasticType=0;
 c=0;
-
-
-
-% points on a path, like a mouse in a box
-%in a box
-% trials = nan(nTrials,2);
-% trials(1,:)=[randsample(linspace(locRange(1),locRange(2),50),1,'true'), randsample(linspace(locRange(1),locRange(2),50),1,'true')];
-% for i=2:nTrials
-%     moveDir=randsample([-stepSize*5,-stepSize*3,-stepSize,0,stepSize,stepSize*3,stepSize*5],2); %move in a random direction or stay
-%     %if edge, stay or move
-%     while trials(i-1,1)+moveDir(1) < locRange(1) || trials(i-1,2)+moveDir(2) < locRange(1) || trials(i-1,1)+moveDir(1) > locRange(2) || trials(i-1,2)+moveDir(2) > locRange(2)
-%         if trials(i-1,1)+moveDir(1) < locRange(1)
-%             moveDir(1) = randsample([0,stepSize,stepSize*3,stepSize*5],1);
-%         elseif trials(i-1,2)+moveDir(2) < locRange(1)
-%             moveDir(2) = randsample([0,stepSize,stepSize*3,stepSize*5],1);
-%         elseif trials(i-1,1)+moveDir(1) > locRange(2)
-%             moveDir(1) = randsample([0,-stepSize,-stepSize*3,-stepSize*5],1);
-%         elseif trials(i-1,2)+moveDir(2) > locRange(2)
-%             moveDir(2) = randsample([0,-stepSize,-stepSize*3,-stepSize*5],1);
-%         end
-%     end
-%     trials(i,:)=trials(i-1,:)+moveDir;% add 1 or -1 
-% end
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
-nIter=1; %how many iterations (starting points)
+nIter=200; %how many iterations (starting points)
 
 switch dat
     case 'square'
@@ -206,7 +181,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
 %                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(avgBatchUpdate(iBvals)),round(batchSize),nIter)];
             end
 %             [densityPlot,densityPlotAct,densityPlotActNorm,clusMu,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,rSeed] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
-            [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB, permPrc, muAll, trials] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stochasticType,c,dat,annEps,doPerm);
+            [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB, permPrc] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stochasticType,c,dat,annEps,doPerm);
 
             timeTaken=toc;
             if saveDat
