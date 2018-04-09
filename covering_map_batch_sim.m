@@ -1,5 +1,5 @@
 % function [densityPlot,densityPlotAct,densityPlotActNorm,clusMu,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,rSeed,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE)
-function [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB,permPrc,muAll, trials] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stochasticType,c,dat,annEps,doPerm)
+function [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB,permPrc,muAll, trials] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stochasticType,c,dat,boxSize,annEps,jointTrls,doPerm)
 
 %if end up not using desityPlotAct and gA_act - edit out below, or no need
 %to save the iters, etc.
@@ -28,19 +28,12 @@ end
 %note that this is averaging over trials, not just batches though - might
 %be to show activations as clusters are stationary as well as move?
 
-%compute gridness over time - for clusMu only use last trl (toTrlN2)
+%compute gridness over time
 % fromTrlI  = round([1,                  nTrials.*.1+1,    nTrials.*.25+1,   nTrials.*.30+1,  nTrials.*.40+1,  nTrials.*.50+1, nTrials.*.75+1, nTrials.*.90+1]);
 % toTrlN    = round([nTrials.*.01+1,  nTrials.*.11+1,  nTrials.*.26+1,  nTrials.*.31+1, nTrials.*.41+1, nTrials.*.51+1, nTrials.*.76+1, nTrials.*.91+1]);%
 % toTrlN    = round([nTrials.*.025+1,  nTrials.*.125+1,  nTrials.*.275+1,  nTrials.*.325+1, nTrials.*.425+1, nTrials.*.525+1, nTrials.*.775+1, nTrials.*.925+1]);%
 % toTrlN    = round([nTrials.*.045+1,    nTrials.*.145+1,  nTrials.*.295+1,  nTrials.*.345+1, nTrials.*.445+1, nTrials.*.545+1, nTrials.*.795+1, nTrials.*.945+1]);%
 % toTrlN    = round([nTrials.*.1+1,    nTrials.*.2+1,  nTrials.*.35+1,  nTrials.*.4+1, nTrials.*.5+1, nTrials.*.6+1, nTrials.*.85+1, nTrials]);%
-% 
-% fromTrlI  = round([1,                nTrials.*.1+1,  nTrials.*.2+1,   nTrials.*.30+1,  nTrials.*.4+1,  nTrials.*.5+1, nTrials.*.6+1, nTrials.*.7+1, nTrials.*.8+1, nTrials.*.9+1]);
-% toTrlN    = round([nTrials.*.05+1,    nTrials.*.15+1,  nTrials.*.25+1,   nTrials.*.35+1,   nTrials.*.45+1,  nTrials.*.55+1, nTrials.*.65+1, nTrials.*.75+1, nTrials.*.85+1, nTrials.*.95+1]);
-% toTrlN    = round([nTrials.*.1+1,    nTrials.*.2+1,  nTrials.*.3+1,   nTrials.*.4+1,   nTrials.*.5+1,  nTrials.*.6+1, nTrials.*.7+1, nTrials.*.8+1, nTrials.*.9+1, nTrials]);%
-% 
-% fromTrlI  = round([1,                nTrials.*.1+1,   nTrials.*.2+1,    nTrials.*.30+1,   nTrials.*.4+1,   nTrials.*.5+1,  nTrials.*.6+1,  nTrials.*.7+1,  nTrials.*.75+1, nTrials.*.8+1,  nTrials.*.85+1, nTrials.*.9+1, nTrials.*.95+1]);
-% toTrlN    = round([nTrials.*.05+1,   nTrials.*.15+1,  nTrials.*.25+1,   nTrials.*.35+1,   nTrials.*.45+1,  nTrials.*.55+1, nTrials.*.65+1, nTrials.*.75+1, nTrials.*.8+1,  nTrials.*.85+1, nTrials.*.9+1, nTrials.*.95+1, nTrials]);%
 
 %20 timepoints; last 2: first quarter, last quarter
 %half, last quarter
@@ -50,9 +43,7 @@ toTrlN    = round([nTrials.*.05,    nTrials.*.1,     nTrials.*.15,   nTrials.*.2
 if nargout > 8
     muAll            = nan(nClus,2,nBatch+1,nIter);
 end
-% nSets                = length(trlSel);
 nSets              = length(fromTrlI);
-% clusMu               = nan(nClus,2,nSets,nIter);
 % actAll               = nan(nClus,nTrials); %keep this trial by trial %no need to declare if not saving over iters
 muInit               = nan(nClus,2,nIter);
 
@@ -64,14 +55,13 @@ gA = nan(nSets,nIter,9); %if saving the 5 r values, 9. if not, 4.
 % gW_act = nan(nSets,nIter,9);
 gA_actNorm = nan(nSets,nIter,9);
 % gW_actNorm = nan(nSets,nIter,9);
+
 %if trapz - compute gridness of left/right half of boxes too
 if strcmp(dat(1:4),'trap')
     gA = nan(nSets,nIter,9,3);
-%     gW = nan(nSets,nIter,9,3);
-%     gA_act = nan(nSets,nIter,9,3);
     gA_actNorm = nan(nSets,nIter,9,3);
-
 end
+
 
 %perm testing
 nPerm = 1000;
@@ -91,20 +81,16 @@ if strcmp(dat(1:4),'trap') && length(dat)>10
         a=length(spacingTrapz); %trapz length1
         b=locRange(2)+1; %50 - trapz length2 - +1 to let density plot go from 1:50 (rather than 0:49)
         h=round(((locRange(2)+1)^2)/((a+b)/2))+1; %trapz height (area = 50^2; like square)
-%     elseif strcmp(dat,'trapzKrupic2')
-%         b=length(spacing)*1.5; %make smaller; since datapoints dont reach out there
-%         h=length(spacing)*2;
-%     elseif strcmp(dat,'trapzKrupic3')
-%         b=length(spacing)*2; %make smaller; since datapoints dont reach out there
-%         h=length(spacing)*3;
     elseif strcmp(dat(1:11),'trapzKrupic')
-%         %INCORRECT NOW
-%         a=length(spacing(14:37));
-%         b=locRange(2)+1; %50 - trapz length2 - +1 to let density plot go from 1:50 (rather than 0:49)
-%         h=round(((locRange(2)+1)^2)/((a+b)/2))+1; %trapz height (area = 50^2; like square)
-        b=length(spacing);
-        h=length(spacing);
-        
+        if length(dat)==11 % 'trapzKrupic', no number following
+            b=length(spacing);
+            h=length(spacing);
+        else
+            if strcmp(dat(12),'2') % 'trapzKrupic2' - if do larger, add here
+                b=length(spacing)*1.5; %make smaller; since datapoints dont reach out there
+                h=length(spacing)*2;
+            end
+        end
     end
     
 else
@@ -112,22 +98,19 @@ else
     h=length(spacing);
 end
 
-% %now refreshing some of these over sets
+% %now setting/refreshing some of these over sets below
 % densityPlotClus    = zeros(b,h,nClus,nSets,nIter); 
 densityPlot        = zeros(b,h,nSets,nIter);
 % densityPlotAct     = zeros(b,h,nSets,nIter);
-% densityPlotActUpd  = zeros(b,h);
 densityPlotActNorm = zeros(b,h,nSets,nIter);
 
 for iterI = 1:nIter
+%     epsMu = epsMuOrig; %revert learning rate back to original if reset
     
     fprintf('iter %d \n',iterI);
-    epsMu = epsMuOrig; %revert learning rate back to original if reset
 
-    if ~useSameTrls %if want training data to be different set of points
-        %make seed so can regenerate the trials later without saving - load up
-        %the seed using: rng(s); then run trials = ...
-        rSeed(iterI)=rng;
+    rSeed(iterI)=rng; % seed so can regenerate the trials later; do: rng(rSeed(iterI)); then run trials = ...
+    if ~useSameTrls && ~jointTrls %if want training data to be different set of points
         switch dat
             case 'square' %square
                 trials      = [randsample(linspace(locRange(1),locRange(2),locRange(2)+1),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),locRange(2)+1),nTrials,'true')]';
@@ -141,7 +124,6 @@ for iterI = 1:nIter
                 end
                 trials = reshape(datPtsGauss,nTrials,2);
                 trials = trials(randperm(length(trials)),:);
-                trialsUnique=[];
                 for iCat = 1:nCats
                     mu(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % ±10 so category centres are not on the edge
                     datPtsGauss(:,:,iCat) = round(repmat(mu(iCat,:),nTrials,1) + randn(nTrials,2)*R); % key - these are the coordinates of the points
@@ -153,52 +135,15 @@ for iterI = 1:nIter
                 dataPtsTest = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)/1.5,nTrialsTest,'true'); randsample(spacing,nTrialsTest,'true')]';
             case 'trapzKrupic'
                 %if scale to Krupic:
-                %%%%%
                 spacingTrapz = spacing(14:37); %23.7 would be right, here 24; krupic (relative): [5.26, 23.68, 50]
-                %%%%% 
                 trapY=locRange(2).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
                 trapX=spacingTrapz;
                 trapPts=[];
                 for i=1:length(trapY)
                     trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
                 end
-                %             trapPts(2,:)=trapPts(2,:).*2-1; %put it back into -1 to 1
-                % use this to select from the PAIR in trapPts
-                trialInd     = randi(length(trapPts),nTrials,1);
-                trials       = trapPts(:,trialInd)';
-                %dataPtsTest
-                trialIndTest = randi(length(trapPts),nTrials,1);
-                dataPtsTest  = trapPts(:,trialIndTest)';
-            case 'trapzKrupic2'
-                 %if scale to Krupic x 2:
-                spacingTrapz = spacing(14:37); %23.7 would be right, here 24; krupic (relative): [5.26, 23.68, 50]
-                trapY=locRange(2)*2.*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
-                trapX=spacingTrapz(1):2:spacingTrapz(end)*2;
-                trapPts=[];
-                for i=1:length(trapY)
-                    trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
-                end
-                % use this to select from the PAIR in trapPts
-                trialInd     = randi(length(trapPts),nTrials,1);
-                trials       = trapPts(:,trialInd)';
-                %dataPtsTest
-                trialIndTest = randi(length(trapPts),nTrials,1);
-                dataPtsTest  = trapPts(:,trialIndTest)';  
-            case 'trapzKrupic3'
-                 %if scale to Krupic x 3:
-                spacingTrapz = spacing(14:37); %23.7 would be right, here 24; krupic (relative): [5.26, 23.68, 50]
-                trapY=locRange(2)*3.*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
-                trapX=spacingTrapz(1):2:spacingTrapz(end)*2;
-                trapPts=[];
-                for i=1:length(trapY)
-                    trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
-                end
-                trialInd     = randi(length(trapPts),nTrials,1);
-                trials       = trapPts(:,trialInd)';
-                %dataPtsTest
-                trialIndTest      = randi(length(trapPts),nTrials,1);
-                dataPtsTest       = trapPts(:,trialIndTest)';
-            case 'trapzNorm' % not scale - fit into square 
+                shapePts = trapPts;
+            case 'trapzNorm' % not scaled - fit into square 
                 spacingTrapz = spacing; 
                 trapY=locRange(2).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
                 trapX=spacingTrapz;
@@ -206,12 +151,7 @@ for iterI = 1:nIter
                 for i=1:length(trapY)
                     trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
                 end
-                trialInd     = randi(length(trapPts),nTrials,1);
-                trials       = trapPts(:,trialInd)';
-                %dataPtsTest
-                trialIndTest = randi(length(trapPts),nTrials,1);
-                dataPtsTest  = trapPts(:,trialIndTest)';
-                
+                shapePts = trapPts;
             case 'trapz1' % new - scale differently - more like box but more squished
                 spacingTrapz = spacing(10:41); 
                 trapY=locRange(2).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
@@ -220,13 +160,8 @@ for iterI = 1:nIter
                 for i=1:length(trapY)
                     trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
                 end
-                % use this to select from the PAIR in trapPts
-                trialInd     = randi(length(trapPts),nTrials,1);
-                trials       = trapPts(:,trialInd)';
-                %dataPtsTest
-                trialIndTest = randi(length(trapPts),nTrials,1);
-                dataPtsTest  = trapPts(:,trialIndTest)';                
-            case 'trapz2' % new - scale differently - more like box but more squished
+                shapePts = trapPts;              
+            case 'trapz2'
                 spacingTrapz = spacing(7:44); 
                 trapY=locRange(2).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
                 trapX=spacingTrapz;
@@ -234,13 +169,8 @@ for iterI = 1:nIter
                 for i=1:length(trapY)
                     trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
                 end
-                % use this to select from the PAIR in trapPts
-                trialInd     = randi(length(trapPts),nTrials,1);
-                trials       = trapPts(:,trialInd)';
-                %dataPtsTest
-                trialIndTest = randi(length(trapPts),nTrials,1);
-                dataPtsTest  = trapPts(:,trialIndTest)';  
-            case 'trapz3' % new - scale differently - more like box but more squished
+                shapePts = trapPts;
+            case 'trapz3'
                 spacingTrapz = spacing(4:47); 
                 trapY=locRange(2).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
                 trapX=spacingTrapz;
@@ -248,80 +178,31 @@ for iterI = 1:nIter
                 for i=1:length(trapY)
                     trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
                 end
-                % use this to select from the PAIR in trapPts
-                trialInd     = randi(length(trapPts),nTrials,1);
-                trials       = trapPts(:,trialInd)';
-                %dataPtsTest
-                trialIndTest = randi(length(trapPts),nTrials,1);
-                dataPtsTest  = trapPts(:,trialIndTest)';  
-                
+                shapePts = trapPts;
             case 'trapzScaled1' % new - scale differently - now loc > 50 though
-%                 spacingTrapz = spacing(10:41); 
                 trapY=(h-1).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
                 trapX=spacingTrapz;
                 trapPts=[];
                 for i=1:length(trapY)
                     trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
                 end
-                % use this to select from the PAIR in trapPts
-                trialInd     = randi(length(trapPts),nTrials,1);
-                trials       = trapPts(:,trialInd)';
-                %dataPtsTest
-                trialIndTest = randi(length(trapPts),nTrials,1);
-                dataPtsTest  = trapPts(:,trialIndTest)';  
-                          
+                shapePts = trapPts;
             case 'trapzScaled2' % new - scale differently - now loc > 50 though
-%                 spacingTrapz = spacing(7:44); 
                 trapY=(h-1).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
                 trapX=spacingTrapz;
                 trapPts=[];
                 for i=1:length(trapY)
                     trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
                 end
-                % use this to select from the PAIR in trapPts
-                trialInd     = randi(length(trapPts),nTrials,1);
-                trials       = trapPts(:,trialInd)';
-                %dataPtsTest
-                trialIndTest = randi(length(trapPts),nTrials,1);
-                dataPtsTest  = trapPts(:,trialIndTest)';  
-               
+                shapePts = trapPts;
             case 'trapzScaled3' % new - scale differently - now loc > 50 though
-%                 spacingTrapz = spacing(4:47); 
                 trapY=(h-1).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
                 trapX=spacingTrapz;
                 trapPts=[];
                 for i=1:length(trapY)
                     trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
                 end
-                % use this to select from the PAIR in trapPts
-                trialInd     = randi(length(trapPts),nTrials,1);
-                trials       = trapPts(:,trialInd)';
-                %dataPtsTest
-                trialIndTest = randi(length(trapPts),nTrials,1);
-                dataPtsTest  = trapPts(:,trialIndTest)';  
-                
-            case 'trapzSq' %probably need a more narrow trapezium!
-                trapY=locRange(2)/2.*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
-                trapY=trapY+floor(length(trapY)./2);
-                trapX=spacing;
-                trapPts=[];
-                for i=1:length(trapY)
-                    trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
-                end
-                %make square box attached to it
-                sqX=spacing;
-                sqY=spacing(1:floor(length(spacing)/2));
-                for i=1:length(sqX)
-                    for j=1:length(sqY)
-                        trapPts = [trapPts, [sqX(i); sqY(j)]];
-                    end
-                end
-                % use this to select from the PAIR in trapPts
-                trialInd     = randi(length(trapPts),nTrials,1);
-                trials       = trapPts(:,trialInd)';
-                %dataPtsTest
-                trialIndTest = randi(length(trapPts),nTrials,1);
-                dataPtsTest  = trapPts(:,trialIndTest)';  
+                shapePts = trapPts;
             case 'circ'
                 % Create logical image of a circle
                 imageSizeX = nSteps;
@@ -335,48 +216,45 @@ for iterI = 1:nIter
                     yVals = find(circIm(iX,:));
                     circPts = [circPts; ones(length(yVals),1)*iX, yVals'];
                 end
-                trialInd=randi(length(circPts),nTrials,1);
-                trials=circPts(trialInd,:);
-                %dataPtsTest
-                trialIndTest = randi(length(circPts),nTrials,1);
-                dataPtsTest  = circPts(trialIndTest,:);
+                shapePts = circPts;
         end
-        %trialsAll(:,:,iterI) = trials;
-    end
-    
-    
-    
-    
-    
-    % TEMP - joined trials
-    % first get points in the shape
-    switch dat
-        case 'square'
-            trials = nan(nTrials,2);
-%             trials(1,:)=[randsample(linspace(locRange(1),locRange(2),50),1,'true'), randsample(linspace(locRange(1),locRange(2),50),1,'true')];
-            sq=linspace(locRange(1),locRange(2),nSteps);
-            sqPts=[];
-            for i=1:length(sq)
-                for j=1:length(sq)
-                    sqPts = [sqPts; [sq(i), sq(j)]];
+        
+        %select points from specified shape
+        trialInd=randi(length(shapePts),nTrials,1);
+        trials=shapePts(trialInd,:);
+        %dataPtsTest
+        trialIndTest = randi(length(shapePts),nTrials,1);
+        dataPtsTest  = shapePts(trialIndTest,:);
+                
+        
+    elseif ~useSameTrls && jointTrls    %joined trials
+        % first get points in the shape
+        switch dat
+            case 'square'
+                trials = nan(nTrials,2);
+                sq=linspace(locRange(1),locRange(2),nSteps);
+                sqPts=[];
+                for i=1:length(sq)
+                    for j=1:length(sq)
+                        sqPts = [sqPts; [sq(i), sq(j)]];
+                    end
                 end
-            end
-            shapePts = sqPts;
-        case 'circ'
-            imageSizeX = nSteps;
-            [columnsInImage, rowsInImage] = meshgrid(1:imageSizeX, 1:imageSizeX);
-            centerX = nSteps/2; centerY = nSteps/2;
-            radius = nSteps/2-1;
-            circIm = (rowsInImage - centerY).^2 ...
-                + (columnsInImage - centerX).^2 <= radius.^2;
-            circPts=[]; % find circle points in XY coords
-            for iX=1:length(circIm)
-                yVals = find(circIm(iX,:));
-                circPts = [circPts; ones(length(yVals),1)*iX, yVals'];
-            end
-            shapePts = circPts;
-            case 'trapzNorm' % not scale - fit into square 
-                spacingTrapz = spacing; 
+                shapePts = sqPts;
+            case 'circ'
+                imageSizeX = nSteps;
+                [columnsInImage, rowsInImage] = meshgrid(1:imageSizeX, 1:imageSizeX);
+                centerX = nSteps/2; centerY = nSteps/2;
+                radius = nSteps/2-1;
+                circIm = (rowsInImage - centerY).^2 ...
+                    + (columnsInImage - centerX).^2 <= radius.^2;
+                circPts=[]; % find circle points in XY coords
+                for iX=1:length(circIm)
+                    yVals = find(circIm(iX,:));
+                    circPts = [circPts; ones(length(yVals),1)*iX, yVals'];
+                end
+                shapePts = circPts;
+            case 'trapzNorm' % not scaled - fit into square
+                spacingTrapz = spacing;
                 trapY=locRange(2).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
                 trapX=spacingTrapz;
                 trapPts=[];
@@ -384,45 +262,89 @@ for iterI = 1:nIter
                     trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
                 end
                 shapePts = trapPts';
-        case 'trapzKrupic'
-            spacingTrapz = spacing(14:37); %23.7 would be right, here 24; krupic (relative): [5.26, 23.68, 50]
-            trapY=locRange(2).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
-            trapX=spacingTrapz;
-            trapPts=[];
-            for i=1:length(trapY)
-                trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
-            end
-            shapePts = trapPts';
+            case 'trapzKrupic'
+                spacingTrapz = spacing(14:37); 
+                trapY=locRange(2).*trapmf(spacingTrapz,[spacingTrapz(1), spacingTrapz(round(length(spacingTrapz)*.25)), spacingTrapz(round(length(spacingTrapz)*.75)),spacingTrapz(end)]);
+                trapX=spacingTrapz;
+                trapPts=[];
+                for i=1:length(trapY)
+                    trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
+                end
+                shapePts = trapPts';
+        end
+        
+       
+        %move step sizes - possible step sizes; if larger, e.g. double, then need bigger steps?
+        selStepSiz = [-stepSize*5,-stepSize*3,-stepSize,0,stepSize,stepSize*3,stepSize*5].*boxSize;
 
-    end
-    
-    % select points trial by trial, if not in shape go back into the shape
-    trials      = nan(nTrials,2);
-    trials(1,:) = shapePts(randi(length(shapePts),1,1),:);
-    for i=2:nTrials
-        moveDir=randsample([-stepSize*5,-stepSize*3,-stepSize,0,stepSize,stepSize*3,stepSize*5],2); %move in a random direction or stay
-        %if edge, stay or move
-        if ~any(trials(i-1,1)+moveDir(1)==shapePts(:,1) & trials(i-1,2)+moveDir(2)==shapePts(:,2)) % if not in the shape
-            if trials(i-1,1)+moveDir(1) < length(locRange(1):locRange(2))/2 %if less than half the box, +
-                moveDir(1) = randsample([0,stepSize,stepSize*3,stepSize*5],1);
+                
+        % select points trial by trial, if not in shape go back into the shape
+        trials       =  nan(nTrials,2);
+        trials(1,:)  =  shapePts(randi(length(shapePts),1,1),:);
+        if ~strcmp(dat(1:4),'trap') % regular shapes (circ, square, rect)
+            %%%%%
+            % EDIT FOR RECT / WARP BOX TO RECT - locRangeX,Y are diff
+            % ++
+            %%%%
+            for i=2:nTrials
+                locRangeX = locRange; 
+                locRangeY = locRange;
+                moveDir=randsample(selStepSiz,2); %move in a random direction or stay
+                %if edge, stay or move
+                while ~any(trials(i-1,1)+moveDir(1)==shapePts(:,1) & trials(i-1,2)+moveDir(2)==shapePts(:,2)) % if not in the shape
+                    if trials(i-1,1)+moveDir(1) < length(locRangeX(1):locRangeX(2))/2 %if less than half the box, +
+                        moveDir(1) = randsample(selStepSiz(end-3:end),1);
+                    end
+                    if trials(i-1,2)+moveDir(2) < length(locRangeY(1):locRangeY(2))/2
+                        moveDir(2) = randsample(selStepSiz(end-3:end),1);
+                    end
+                    if trials(i-1,1)+moveDir(1) > length(locRangeX(1):locRangeX(2))/2
+                        moveDir(1) = randsample(selStepSiz(1:end-3),1);
+                    end
+                    if trials(i-1,2)+moveDir(2) > length(locRangeY(1):locRangeY(2))/2
+                        moveDir(2) = randsample(selStepSiz(1:end-3),1);
+                    end
+                end
+                trials(i,:)=trials(i-1,:)+moveDir;% add 1 or -1
             end
-            if trials(i-1,2)+moveDir(2) < length(locRange(1):locRange(2))/2
-                moveDir(2) = randsample([0,stepSize,stepSize*3,stepSize*5],1);
-            end
-            if trials(i-1,1)+moveDir(1) > length(locRange(1):locRange(2))/2
-                moveDir(1) = randsample([0,-stepSize,-stepSize*3,-stepSize*5],1);
-            end
-            if trials(i-1,2)+moveDir(2) > length(locRange(1):locRange(2))/2
-                moveDir(2) = randsample([0,-stepSize,-stepSize*3,-stepSize*5],1);
+            
+        else % if trapz, y-axis is a bit different (always + if not in area, unless <0)
+            % turns out too often going 'down' when out of trapz, and
+            % rarely going up. reduce this by having more 0s/'stays', and
+            % one more selStepsize in the + direction for up
+            locRangeX = [min(trapX), max(trapX)];
+%             locRangeY = [min(trapY), max(trapY)];
+            for i=2:nTrials
+%                 moveDir=randsample([selStepSiz selStepSiz(end-2)],2); %move in a random direction or stay
+                moveDir(1)=randsample(selStepSiz,1); %move in a random direction or stay (x-axis: left/right)
+                moveDir(2)=randsample([selStepSiz selStepSiz(end-1)],1); %move in a random direction or stay added -  more likely to go up (y-axis)
+%                 moveDir(2)=randsample([selStepSiz],1); %move in a random direction or stay added -  more likely to go up (y-axis)
+                
+                %if edge, stay or move
+                while ~any(trials(i-1,1)+moveDir(1)==shapePts(:,1) & trials(i-1,2)+moveDir(2)==shapePts(:,2)) % if not in the shape
+                    if trials(i-1,1)+moveDir(1) <= length(locRangeX(1):locRangeX(2))/2 %if less than half the box, +
+                        moveDir(1) = randsample(selStepSiz(end-3:end),1);
+                    end
+                    if trials(i-1,2)+moveDir(2) < 0 % only if goes 'below' the shape
+                        moveDir(2) = randsample(selStepSiz(end-3:end),1);
+                    end
+                    if trials(i-1,1)+moveDir(1) >= length(locRangeX(1):locRangeX(2))/2
+                        moveDir(1) = randsample(selStepSiz(1:end-3),1);
+                    end
+                    if trials(i-1,2)+moveDir(2) > 0 % if above 0 and out, need to go back up into shape
+                        moveDir(2) = randsample([selStepSiz(1:end-3),0,0],1);
+                    end
+                end
+                trials(i,:)=trials(i-1,:)+moveDir;% add 1 or -1
             end
         end
-        trials(i,:)=trials(i-1,:)+moveDir;% add 1 or -1
     end
     
-    
-    
-    
-    
+    %dataPtsTest - for initiating cluster centres, better to not select from the
+    %joint trials
+    trialIndTest = randi(length(shapePts),nTrials,1);
+    dataPtsTest  = shapePts(trialIndTest,:);
+        
     % if expand box
     switch warpType
         case 'sq2rect'
@@ -435,13 +357,18 @@ for iterI = 1:nIter
     mu = nan(nClus,2,nBatch+1);
 %     mu(:,:,1) = kmplusInit(dataPtsTest,nClus); %kmeans++ initialisation
     mu(:,:,1) = dataPtsTest(randi(nTrials,nClus,1),:); %forgy method
+    %add one where all clusters are randomly placed within the box (need to
+    %figure out how to do this for irregular shapes)
+    %++
+    
+    
+    
     muInit(:,:,iterI) = mu(:,:,1);
 
     actTrl = zeros(nClus,batchSize);
     %%
     
 %     updatedC = nan(nTrials,1);
-%     epsMuAll = nan(nTrials,2);
     deltaMu  = zeros(nClus,2,nBatch);
 %     clusUpdates = zeros(nClus,2); %acutally starting at 0 is OK, since there was no momentum from last trial
     
@@ -542,7 +469,6 @@ for iterI = 1:nIter
             else
                 epsMu = epsMuOrig;
             end
-%             epsMuAll(iTrl,:) = [epsMu,closestC]; 
             
             %batch update - save all updates for each cluster for X
             %trials, update it, then again
@@ -571,15 +497,14 @@ for iterI = 1:nIter
 %     sseSpreadVar(:,iterI)   = varAcrossClus;
 
     % densityPlotClus - density plot with each cluster in dim 3 - more like
-    % a place cell map - use to find clusMu (clus centres) - leave it out
-    % here so can use diff smoothing values outside . also then use to make
+    % a place cell map - leave it here so can use diff smoothing values outside . also then use to make
     % it a gridcell map: densityPlot=sum(densityPlotClus,3); - to compute autocorrelogram
     
     %densityplot over time (more samples)
     for iSet = 1:nSets
-        densityPlotClus   = zeros(b,h,nClus);
+        densityPlotClus      = zeros(b,h,nClus);
         densityPlotAct       = zeros(b,h);
-        densityPlotActUpd    = zeros(b,h);
+        densityPlotActUpd    = zeros(b,h); %start with ones, so won't divide by 0
       
         clus = round(mu(:,:,round(toTrlN(iSet)./batchSize))); %mu is in batches
         ind=clus<=0; clus(ind)=1; %indices <= 0 make to 1
@@ -594,14 +519,14 @@ for iterI = 1:nIter
         end
         densityPlot(:,:,iSet,iterI) = nansum(densityPlotClus,3);
         
+        %densityPlotActNorm
         for iTrl = fromTrlI(iSet):toTrlN(iSet)
-            densityPlotAct(trials(iTrl,1)+1, trials(iTrl,2)+1) = densityPlotAct(trials(iTrl,1)+1, trials(iTrl,2)+1)+ sum(actAll(:,iTrl)); %.^2 to make it look better?
+            densityPlotAct(trials(iTrl,1)+1, trials(iTrl,2)+1)    = densityPlotAct(trials(iTrl,1)+1, trials(iTrl,2)+1)+ nansum(actAll(:,iTrl));
             densityPlotActUpd(trials(iTrl,1)+1, trials(iTrl,2)+1) = densityPlotActUpd(trials(iTrl,1)+1, trials(iTrl,2)+1)+1; %log nTimes loc was visited
         end
         densityPlotActNorm(:,:,iSet,iterI) = densityPlotAct./densityPlotActUpd; %divide by number of times that location was visited
-        % smooth
-        densityPlotSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
-        densityPlotActNormSm = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);   
+        densityPlotSm                      = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth); %smooth
+        densityPlotActNormSm               = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);   
         
         %compute the sum of the distances between each cluster and itself over batches 
         if iSet>1 
@@ -609,7 +534,7 @@ for iterI = 1:nIter
         end
         
         if ~strcmp(dat,'cat') %if finding cats, won't be gridlike
-            %compute autocorrmap, no need to save
+            %compute autocorrmap
             aCorrMap = ndautoCORR(densityPlotSm);
             %compute gridness
             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
@@ -619,7 +544,7 @@ for iterI = 1:nIter
             %             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
             %             gA_act_t(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
             
-            %normalised by times loc visited
+            %compute gridness over normalised activation map - normalised by times loc visited
             aCorrMap = ndautoCORR(densityPlotActNormSm);
             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
             gA_actNorm(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
@@ -704,7 +629,7 @@ for iterI = 1:nIter
             end
             densityPlotActNormPerm = densityPlotActPerm./densityPlotActUpdPerm; %divide by number of times that location was visited
             % smooth
-            %         densityPlotTSmPerm = imgaussfilt(densityPlotPerm(:,:,iSet,iterI),gaussSmooth);
+            %         densityPlotSmPerm = imgaussfilt(densityPlotPerm(:,:,iSet,iterI),gaussSmooth);
             %         densityPlotActTSm     = imgaussfilt(densityPlotAct(:,:,iSet,iterI),gaussSmooth);
             densityPlotActNormSmPerm = imgaussfilt(densityPlotActNormPerm,gaussSmooth);
             
@@ -717,5 +642,3 @@ for iterI = 1:nIter
     end
 end
 end
-
-

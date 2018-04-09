@@ -49,11 +49,11 @@ end
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1);
 
 %temp for krupic
-% spacingTrapz = spacing(14:37);
-% spacing=spacingTrapz;
+spacingTrapz = spacing(14:37);
+spacing=spacingTrapz;
 
 gaussSmooth=1;
-for iSet=22
+for iSet=21:22
 for iterI = 1%:10
     
     densityPlotCentresSm = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);
@@ -67,14 +67,12 @@ for iterI = 1%:10
     aCorrMap = ndautoCORR(densityPlotCentresSm(:,spacing(1):spacing(ceil(length(spacing)/2))));
     [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
     % [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
-    gdataA
     
     %right half of box
     subplot(1,3,3)
     aCorrMap = ndautoCORR(densityPlotCentresSm(:,spacing(ceil(length(spacing)/2))+1:spacing(end)));
     [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
     % [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
-    gdataA
 end
 end
 
@@ -120,7 +118,7 @@ end
 %% over time - one plot
 
 %if plotAgent, need trials as an output argument
-plotAgent = 0;
+plotAgent = 1;
 
 
 nClus = size(muAll,1);
@@ -145,7 +143,7 @@ end
 figure;
 % figure('units','normalized','outerposition',[0 0 1 1]);
 for iTrl = 1:nTrials
-    if mod(iTrl,20)==0 %plot centers after x trials
+    if mod(iTrl,100)==0 %plot centers after x trials
         %agent
         if plotAgent
 %         scatter(trials(iTrl,1),trials(iTrl,2),1000,colAgent,'.');
