@@ -14,8 +14,9 @@ nSet        = 6;
 gaussSmooth = 1; 
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
-dat='square';
+dat='circ';
 annEps=0;
+boxSize=1;
 
 % clus2run = [7,8,10,12]; 
 % nTrials = 100000; 
@@ -101,6 +102,14 @@ epsMuVals=.075;
 % covering_map_batch_dat_22clus_2000ktrls_eps200_batchSiz100_200iters_circ_wAct_annEps_132454
 
 
+% joined trials
+jointTrls=1;
+clus2run = [8, 20, 28]; 
+epsMuVals=.025;
+nTrials=1000000;
+batchSizeVals = [1000, 400, 100]; 
+annEps=0;
+
 %load loop
 for iClus2run = 1:length(clus2run) 
     nClus = clus2run(iClus2run);
@@ -132,14 +141,26 @@ for iClus2run = 1:length(clus2run)
             %tmp - wAct and boxSizex2
             batchSize = batchSizeVals(iBvals);
             fprintf('Loading nClus=%d, epsMu=%d, batchSize=%d\n',nClus,epsMuOrig1000,batchSize)
-%             fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_wAct_%s*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
-            fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_%s*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,dat)];
-%             fname = [fname '_boxSizex2*'];
-            
-            if annEps
-                fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz*_%diters_%s_wAct_annEps*',nClus,round(nTrials/1000),epsMuOrig1000,nIter,dat)];
-            end
+%             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_wAct_%s*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+%             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_%s',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,dat)]; %double 'dat'
+            fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
 
+            if boxSize>1
+                fname = [fname sprintf('_boxSizex%d',boxSize)];
+            end
+            if annEps %epsMu is different here
+                fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps*_batchSiz%d_%diters_%s_wAct',nClus,round(nTrials/1000),batchSize,nIter,dat)];
+                fname = [fname '_annEps'];
+            end            
+            %finish with directory and * for date/time
+%             fname = [saveDir, fname '*'];
+            
+            %silly thing where i appended this (and perm) after the date/time...
+            if jointTrls
+%                 fname = [fname '_jointTrls'];
+                fname = [saveDir, fname '*_jointTrls*'];
+            end
+           
 
             
             %edit if want to load more than one file per sim, merge
@@ -208,7 +229,7 @@ for iClus2run = 1:length(clus2run)
 end
 %% plot univar scatters
 
-clusPosAct = 'clus'; %'clus' or 'actNorm'
+clusPosAct = 'actNorm'; %'clus' or 'actNorm'
 
 gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
 
@@ -269,7 +290,7 @@ switch gridMeasure
 end
 
 
-iSet=size(datTmp,1);
+iSet=size(datTmp,1)-1;
 
 iEps=1;
 

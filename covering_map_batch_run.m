@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -49,15 +49,16 @@ jointTrls = 1;
 % clus2run = [22, 28, 26, 14];
 
 %joint trials; 8, 12, 16, 20, 24, 28;    then 6, 10, 14, 18, 22, 26, 28
-clus2run = [8,24];
-% clus2run = [28,16];
-% clus2run = [20,12];
+clus2run = [24]; % ran 8
+clus2run = [16]; % ran 28
+clus2run = [12]; % ran 20
 
 %trapz joint trials
-clus2run = [8, 24, 16];
-clus2run = [20,12, 28];
+clus2run = 8; % annEps=0 only
+clus2run = [16, 24];
+clus2run = 28; 
 
-% clus2run = 18;
+% clus2run = 28;
 
 
 %trapz
@@ -82,6 +83,7 @@ if fixBatchSize
 %     nBatches = [20000, 5000, 50000]./2; %half nBatches
     %joint trials
     nBatches = [1000, 10000, 2500]; 
+    nBatches = [10000, 2500]; 
     nBatches = 2500;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals);
@@ -102,6 +104,8 @@ epsMuVals = 0.05;
 epsMuVals = 0.025;
 % epsMuVals = 0.015; 
 
+%faster...?
+% epsMuVals = 0.1;
 
 % learning rate - annealed (reduced over time)  -actually beter to compute
 % inside?
@@ -183,7 +187,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
 %                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(avgBatchUpdate(iBvals)),round(batchSize),nIter)];
             end
 %             [densityPlot,densityPlotAct,densityPlotActNorm,clusMu,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,rSeed] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
-            [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB, permPrc] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stochasticType,c,dat,boxSize,annEps,jointTrls,doPerm);
+            [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB, permPrc, muAll, trials] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stochasticType,c,dat,boxSize,annEps,jointTrls,doPerm);
 
             timeTaken=toc;
             if saveDat
@@ -199,13 +203,15 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                 if annEps
                     fname = [fname '_annEps'];
                 end
+                if doPerm
+                    fname = [fname '_doPerm'];
+                end
+                
+                
                 cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
 %                 save(fname,'densityPlot','densityPlotAct','clusMu','gA','gW','gA_act','gW_act','nIter','rSeed','timeTaken'); %added trialsAll for xval - removed, too big.maybe compute at end of each sim? or at each set
 %                 save(fname,'densityPlot','densityPlotActNorm','gA','gA_actNorm','rSeed','muInit','clusDistB','timeTaken'); 
 
-                if doPerm
-                    fname = [fname '_doPerm'];
-                end
                 
                 if jointTrls
                     fname = [fname '_jointTrls'];

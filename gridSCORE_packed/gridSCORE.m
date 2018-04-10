@@ -60,7 +60,10 @@ switch method
         blobs = regionprops(imb,'Centroid','Area','PixelIdxList'); % get all blobs
         as = [blobs.Area].';
         blobs = blobs(as>10,:); %get blobs more than 10 pixels
-
+        if length(blobs)==1 %if only 1 blob, exits function - shifted up from below - RM edited 180410
+            return
+        end
+        
         % get distance to image centre
         cents = cell2mat({blobs.Centroid}.');
         cent = [size(im,2)/2,size(im,1)/2];
@@ -74,9 +77,7 @@ switch method
         % sort blobs according to distance
         [ds,sindx] = sort(ds,'ascend');
         blobs = blobs(sindx,:);
-        if length(blobs)==1 %if only 1 blob, exits function
-            return
-        end
+
         if length(blobs)>7 %if more than 7, get closest 7
             blobs = blobs(1:7,:);
             ds = ds(1:7,:);
