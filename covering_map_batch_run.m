@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -67,7 +67,7 @@ clus2run = 28;
 
 % nTrials = 5000000; %how many locations in the box / trials 
 % nTrials = 2000000;
-nTrials = 1000000; %new
+nTrials = 1000000/2; %new
 
 %batch size
 fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
@@ -134,9 +134,9 @@ sTypes = 0;%:1;% :3; %0, 1 ,2, 3
 stochasticType=0;
 c=0;
 %%
-saveDat=1; %save simulations
+saveDat=0; %save simulations
 
-nIter=200; %how many iterations (starting points)
+nIter=1; %how many iterations (starting points)
 
 switch dat
     case 'square'
