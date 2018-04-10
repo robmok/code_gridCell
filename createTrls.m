@@ -164,7 +164,8 @@ elseif ~useSameTrls && jointTrls  %joined trials
         for i=2:nTrials
             %                 moveDir=randsample([selStepSiz selStepSiz(end-2)],2); %move in a random direction or stay
             moveDir(1)=randsample(selStepSiz,1); %move in a random direction or stay (x-axis: left/right)
-            moveDir(2)=randsample([selStepSiz selStepSiz(end-1)],1); %move in a random direction or stay added -  more likely to go up (y-axis)
+            moveDir(2)=randsample(selStepSiz,1); %move in a random direction or stay
+%             moveDir(2)=randsample([selStepSiz selStepSiz(end-1)],1); %move in a random direction or stay added -  more likely to go up (y-axis)
             
             %if edge, stay or move
             while ~any(trials(i-1,1)+moveDir(1)==shapePts(:,1) & trials(i-1,2)+moveDir(2)==shapePts(:,2)) % if not in the shape
