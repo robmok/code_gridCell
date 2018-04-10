@@ -14,7 +14,7 @@ nSet        = 6;
 gaussSmooth = 1; 
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
-dat='circ';
+dat='square';
 annEps=0;
 boxSize=1;
 
@@ -104,7 +104,7 @@ epsMuVals=.075;
 
 % joined trials
 jointTrls=1;
-clus2run = [8, 20, 28]; 
+clus2run = [8, 12, 16, 20,24, 28]; 
 epsMuVals=.025;
 nTrials=1000000;
 batchSizeVals = [1000, 400, 100]; 

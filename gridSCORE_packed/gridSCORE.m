@@ -60,7 +60,7 @@ switch method
         blobs = regionprops(imb,'Centroid','Area','PixelIdxList'); % get all blobs
         as = [blobs.Area].';
         blobs = blobs(as>10,:); %get blobs more than 10 pixels
-        if length(blobs)==1 %if only 1 blob, exits function - shifted up from below - RM edited 180410
+        if length(blobs)<=1 %if only 1 blob, exits function - shifted up from below, added less than or eq - RM edited 180410
             return
         end
         

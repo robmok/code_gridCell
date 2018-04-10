@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -41,7 +41,6 @@ doPerm = 0;
 
 jointTrls = 1;
 
-
 % clus2run = [16:2:30];
 
 % fewer trials, lower learning rate
@@ -52,13 +51,13 @@ jointTrls = 1;
 clus2run = [24]; % ran 8
 clus2run = [16]; % ran 28
 clus2run = [12]; % ran 20
-
-%trapz joint trials
-clus2run = 8; % annEps=0 only
-clus2run = [16, 24];
+% 
+% %trapz joint trials
+% clus2run = 8; % annEps=0 only
+% clus2run = [16, 24];
 clus2run = 28; 
 
-% clus2run = 28;
+% clus2run = 20;
 
 
 %trapz
@@ -113,12 +112,6 @@ epsMuVals = 0.025;
 %     epsMuVals = nBatches/100;
 % end
 
-% %tesing 60+clusters
-% nTrials = 1000000; 
-% nBatches = 1000;
-% batchSizeVals = nTrials/nBatches; 
-% epsMuVals = 0.025; 
-
 % use the same training data (trials) across current sims or gen new data
 useSameTrls=0;
 
@@ -132,7 +125,6 @@ if boxSize==2 %double
 elseif boxSize==3 %triple
     locRange(2)= locRange(2)*3;
 end
-
 
 % change box shape during learning rectangle
 warpBox = 0; %1 or 0
