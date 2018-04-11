@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -19,7 +19,7 @@ dat = 'square';
 % dat = 'trapz1'; % trapz, trapzNorm (without Krupic scaling) trapzSqs,
 % dat = 'trapz2';% 
 % dat = 'trapz3';
-dat = 'trapzKrupic'; % 
+% dat = 'trapzKrupic'; % 
 % dat = 'trapzKrupic2'; % dat = 'trapzKrupic3';
 % dat = 'trapzScaled1';
 % dat = 'trapzScaled2';
@@ -48,14 +48,16 @@ jointTrls = 1;
 % clus2run = [22, 28, 26, 14];
 
 %joint trials; 8, 12, 16, 20, 24, 28;    then 6, 10, 14, 18, 22, 26, 28
-clus2run = [24]; % ran 8
-clus2run = [16]; % ran 28
-clus2run = [12]; % ran 20
-% 
-% %trapz joint trials
-% clus2run = 8; % annEps=0 only
-% clus2run = [16, 24];
-clus2run = 28; 
+clus2run = [24]; %  8
+clus2run = [16]; %  28
+clus2run = [12]; %  20
+
+%then 6, 10, 14, 18, 22, 26, 30, plus 3,4,5
+clus2run = [6, 14, 5];
+clus2run = [26, 3, 4];
+clus2run = [18, 30];
+clus2run = [10, 22];
+
 
 % clus2run = 20;
 
@@ -82,8 +84,8 @@ if fixBatchSize
 %     nBatches = [20000, 5000, 50000]./2; %half nBatches
     %joint trials
     nBatches = [1000, 10000, 2500]; 
-    nBatches = [10000, 2500]; 
-    nBatches = 2500;
+%     nBatches = [10000, 2500]; 
+%     nBatches = 2500;
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals);
     
@@ -134,9 +136,9 @@ sTypes = 0;%:1;% :3; %0, 1 ,2, 3
 stochasticType=0;
 c=0;
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
-nIter=1; %how many iterations (starting points)
+nIter=200; %how many iterations (starting points)
 
 switch dat
     case 'square'

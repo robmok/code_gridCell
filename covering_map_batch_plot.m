@@ -10,7 +10,7 @@ addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed']));
 
 % load
-nSet        = 6;
+nSet        = 22;
 gaussSmooth = 1; 
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
@@ -108,7 +108,12 @@ clus2run = [8, 12, 16, 20,24, 28];
 epsMuVals=.025;
 nTrials=1000000;
 batchSizeVals = [1000, 400, 100]; 
-annEps=0;
+annEps=1;
+
+
+dat='trapzKrupic';
+clus2run = [8, 12, 16, 20,28]; %24 failed, leave for now
+batchSizeVals = 400;
 
 %load loop
 for iClus2run = 1:length(clus2run) 
@@ -290,7 +295,7 @@ switch gridMeasure
 end
 
 
-iSet=size(datTmp,1)-1;
+iSet=size(datTmp,1);
 
 iEps=1;
 
@@ -561,7 +566,7 @@ nnz(peaksW~=6)
 %% density plots
 close all
 
-iSet=6;
+iSet=size(datTmp,1);
 iEps=1;
 gaussSmooth=1;
 
@@ -576,7 +581,7 @@ end
 iClus2run = 2;
 iBvals    = 1;
 
-iters2plot = 40:45;
+iters2plot = 1;
 
 fprintf(sprintf('clus %d batchSizeVals %d\n',clus2run(iClus2run),batchSizeVals(iBvals)));
 for iterI = iters2plot
