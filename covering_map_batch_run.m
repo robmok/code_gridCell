@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -15,11 +15,11 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
-dat = 'square'; 
+% dat = 'square'; 
 % dat = 'trapz1'; % trapz, trapzNorm (without Krupic scaling) trapzSqs,
 % dat = 'trapz2';% 
 % dat = 'trapz3';
-% dat = 'trapzKrupic'; % 
+dat = 'trapzKrupic'; % 
 % dat = 'trapzKrupic2'; % dat = 'trapzKrupic3';
 % dat = 'trapzScaled1';
 % dat = 'trapzScaled2';
@@ -47,17 +47,19 @@ jointTrls = 1;
 % clus2run = [16, 20, 18, 30];
 % clus2run = [22, 28, 26, 14];
 
-%joint trials; 8, 12, 16, 20, 24, 28;    then 6, 10, 14, 18, 22, 26, 28
-clus2run = [24]; %  8
-clus2run = [16]; %  28
-clus2run = [12]; %  20
+% %joint trials; 8, 12, 16, 20, 24, 28;    then 6, 10, 14, 18, 22, 26, 28
+clus2run = [24, 8]; %  8
+% clus2run = [16,28]; %  28
+% clus2run = [12,20]; %  20
+% clus2run = 8;
+% clus2run = 28;
+% clus2run = 20;
 
-%then 6, 10, 14, 18, 22, 26, 30, plus 3,4,5
-clus2run = [6, 14, 5];
-clus2run = [26, 3, 4];
-clus2run = [18, 30];
-clus2run = [10, 22];
-
+% %then 6, 10, 14, 18, 22, 26, 30, plus 3,4,5
+% clus2run = [6, 14, 5];
+% clus2run = [26, 3, 4];
+% clus2run = [18, 30];
+% clus2run = [10, 22];
 
 % clus2run = 20;
 
@@ -85,7 +87,10 @@ if fixBatchSize
     %joint trials
     nBatches = [1000, 10000, 2500]; 
 %     nBatches = [10000, 2500]; 
-%     nBatches = 2500;
+    nBatches = 2500;
+
+    nBatches = [1000,10000]; %trapzkrupic
+
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals);
     
