@@ -108,7 +108,7 @@ clus2run = [8, 12, 16, 20,24, 28];
 epsMuVals=.025;
 nTrials=1000000;
 batchSizeVals = [1000, 400, 100]; 
-annEps=1;
+annEps=0;
 
 
 dat='trapzKrupic';

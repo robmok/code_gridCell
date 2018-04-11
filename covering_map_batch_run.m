@@ -48,9 +48,9 @@ jointTrls = 1;
 % clus2run = [22, 28, 26, 14];
 
 % %joint trials; 8, 12, 16, 20, 24, 28;    then 6, 10, 14, 18, 22, 26, 28
-clus2run = [24, 8]; %  8
-% clus2run = [16,28]; %  28
-% clus2run = [12,20]; %  20
+clus2run = [24, 8, 20]; 
+% clus2run = [16,28, 12];  
+% clus2run = [12,20]; 
 % clus2run = 8;
 % clus2run = 28;
 % clus2run = 20;
@@ -60,6 +60,10 @@ clus2run = [24, 8]; %  8
 % clus2run = [26, 3, 4];
 % clus2run = [18, 30];
 % clus2run = [10, 22];
+
+%more trapzKrupic: 6, 10, 14, 18, 22, 26 - running nBatches=2500 only
+% clus2run = [6,26,18];
+% clus2run = [10,14,22];
 
 % clus2run = 20;
 
@@ -87,9 +91,9 @@ if fixBatchSize
     %joint trials
     nBatches = [1000, 10000, 2500]; 
 %     nBatches = [10000, 2500]; 
-    nBatches = 2500;
+    nBatches = 10000;
 
-    nBatches = [1000,10000]; %trapzkrupic
+%     nBatches = [1000,10000]; %trapzkrupic
 
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals);
@@ -112,12 +116,6 @@ epsMuVals = 0.025;
 
 %faster...?
 % epsMuVals = 0.1;
-
-% learning rate - annealed (reduced over time)  -actually beter to compute
-% inside?
-% if annEps
-%     epsMuVals = nBatches/100;
-% end
 
 % use the same training data (trials) across current sims or gen new data
 useSameTrls=0;
