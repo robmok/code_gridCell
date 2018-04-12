@@ -4,7 +4,7 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -26,6 +26,8 @@ dat = 'trapzKrupic'; %
 %  dat = 'trapzScaled3';
 % dat = 'trapzNorm';%not scaled, fit into square
 
+% dat = 'cat';
+
 boxSize = 1; % 1=normal, 2=double size, 3=triple size
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
@@ -40,8 +42,6 @@ annEps = 0; %1 or 0
 doPerm = 0;
 
 jointTrls = 1;
-
-% clus2run = [16:2:30];
 
 % fewer trials, lower learning rate
 % clus2run = [16, 20, 18, 30];
@@ -65,8 +65,7 @@ clus2run = [12,20];
 % clus2run = [6,26,18];
 % clus2run = [10,14,22];
 
-% clus2run = 20;
-
+clus2run = 16;
 
 %trapz
 % clus2run = [18, 24, 26, 28, 16, 30, 20, 22]; %trapzScaled
@@ -75,7 +74,7 @@ clus2run = [12,20];
 
 % nTrials = 5000000; %how many locations in the box / trials 
 % nTrials = 2000000;
-nTrials = 1000000; %new
+nTrials = 1000000/2; %new
 
 %batch size
 fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
@@ -91,7 +90,7 @@ if fixBatchSize
     %joint trials
     nBatches = [1000, 10000, 2500]; 
 %     nBatches = [10000, 2500]; 
-    nBatches = 2500;
+%     nBatches = 2500;
     nBatches = 1000;
 
 %     nBatches = [1000,10000]; %trapzkrupic
@@ -140,9 +139,9 @@ sTypes = 0;%:1;% :3; %0, 1 ,2, 3
 stochasticType=0;
 c=0;
 %%
-saveDat=1; %save simulations
+saveDat=0; %save simulations
 
-nIter=200; %how many iterations (starting points)
+nIter=1; %how many iterations (starting points)
 
 switch dat
     case 'square'
