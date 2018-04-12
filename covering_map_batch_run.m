@@ -4,7 +4,7 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -49,9 +49,9 @@ jointTrls = 1;
 
 % %joint trials; 8, 12, 16, 20, 24, 28;    then 6, 10, 14, 18, 22, 26, 28
 clus2run = [24, 8,  10, 18]; 
-clus2run = [16, 28, 14, 6];  
-clus2run = [12, 20, 22]; 
-clus2run = [28, 26, 30];
+% clus2run = [16, 28, 14, 6];  
+% clus2run = [12, 20, 22]; 
+% clus2run = [28, 26, 30];
 
 % %then 6, 10, 14, 18, 22, 26, 30, plus 3,4,5
 % clus2run = [6, 14, 5];
@@ -63,11 +63,11 @@ clus2run = [28, 26, 30];
 % clus2run = [6,26,18];
 % clus2run = [10,14,22];
 
-clus2run = 18;
+% clus2run = 18;
 
 % nTrials = 5000000; %how many locations in the box / trials 
 % nTrials = 2000000;
-nTrials = 1000000/2; %new
+nTrials = 1000000; %new
 
 %batch size
 fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
@@ -132,9 +132,9 @@ sTypes = 0;%:1;% :3; %0, 1 ,2, 3
 stochasticType=0;
 c=0;
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
-nIter=1; %how many iterations (starting points)
+nIter=200; %how many iterations (starting points)
 
 switch dat
     case 'square'
