@@ -115,7 +115,7 @@ dat='trapzKrupic';
 clus2run = [8, 12, 16, 20, 24,28]; 
 
 % 6, 10, 14, 18, 22, 26 - 
-clus2run = [6:2:28]; 
+clus2run = [6:2:28]; % only for batcgSize=400 (with up bias)
 batchSizeVals = 400; %100,400, 1000
 
 %load loop
