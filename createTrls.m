@@ -195,10 +195,8 @@ elseif ~useSameTrls && jointTrls  %joined trials
                 if trials(i-1,1)+moveDir(1) == median(locRangeX(1):locRangeX(2)) %if middle, move a little or stay
                     moveDir(1) = randsample([-1,0,1],1);
                 end
-                
             end
             trials(i,:)=trials(i-1,:)+moveDir;% add 1 or -1
-            moveAll(i,:)=moveDir;
         end
     end
 end
