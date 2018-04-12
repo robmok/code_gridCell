@@ -128,7 +128,7 @@ colors = distinguishable_colors(nClus); %function for making distinguishable col
 colAgent = [.75, .75, .75];
 
 % colAgent gets darker over time? also clear the lines?
-% colAgentCh = fliplr(linspace(0,.9,nTrials));
+colAgentCh = fliplr(linspace(0,.9,nTrials));
 
 %if plotting agent over batches - need make cluster positions same over
 %trials in a batch
