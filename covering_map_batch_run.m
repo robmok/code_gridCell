@@ -91,7 +91,7 @@ if fixBatchSize
     %joint trials
     nBatches = [1000, 10000, 2500]; 
 %     nBatches = [10000, 2500]; 
-    nBatches = 10000;
+    nBatches = 2500;
 
 %     nBatches = [1000,10000]; %trapzkrupic
 
