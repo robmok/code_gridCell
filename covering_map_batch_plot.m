@@ -112,8 +112,11 @@ annEps=0;
 
 
 dat='trapzKrupic';
-clus2run = [8, 12, 16, 20,28]; %24 failed, leave for now
-batchSizeVals = 400;
+clus2run = [8, 12, 16, 20, 24,28]; 
+
+% 6, 10, 14, 18, 22, 26 - 
+clus2run = [6:2:28]; 
+batchSizeVals = 400; %100,400, 1000
 
 %load loop
 for iClus2run = 1:length(clus2run) 
@@ -234,7 +237,7 @@ for iClus2run = 1:length(clus2run)
 end
 %% plot univar scatters
 
-clusPosAct = 'actNorm'; %'clus' or 'actNorm'
+clusPosAct = 'clus'; %'clus' or 'actNorm'
 
 gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
 
@@ -578,10 +581,10 @@ else
 end
 
 %set
-iClus2run = 2;
+iClus2run = 12;
 iBvals    = 1;
 
-iters2plot = 1;
+iters2plot = 1:5;
 
 fprintf(sprintf('clus %d batchSizeVals %d\n',clus2run(iClus2run),batchSizeVals(iBvals)));
 for iterI = iters2plot
