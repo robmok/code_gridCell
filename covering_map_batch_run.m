@@ -48,9 +48,9 @@ jointTrls = 1;
 % clus2run = [22, 28, 26, 14];
 
 % %joint trials; 8, 12, 16, 20, 24, 28;    then 6, 10, 14, 18, 22, 26, 28
-clus2run = [24, 8, 20]; 
-% clus2run = [16,28, 12];  
-% clus2run = [12,20]; 
+clus2run = [24, 8]; 
+clus2run = [16,28];  
+clus2run = [12,20]; 
 % clus2run = 8;
 % clus2run = 28;
 % clus2run = 20;
@@ -92,6 +92,7 @@ if fixBatchSize
     nBatches = [1000, 10000, 2500]; 
 %     nBatches = [10000, 2500]; 
     nBatches = 2500;
+    nBatches = 1000;
 
 %     nBatches = [1000,10000]; %trapzkrupic
 
