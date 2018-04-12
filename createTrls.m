@@ -188,9 +188,8 @@ elseif ~useSameTrls && jointTrls  %joined trials
                     moveDir(1) = randsample(selStepSiz(1:end-3),1);
                 end
                 if trials(i-1,2)+moveDir(2) > 0 % if above 0 and out, need to go back up into shape
-%                     moveDir(2) = randsample([selStepSiz(1:end-3),0,0],1);
-%                     moveDir(2) = randsample([selStepSiz(1:end-3),zeros(1,25)],1); %equalize the probability with going up
-                    moveDir(2) = 0;% bias it not to go down
+                    moveDir(2) = randsample(selStepSiz,1); %this works fine
+%                     moveDir(2) = 0;% bias it not to go down
                 end
                 if trials(i-1,1)+moveDir(1) == median(locRangeX(1):locRangeX(2)) %if middle, move a little or stay
                     moveDir(1) = randsample([-1,0,1],1);
@@ -207,3 +206,15 @@ trialIndTest = randi(length(shapePts),nTrials,1);
 dataPtsTest  = shapePts(trialIndTest,:);
 
 end
+
+% %checking trapz - upward/downward bias
+% densityPlot=zeros(50,50);
+% for iTrl = 1:nTrials
+%     densityPlot(trials(iTrl,1)+1,trials(iTrl,2)+1) = densityPlot(trials(iTrl,1)+1,trials(iTrl,2)+1)+1;
+% end
+% figure;imagesc(densityPlot)
+
+%need add this if want to check
+% figure; hist(moveAll(:,2),50)
+% nnz(moveAll(:,2)<0)
+% nnz(moveAll(:,2)>0)
