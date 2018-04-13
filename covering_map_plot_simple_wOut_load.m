@@ -46,11 +46,19 @@ end
 
 %% gridness - left vs right half
 
-spacing=linspace(locRange(1),locRange(2),locRange(2)+1);
+spacing=linspace(locRange(1),locRange(2),locRange(2)+1)+1;
 
-%temp for krupic
+%spacing split into 2 equal areas - trapzKrupic only for now]
+
+%krupic
 spacingTrapz = spacing(14:37);
-spacing=spacingTrapz;
+
+a = length(spacingTrapz);
+b = length(spacing);
+h = length(spacing);
+halfArea = (((a+b)/2)*h)/2;
+c = sqrt(((a^2)+(b^2))/2);
+hLeft  = round(halfArea/((b+c)/2)); %bigger side
 
 gaussSmooth=1;
 for iSet=21:22
@@ -64,13 +72,15 @@ for iterI = 1%:10
     
     %left half of box
     subplot(1,3,2)
-    aCorrMap = ndautoCORR(densityPlotCentresSm(:,spacing(1):spacing(ceil(length(spacing)/2))));
+%     aCorrMap = ndautoCORR(densityPlotCentresSm(:,spacing(1):spacing(ceil(length(spacing)/2))));
+    aCorrMap = ndautoCORR(densityPlotCentresSm(:,1:hLeft));
     [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
     % [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
     
     %right half of box
     subplot(1,3,3)
-    aCorrMap = ndautoCORR(densityPlotCentresSm(:,spacing(ceil(length(spacing)/2))+1:spacing(end)));
+%     aCorrMap = ndautoCORR(densityPlotCentresSm(:,spacing(ceil(length(spacing)/2))+1:spacing(end)));
+    aCorrMap = ndautoCORR(densityPlotCentresSm(:,hLeft+1:end));
     [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
     % [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
 end

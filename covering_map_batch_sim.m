@@ -84,8 +84,9 @@ if strcmp(dat(1:4),'trap') && length(dat)>10
     elseif strcmp(dat(1:11),'trapzKrupic')
         spacingTrapz = spacing(14:37);
         if length(dat)==11 % 'trapzKrupic', no number following
-            b=length(spacing);
-            h=length(spacing);
+            a = length(spacingTrapz);
+            b = length(spacing);
+            h = length(spacing);
         else
             if strcmp(dat(12),'2') % 'trapzKrupic2' - if do larger, add here
                 b=length(spacing)*1.5; %make smaller; since datapoints dont reach out there
@@ -93,6 +94,18 @@ if strcmp(dat(1:4),'trap') && length(dat)>10
             end
         end
     end
+    
+    %split left and right half the trapz with equal areas
+    % c is the length of the line when split the trapz in half
+
+    %krupic should work, check if valid for otehrs - esp rounding below
+    
+    halfArea = (((a+b)/2)*h)/2;
+    c = sqrt(((a^2)+(b^2))/2);
+    %(b+c)/2)*h=c
+    hLeft  = round(halfArea/((b+c)/2)); %bigger side
+%     hRight = round(halfArea/((a+c)/2)); %smaller side
+
 else
     b=length(spacing);
     h=length(spacing);
@@ -321,28 +334,32 @@ for iterI = 1:nIter
             if  strcmp(dat(1:4),'trap')
                 
                 %left half of box
-%                 aCorrMap = ndautoCORR(densityPlotSm(:,1:ceil(length(spacing)/2)));
-                aCorrMap = ndautoCORR(densityPlotSm(:,spacingTrapz(1):spacingTrapz(ceil(length(spacingTrapz)/2))));
+%                 aCorrMap = ndautoCORR(densityPlotSm(:,spacing(1):spacing(ceil(length(spacing)/2))));
+                aCorrMap = ndautoCORR(densityPlotSm(:,1:hLeft));
                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
                 gA(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
                 
                 %right half of box
-                aCorrMap = ndautoCORR(densityPlotSm(:,spacingTrapz(ceil(length(spacingTrapz)/2))+1:spacingTrapz(end)));
+%                 aCorrMap = ndautoCORR(densityPlotSm(:,spacing(ceil(length(spacing)/2))+1:spacing(end)));
+                aCorrMap = ndautoCORR(densityPlotSm(:,hLeft+1:end));
                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
                 gA(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
                 
                 %act
                 %left half of box
-                aCorrMap = ndautoCORR(densityPlotActNormSm(:,spacingTrapz(1):spacingTrapz(ceil(length(spacingTrapz)/2))));
-                [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-                gA_act(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
-                aCorrMap = ndautoCORR(densityPlotActNormSm(:,spacingTrapz(ceil(length(spacingTrapz)/2))+1:spacingTrapz(end)));
-
+%                 aCorrMap = ndautoCORR(densityPlotActNormSm(:,spacing(1):spacing(ceil(length(spacing)/2))));
+%                 aCorrMap = ndautoCORR(densityPlotActNormSm(:,1:hLeft));
+%                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+%                 gA_act(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+                
+%                 aCorrMap = ndautoCORR(densityPlotActNormSm(:,spacing(ceil(length(spacing)/2))+1:spacing(end)));
+                aCorrMap = ndautoCORR(densityPlotActNormSm(:,1:hLeft));
                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
                 gA_actNorm(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
                 
                 %right half of box
-                aCorrMap = ndautoCORR(densityPlotActNormSm(:,ceil(length(spacing)/2)+1:end));
+%                 aCorrMap = ndautoCORR(densityPlotActNormSm(:,ceil(length(spacing)/2)+1:end));
+                aCorrMap = ndautoCORR(densityPlotActNormSm(:,hLeft+1:end));
                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
                 gA_actNorm(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
                 

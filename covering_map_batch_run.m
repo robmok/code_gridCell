@@ -4,8 +4,8 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -15,11 +15,11 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
-% dat = 'square'; 
+dat = 'square'; 
 % dat = 'trapz1'; % trapz, trapzNorm (without Krupic scaling) trapzSqs,
 % dat = 'trapz2';% 
 % dat = 'trapz3';
-dat = 'trapzKrupic'; % 
+% dat = 'trapzKrupic'; % 
 % dat = 'trapzKrupic2'; % dat = 'trapzKrupic3';
 % dat = 'trapzScaled1';
 % dat = 'trapzScaled2';
@@ -48,22 +48,15 @@ jointTrls = 1;
 % clus2run = [22, 28, 26, 14];
 
 % %joint trials; 8, 12, 16, 20, 24, 28;    then 6, 10, 14, 18, 22, 26, 28
-clus2run = [24, 8,  10, 18]; 
-% clus2run = [16, 28, 14, 6];  
+clus2run = [24, 8,  10]; 
+% clus2run = [16, 28, 14,];  
 % clus2run = [12, 20, 22]; 
-% clus2run = [28, 26, 30];
+% clus2run = [28, 26, 18];
 
-% %then 6, 10, 14, 18, 22, 26, 30, plus 3,4,5
-% clus2run = [6, 14, 5];
-% clus2run = [26, 3, 4];
-% clus2run = [18, 30];
-% clus2run = [10, 22];
+%then 6, 30, plus 3,4,5
 
-%more trapzKrupic: 6, 10, 14, 18, 22, 26 - running nBatches=2500 only
-% clus2run = [6,26,18];
-% clus2run = [10,14,22];
 
-% clus2run = 18;
+% clus2run = 16;
 
 % nTrials = 5000000; %how many locations in the box / trials 
 % nTrials = 2000000;
@@ -81,11 +74,9 @@ if fixBatchSize
     %new - for 100k trials, half nBatches for same batchsize
 %     nBatches = [20000, 5000, 50000]./2; %half nBatches
     %joint trials
-    nBatches = [1000, 10000, 2500]; 
+    nBatches = [1000, 2500, 10000]; 
 %     nBatches = [10000, 2500]; 
 %     nBatches = 2500;
-    nBatches = 1000;
-%     nBatches = 10000;
 
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals);
@@ -102,7 +93,7 @@ end
 % epsMuVals=[.01, .05, .075, .1, .2, .3];% %learning rate / starting learning rate 
 % epsMuVals = 0.075; 
 % epsMuVals = [0.05, 0.025]; 
-epsMuVals = 0.05;
+% epsMuVals = 0.05;
 epsMuVals = 0.025;
 % epsMuVals = 0.015; 
 
@@ -195,18 +186,18 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                 if doPerm
                     fname = [fname '_doPerm'];
                 end
+                if jointTrls
+                    fname = [fname '_jointTrls'];
+                end
                 
+                
+                %temp - trying 1,1,2,4 selStepSiz; rather than 1,3,5
+                fname=[fname '_stepSiz'];
                 
                 cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
 %                 save(fname,'densityPlot','densityPlotAct','clusMu','gA','gW','gA_act','gW_act','nIter','rSeed','timeTaken'); %added trialsAll for xval - removed, too big.maybe compute at end of each sim? or at each set
 %                 save(fname,'densityPlot','densityPlotActNorm','gA','gA_actNorm','rSeed','muInit','clusDistB','timeTaken'); 
-
-                
-                if jointTrls
-                    fname = [fname '_jointTrls'];
-                end
                     
-                
                 save(fname,'densityPlot','densityPlotActNorm','gA','gA_actNorm','rSeed','muInit','clusDistB','permPrc','timeTaken'); 
 
             end
