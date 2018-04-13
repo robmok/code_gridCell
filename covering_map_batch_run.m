@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+ wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -48,10 +48,19 @@ jointTrls = 1;
 % clus2run = [22, 28, 26, 14];
 
 % %joint trials; 8, 12, 16, 20, 24, 28;    then 6, 10, 14, 18, 22, 26, 28
-clus2run = [24, 8,  10]; 
+%clus2run = [24, 8,  10]; 
 % clus2run = [16, 28, 14,];  
 % clus2run = [12, 20, 22]; 
 % clus2run = [28, 26, 18];
+
+%split into 6 instead - sq
+clus2run = [24, 8]; 
+ clus2run = [16, 28];  
+ clus2run = [12, 20]; 
+ clus2run = [28, 26];
+ clus2run = [10, 22];
+ clus2run = [14, 18];
+
 
 %then 6, 30, plus 3,4,5
 
