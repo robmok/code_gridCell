@@ -105,19 +105,19 @@ epsMuVals=.075;
 % joined trials
 jointTrls=1;
 % clus2run = [8, 12, 16, 20,24, 28]; 
-clus2run = [6:2:30]; 
+clus2run = [8:2:28]; 
 epsMuVals=.025;
 nTrials=1000000;
 batchSizeVals = [1000, 400, 100]; 
 annEps=0;
 
 
-% dat='trapzKrupic';
+dat='trapzKrupic';
 % clus2run = [8, 12, 16, 20, 24,28]; 
 % 
 % % 6, 10, 14, 18, 22, 26 - 
-% clus2run = [6:2:28]; % only for batcgSize=400 (with up bias)
-% batchSizeVals = 400; %100,400, 1000
+clus2run = [8:2:28]; % only for batcgSize=400 (with up bias)
+batchSizeVals = 400; %100,400, 1000
 
 %load loop
 for iClus2run = 1:length(clus2run) 
@@ -152,24 +152,19 @@ for iClus2run = 1:length(clus2run)
             fprintf('Loading nClus=%d, epsMu=%d, batchSize=%d\n',nClus,epsMuOrig1000,batchSize)
 %             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_wAct_%s*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
 %             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_%s',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,dat)]; %double 'dat'
-            fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+%             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+            fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
 
             if boxSize>1
                 fname = [fname sprintf('_boxSizex%d',boxSize)];
             end
             if annEps %epsMu is different here
-                fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps*_batchSiz%d_%diters_%s_wAct',nClus,round(nTrials/1000),batchSize,nIter,dat)];
-                fname = [fname '_annEps'];
+                fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps*_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_annEps',nClus,round(nTrials/1000),batchSize,nIter,dat)];
+%                 fname = [fname '_annEps'];
             end            
-            %finish with directory and * for date/time
-%             fname = [saveDir, fname '*'];
-            
-            %silly thing where i appended this (and perm) after the date/time...
-            if jointTrls
-%                 fname = [fname '_jointTrls'];
-                fname = [saveDir, fname '*_jointTrls*'];
-            end
-           
+%             finish with directory and * for date/time
+            fname = [saveDir, fname '*'];
+                       
 
             
             %edit if want to load more than one file per sim, merge
@@ -582,7 +577,7 @@ else
 end
 
 %set
-iClus2run = 12;
+iClus2run = 5;
 iBvals    = 1;
 
 iters2plot = 1:5;

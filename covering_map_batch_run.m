@@ -15,7 +15,7 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
-dat = 'square'; 
+% dat = 'square'; 
 % dat = 'trapz1'; % trapz, trapzNorm (without Krupic scaling) trapzSqs,
 % dat = 'trapz2';% 
 % dat = 'trapz3';
@@ -36,7 +36,7 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic % sigmaG = [1 .5; .5 2]; R
 
 
 %annealed learning rate
-annEps = 0; %1 or 0
+annEps = 1; %1 or 0
 
 %perm testing
 doPerm = 0;
@@ -48,24 +48,26 @@ jointTrls = 1;
 % clus2run = [22, 28, 26, 14];
 
 % %joint trials; 8, 12, 16, 20, 24, 28;    then 6, 10, 14, 18, 22, 26, 28
-%clus2run = [24, 8,  10]; 
-% clus2run = [16, 28, 14,];  
-% clus2run = [12, 20, 22]; 
-% clus2run = [28, 26, 18];
+%annEps to do - circ love06
+clus2run = [24, 8,  10]; 
+clus2run = [16, 28, 14,];  
+clus2run = [12, 20, 22]; 
+clus2run = [28, 26, 18];
 
-%split into 6 instead - sq
-clus2run = [24, 8]; 
- clus2run = [16, 28];  
- clus2run = [12, 20]; 
- clus2run = [28, 26];
- clus2run = [10, 22];
- clus2run = [14, 18];
-
+%split into X instead 
+%annEps - circ love01
+clus2run  = [20]; 
+% clus2run  = [22]; 
+%  clus2run = [24];
+%  clus2run = [26];
+%  clus2run = [28];
+%  clus2run = [8,  18]; 
+%  clus2run = [12, 10]; 
+%  clus2run = [16, 14];
 
 %then 6, 30, plus 3,4,5
 
-
-% clus2run = 16;
+% clus2run = 10;
 
 % nTrials = 5000000; %how many locations in the box / trials 
 % nTrials = 2000000;

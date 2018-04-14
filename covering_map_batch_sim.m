@@ -103,8 +103,11 @@ if strcmp(dat(1:4),'trap') && length(dat)>10
     halfArea = (((a+b)/2)*h)/2;
     c = sqrt(((a^2)+(b^2))/2);
     %(b+c)/2)*h=c
-    hLeft  = round(halfArea/((b+c)/2)); %bigger side
-%     hRight = round(halfArea/((a+c)/2)); %smaller side
+%     hLeft  = round(halfArea/((b+c)/2)); %bigger side
+
+% new to equalize area - Krupic
+    hLeft  = floor(halfArea/((b+c)/2)); %bigger side
+    hRight = ceil(halfArea/((a+c)/2))+1; %smaller side
 
 else
     b=length(spacing);
@@ -341,7 +344,7 @@ for iterI = 1:nIter
                 
                 %right half of box
 %                 aCorrMap = ndautoCORR(densityPlotSm(:,spacing(ceil(length(spacing)/2))+1:spacing(end)));
-                aCorrMap = ndautoCORR(densityPlotSm(:,hLeft+1:end));
+                aCorrMap = ndautoCORR(densityPlotSm(:,hRight:end));
                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
                 gA(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
                 
@@ -359,7 +362,7 @@ for iterI = 1:nIter
                 
                 %right half of box
 %                 aCorrMap = ndautoCORR(densityPlotActNormSm(:,ceil(length(spacing)/2)+1:end));
-                aCorrMap = ndautoCORR(densityPlotActNormSm(:,hLeft+1:end));
+                aCorrMap = ndautoCORR(densityPlotActNormSm(:,hRight:end));
                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
                 gA_actNorm(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
                 

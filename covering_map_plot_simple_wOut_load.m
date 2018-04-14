@@ -58,7 +58,9 @@ b = length(spacing);
 h = length(spacing);
 halfArea = (((a+b)/2)*h)/2;
 c = sqrt(((a^2)+(b^2))/2);
-hLeft  = round(halfArea/((b+c)/2)); %bigger side
+% hLeft  = round(halfArea/((b+c)/2)); %bigger side
+hLeft  = floor(halfArea/((b+c)/2)); %bigger side
+hRight = ceil(halfArea/((b+c)/2))+1; %smaller size - to equalize area more
 
 gaussSmooth=1;
 for iSet=21:22
@@ -80,7 +82,7 @@ for iterI = 1%:10
     %right half of box
     subplot(1,3,3)
 %     aCorrMap = ndautoCORR(densityPlotCentresSm(:,spacing(ceil(length(spacing)/2))+1:spacing(end)));
-    aCorrMap = ndautoCORR(densityPlotCentresSm(:,hLeft+1:end));
+    aCorrMap = ndautoCORR(densityPlotCentresSm(:,hRight:end));
     [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
     % [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
 end
