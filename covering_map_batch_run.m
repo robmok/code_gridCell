@@ -107,9 +107,10 @@ if fixBatchSize
     nBatches = [5000, 10000];
 %    nBatches = [5000];
    % nBatches = [10000];
+nBatches = [7500];
    
    
-   nBatches = 2500;
+%   nBatches = 2500;
 
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals);
