@@ -15,11 +15,11 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
-% dat = 'square'; 
+dat = 'square'; 
 % dat = 'trapz1'; % trapz, trapzNorm (without Krupic scaling) trapzSqs,
 % dat = 'trapz2';% 
 % dat = 'trapz3';
-% dat = 'trapzKrupic'; % 
+dat = 'trapzKrupic'; % 
 % dat = 'trapzKrupic2'; % dat = 'trapzKrupic3';
 % dat = 'trapzScaled1';
 % dat = 'trapzScaled2';
@@ -36,7 +36,7 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic % sigmaG = [1 .5; .5 2]; R
 
 
 %annealed learning rate
-annEps = 1; %1 or 0
+annEps = 0; %1 or 0
 
 %perm testing
 doPerm = 0;
@@ -54,9 +54,14 @@ clus2run = [16, 28, 14,];
 clus2run = [12, 20, 22]; 
 clus2run = [28, 26, 18];
 
+% %sq cancelled by accident anneps
+% clus2run = [8]; %batchsize 2:3 - 1st term
+% clus2run = [10]; %all batchsizes - 5th terminal
+
+
 %split into X instead 
 %annEps - circ love01
-clus2run  = [20]; 
+% clus2run  = [20]; 
 % clus2run  = [22]; 
 %  clus2run = [24];
 %  clus2run = [26];
@@ -67,7 +72,16 @@ clus2run  = [20];
 
 %then 6, 30, plus 3,4,5
 
-% clus2run = 10;
+
+%trapzKrupic - running eps=0.15 trapz; could also run larger nBatches (but
+%maybe less than 10k)
+% clus2run = [12,16,20,24,28]; %8,10,14,18,22,26];
+
+%also run diff batch sizes
+clus2run = [12,16,20];
+clus2run = [24,28];
+
+% clus2run = 18;
 
 % nTrials = 5000000; %how many locations in the box / trials 
 % nTrials = 2000000;
@@ -88,6 +102,11 @@ if fixBatchSize
     nBatches = [1000, 2500, 10000]; 
 %     nBatches = [10000, 2500]; 
 %     nBatches = 2500;
+    
+    %new trapzkurpic try batchsizes 
+    nBatches = [5000, 10000];
+
+    
 
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals);
@@ -204,6 +223,8 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                 
                 %temp - trying 1,1,2,4 selStepSiz; rather than 1,3,5
                 fname=[fname '_stepSiz'];
+%                 trying 1,2,3,4 selStepSiz;
+%                 fname=[fname '_stepSiz1'];
                 
                 cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
 %                 save(fname,'densityPlot','densityPlotAct','clusMu','gA','gW','gA_act','gW_act','nIter','rSeed','timeTaken'); %added trialsAll for xval - removed, too big.maybe compute at end of each sim? or at each set

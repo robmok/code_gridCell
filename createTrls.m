@@ -139,8 +139,10 @@ elseif ~useSameTrls && jointTrls  %joined trials
 %     selStepSiz = [-stepSize*3,-stepSize*2,-stepSize,-stepSize,0,stepSize,stepSize,stepSize*2,stepSize*3].*boxSize;
 
 
-    selStepSiz = [-stepSize*4,-stepSize*3,-stepSize*2,-stepSize,-stepSize,0,stepSize,stepSize,stepSize*2,stepSize*3,stepSize*4].*boxSize;
-%     selStepSiz = [-stepSize*4,-stepSize*2,-stepSize,-stepSize,0,stepSize,stepSize,stepSize*2,stepSize*4].*boxSize;
+%     selStepSiz = [-stepSize*4,-stepSize*3,-stepSize*2,-stepSize,-stepSize,0,stepSize,stepSize,stepSize*2,stepSize*3,stepSize*4].*boxSize;
+    
+    selStepSiz = [-stepSize*4,-stepSize*2,-stepSize,-stepSize,0,stepSize,stepSize,stepSize*2,stepSize*4].*boxSize; %stepSiz
+%     selStepSiz = [-stepSize*4,-stepSize*3,-stepSize*2,-stepSize,0,stepSize,stepSize*2,stepSize*3,stepSize*4].*boxSize;% stepSiz1
 
     
     % select points trial by trial, if not in shape go back into the shape
@@ -154,16 +156,16 @@ elseif ~useSameTrls && jointTrls  %joined trials
             %if edge, stay or move
             while ~any(trials(i-1,1)+moveDir(1)==shapePts(:,1) & trials(i-1,2)+moveDir(2)==shapePts(:,2)) % if not in the shape
                 if trials(i-1,1)+moveDir(1) < median(locRangeX(1):locRangeX(2)) %if less than half the box, +
-                    moveDir(1) = randsample(selStepSiz(end-5:end),1);
+                    moveDir(1) = randsample(selStepSiz(end-4:end),1);
                 end
                 if trials(i-1,2)+moveDir(2) < median(locRangeY(1):locRangeY(2))
-                    moveDir(2) = randsample(selStepSiz(end-5:end),1);
+                    moveDir(2) = randsample(selStepSiz(end-4:end),1);
                 end
                 if trials(i-1,1)+moveDir(1) > median(locRangeX(1):locRangeX(2))
-                    moveDir(1) = randsample(selStepSiz(1:end-5),1);
+                    moveDir(1) = randsample(selStepSiz(1:end-4),1);
                 end
                 if trials(i-1,2)+moveDir(2) > median(locRangeY(1):locRangeY(2))
-                    moveDir(2) = randsample(selStepSiz(1:end-5),1);
+                    moveDir(2) = randsample(selStepSiz(1:end-4),1);
                 end
                 if trials(i-1,1)+moveDir(1) == median(locRangeX(1):locRangeX(2)) %if middle, move a little or stay
                     moveDir(1) = randsample([-1,0,1],1);
@@ -184,19 +186,19 @@ elseif ~useSameTrls && jointTrls  %joined trials
             moveDir=randsample(selStepSiz,2); %move in a random direction or stay
 %             moveDir(1)=randsample(selStepSiz,1); %move in a random direction or stay (x-axis: left/right)
 %             moveDir(2)=randsample(selStepSiz,1); %move in a random direction or stay
-%             moveDir(2)=randsample([selStepSiz selStepSiz(end-5:end-2)],1); %move in a random direction or stay; added -  more likely to go up (y-axis) - trapzKrupic 
+%             moveDir(2)=randsample([selStepSiz selStepSiz(end-4:end-2)],1); %move in a random direction or stay; added -  more likely to go up (y-axis) - trapzKrupic 
             
             %if edge, stay or move
             while ~any(trials(i-1,1)+moveDir(1)==shapePts(:,1) & trials(i-1,2)+moveDir(2)==shapePts(:,2)) % if not in the shape
                 if trials(i-1,1)+moveDir(1) < median(locRangeX(1):locRangeX(2)) %if less than half the box, +
-                    moveDir(1) = randsample(selStepSiz(end-5:end),1);
+                    moveDir(1) = randsample(selStepSiz(end-4:end),1);
                 end
                 if trials(i-1,2)+moveDir(2) < 0 % only if goes 'below' the shape
-                    moveDir(2) = randsample(selStepSiz(end-5:end),1);
-%                     moveDir(2) = randsample(selStepSiz(end-5:end),1); %staying too much? take this away
+                    moveDir(2) = randsample(selStepSiz(end-4:end),1);
+%                     moveDir(2) = randsample(selStepSiz(end-4:end),1); %staying too much? take this away
                 end
                 if trials(i-1,1)+moveDir(1) > median(locRangeX(1):locRangeX(2))
-                    moveDir(1) = randsample(selStepSiz(1:end-5),1);
+                    moveDir(1) = randsample(selStepSiz(1:end-4),1);
                 end
                 if trials(i-1,2)+moveDir(2) > 0 % if above 0 and out, need to go back up into shape
                     moveDir(2) = randsample(selStepSiz,1); %this works fine
