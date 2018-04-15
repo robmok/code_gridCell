@@ -12,7 +12,8 @@ stepSize=diff(spacing(1:2));
 
 gaussSmooth=1; %smoothing for density map
 
-nBatch=floor(nTrials/batchSize);
+% nBatch=floor(nTrials/batchSize);
+nBatch=round(nTrials/batchSize); %nBatch 7500 this better?
 batchSize = floor(batchSize); % when have decimal points, above needed
 
 %if decrease learning rate over time: 1/(1+decay+timestep); Decay - set a param

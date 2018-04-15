@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-%  wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+  wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -79,7 +79,7 @@ clus2run = [28, 26, 18];
 
 %also run diff batch sizes
 clus2run = [12,16,20];
-clus2run = [24,28];
+% clus2run = [24,28];
 
 % clus2run = 18;
 
@@ -110,7 +110,7 @@ if fixBatchSize
 nBatches = [7500];
    
    
-%   nBatches = 2500;
+%   nBatches = 10000;
 
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals);
