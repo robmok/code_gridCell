@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
- wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+%  wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -103,10 +103,13 @@ if fixBatchSize
 %     nBatches = [10000, 2500]; 
 %     nBatches = 2500;
     
-    %new trapzkurpic try batchsizes 
+    %new trapzkurpic try batchsizes - maybe try 7.5k later?
     nBatches = [5000, 10000];
 %    nBatches = [5000];
    % nBatches = [10000];
+   
+   
+   nBatches = 2500;
 
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals);
