@@ -120,6 +120,10 @@ clus2run = [8:2:28];
 clus2run = [12:4:28]; %stepSiz2 - ran this only
 batchSizeVals = 400; %100,400, 1000
 
+%new - slower learning rate
+epsMuVals=.015;
+
+
 %load loop
 for iClus2run = 1:length(clus2run) 
     nClus = clus2run(iClus2run);
@@ -155,7 +159,7 @@ for iClus2run = 1:length(clus2run)
 %             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_%s',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,dat)]; %double 'dat'
 %             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
-            fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz1',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+%             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz1',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
 
             if boxSize>1
                 fname = [fname sprintf('_boxSizex%d',boxSize)];

@@ -75,7 +75,7 @@ clus2run = [28, 26, 18];
 
 %trapzKrupic - running eps=0.15 trapz; could also run larger nBatches (but
 %maybe less than 10k)
-% clus2run = [12,16,20,24,28]; %8,10,14,18,22,26];
+clus2run = [12,16,20,24,28]; %8,10,14,18,22,26];
 
 %also run diff batch sizes
 clus2run = [12,16,20];
@@ -104,10 +104,11 @@ if fixBatchSize
 %     nBatches = 2500;
     
     %new trapzkurpic try batchsizes - maybe try 7.5k later?
-    nBatches = [5000, 10000];
-%    nBatches = [5000];
-   % nBatches = [10000];
-nBatches = [7500];
+%     nBatches = [5000, 10000];
+    nBatches = [5000];
+%     nBatches = [10000];
+
+%     nBatches = [8000];
    
    
 %   nBatches = 10000;
@@ -129,7 +130,7 @@ end
 % epsMuVals = [0.05, 0.025]; 
 % epsMuVals = 0.05;
 epsMuVals = 0.025;
-% epsMuVals = 0.015; 
+epsMuVals = 0.015; 
 
 %faster...?
 % epsMuVals = 0.1;
