@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-%  wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+ wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -19,9 +19,9 @@ dat = 'square';
 % dat = 'trapz1'; % trapz, trapzNorm (without Krupic scaling) trapzSqs,
 % dat = 'trapz2';% 
 % dat = 'trapz3';
-dat = 'trapzKrupic'; % 
+% dat = 'trapzKrupic'; % 
 % dat = 'trapzKrupic2'; % dat = 'trapzKrupic3';
-dat = 'trapzScaled1';
+% dat = 'trapzScaled1';
 % dat = 'trapzScaled2';
 %  dat = 'trapzScaled3';
 % dat = 'trapzNorm';%not scaled, fit into square
@@ -48,45 +48,32 @@ jointTrls = 1;
 % clus2run = [22, 28, 26, 14];
 
 % %joint trials; 8, 12, 16, 20, 24, 28;    then 6, 10, 14, 18, 22, 26, 28
-%annEps to do - circ love06
-clus2run = [24, 8,  10]; 
-clus2run = [16, 28, 14,];  
-clus2run = [12, 20, 22]; 
-clus2run = [28, 26, 18];
+% clus2run = [24, 8,  10]; 
+% clus2run = [16, 28, 14,];  
+% clus2run = [12, 20, 22]; 
+% clus2run = [28, 26, 18];
 
-% %sq cancelled by accident anneps
-% clus2run = [8]; %batchsize 2:3 - 1st term
-% clus2run = [10]; %all batchsizes - 5th terminal
+%run the rest and odd number - 3,4,5,6, 7:2:29
+%love06 - circ
+clus2run = [3,  29, 25];
+% clus2run = [15, 27,  9];
+% clus2run = [21, 19,  5];
+% clus2run = [6,  11,  17];
+% clus2run = [13, 7,  23];
+% clus2run = [4,  30];
 
-
-%split into X instead 
-%annEps - circ love01
-% clus2run  = [20]; 
-% clus2run  = [22]; 
-%  clus2run = [24];
-%  clus2run = [26];
-%  clus2run = [28];
-%  clus2run = [8,  18]; 
-%  clus2run = [12, 10]; 
-%  clus2run = [16, 14];
-
-%then 6, 30, plus 3,4,5
+%love01 - sq - run x3 batchSizes 
+clus2run = [11, 29,7, 25];
+% clus2run = [5,  15, 9, 30];
+% clus2run = [21, 19, 13, 27];
+% clus2run = [6,  3, 17, 4, 13];
 
 
 %trapzKrupic - running eps=0.15 trapz; could also run larger nBatches (but
 %maybe less than 10k)
-clus2run = [12,16,20,24,28]; %8,10,14,18,22,26];
-
-%also run diff batch sizes
-clus2run = [12,16,20];
+% clus2run = [12,16,20,24,28]; %8,10,14,18,22,26];
+% clus2run = [12,16,20];
 % clus2run = [24,28];
-
-clus2run = 12;
-% clus2run = 16;
- %clus2run = 20;
-% clus2run = 24;
-% clus2run = 28;
-
 
 %clus2run = 24;
 
@@ -108,14 +95,14 @@ if fixBatchSize
     %joint trials
     nBatches = [1000, 2500, 10000]; 
 %     nBatches = [10000, 2500]; 
+%     nBatches = 1000;
 %     nBatches = 2500;
+%     nBatches = 10000;
     
     %new trapzkurpic try batchsizes - maybe try 7.5k later?
 %     nBatches = [5000, 10000];
-    nBatches = [5000];
+%     nBatches = [5000];
 %     nBatches = [8000];
-   
-   
 %   nBatches = 10000;
 
     batchSizeVals = nTrials./nBatches;
@@ -232,7 +219,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                 
                 
                 %temp - trying 1,1,2,4 selStepSiz; rather than 1,3,5
-                fname=[fname '_stepSiz'];
+%                 fname=[fname '_stepSiz'];
 %                 trying 1,2,3,4 selStepSiz;
 %                 fname=[fname '_stepSiz1'];
                 %trying trapz - left right smaller steps

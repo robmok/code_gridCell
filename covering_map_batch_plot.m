@@ -112,17 +112,18 @@ batchSizeVals = [1000, 400, 100];
 annEps=0;
 
 
-dat='trapzKrupic';
-% clus2run = [8, 12, 16, 20, 24,28]; 
-% 
-% % 6, 10, 14, 18, 22, 26 - 
-clus2run = [8:2:28]; 
-clus2run = [12:4:28]; %stepSiz2 - ran this only
-batchSizeVals = 400; %100,400, 1000
+% dat='trapzKrupic';
+% % % clus2run = [8, 12, 16, 20, 24,28]; 
+% % % 
+% % % % 6, 10, 14, 18, 22, 26 - 
+% % % clus2run = [8:2:28]; 
+% clus2run = [12:4:28]; 
+% batchSizeVals = 200; %100, 125, 200,400, 1000
 
 %new - slower learning rate
-epsMuVals=.015;
-batchSizeVals = 125; %125, 400
+% epsMuVals=.015;
+% batchSizeVals = 100; %100, 125, 200, 400
+% clus2run = [12, 16, 24, 28]; %batchSize200 missed 20?
 
 
 %load loop
@@ -160,7 +161,7 @@ for iClus2run = 1:length(clus2run)
 %             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_%s',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,dat)]; %double 'dat'
 %             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
-%             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz1',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+%             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSizLR',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
 
             if boxSize>1
                 fname = [fname sprintf('_boxSizex%d',boxSize)];
@@ -629,45 +630,123 @@ for iterI = iters2plot
     end
     
 end
+%% plotting - making figs
 
-%% regen trials and activation?
-% 
-% 
-% %set
-% iClus2run = 3;
-% iBvals    = 3;
-% 
-% iters2plot = 40:45;
-% 
-% locRange = [0 49];
-% 
-% % fprintf(sprintf('clus %d batchSizeVals %d\n',clus2run(iClus2run),batchSizeVals(iBvals)));
-% for iterI = iters2plot
-% 
-%     rng(rSeedAll(iterI,iEps,iBvals,iClus2run));
-%     
-%     trials = [randsample(linspace(locRange(1),locRange(2),50),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),50),nTrials,'true')]';
-%     
-%     
-%     %need mu starting points
-%     
-%     
-%     %for each trial, compute closest cluster and save activation + location
-%     
-%     
-%     %need also to update the cluster means over batches...
-%     
-%     
-%     
-%     
-%     
-%     
-%     
-%     
-%     
-%     
-% end
-% 
-% 
-%         
-% 
+savDir = [wd '/grid_figs'];
+
+
+savePlots=0;
+
+clusPosAct = 'actNorm'; %'clus' or 'actNorm'
+
+gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
+
+gridMeasure = 'grid';
+
+switch clusPosAct
+case 'clus'
+    switch gridMsrType
+        case 'a'
+            gridness    = gA_gAll;
+            orientation = gA_oAll;
+            rad         = gA_radAll;
+            wav         = gA_wavAll;
+        case 'w'
+            gridness    = gW_gAll;
+            orientation = gW_oAll;
+            rad         = gW_radAll;
+            wav         = gW_wavAll;
+    end
+    case 'act'
+        switch gridMsrType
+            case 'a'
+                gridness    = gA_gAll_act;
+                orientation = gA_oAll_act;
+                rad         = gA_radAll_act;
+                wav         = gA_wavAll_act;
+            case 'w'
+                gridness    = gW_gAll_act;
+                orientation = gW_oAll_act;
+                rad         = gW_radAll_act;
+                wav         = gW_wavAll_act;
+        end
+    case 'actNorm'
+        switch gridMsrType
+            case 'a'
+                gridness    = gA_gAll_actNorm;
+                orientation = gA_oAll_actNorm;
+                rad         = gA_radAll_actNorm;
+                wav         = gA_wavAll_actNorm;
+            case 'w'
+                gridness    = gW_gAll_actNorm;
+                orientation = gW_oAll_act;
+                rad         = gW_radAll_actNorm;
+                wav         = gW_wavAll_actNorm;
+        end
+end
+
+switch gridMeasure
+    case 'grid'
+        datTmp=gridness;
+    case 'angle'
+        datTmp=orientation;
+    case 'rad'
+        datTmp=rad;
+    case 'wav'
+        datTmp=wav;
+end
+
+
+iSet=size(datTmp,1); %last or second last (add -1)
+iEps=1;
+
+iBatchVals=2; %'medium' one
+
+%fig specs
+xTickLabs = num2cell(clus2run);
+fontSiz=15;
+
+figure; hold on;
+    for iEps = 1:length(epsMuVals)
+        %     subplot(2,3,iEps);
+        dat1     = squeeze(datTmp(iSet,:,iEps,iBatchVal,:,1));
+        barpos  = .25:.5:.5*size(dat1,2);
+        colors  = distinguishable_colors(size(dat1,2));
+        colgrey = [.5, .5, .5];
+        mu      = mean(dat1,1);
+        sm      = std(dat1)./sqrt(size(dat1,1));
+        ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+        plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
+        errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+        scatter(barpos,mu,50,colors,'filled','d');
+        xticklabels(xTickLabs);
+        xlim([barpos(1)-.5, barpos(end)+.5]);
+%         ylim([0,1]);
+        ylim([-.35,1.25]);
+        
+        xlabel('Number of Clusters');
+        ylabel('Grid Score');
+        
+        
+        title(sprintf('%s, %s - eps=%d, batchSize=%d',dat, gridMeasure,epsMuVals(iEps)*1000,batchSizeVals(iBatchVals)))
+        
+        set(gca,'FontSize',fontSiz,'fontname','Arial')
+    end
+
+    fname = [savDir sprintf('/gridness_univarScatters_nClus%d-%d_eps%d_batchSiz%d,',clus2run(1),clus2run(end),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals))];
+if savePlots
+   set(gcf,'Renderer','painters');
+   print(gcf,'-depsc2',fname)
+   saveas(gcf,fname,'png');
+    
+end
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
