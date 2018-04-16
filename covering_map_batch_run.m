@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-%   wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+%  wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -83,16 +83,16 @@ clus2run = [12,16,20];
 
 clus2run = 12;
 % clus2run = 16;
-% clus2run = 20;
+ %clus2run = 20;
 % clus2run = 24;
 % clus2run = 28;
 
 
-clus2run = 24;
+%clus2run = 24;
 
 % nTrials = 5000000; %how many locations in the box / trials 
 % nTrials = 2000000;
-nTrials = 1000000*; %new
+nTrials = 1000000; %new
 
 %batch size
 fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
