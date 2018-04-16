@@ -166,6 +166,9 @@ switch method
         blobs = regionprops(imb,'Centroid','Area','PixelIdxList');
         as = [blobs.Area].';
         blobs = blobs(as>3,:);
+        if length(blobs)<=1 %if only 1 blob, exits function - shifted up from below, added less than or eq - RM edited 180410
+            return
+        end
 
         % get distance to image centre
         cents = cell2mat({blobs.Centroid}.');
@@ -180,9 +183,6 @@ switch method
         % sort blobs according to distance
         [ds,sindx] = sort(ds,'ascend');
         blobs = blobs(sindx,:);
-        if length(blobs)==1
-            return
-        end
         if length(blobs)>7
             blobs = blobs(1:7,:);
             ds = ds(1:7,:);
@@ -241,6 +241,9 @@ switch method
         msk = ones(size(im)).*0.2;
         msk(dmat<dcut & dmat>dcuti) = 1;
         gdata.central_mask = msk;
+        
+        %save the correlations for each angle too %RM edited 180322
+        gdata.r = rs;
 
         % create figure if required
         if doPlot %1 %RM edited 171127

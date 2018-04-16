@@ -4,7 +4,7 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 %  wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -28,7 +28,7 @@ dat = 'trapzKrupic'; %
 
 % dat = 'cat';
 
-boxSize = 2; % 1=normal, 2=double size, 3=triple size
+boxSize = 1; % 1=normal, 2=double size, 3=triple size
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
 nCats   = 2; %2 categories
@@ -89,11 +89,11 @@ jointTrls = 1;
 % clus2run = [12,16,20];
 % clus2run = [24,28];
 
-clus2run = 24;
+clus2run = 16;
 
 % nTrials = 5000000; %how many locations in the box / trials 
 % nTrials = 2000000;
-nTrials = 1000000; %new
+nTrials = 1000000/2; %new
 
 %batch size
 fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
@@ -149,7 +149,9 @@ nSteps = 50; %to define spacing beween each loc in box
 locRange = [0, nSteps-1]; %[-1, 1]; % from locRange(1) to locRange(2)
 stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %smallest diff between locs
 
-if boxSize==2 %double
+if boxSize==1.5
+    locRange(2)= ceil(locRange(2)*1.5);
+elseif boxSize==2 %double
     locRange(2)= locRange(2)*2;
 elseif boxSize==3 %triple
     locRange(2)= locRange(2)*3;
@@ -208,7 +210,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
 %                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(avgBatchUpdate(iBvals)),round(batchSize),nIter)];
             end
 %             [densityPlot,densityPlotAct,densityPlotActNorm,clusMu,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,rSeed] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
-            [densityPlot,densityPlotActNorm,gA,gA_actNorm,muInit,rSeed,clusDistB, permPrc, muAll, trials] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stochasticType,c,dat,boxSize,annEps,jointTrls,doPerm);
+            [densityPlot,densityPlotActNorm,gA,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB, permPrc, muAll, trials] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stochasticType,c,dat,boxSize,annEps,jointTrls,doPerm);
 
             timeTaken=toc;
             if saveDat
@@ -231,19 +233,22 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                     fname = [fname '_jointTrls'];
                 end
                 
-                
                 %temp - trying 1,1,2,4 selStepSiz; rather than 1,3,5
 %                 fname=[fname '_stepSiz'];
 %                 trying 1,2,3,4 selStepSiz;
 %                 fname=[fname '_stepSiz1'];
                 %trying trapz - left right smaller steps
-                fname=[fname '_stepSizLR'];
+                if strcmp(dat(1:4),'trap')
+                    fname=[fname '_stepSizLR'];
+                else
+                    fname=[fname '_stepSiz'];
+                end
                 
                 cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
 %                 save(fname,'densityPlot','densityPlotAct','clusMu','gA','gW','gA_act','gW_act','nIter','rSeed','timeTaken'); %added trialsAll for xval - removed, too big.maybe compute at end of each sim? or at each set
 %                 save(fname,'densityPlot','densityPlotActNorm','gA','gA_actNorm','rSeed','muInit','clusDistB','timeTaken'); 
-                    
-                save(fname,'densityPlot','densityPlotActNorm','gA','gA_actNorm','rSeed','muInit','clusDistB','permPrc','timeTaken'); 
+                
+                save(fname,'densityPlot','densityPlotActNorm','gA','gA_actNorm','gW_actNorm','rSeed','muInit','clusDistB','permPrc','timeTaken'); 
 
             end
         end

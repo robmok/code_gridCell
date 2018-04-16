@@ -53,7 +53,7 @@ spacing=linspace(locRange(1),locRange(2),locRange(2)+1)+1;
 %krupic
 spacingTrapz = spacing(14:37);
 %boxSize=2
-spacingTrapz = spacing(14:37+length(14:37));
+% spacingTrapz = spacing(14:37+length(14:37));
 
 %trapzScaled1
 % spacingTrapz = spacing(10:41);
@@ -81,15 +81,15 @@ for iterI = 1%:10
     subplot(1,3,2)
 %     aCorrMap = ndautoCORR(densityPlotCentresSm(:,spacing(1):spacing(ceil(length(spacing)/2))));
     aCorrMap = ndautoCORR(densityPlotCentresSm(:,1:hLeft));
-    [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
-    % [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
+%     [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
+    [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
     
     %right half of box
     subplot(1,3,3)
 %     aCorrMap = ndautoCORR(densityPlotCentresSm(:,spacing(ceil(length(spacing)/2))+1:spacing(end)));
-    aCorrMap = ndautoCORR(densityPlotCentresSm(:,hRight:end));
-    [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
-    % [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
+    aCorrMap = ndautoCORR(densityPlotCentresSm(:,h-hRight+1:end));
+%     [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
+    [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
 end
 end
 

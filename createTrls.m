@@ -41,8 +41,10 @@ switch dat
         %if scale to Krupic:
         if boxSize==1
             spacing = spacing(14:37);
+        elseif boxSize==1.5
+            spacingTrapz = spacing(14:37+length(14:37)*.5);
         elseif boxSize==2
-            spacing = spacing(14:37+length(14:37));
+            spacingTrapz = spacing(14:37+length(14:37));
         end
         trapY=locRange(2).*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
         trapX=spacing;
