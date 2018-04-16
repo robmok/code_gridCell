@@ -84,6 +84,9 @@ if strcmp(dat(1:4),'trap') && length(dat)>10
         h=round(((locRange(2)+1)^2)/((a+b)/2))+1; %trapz height (area = 50^2; like square)
     elseif strcmp(dat(1:11),'trapzKrupic')
         spacingTrapz = spacing(14:37);
+        if boxSize==2
+            spacingTrapz = spacing(14:37+length(14:37));
+        end
         if length(dat)==11 % 'trapzKrupic', no number following
             a = length(spacingTrapz);
             b = length(spacing);

@@ -39,7 +39,11 @@ switch dat
 %         dataPtsTest = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)/1.5,nTrials,'true'); randsample(spacing,nTrials,'true')]';
     case 'trapzKrupic'
         %if scale to Krupic:
-        spacing = spacing(14:37);
+        if boxSize==1
+            spacing = spacing(14:37);
+        elseif boxSize==2
+            spacing = spacing(14:37+length(14:37));
+        end
         trapY=locRange(2).*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
         trapX=spacing;
         trapPts=[];
@@ -141,7 +145,7 @@ elseif ~useSameTrls && jointTrls  %joined trials
 
 %     selStepSiz = [-stepSize*4,-stepSize*3,-stepSize*2,-stepSize,-stepSize,0,stepSize,stepSize,stepSize*2,stepSize*3,stepSize*4].*boxSize;
     
-    selStepSiz = [-stepSize*4,-stepSize*2,-stepSize,-stepSize,0,stepSize,stepSize,stepSize*2,stepSize*4].*boxSize; %stepSiz
+    selStepSiz = [-stepSize*4,-stepSize*2,-stepSize,-stepSize,0,stepSize,stepSize,stepSize*2,stepSize*4]; %stepSiz
 %     selStepSiz = [-stepSize*4,-stepSize*3,-stepSize*2,-stepSize,0,stepSize,stepSize*2,stepSize*3,stepSize*4].*boxSize;% stepSiz1
 
 %     selStepSiz = [-stepSize*4,-stepSize*2,-stepSize,-stepSize,0,0,0,stepSize,stepSize,stepSize*2,stepSize*4].*boxSize; %new; stay more - maybe stepSizLR2 if try
@@ -231,8 +235,8 @@ dataPtsTest  = shapePts(trialIndTest,:);
 end
 
 % %checking agent's visited locations
-% densityPlot=zeros(50,50);
-% densityPlot=zeros(50,62); %trapzScaled1
+% densityPlot=zeros(locRange(2)+1,locRange(2)+1);
+% % densityPlot=zeros(50,62); %trapzScaled1
 % for iTrl = 1:nTrials
 %     densityPlot(trials(iTrl,1)+1,trials(iTrl,2)+1) = densityPlot(trials(iTrl,1)+1,trials(iTrl,2)+1)+1;
 % end

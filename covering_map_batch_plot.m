@@ -15,6 +15,7 @@ gaussSmooth = 1;
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
+dat='square';
 annEps=0;
 boxSize=1;
 
@@ -112,18 +113,22 @@ batchSizeVals = [1000, 400, 100];
 annEps=0;
 
 
-% dat='trapzKrupic';
-% % % clus2run = [8, 12, 16, 20, 24,28]; 
-% % % 
-% % % % 6, 10, 14, 18, 22, 26 - 
-% % % clus2run = [8:2:28]; 
-% clus2run = [12:4:28]; 
-% batchSizeVals = 200; %100, 125, 200,400, 1000
+dat='trapzKrupic';
+% clus2run = [8, 12, 16, 20, 24,28]; 
+% 
+% % 6, 10, 14, 18, 22, 26 - 
+% clus2run = [8:2:28]; 
+clus2run = [12:4:28]; 
+batchSizeVals = 200; %100, 125, 200,400, 1000
 
 %new - slower learning rate
 % epsMuVals=.015;
 % batchSizeVals = 100; %100, 125, 200, 400
 % clus2run = [12, 16, 24, 28]; %batchSize200 missed 20?
+
+rHex=1; %if choose raw 60deg corr values, not gridness
+
+dat='trapzScaled1';
 
 
 %load loop
@@ -160,8 +165,8 @@ for iClus2run = 1:length(clus2run)
 %             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_wAct_%s*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
 %             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_%s',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,dat)]; %double 'dat'
 %             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
-            fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
-%             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSizLR',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+%             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+            fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSizLR',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
 
             if boxSize>1
                 fname = [fname sprintf('_boxSizex%d',boxSize)];
@@ -220,6 +225,11 @@ for iClus2run = 1:length(clus2run)
 %                 gW_wavAll_act(:,:,iEps,iBvals,iClus2run,:) = gW_act(:,:,4,:);
 %                 
                 gA_gAll_actNorm(:,:,iEps,iBvals,iClus2run,:)   = gA_actNorm(:,:,1,:);
+                if rHex
+%                     gA_gAll_actNorm(:,:,iEps,iBvals,iClus2run,:)   = (gA_actNorm(:,:,6,:)+gA_actNorm(:,:,8,:))./2; %rHex 60/120
+                    gA_gAll_actNorm(:,:,iEps,iBvals,iClus2run,:)   = (gA_actNorm(:,:,5,:)+gA_actNorm(:,:,7,:)+(gA_actNorm(:,:,9,:)))./3; %rHex 30,90,150
+%                     gA_gAll_actNorm(:,:,iEps,iBvals,iClus2run,:)   = (gA_actNorm(:,:,8,:)); %rHex 
+                end
                 gA_oAll_actNorm(:,:,iEps,iBvals,iClus2run,:)   = gA_actNorm(:,:,2,:);
                 gA_radAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gA_actNorm(:,:,3,:);
                 gA_wavAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gA_actNorm(:,:,4,:);
@@ -228,14 +238,7 @@ for iClus2run = 1:length(clus2run)
 %                 gW_radAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,3,:);
 %                 gW_wavAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,4,:);
 
-                gA_gAll_actNorm(:,:,iEps,iBvals,iClus2run,:)   = gA_actNorm(:,:,1,:);
-                gA_oAll_actNorm(:,:,iEps,iBvals,iClus2run,:)   = gA_actNorm(:,:,2,:);
-                gA_radAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gA_actNorm(:,:,3,:);
-                gA_wavAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gA_actNorm(:,:,4,:);
-
-            end
-
-            
+            end            
         end
     end
 end
@@ -335,7 +338,7 @@ if size(gridness,4)==1 %only 1 batchSize
         errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
         scatter(barpos,mu,100,colors,'d','filled');
         xlim([barpos(1)-.5, barpos(end)+.5]);
-        ylim([-.5,1.25]);
+        ylim([-1.5,1.5]);
         title(sprintf('Left half of box %s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
         
         figure; hold on;
@@ -347,7 +350,7 @@ if size(gridness,4)==1 %only 1 batchSize
         errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
         scatter(barpos,mu,100,colors,'d','filled');
         xlim([barpos(1)-.5, barpos(end)+.5]);
-        ylim([-.5,1.25]);
+        ylim([-1.5,1.5]);
         title(sprintf('Right half of box %s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
         
         figure; hold on;
@@ -709,7 +712,7 @@ fontSiz=15;
 figure; hold on;
     for iEps = 1:length(epsMuVals)
         %     subplot(2,3,iEps);
-        dat1     = squeeze(datTmp(iSet,:,iEps,iBatchVal,:,1));
+        dat1     = squeeze(datTmp(iSet,:,iEps,iBatchVals,:,1));
         barpos  = .25:.5:.5*size(dat1,2);
         colors  = distinguishable_colors(size(dat1,2));
         colgrey = [.5, .5, .5];
@@ -742,6 +745,11 @@ if savePlots
 end
     
     
+
+% for i=1:length(clus2run),
+% xx(i)=nnz(dat1(:,i)>.37)/200;
+% end
+%mean(xx) %prop grid cells, averaged across clusters
     
     
     

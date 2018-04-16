@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
- wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+%  wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -15,11 +15,11 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
-dat = 'square'; 
+% dat = 'square'; 
 % dat = 'trapz1'; % trapz, trapzNorm (without Krupic scaling) trapzSqs,
 % dat = 'trapz2';% 
 % dat = 'trapz3';
-% dat = 'trapzKrupic'; % 
+dat = 'trapzKrupic'; % 
 % dat = 'trapzKrupic2'; % dat = 'trapzKrupic3';
 % dat = 'trapzScaled1';
 % dat = 'trapzScaled2';
@@ -28,7 +28,7 @@ dat = 'square';
 
 % dat = 'cat';
 
-boxSize = 1; % 1=normal, 2=double size, 3=triple size
+boxSize = 2; % 1=normal, 2=double size, 3=triple size
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
 nCats   = 2; %2 categories
@@ -62,8 +62,16 @@ jointTrls = 1;
 % clus2run = [13, 7,  23];
 % clus2run = [4,  30];
 
+% love06 restarted after first set above
+% clus2run = [29, 25];
+% clus2run = [27,  9];
+% clus2run = [19,  5];
+% clus2run = [11,  17];
+% clus2run = [7,  23];
+% clus2run = [30];
+
 % % %love01 - sq - 
-clus2run = [3 21];
+% clus2run = [3 21];
 % % clus2run = [19, 6];
 % % clus2run = [7, 11];
 % % clus2run = [13, 4];
@@ -81,7 +89,7 @@ clus2run = [3 21];
 % clus2run = [12,16,20];
 % clus2run = [24,28];
 
-%clus2run = 24;
+clus2run = 24;
 
 % nTrials = 5000000; %how many locations in the box / trials 
 % nTrials = 2000000;
@@ -102,7 +110,7 @@ if fixBatchSize
     nBatches = [1000, 2500, 10000]; 
     nBatches = [2500, 10000]; 
 %     nBatches = 1000;
-%     nBatches = 2500;
+    nBatches = 2500;
 %     nBatches = 10000;
     
     %new trapzkurpic try batchsizes - maybe try 7.5k later?
@@ -155,9 +163,9 @@ sTypes = 0;%:1;% :3; %0, 1 ,2, 3
 stochasticType=0;
 c=0;
 %%
-saveDat=1; %save simulations
+saveDat=0; %save simulations
 
-nIter=200; %how many iterations (starting points)
+nIter=1; %how many iterations (starting points)
 
 switch dat
     case 'square'
