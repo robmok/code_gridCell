@@ -4,8 +4,8 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-%  wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+ wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -21,7 +21,7 @@ dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning
 % dat = 'trapz3';
 dat = 'trapzKrupic'; % 
 % dat = 'trapzKrupic2'; % dat = 'trapzKrupic3';
-% dat = 'trapzScaled1';
+dat = 'trapzScaled1';
 % dat = 'trapzScaled2';
 %  dat = 'trapzScaled3';
 % dat = 'trapzNorm';%not scaled, fit into square
@@ -63,12 +63,10 @@ jointTrls = 1;
 % clus2run = [4,  30];
 
 % love06 restarted after first set above
-% clus2run = [29, 25];
-% clus2run = [27,  9];
-% clus2run = [19,  5];
-% clus2run = [11,  17];
-% clus2run = [7,  23];
-% clus2run = [30];
+% clus2run = [29, 25, 11];
+% clus2run = [17, 27, 19];
+% clus2run = [9,  5,  7];
+% clus2run = [23, 30];
 
 % % %love01 - sq - 
 % clus2run = [3 21];
@@ -87,13 +85,15 @@ jointTrls = 1;
 %maybe less than 10k)
 % clus2run = [12,16,20,24,28]; %8,10,14,18,22,26];
 % clus2run = [12,16,20];
-% clus2run = [24,28];
+clus2run = [12,16];
+% clus2run = [20,24];
+% clus2run = [28];
 
-clus2run = 16;
+% clus2run = 16;
 
 % nTrials = 5000000; %how many locations in the box / trials 
 % nTrials = 2000000;
-nTrials = 1000000/2; %new
+nTrials = 1000000; %new
 
 %batch size
 fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
@@ -165,9 +165,9 @@ sTypes = 0;%:1;% :3; %0, 1 ,2, 3
 stochasticType=0;
 c=0;
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
-nIter=1; %how many iterations (starting points)
+nIter=200; %how many iterations (starting points)
 
 switch dat
     case 'square'
