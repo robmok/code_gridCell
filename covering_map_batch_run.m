@@ -55,19 +55,25 @@ jointTrls = 1;
 
 %run the rest and odd number - 3,4,5,6, 7:2:29
 %love06 - circ
-clus2run = [3,  29, 25];
+% clus2run = [3,  29, 25];
 % clus2run = [15, 27,  9];
 % clus2run = [21, 19,  5];
 % clus2run = [6,  11,  17];
 % clus2run = [13, 7,  23];
 % clus2run = [4,  30];
 
-%love01 - sq - run x3 batchSizes 
-clus2run = [11, 29,7, 25];
-% clus2run = [5,  15, 9, 30];
-% clus2run = [21, 19, 13, 27];
-% clus2run = [6,  3, 17, 4, 13];
-
+% % %love01 - sq - 
+clus2run = [3 21];
+% % clus2run = [19, 6];
+% % clus2run = [7, 11];
+% % clus2run = [13, 4];
+% clus2run = [9, 15];
+% clus2run = [5, 17];
+% clus2run = 23;
+% clus2run = 27;
+% clus2run = 25;
+% clus2run = 29;
+% clus2run = 30;
 
 %trapzKrupic - running eps=0.15 trapz; could also run larger nBatches (but
 %maybe less than 10k)
@@ -94,7 +100,7 @@ if fixBatchSize
 %     nBatches = [20000, 5000, 50000]./2; %half nBatches
     %joint trials
     nBatches = [1000, 2500, 10000]; 
-%     nBatches = [10000, 2500]; 
+    nBatches = [2500, 10000]; 
 %     nBatches = 1000;
 %     nBatches = 2500;
 %     nBatches = 10000;
