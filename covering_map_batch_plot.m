@@ -122,6 +122,7 @@ batchSizeVals = 400; %100,400, 1000
 
 %new - slower learning rate
 epsMuVals=.015;
+batchSizeVals = 125; %125, 400
 
 
 %load loop
@@ -617,10 +618,12 @@ for iterI = iters2plot
     
     if strcmp(dat(1:4),'trap')
         subplot(subPlt(1),subPlt(2),3);
-        aCorrMap = ndautoCORR(densityPlotCentresSm(:,1:size(densityPlotAll,1)/2));
+%         aCorrMap = ndautoCORR(densityPlotCentresSm(:,1:size(densityPlotAll,1)/2));
+        aCorrMap = ndautoCORR(densityPlotCentresSm(19:32,1:20));
         [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
         subplot(subPlt(1),subPlt(2),4);
-        aCorrMap = ndautoCORR(densityPlotCentresSm(:,size(densityPlotAll,1)/2+1:end));
+%         aCorrMap = ndautoCORR(densityPlotCentresSm(:,size(densityPlotAll,1)/2+1:end));
+        aCorrMap = ndautoCORR(densityPlotCentresSm(19:32,22:end));
         [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
         
     end

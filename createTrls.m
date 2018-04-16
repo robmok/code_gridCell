@@ -144,6 +144,7 @@ elseif ~useSameTrls && jointTrls  %joined trials
     selStepSiz = [-stepSize*4,-stepSize*2,-stepSize,-stepSize,0,stepSize,stepSize,stepSize*2,stepSize*4].*boxSize; %stepSiz
 %     selStepSiz = [-stepSize*4,-stepSize*3,-stepSize*2,-stepSize,0,stepSize,stepSize*2,stepSize*3,stepSize*4].*boxSize;% stepSiz1
 
+%     selStepSiz = [-stepSize*4,-stepSize*2,-stepSize,-stepSize,0,0,0,stepSize,stepSize,stepSize*2,stepSize*4].*boxSize; %new; stay more - maybe stepSizLR2 if try
     
     % select points trial by trial, if not in shape go back into the shape
     trials       =  nan(nTrials,2);
@@ -181,6 +182,16 @@ elseif ~useSameTrls && jointTrls  %joined trials
         % turns out too often going 'down' when out of trapz, and
         % rarely going up. reduce this by having more 0s/'stays', and
         % one more selStepsize in the + direction for up
+        
+        %trapz - left right don't make too big steps - since height is more than
+        %double the width
+        if strcmp(dat(1:6),'trapzK')
+            selStepSizLR = [-stepSize,-stepSize,0,0,0,stepSize,stepSize]; %stepSizLR - combined with stepSiz
+        elseif strcmp(dat(1:6),'trapzS') %for now, trapzScaled1
+            %trapzScaled1 - larger LR dim
+            selStepSizLR = [-stepSize*2,-stepSize,-stepSize,0,0,0,stepSize,stepSize*2]; %stepSizLR - combined with stepSiz
+        end
+        
         locRangeX = [min(trapX), max(trapX)];
         for i=2:nTrials
             moveDir=randsample(selStepSiz,2); %move in a random direction or stay
@@ -191,16 +202,15 @@ elseif ~useSameTrls && jointTrls  %joined trials
             %if edge, stay or move
             while ~any(trials(i-1,1)+moveDir(1)==shapePts(:,1) & trials(i-1,2)+moveDir(2)==shapePts(:,2)) % if not in the shape
                 if trials(i-1,1)+moveDir(1) < median(locRangeX(1):locRangeX(2)) %if less than half the box, +
-                    moveDir(1) = randsample(selStepSiz(end-4:end),1);
+                    moveDir(1) = randsample(selStepSizLR(end-3:end),1);
                 end
                 if trials(i-1,2)+moveDir(2) < 0 % only if goes 'below' the shape
                     moveDir(2) = randsample(selStepSiz(end-4:end),1);
-%                     moveDir(2) = randsample(selStepSiz(end-4:end),1); %staying too much? take this away
                 end
                 if trials(i-1,1)+moveDir(1) > median(locRangeX(1):locRangeX(2))
-                    moveDir(1) = randsample(selStepSiz(1:end-4),1);
+                    moveDir(1) = randsample(selStepSizLR(1:end-3),1);
                 end
-                if trials(i-1,2)+moveDir(2) > 0 % if above 0 and out, need to go back up into shape
+                if trials(i-1,2)+moveDir(2) > 0 % if above 0 and out
                     moveDir(2) = randsample(selStepSiz,1); %this works fine
 %                     moveDir(2) = 0;% bias it not to go down
                 end
@@ -222,6 +232,7 @@ end
 
 % %checking agent's visited locations
 % densityPlot=zeros(50,50);
+% densityPlot=zeros(50,62); %trapzScaled1
 % for iTrl = 1:nTrials
 %     densityPlot(trials(iTrl,1)+1,trials(iTrl,2)+1) = densityPlot(trials(iTrl,1)+1,trials(iTrl,2)+1)+1;
 % end

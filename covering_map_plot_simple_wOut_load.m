@@ -52,6 +52,8 @@ spacing=linspace(locRange(1),locRange(2),locRange(2)+1)+1;
 
 %krupic
 spacingTrapz = spacing(14:37);
+%trapzScaled1
+spacingTrapz = spacing(10:41);
 
 a = length(spacingTrapz);
 b = length(spacing);

@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-  wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+%   wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -21,7 +21,7 @@ dat = 'square';
 % dat = 'trapz3';
 dat = 'trapzKrupic'; % 
 % dat = 'trapzKrupic2'; % dat = 'trapzKrupic3';
-% dat = 'trapzScaled1';
+dat = 'trapzScaled1';
 % dat = 'trapzScaled2';
 %  dat = 'trapzScaled3';
 % dat = 'trapzNorm';%not scaled, fit into square
@@ -81,11 +81,18 @@ clus2run = [12,16,20,24,28]; %8,10,14,18,22,26];
 clus2run = [12,16,20];
 % clus2run = [24,28];
 
-% clus2run = 18;
+clus2run = 12;
+% clus2run = 16;
+% clus2run = 20;
+% clus2run = 24;
+% clus2run = 28;
+
+
+clus2run = 24;
 
 % nTrials = 5000000; %how many locations in the box / trials 
 % nTrials = 2000000;
-nTrials = 1000000; %new
+nTrials = 1000000*; %new
 
 %batch size
 fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
@@ -106,8 +113,6 @@ if fixBatchSize
     %new trapzkurpic try batchsizes - maybe try 7.5k later?
 %     nBatches = [5000, 10000];
     nBatches = [5000];
-%     nBatches = [10000];
-
 %     nBatches = [8000];
    
    
@@ -130,7 +135,7 @@ end
 % epsMuVals = [0.05, 0.025]; 
 % epsMuVals = 0.05;
 epsMuVals = 0.025;
-epsMuVals = 0.015; 
+% epsMuVals = 0.015; 
 
 %faster...?
 % epsMuVals = 0.1;
@@ -230,6 +235,8 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                 fname=[fname '_stepSiz'];
 %                 trying 1,2,3,4 selStepSiz;
 %                 fname=[fname '_stepSiz1'];
+                %trying trapz - left right smaller steps
+                fname=[fname '_stepSizLR'];
                 
                 cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
 %                 save(fname,'densityPlot','densityPlotAct','clusMu','gA','gW','gA_act','gW_act','nIter','rSeed','timeTaken'); %added trialsAll for xval - removed, too big.maybe compute at end of each sim? or at each set
