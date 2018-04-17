@@ -19,7 +19,8 @@ batchSize = floor(batchSize); % when have decimal points, above needed
 %if decrease learning rate over time: 1/(1+decay+timestep); Decay - set a param
 if annEps
     nBatches = nTrials./batchSize; %2500, 5000, 250000, 50000
-    epsMuOrig = nBatches/100;
+%     epsMuOrig = nBatches/100;
+    epsMuOrig = nBatches/150; %200
     annEpsDecay = nBatches/40;
 end
 % trlSel = ceil([nBatch*.25, nBatch*.5, nBatch*.67, nBatch*.75, nBatch*.9, nBatch+1]);
@@ -39,6 +40,9 @@ end
 %20 timepoints; last 2: first quarter, last quarter
 %half, last quarter
 fromTrlI  = round([1,               nTrials.*.05+1,  nTrials.*.1+1,  nTrials.*.15+1,  nTrials.*.2+1,  nTrials.*.25+1,   nTrials.*.3+1,  nTrials.*.35+1,  nTrials.*.4+1,  nTrials.*.45+1,  nTrials.*.5+1,  nTrials.*.55+1, nTrials.*.6+1,  nTrials.*.65+1, nTrials.*.7+1, nTrials.*.75+1, nTrials.*.8+1,  nTrials.*.85+1,  nTrials.*.9+1,  nTrials.*.95+1, nTrials.*.5, nTrials.*.75]);
+% fromTrlI  = round([1,               nTrials.*.075+1,  nTrials.*.125+1,  nTrials.*.175+1,  nTrials.*.225+1,  nTrials.*.275+1,   nTrials.*.325+1,  nTrials.*.375+1,  nTrials.*.425+1,  nTrials.*.475+1,  nTrials.*.525+1,  nTrials.*.575+1, nTrials.*.625+1,  nTrials.*.675+1, nTrials.*.725+1, nTrials.*.775+1, nTrials.*.825+1,  nTrials.*.875+1,  nTrials.*.925+1,  nTrials.*.975+1, nTrials.*.5, nTrials.*.75]);
+% nBatchDplot = 30;
+% fromTrlI    = round([nTrials.*.05-batchSize*nBatchDplot,    nTrials.*.1-batchSize*nBatchDplot,     nTrials.*.15-batchSize*nBatchDplot,   nTrials.*.2-batchSize*nBatchDplot,     nTrials.*.25-batchSize*nBatchDplot,   nTrials.*.3-batchSize*nBatchDplot,      nTrials.*.35-batchSize*nBatchDplot,   nTrials.*.4-batchSize*nBatchDplot,     nTrials.*.45-batchSize*nBatchDplot,   nTrials.*.5-batchSize*nBatchDplot,     nTrials.*.55-batchSize*nBatchDplot,   nTrials.*.6-batchSize*nBatchDplot,    nTrials.*.65-batchSize*nBatchDplot,   nTrials.*.7-batchSize*nBatchDplot,    nTrials.*.75-batchSize*nBatchDplot,  nTrials.*.8-batchSize*nBatchDplot,    nTrials.*.85-batchSize*nBatchDplot,   nTrials.*.9-batchSize*nBatchDplot,     nTrials.*.95-batchSize*nBatchDplot,   nTrials-batchSize*nBatchDplot,        nTrials.*.9, nTrials.*.99]);
 toTrlN    = round([nTrials.*.05,    nTrials.*.1,     nTrials.*.15,   nTrials.*.2,     nTrials.*.25,   nTrials.*.3,      nTrials.*.35,   nTrials.*.4,     nTrials.*.45,   nTrials.*.5,     nTrials.*.55,   nTrials.*.6,    nTrials.*.65,   nTrials.*.7,    nTrials.*.75,  nTrials.*.8,    nTrials.*.85,   nTrials.*.9,     nTrials.*.95,   nTrials,        nTrials,      nTrials]);
 
 if nargout > 8
@@ -51,7 +55,7 @@ muInit               = nan(nClus,2,nIter);
 % tsseAll              = nan(nBatch+1,nIter); %not sure if this is +1 or not; not tested
 % rSeed = struct(1,nIter); %how to initialise this struct?
 gA = nan(nSets,nIter,9); %if saving the 5 r values, 9. if not, 4.
-% gW = nan(nSets,nIter,9);
+gW = nan(nSets,nIter,9);
 % gA_act = nan(nSets,nIter,9);
 % gW_act = nan(nSets,nIter,9);
 gA_actNorm = nan(nSets,nIter,9);
@@ -60,6 +64,7 @@ gW_actNorm = nan(nSets,nIter,9);
 %if trapz - compute gridness of left/right half of boxes too
 if strcmp(dat(1:4),'trap')
     gA = nan(nSets,nIter,9,3);
+    gW = nan(nSets,nIter,9,3);
     gA_actNorm = nan(nSets,nIter,9,3);
     gW_actNorm = nan(nSets,nIter,9,3);
 end
@@ -90,15 +95,10 @@ if strcmp(dat(1:4),'trap') && length(dat)>10
         elseif boxSize==2
             spacingTrapz = spacing(14:37+length(14:37));
         end
-        if length(dat)==11 % 'trapzKrupic', no number following
+        if length(dat)==11 % 'trapzKrupic'
             a = length(spacingTrapz);
             b = length(spacing);
             h = length(spacing);
-        else
-            if strcmp(dat(12),'2') % 'trapzKrupic2' - if do larger, add here
-                b=length(spacing)*1.5; %make smaller; since datapoints dont reach out there
-                h=length(spacing)*2;
-            end
         end
     end
     
@@ -226,16 +226,15 @@ for iterI = 1:nIter
                     closestC(iTrlBatch) = closestTmp;
                     
                 end
-                
                 %compute activation
-                sigmaGauss = stepSize;%/3.5; %move up later - 1 seems to be fine
-                actTrl(closestC(iTrlBatch),iTrlBatch)=mvnpdf(trls2Upd(iTrlBatch,:),mu(closestC(iTrlBatch),:,iBatch),eye(2)*sigmaGauss); % save only the winner
-                
-                
-                
+                if ~strcmp(dat(1:4),'trap') %not computing for trapz
+                    sigmaGauss = stepSize;%/3.5; %move up later - 1 seems to be fine
+                    actTrl(closestC(iTrlBatch),iTrlBatch)=mvnpdf(trls2Upd(iTrlBatch,:),mu(closestC(iTrlBatch),:,iBatch),eye(2)*sigmaGauss); % save only the winner
+                end
             end
-            actTrlAll(:,:,iBatch) = actTrl;
-
+            if ~strcmp(dat(1:4),'trap') %not computing for trapz
+                actTrlAll(:,:,iBatch) = actTrl;
+            end
 %             %if stochastic, closestC might not be if more than 1 actual
 %             %closest, have to check if stoch update chose one of them
 %             actualClosestC = find(min(dist2Clus)==dist2Clus); 
@@ -252,10 +251,10 @@ for iterI = 1:nIter
             %learning rate
             if annEps %if use annealed learning rate
                 epsMu = epsMuOrig./(1+annEpsDecay+iBatch); %need to check if it's actually epsMuOrig*(1/(1+annEpsDecay+iBatch);
-                %                     clear epsAll
-                %                     for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+annEpsDecay+iBatch); end
-                %                     figure; plot(epsAll);
-                %                     epsAll(nBatches.*[.25, .5, .75]) % eps at 25%, 50%, 75% of trials: 0.0396    0.0199    0.0133
+%                                     clear epsAll
+%                                     for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+annEpsDecay+iBatch); end
+%                                     figure; plot(epsAll);
+%                                     epsAll(nBatches.*[.25, .5, .75]) % eps at 25%, 50%, 75% of trials: 0.0396    0.0199    0.0133
             else
                 epsMu = epsMuOrig;
             end
@@ -280,8 +279,9 @@ for iterI = 1:nIter
     if nargout > 8
         muAll(:,:,:,iterI)      = mu;
     end
-    actAll  = reshape(actTrlAll,nClus,nTrials); %save trial-by-trial act over blocks, here unrolling it
-    
+    if ~strcmp(dat(1:4),'trap') %not computing for trapz
+        actAll  = reshape(actTrlAll,nClus,nTrials); %save trial-by-trial act over blocks, here unrolling it
+    end 
 %     tsseAll(:,iterI)        = tsse;
 %     sseSpreadSd(:,iterI)    = stdAcrossClus;
 %     sseSpreadVar(:,iterI)   = varAcrossClus;
@@ -308,16 +308,17 @@ for iterI = 1:nIter
             end
         end
         densityPlot(:,:,iSet,iterI) = nansum(densityPlotClus,3);
-        
+        densityPlotSm               = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth); %smooth
+
         %densityPlotActNorm
+        if ~strcmp(dat(1:4),'trap') %not computing for trapz
         for iTrl = fromTrlI(iSet):toTrlN(iSet)
             densityPlotAct(trials(iTrl,1)+1, trials(iTrl,2)+1)    = densityPlotAct(trials(iTrl,1)+1, trials(iTrl,2)+1)+ nansum(actAll(:,iTrl));
             densityPlotActUpd(trials(iTrl,1)+1, trials(iTrl,2)+1) = densityPlotActUpd(trials(iTrl,1)+1, trials(iTrl,2)+1)+1; %log nTimes loc was visited
         end
         densityPlotActNorm(:,:,iSet,iterI) = densityPlotAct./densityPlotActUpd; %divide by number of times that location was visited
-        densityPlotSm                      = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth); %smooth
         densityPlotActNormSm               = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);   
-        
+        end
         %compute the sum of the distances between each cluster and itself over batches 
         if iSet>1 
            clusDistB(iSet-1,iterI)=sum(sqrt(sum([(mu(:,1,round(toTrlN(iSet)./batchSize)))-(mu(:,1,round(toTrlN(iSet-1)./batchSize))),(mu(:,2,round(toTrlN(iSet)./batchSize)))-(mu(:,2,round(toTrlN(iSet-1)./batchSize)))].^2,2)));
@@ -329,60 +330,138 @@ for iterI = 1:nIter
             %compute gridness
             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
             gA(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+            [g,gdataA] = gridSCORE(aCorrMap,'wills',0);
+            gW(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
             %compute gridness over activation map
             %             aCorrMap = ndautoCORR(densityPlotActTSm);
             %             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
             %             gA_act_t(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
             
             %compute gridness over normalised activation map - normalised by times loc visited
+            if ~strcmp(dat(1:4),'trap') %not computing for trapz
             aCorrMap = ndautoCORR(densityPlotActNormSm);
             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
             gA_actNorm(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
 
             [g,gdataA] = gridSCORE(aCorrMap,'wills',0);
             gW_actNorm(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
-
+            end
+            
             %trapz left right of box
             %split in half then compute gridness for each half
             if  strcmp(dat(1:4),'trap')
                 
                 %left half of box
-%                 aCorrMap = ndautoCORR(densityPlotSm(:,spacing(1):spacing(ceil(length(spacing)/2))));
                 aCorrMap = ndautoCORR(densityPlotSm(:,1:hLeft));
                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
                 gA(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
 
                 %right half of box
-%                 aCorrMap = ndautoCORR(densityPlotSm(:,spacing(ceil(length(spacing)/2))+1:spacing(end)));
                 aCorrMap = ndautoCORR(densityPlotSm(:,h-hRight:end));
                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
                 gA(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
                 
-                %act
-                %left half of box
-%                 aCorrMap = ndautoCORR(densityPlotActNormSm(:,spacing(1):spacing(ceil(length(spacing)/2))));
+%                 %actNorm                 
 %                 aCorrMap = ndautoCORR(densityPlotActNormSm(:,1:hLeft));
 %                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-%                 gA_act(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
-                
-%                 aCorrMap = ndautoCORR(densityPlotActNormSm(:,spacing(ceil(length(spacing)/2))+1:spacing(end)));
-                aCorrMap = ndautoCORR(densityPlotActNormSm(:,1:hLeft));
-                [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-                gA_actNorm(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
-                [g,gdataA] = gridSCORE(aCorrMap,'wills',0);
-                gW_actNorm(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
-                                
-                %right half of box
-%                 aCorrMap = ndautoCORR(densityPlotActNormSm(:,ceil(length(spacing)/2)+1:end));
-                aCorrMap = ndautoCORR(densityPlotActNormSm(:,h-hRight:end));
-                [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-                gA_actNorm(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
-                [g,gdataA] = gridSCORE(aCorrMap,'wills',0);
-                gW_actNorm(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+%                 gA_actNorm(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+%                 [g,gdataA] = gridSCORE(aCorrMap,'wills',0);
+%                 gW_actNorm(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+%                                 
+%                 %right half of box
+%                 aCorrMap = ndautoCORR(densityPlotActNormSm(:,h-hRight:end));
+%                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+%                 gA_actNorm(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+%                 [g,gdataA] = gridSCORE(aCorrMap,'wills',0);
+%                 gW_actNorm(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
             end
         end
     end
     
+       
+    
+    %new compute actNorm maps after 'training' (on a new test set of
+    %locations)
+    
+%         [trialsTest,~, rSeedTest(iterI)] = createTrls(dat,nTrials,locRange,useSameTrls,jointTrls,boxSize,h);
+% 
+%     for iSet=1:nSet
+%         
+%         muTrain(:,:,iSet) = round(mu(:,:,round(toTrlN(iSet)./batchSize)));
+%     
+%         dist2Clus = sqrt(sum(reshape([muTrain(:,1,iSet)'-trialsTest(:,1), muTrain(:,2,iSet)'-trialsTest(:,2)].^2,nTrials,nClus,2),3));
+%         
+%         closestC = nan(1,nTrials);
+%         for iTrl = 1:nTrials
+%             closestTmp = find(min(dist2Clus(iTrl,:))==dist2Clus(iTrl,:));
+%             if numel(closestTmp)>1
+%                 closestC(iTrl) = randsample(closestTmp,1);
+%             else
+%                 closestC(iTrl) = closestTmp;
+% 
+%             end
+%             %compute activation
+%             sigmaGauss = stepSize;%/3.5; %move up later - 1 seems to be fine
+%             actTrl(closestC(iTrl),iTrl)=mvnpdf(trialsTest(iTrl,:),muTrain(closestC(iTrl),:,iSet),eye(2)*sigmaGauss); % save only the winner
+% 
+%         end
+%     
+%          %densityPlotActNorm
+%         for iTrl = fromTrlI(iSet):toTrlN(iSet)
+%             densityPlotAct(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)    = densityPlotAct(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)+ nansum(actTrl(:,iTrl));
+%             densityPlotActUpd(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1) = densityPlotActUpd(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)+1; %log nTimes loc was visited
+%         end
+%         densityPlotActNorm(:,:,iSet,iterI) = densityPlotAct./densityPlotActUpd; %divide by number of times that location was visited
+%         densityPlotActNormSm               = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);   
+%         
+% 
+%         aCorrMap = ndautoCORR(densityPlotAct);
+%         [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+%         gA_act(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+%         
+%         [g,gdataA] = gridSCORE(aCorrMap,'wills',0);
+%         gW_act(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+%         
+%         %compute gridness over normalised activation map - normalised by times loc visited
+%         aCorrMap = ndautoCORR(densityPlotActNormSm);
+%         [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+%         gA_actNorm(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+%         
+%         [g,gdataA] = gridSCORE(aCorrMap,'wills',0);
+%         gW_actNorm(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+%         
+%         if  strcmp(dat(1:4),'trap')
+%             %left
+%             aCorrMap = ndautoCORR(densityPlotAct(:,1:hLeft));
+%             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+%             gA_act(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+%             [g,gdataA] = gridSCORE(aCorrMap,'wills',0);
+%             gW_act(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+%             
+%             %right half of box
+%             aCorrMap = ndautoCORR(densityPlotAct(:,h-hRight:end));
+%             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+%             gA_act(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+%             [g,gdataA] = gridSCORE(aCorrMap,'wills',0);
+%             gW_act(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+%             
+%             %left
+%             aCorrMap = ndautoCORR(densityPlotActNormSm(:,1:hLeft));
+%             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+%             gA_actNorm(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+%             [g,gdataA] = gridSCORE(aCorrMap,'wills',0);
+%             gW_actNorm(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+%             
+%             %right half of box
+%             aCorrMap = ndautoCORR(densityPlotActNormSm(:,h-hRight:end));
+%             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+%             gA_actNorm(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+%             [g,gdataA] = gridSCORE(aCorrMap,'wills',0);
+%             gW_actNorm(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+%             
+%         end
+%     end
+        
     
     % for perm test, need actAll (nClus x nTrials), and mu (nClus x 2 x
     % nBatch). 

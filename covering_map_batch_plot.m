@@ -119,16 +119,16 @@ dat='trapzKrupic';
 % % 6, 10, 14, 18, 22, 26 - 
 % clus2run = [8:2:28]; 
 clus2run = [12:4:28]; 
-batchSizeVals = 200; %100, 125, 200,400, 1000
+batchSizeVals = 400; %100, 125, 200,400, 1000
 
 %new - slower learning rate
 % epsMuVals=.015;
 % batchSizeVals = 100; %100, 125, 200, 400
 % clus2run = [12, 16, 24, 28]; %batchSize200 missed 20?
 
-rHex=1; %if choose raw 60deg corr values, not gridness
+rHex=0; %if choose raw 60deg corr values, not gridness
 
-dat='trapzScaled1';
+% dat='trapzScaled1';
 
 
 %load loop
@@ -233,10 +233,10 @@ for iClus2run = 1:length(clus2run)
                 gA_oAll_actNorm(:,:,iEps,iBvals,iClus2run,:)   = gA_actNorm(:,:,2,:);
                 gA_radAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gA_actNorm(:,:,3,:);
                 gA_wavAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gA_actNorm(:,:,4,:);
-%                 gW_gAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,1,:);
-%                 gW_oAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,2,:);
-%                 gW_radAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,3,:);
-%                 gW_wavAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,4,:);
+                gW_gAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,1,:);
+                gW_oAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,2,:);
+                gW_radAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,3,:);
+                gW_wavAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,4,:);
 
             end            
         end
@@ -244,7 +244,7 @@ for iClus2run = 1:length(clus2run)
 end
 %% plot univar scatters
 
-clusPosAct = 'actNorm'; %'clus' or 'actNorm'
+clusPosAct = 'clus'; %'clus' or 'actNorm'
 
 gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
 
@@ -252,31 +252,31 @@ gridMeasure = 'grid';
 
 switch clusPosAct
 case 'clus'
-    switch gridMsrType
-        case 'a'
+%     switch gridMsrType
+%         case 'a'
             gridness    = gA_gAll;
             orientation = gA_oAll;
             rad         = gA_radAll;
             wav         = gA_wavAll;
-        case 'w'
-            gridness    = gW_gAll;
-            orientation = gW_oAll;
-            rad         = gW_radAll;
-            wav         = gW_wavAll;
-    end
-    case 'act'
-        switch gridMsrType
-            case 'a'
-                gridness    = gA_gAll_act;
-                orientation = gA_oAll_act;
-                rad         = gA_radAll_act;
-                wav         = gA_wavAll_act;
-            case 'w'
-                gridness    = gW_gAll_act;
-                orientation = gW_oAll_act;
-                rad         = gW_radAll_act;
-                wav         = gW_wavAll_act;
-        end
+%         case 'w'
+%             gridness    = gW_gAll;
+%             orientation = gW_oAll;
+%             rad         = gW_radAll;
+%             wav         = gW_wavAll;
+%     end
+%     case 'act'
+%         switch gridMsrType
+%             case 'a'
+%                 gridness    = gA_gAll_act;
+%                 orientation = gA_oAll_act;
+%                 rad         = gA_radAll_act;
+%                 wav         = gA_wavAll_act;
+%             case 'w'
+%                 gridness    = gW_gAll_act;
+%                 orientation = gW_oAll_act;
+%                 rad         = gW_radAll_act;
+%                 wav         = gW_wavAll_act;
+%         end
     case 'actNorm'
         switch gridMsrType
             case 'a'
@@ -286,7 +286,7 @@ case 'clus'
                 wav         = gA_wavAll_actNorm;
             case 'w'
                 gridness    = gW_gAll_actNorm;
-                orientation = gW_oAll_act;
+                orientation = gW_oAll_actNorm;
                 rad         = gW_radAll_actNorm;
                 wav         = gW_wavAll_actNorm;
         end

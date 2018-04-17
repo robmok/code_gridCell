@@ -68,10 +68,11 @@ hLeft  = floor(halfArea/((b+c)/2)); %bigger side
 hRight = ceil(halfArea/((b+c)/2))+1; %smaller size - to equalize area more
 
 gaussSmooth=1;
-for iSet=21:22
+for iSet=1:22
 for iterI = 1%:10
     
-    densityPlotCentresSm = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);
+    densityPlotCentresSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
+%     densityPlotCentresSm = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);
     
     figure; hold on;
     subplot(1,3,1)
