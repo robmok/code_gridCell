@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-%  wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+ wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -19,7 +19,7 @@ dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning
 % dat = 'trapz1'; % trapz, trapzNorm (without Krupic scaling) trapzSqs,
 % dat = 'trapz2';% 
 % dat = 'trapz3';
-dat = 'trapzKrupic'; % 
+% dat = 'trapzKrupic'; % 
 % dat = 'trapzKrupic2'; % dat = 'trapzKrupic3';
 % dat = 'trapzScaled1';
 % dat = 'trapzScaled2';
@@ -48,10 +48,11 @@ jointTrls = 1;
 % clus2run = [22, 28, 26, 14];
 
 % %joint trials; 8, 12, 16, 20, 24, 28;    then 6, 10, 14, 18, 22, 26, 28
-% clus2run = [24, 8,  10]; 
+% clus2run = [26, 8,  10]; 
 % clus2run = [16, 28, 14,];  
 % clus2run = [12, 20, 22]; 
-% clus2run = [28, 26, 18];
+% clus2run = [28, 24, 5, 6];
+% clus2run = [3, 4, 30];
 
 %run the rest and odd number - 3,4,5,6, 7:2:29
 %love06 - circ
@@ -62,36 +63,18 @@ jointTrls = 1;
 % clus2run = [13, 7,  23];
 % clus2run = [4,  30];
 
-% love06 restarted after first set above
-% clus2run = [29, 25, 11];
-% clus2run = [17, 27, 19];
-% clus2run = [9,  5,  7];
-% clus2run = [23, 30];
-
-% % %love01 - sq - 
-% clus2run = [3 21];
-% % clus2run = [19, 6];
-% % clus2run = [7, 11];
-% % clus2run = [13, 4];
+% % love01 - circ nBatches=10k
+clus2run = [3 21];
+% clus2run = [19, 6];
+% clus2run = [7, 13];
+% clus2run = [25, 4];
 % clus2run = [9, 15];
-% clus2run = [5, 17];
-% clus2run = 23;
+% clus2run = [11, 17];
+% clus2run = [23,5];
 % clus2run = 27;
-% clus2run = 25;
 % clus2run = 29;
 % clus2run = 30;
 
-%trapzKrupic - running eps=0.15 trapz; could also run larger nBatches (but
-%maybe less than 10k)
-% clus2run = [12,16,20,24,28]; %8,10,14,18,22,26];
-% clus2run = [12,16,20];
-% clus2run = [20,24];
-% clus2run = [28];
-
-clus2run = [12];
-% clus2run = [16];
-% clus2run = [20];
-clus2run = [24];
 
 % clus2run = 16;
 
@@ -111,21 +94,20 @@ if fixBatchSize
     %new - for 100k trials, half nBatches for same batchsize
 %     nBatches = [20000, 5000, 50000]./2; %half nBatches
     %joint trials
-    nBatches = [1000, 2500, 10000]; 
-    nBatches = [2500, 10000]; 
+%     nBatches = [1000, 2500, 10000]; 
+%     nBatches = [2500, 10000]; 
 %     nBatches = 1000;
-    nBatches = 2500;
-%     nBatches = 10000;
+%     nBatches = 2500;
+    nBatches = 10000;
     
     %new trapzkurpic try batchsizes - maybe try 7.5k later?
 %     nBatches = [5000, 10000];
-    nBatches = [5000, 8000];
-%     nBatches = [8000];
-%   nBatches = 10000;
+%     nBatches = [2500, 5000];
+%     nBatches = 8000;
+%     nBatches = 2500;
 
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals);
-    
 else % define batch size based on average number of updates per cluster
     avgBatchUpdate = [10, 25, 35, 50]; % 
     avgBatchUpdate = [1, 2, 5]; % avgBatchUpdate = 25;
@@ -138,12 +120,8 @@ end
 % epsMuVals=[.01, .05, .075, .1, .2, .3];% %learning rate / starting learning rate 
 % epsMuVals = 0.075; 
 % epsMuVals = [0.05, 0.025]; 
-% epsMuVals = 0.05;
 epsMuVals = 0.025;
 % epsMuVals = 0.015; 
-
-%faster...?
-% epsMuVals = 0.1;
 
 % use the same training data (trials) across current sims or gen new data
 useSameTrls=0;
@@ -214,7 +192,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
 %                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(avgBatchUpdate(iBvals)),round(batchSize),nIter)];
             end
 %             [densityPlot,densityPlotAct,densityPlotActNorm,clusMu,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,rSeed] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
-            [densityPlot,densityPlotActNorm,gA,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB, permPrc, muAll, trials] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stochasticType,c,dat,boxSize,annEps,jointTrls,doPerm);
+            [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB, permPrc] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stochasticType,c,dat,boxSize,annEps,jointTrls,doPerm);
 
             timeTaken=toc;
             if saveDat
@@ -241,18 +219,16 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
 %                 fname=[fname '_stepSiz'];
 %                 trying 1,2,3,4 selStepSiz;
 %                 fname=[fname '_stepSiz1'];
-                if ~strcmp(dat(1:4),'trap')
-                    fname=[fname '_stepSiz'];
-                else
-                    fname=[fname '_stepSizLR']; %left right smaller steps
-                end
+                
+                fname=[fname '_stepSiz'];
+
                 
                 cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
 %                 save(fname,'densityPlot','densityPlotAct','clusMu','gA','gW','gA_act','gW_act','nIter','rSeed','timeTaken'); %added trialsAll for xval - removed, too big.maybe compute at end of each sim? or at each set
 %                 save(fname,'densityPlot','densityPlotActNorm','gA','gA_actNorm','rSeed','muInit','clusDistB','timeTaken'); 
                 
                 if ~strcmp(dat(1:4),'trap')
-                    save(fname,'densityPlot','densityPlotActNorm','gA','gA_actNorm','gW_actNorm','rSeed','muInit','clusDistB','permPrc','timeTaken'); 
+                    save(fname,'densityPlot','densityPlotActNorm','gA','gW','gA_actNorm','gW_actNorm','rSeed','muInit','clusDistB','permPrc','timeTaken'); 
                 else
                     save(fname,'densityPlot','gA','gW','rSeed','muInit','clusDistB','permPrc','timeTaken'); 
                 end

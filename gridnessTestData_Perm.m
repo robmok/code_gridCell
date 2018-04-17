@@ -29,6 +29,9 @@ gaussSmooth = 1;
 nSets = size(densityPlot,3);
 nIter = size(densityPlot,4);
 
+nSetsTest = 2; %last 2 only for now
+
+
 b = 50;
 h = 50; %for trapz - height
 
@@ -63,29 +66,29 @@ end
 %% compute actNorm maps after 'training' (on a new test set of locations)
 [trialsTest,~, rSeedTest] = createTrls(dat,nTrialsTest,locRange,useSameTrls,jointTrls,boxSize,h);
 
-densityPlotAct     = zeros(b,h,nSets,nIter);
-densityPlotActNorm = zeros(b,h,nSets,nIter);
-gA_act = nan(nSets,nIter,9);
-gW_act = nan(nSets,nIter,9);
-gA_actNorm = nan(nSets,nIter,9);
-gW_actNorm = nan(nSets,nIter,9);
+densityPlotAct     = zeros(b,h,nSetsTest,nIter);
+densityPlotActNorm = zeros(b,h,nSetsTest,nIter);
+gA_act = nan(nSetsTest,nIter,9);
+gW_act = nan(nSetsTest,nIter,9);
+gA_actNorm = nan(nSetsTest,nIter,9);
+gW_actNorm = nan(nSetsTest,nIter,9);
 if strcmp(dat(1:4),'trap') %if trapz - compute gridness of left/right half of boxes too
-    gA_act = nan(nSets,nIter,9,3);
-    gW_act = nan(nSets,nIter,9,3);
-    gA_actNorm = nan(nSets,nIter,9,3);
-    gW_actNorm = nan(nSets,nIter,9,3);
+    gA_act = nan(nSetsTest,nIter,9,3);
+    gW_act = nan(nSetsTest,nIter,9,3);
+    gA_actNorm = nan(nSetsTest,nIter,9,3);
+    gW_actNorm = nan(nSetsTest,nIter,9,3);
 end
-muTrain = nan(nClus,2,nSets,nIter);
+muTrain = nan(nClus,2,nSetsTest,nIter);
 
 for iterI=1:nIter
     fprintf('Running iter %d\n',iterI);
-    for iSet=nSets-1:nSets%1:nSets
+    for iSet=1:nSetsTest%1:nSets
 %         fprintf('Running set %d\n',iSet);
 
         actTrl = zeros(nClus,nTrialsTest);
         densityPlotActUpd = zeros(b,h);
         
-        [muTrain(:,1,iSet,iterI), muTrain(:,2,iSet,iterI)] = find(densityPlot(:,:,iSet,iterI)); %find cluster positions
+        [muTrain(:,1,iSet,iterI), muTrain(:,2,iSet,iterI)] = find(densityPlot(:,:,nSets-2+iSet,iterI)); %find cluster positions
         
         dist2Clus = sqrt(sum(reshape([muTrain(:,1,iSet,iterI)'-trialsTest(:,1), muTrain(:,2,iSet,iterI)'-trialsTest(:,2)].^2,nTrialsTest,nClus,2),3));
         closestC = nan(1,nTrialsTest);
