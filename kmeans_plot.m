@@ -11,7 +11,7 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed']));
 
-dat = 'circ'; %'square', 'circ'
+dat = 'square'; %'square', 'circ'
 
 kVals   = 3:30; 
 % nKmeans = 1000;
@@ -42,6 +42,10 @@ sseSprdVarXval=xVal_results.sseSprdVarXval;
 % hold on;
 %% plot hist and density  plots
 
+figsDir = [wd '/grid_figs'];
+
+savePlots = 0;
+
 gridMsr = 'a'; % 'a' or 'w' for allen or willis method
 
 switch gridMsr
@@ -51,29 +55,47 @@ switch gridMsr
         g = gW;
 end
 
+%fig specs
+xTickLabs = num2cell(kVals);
+fontSiz=13;
+
 %plot univar scatters
 figure;
 dat1     = squeeze(g(:,1,:));
 barpos  = .25:.5:.5*size(dat1,2);
 colors  = distinguishable_colors(size(dat1,2));
-colgrey = [.5, .5, .5];
-mu      = mean(dat1,1);
-sm      = std(dat1)./sqrt(size(dat1,1));
-ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+colgrey = [.65, .65, .65];
+mu      = nanmean(dat1,1);
+% sm      = std(dat1)./sqrt(size(dat1,1));
+% ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
 plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-scatter(barpos,mu,750,colors,'x','LineWidth',1);
-xlim([barpos(1)-.5, barpos(end)+.5]);
-ylim([-.5,1.25]);
-% 
-% for i=1:length(kVals)
-%    xLab{i}=num2str(kVals(i));
-% end
-xticks(gca,barpos,kVals)
+% errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+% scatter(barpos,mu,750,colors,'x','LineWidth',1);
+scatter(barpos,mu,50,colgrey,'filled','d');
+xticklabels(xTickLabs);
 
+xlim([barpos(1)-.5, barpos(end)+.5]);
+
+if strcmp(gridMsr,'a')
+    ylim([-.5,1.35]);
+elseif strcmp(gridMsr,'w')
+    ylim([-1.35,1.35]);
+end
 
 xlabel('Number of Clusters');
 ylabel('Gridness score');
+title(sprintf('kmeans %s',dat))
+set(gca,'FontSize',fontSiz,'fontname','Arial')
+
+
+fname = [figsDir sprintf('/kmeans_%s_gridness_univarScatters_nK%d-%d_%s',dat,kVals(1),kVals(end),gridMsr)];
+if savePlots
+   set(gcf,'Renderer','painters');
+   print(gcf,'-depsc2',fname)
+   saveas(gcf,fname,'png');
+    
+end
+    
 
 %plot some grids
 

@@ -19,8 +19,8 @@ batchSize = floor(batchSize); % when have decimal points, above needed
 %if decrease learning rate over time: 1/(1+decay+timestep); Decay - set a param
 if annEps
     nBatches = nTrials./batchSize; %2500, 5000, 250000, 50000
-%     epsMuOrig = nBatches/100;
-    epsMuOrig = nBatches/150; %200
+    epsMuOrig = nBatches/100;
+%     epsMuOrig = nBatches/150; %200
     annEpsDecay = nBatches/40;
 end
 % trlSel = ceil([nBatch*.25, nBatch*.5, nBatch*.67, nBatch*.75, nBatch*.9, nBatch+1]);
