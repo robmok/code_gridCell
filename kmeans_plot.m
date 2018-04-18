@@ -11,7 +11,7 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed']));
 
-dat = 'square'; %'square', 'circ'
+dat = 'circ'; %'square', 'circ'
 
 kVals   = 3:30; 
 % nKmeans = 1000;
@@ -145,41 +145,52 @@ xValErr = tsseXval;
 % xValErr = sseSprdSdXval; %works well too
 %sseSprdVarXval - gives same corr values
 
-
 % corr of gridness and SSE: original data
-iToPlot = [1:28];
-figure; hold on;
-iPlt=0;
-for iKvals = iToPlot
-    iPlt=iPlt+1;
-    subplot(6,5,iPlt)
-    [r p] = corr(g(:,1,iKvals),err(iKvals,:)','type','spearman');
-    r1(iKvals)=r;
-    p1(iKvals)=p;
-    p1corr(iKvals)=p*nKvals;
-    if p1corr(iKvals)>1, p1corr(iKvals)=1; end
-    scatter(err(iKvals,:)',g(:,1,iKvals),'.');
-    title(sprintf('nK=%d, r = %.2f, p (crcted) = %.3f',kVals(iKvals),r,p1corr(iKvals)))
-end
-[r1; p1corr]'
+% iToPlot = [1:28];
+% figure; hold on;
+% iPlt=0;
+% for iKvals = iToPlot
+%     iPlt=iPlt+1;
+%     subplot(6,5,iPlt)
+%     [r p] = corr(g(:,1,iKvals),err(iKvals,:)','type','spearman');
+%     r1(iKvals)=r;
+%     p1(iKvals)=p;
+%     p1corr(iKvals)=p*nKvals;
+%     if p1corr(iKvals)>1, p1corr(iKvals)=1; end
+%     scatter(err(iKvals,:)',g(:,1,iKvals),'.');
+%     title(sprintf('nK=%d, r = %.2f, p (crcted) = %.3f',kVals(iKvals),r,p1corr(iKvals)))
+% end
+% [r1; p1corr]'
 
 % corr of gridness and SSE: cross-validated data
-iToPlot = [1:28];
+
+iToPlot = [1:24]; % excluding more clusters (3:26 here)
 figure; hold on;
 iPlt=0;
 for iKvals = iToPlot
     iPlt=iPlt+1;
-    subplot(6,5,iPlt)
+    subplot(6,4,iPlt)
     [r p] = corr(g(:,1,iKvals),nanmean(xValErr(:,:,iKvals),2),'type','spearman');
     rx1(iKvals)=r;
     px1(iKvals)=p;
-    px1corr(iKvals)=p*nKvals;
+    px1corr(iKvals)=p*(nKvals-4); %-4 if only reporting 26
     if px1corr(iKvals)>1, px1corr(iKvals)=1; end
-    scatter(nanmean(xValErr(:,:,iKvals),2),g(:,1,iKvals),'.');
-    title(sprintf('nK=%d, r = %.2f, p (crcted) = %.3f',kVals(iKvals),r,px1corr(iKvals)))
+    h = scatter(nanmean(xValErr(:,:,iKvals),2),g(:,1,iKvals),'.'); hold on;
+    [b, d, s] = glmfit(nanmean(xValErr(:,:,iKvals),2),g(:,1,iKvals));
+    xMinMax=[min(nanmean(xValErr(:,:,iKvals),2)), max(nanmean(xValErr(:,:,iKvals),2))];
+    yhat = b(1)+b(2)*xMinMax;
+    hLine=plot(xMinMax,yhat,'Color',colgrey+.1','LineWidth',.5);
+    ylim([-.5, 1.5]);
+    if px1corr(iKvals) <0.0001
+        plabels = sprintf('rho = %.2f\npCorr < 0.001',r);
+    else
+        plabels = sprintf('rho = %.2f\npCorr = %.3f',r,px1corr(iKvals));
+    end
+    hleg = legend(h,plabels,'Location','NorthEast');
+    title(sprintf('%d clusters',kVals(iKvals),r,px1corr(iKvals)))
 end
 
-[rx1; px1corr]'
+[rx1(iToPlot); px1corr(iToPlot)]'
 
 
 % are 30/60 degree orientations --> better gridness? nk=3 suggests so.
@@ -194,21 +205,17 @@ end
 %     % hist(g(:,2,iKvals),50);
 %     scatter(g(:,1,iKvals),g(:,2,iKvals),'.')
 % end
-
-
-
-
-% % correlate over all nClus conditions?
-% clus2use=2:28;
-% [r p] = corr(reshape(squeeze(g(:,1,clus2use)),numel(g(:,1,clus2use)),1),reshape(tssekVals(clus2use,:)',numel(tssekVals(clus2use,:)),1),'type','spearman')
-% figure; scatter(reshape(tssekVals(clus2use,:)',numel(tssekVals(clus2use,:)),1),reshape(squeeze(g(:,1,clus2use)),numel(g(:,1,clus2use)),1),'.')
-% %multiply by nK 
-% [r p] = corr(reshape(squeeze(g(:,1,clus2use)),numel(g(:,1,clus2use)),1),reshape(tssekVals(clus2use,:)'.*kVals(clus2use),numel(tssekVals(clus2use,:)),1),'type','spearman')
-% figure; scatter(reshape(tssekVals(clus2use,:)'.*kVals(clus2use),numel(tssekVals(clus2use,:)),1),reshape(squeeze(g(:,1,clus2use)),numel(g(:,1,clus2use)),1),'.')
-
 %% Density plots for top / bottom 3
 
-iToPlot = 16;%[4, 22, 28];
+% making nicer imagesc images - circ: grey out the bits that are not a
+% circle. find the points and those outside of them should be white
+% ([1,1,1])
+
+% circ - might want to cut out the circ before doing autoCorrelogram?
+
+%think about autocorr plots for gridness
+
+iToPlot = 10;%[4, 22, 28];
 
 gaussSmooth             = 1;
 nSets                   = 6; %top and bottom 3 SSE
@@ -216,25 +223,21 @@ locRange                = [0, 49];
 spacing                 = linspace(locRange(1),locRange(2),locRange(2)+1); 
 densityPlotCentresBest  = zeros(length(spacing),length(spacing),nSets,nKvals);
 
-%sort top/bottom 3
+%re-sort sse after combining tsseXval values-atm just one nK value at a time
+[y, indSSEall] = sort(mean(tsseXval(:,:,iKvals),2));
+[y, indSSEall2] = sort(indSSEall);
 
-
-%PROBLEM - ranked SSE seperately over several sims; so multiple ranked 1st/last. rerank by the SSE? tsseXval
-
-
-
-bestWorst = [1,2,3,nKmeans*nSims-3,nKmeans*nSims-2,nKmeans*nSims-1]; 
-% bestWorst = [1,1,1,nKmeans*nSims,nKmeans*nSims,nKmeans*nSims];
+bestWorst = [1,2,3,nKmeans*nSims-2,nKmeans*nSims-1,nKmeans*nSims]; 
 muBest = cell(1,4);
 for iKvals = 1:nKvals
     for iterI=1:length(bestWorst)
-        muBest{iKvals}(:,:,iterI) = muAllkVals{iKvals}(:,:,indSSE2(iKvals,:)==bestWorst(iterI));
+        muBest{iKvals}(:,:,iterI) = muAllkVals{iKvals}(:,:,indSSEall2==bestWorst(iterI));
     end
 end
 
 for iKvals = iToPlot%:nKvals %prob don't want to plot all at once...
     
-    for iSet=1:nSets
+    for iSet=1%:nSets
         nK = kVals(iKvals);
         densityPlotClus = zeros(length(spacing),length(spacing),nK,nSets);
         figure; hold on;
@@ -254,7 +257,7 @@ for iKvals = iToPlot%:nKvals %prob don't want to plot all at once...
         imagesc(densityPlotCentresBestSm);
         aCorrMap=ndautoCORR(densityPlotCentresBestSm); %autocorrelogram
         subplot(1,3,2);
-        imagesc(aCorrMap,[-.45 .45]);
+        imagesc(aCorrMap,[-.3 .3]);
         subplot(1,3,3);
         [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
         % [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
