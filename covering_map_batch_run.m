@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -19,8 +19,7 @@ dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning
 % dat = 'trapz1'; % trapz, trapzNorm (without Krupic scaling) trapzSqs,
 % dat = 'trapz2';% 
 % dat = 'trapz3';
-% dat = 'trapzKrupic';  
-% dat = 'trapzKrupic2'; % dat = 'trapzKrupic3';
+dat = 'trapzKrupic';  
 % dat = 'trapzScaled1';
 % dat = 'trapzScaled2';
 %  dat = 'trapzScaled3';
@@ -48,8 +47,6 @@ jointTrls = 1;
 % clus2run = [22, 28, 26, 14];
 
 % %joint trials; 8, 12, 16, 20, 24, 28;    then 6, 10, 14, 18, 22, 26, 28
-
-% % running trapzK now love06
 % clus2run = [26, 8,  10]; 
 % clus2run = [16, 28, 14,];  
 % clus2run = [12, 20, 22]; 
@@ -62,16 +59,22 @@ jointTrls = 1;
 % clus2run = [11, 19, 21, 29];
 % clus2run = [13, 27, 17, 23];
 
+%now runnig trapzK annEps - 4 batchsizes - 3x nClus, 2x batchSizes
+% clus2run = [26, 8,  10, 16, 28, 7, 21, 19, 6,  17]; 
+% clus2run = [12, 20, 22, 28, 24, 5,  11,  13,  14]; 
+% clus2run = [3,  4,  30, 29, 25, 15, 27, 9,  23];
+
+
 %run the rest and odd number - 3,4,5,6, 7:2:29
 % love01 - circ and sq annEps
-clus2run = [3,  29, 25];
+% clus2run = [3,  29, 25];
 % clus2run = [15, 27,  9];
 % clus2run = [21, 19,  5];
 % clus2run = [6,  11,  17];
 % clus2run = [13, 7,  23];
 % clus2run = [4,  30];
 
-% clus2run = 16;
+clus2run = 16;
 
 % nTrials = 5000000; %how many locations in the box / trials 
 % nTrials = 2000000;
@@ -91,10 +94,11 @@ if fixBatchSize
     %joint trials
 %     nBatches = [1000, 2500, 10000]; 
 %     nBatches = [2500, 10000]; 
-%     nBatches = 2500;
+    nBatches = 2500;
 %     nBatches = 10000;
-    nBatches = [2500, 5000, 10000];
-%     nBatches = [8000 10000];
+
+%     nBatches = [2500, 10000]; 
+%     nBatches = [8000 5000];
 
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals);
