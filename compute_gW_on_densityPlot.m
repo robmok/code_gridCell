@@ -49,7 +49,7 @@ for iClus2run = 1:length(clus2run)
         for iBvals = 1:length(batchSizeVals)
             
             batchSize = batchSizeVals(iBvals);
-            fprintf('Loading nClus=%d, epsMu=%d, batchSize=%d\n',nClus,epsMuOrig1000,batchSize)
+            fprintf('Loading %s, nClus=%d, epsMu=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000,batchSize)
             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
 %             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSizLR',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
 
