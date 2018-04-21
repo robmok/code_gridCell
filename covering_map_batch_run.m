@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+%wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -35,7 +35,7 @@ sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic % sigmaG = [1 .5; .5 2]; R
 
 
 %annealed learning rate
-annEps = 1; %1 or 0
+annEps = 0; %1 or 0
 
 %perm testing
 doPerm = 0;
@@ -75,20 +75,16 @@ jointTrls = 1;
 % clus2run = [4,  30];
 
 
-% batchSize=200 - circ love01
+% batchSize=200 - circ love01 - 3:26
 clus2run = [20,  8,  10]; 
-% clus2run = [3,  7,  22]; 
-% clus2run = [26,  5,  6];
-% clus2run = [15,  12,  4];
-% clus2run = [11,  17, 9];
-% clus2run = [16, 24];  
-% clus2run = [13, 23];
-% clus2run = [21, 19];
-% clus2run = [14, 25];
-% clus2run = [27];
-% clus2run = [28];
-% clus2run = [29];
-% clus2run = [30];
+clus2run = [3,  7,  22]; 
+clus2run = [26,  5,  6];
+clus2run = [15,  12,  4];
+clus2run = [11,  17, 9];
+ clus2run = [16, 24];  
+ clus2run = [13, 23];
+ clus2run = [21, 19];
+ clus2run = [14, 25];
 
 
 % clus2run = 16;
