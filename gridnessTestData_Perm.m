@@ -1,4 +1,4 @@
-function [permPrc_gA, permPrc_gW, gA_actNormPerm, gW_actNormPerm, gA_act,gA_actNorm,gW_act,gW_actNorm, densityPlotAct,densityPlotActNorm, rSeedTest] = gridnessTestData_Perm(densityPlot,dat,locRange,nClus,nTrialsTest,nPerm,nIters2run)
+function [permPrc_gA, permPrc_gW, gA_act,gA_actNorm,gW_act,gW_actNorm,gA_actNormPerm, gW_actNormPerm, densityPlotAct,densityPlotActNorm, rSeedTest] = gridnessTestData_Perm(densityPlot,dat,locRange,nClus,nTrialsTest,nPerm,nIters2run)
 
 
 %input - 
@@ -29,7 +29,7 @@ gaussSmooth = 1;
 nSets = size(densityPlot,3);
 % nIters2run = size(densityPlot,4);
 
-nSetsTest = 2; %last 1/2 only for now
+nSetsTest = 1; %last 1/2 only for now
 
 b = 50;
 h = 50; %for trapz - height
@@ -72,31 +72,30 @@ permPrc_gW = nan(nIters2run,4);
 %% compute actNorm maps after 'training' (on a new test set of locations)
 [trialsTest,~, rSeedTest] = createTrls(dat,nTrialsTest,locRange,useSameTrls,jointTrls,boxSize,h);
 
-densityPlotAct     = zeros(b,h,nSetsTest,nIters2run);
-densityPlotActNorm = zeros(b,h,nSetsTest,nIters2run);
-gA_act = nan(nSetsTest,nIters2run,9);
-gW_act = nan(nSetsTest,nIters2run,9);
-gA_actNorm = nan(nSetsTest,nIters2run,9);
-gW_actNorm = nan(nSetsTest,nIters2run,9);
+densityPlotAct     = zeros(b,h,nIters2run);
+densityPlotActNorm = zeros(b,h,nIters2run);
+gA_act = nan(nIters2run,9);
+gW_act = nan(nIters2run,9);
+gA_actNorm = nan(nIters2run,9);
+gW_actNorm = nan(nIters2run,9);
 if strcmp(dat(1:4),'trap') %if trapz - compute gridness of left/right half of boxes too
-    gA_act = nan(nSetsTest,nIters2run,9,3);
-    gW_act = nan(nSetsTest,nIters2run,9,3);
-    gA_actNorm = nan(nSetsTest,nIters2run,9,3);
-    gW_actNorm = nan(nSetsTest,nIters2run,9,3);
+    gA_act = nan(nIters2run,9,3);
+    gW_act = nan(nIters2run,9,3);
+    gA_actNorm = nan(nIters2run,9,3);
+    gW_actNorm = nan(nIters2run,9,3);
 end
-muTrain = nan(nClus,2,nSetsTest,nIters2run);
+muTrain = nan(nClus,2,nIters2run);
 
+gA_actNormPerm = nan(nPerm,nIters2run);
+gW_actNormPerm = nan(nPerm,nIters2run);
 for iterI=1:nIters2run
     fprintf('Running iter %d\n',iterI);
-    for iSet=1:nSetsTest%1:nSets
-%         fprintf('Running set %d\n',iSet);
-
         actTrl = zeros(nClus,nTrialsTest);
         densityPlotActUpd = zeros(b,h);
         
-        [muTrain(:,1,iSet,iterI), muTrain(:,2,iSet,iterI)] = find(densityPlot(:,:,nSets-2+iSet,iterI)); %find cluster positions
+        [muTrain(:,1,iterI), muTrain(:,2,iterI)] = find(densityPlot(:,:,end,iterI)); %find cluster positions
         
-        dist2Clus = sqrt(sum(reshape([muTrain(:,1,iSet,iterI)'-trialsTest(:,1), muTrain(:,2,iSet,iterI)'-trialsTest(:,2)].^2,nTrialsTest,nClus,2),3));
+        dist2Clus = sqrt(sum(reshape([muTrain(:,1,iterI)'-trialsTest(:,1), muTrain(:,2,iterI)'-trialsTest(:,2)].^2,nTrialsTest,nClus,2),3));
         closestC = nan(1,nTrialsTest);
         for iTrl = 1:nTrialsTest
             closestTmp = find(min(dist2Clus(iTrl,:))==dist2Clus(iTrl,:));
@@ -106,72 +105,69 @@ for iterI=1:nIters2run
                 closestC(iTrl) = closestTmp;
             end
             %compute activation
-            actTrl(closestC(iTrl),iTrl)=mvnpdf(trialsTest(iTrl,:),muTrain(closestC(iTrl),:,iSet),eye(2)*sigmaGauss); % save only the winner
+            actTrl(closestC(iTrl),iTrl)=mvnpdf(trialsTest(iTrl,:),muTrain(closestC(iTrl),:,iterI),eye(2)*sigmaGauss); % save only the winner
         end  %find closestC
         %densityPlotActNorm
         for iTrl = 1:nTrialsTest
-            densityPlotAct(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1,iSet,iterI)    = densityPlotAct(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1,iSet,iterI)+ nansum(actTrl(:,iTrl));
+            densityPlotAct(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1,iterI)    = densityPlotAct(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1,iterI)+ nansum(actTrl(:,iTrl));
             densityPlotActUpd(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1) = densityPlotActUpd(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)+1; %log nTimes loc was visited
         end
-        densityPlotActNorm(:,:,iSet,iterI) = densityPlotAct(:,:,iSet,iterI)./densityPlotActUpd; %divide by number of times that location was visited
-        densityPlotActSm                   = imgaussfilt(densityPlotAct(:,:,iSet,iterI),gaussSmooth);
-        densityPlotActNormSm               = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);
+        densityPlotActNorm(:,:,iterI) = densityPlotAct(:,:,iterI)./densityPlotActUpd; %divide by number of times that location was visited
+        densityPlotActSm                   = imgaussfilt(densityPlotAct(:,:,iterI),gaussSmooth);
+        densityPlotActNormSm               = imgaussfilt(densityPlotActNorm(:,:,iterI),gaussSmooth);
         
         aCorrMap = ndautoCORR(densityPlotActSm);
         [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-        gA_act(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+        gA_act(iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
         
         [g,gdataA] = gridSCORE(aCorrMap,'wills',0);
-        gW_act(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+        gW_act(iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
         
         %compute gridness over normalised activation map - normalised by times loc visited
         aCorrMap = ndautoCORR(densityPlotActNormSm);
         [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-        gA_actNorm(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+        gA_actNorm(iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
         
         [g,gdataA] = gridSCORE(aCorrMap,'wills',0);
-        gW_actNorm(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+        gW_actNorm(iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
         
         if  strcmp(dat(1:4),'trap')
             %left
             aCorrMap = ndautoCORR(densityPlotActSm(:,1:hLeft));
             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-            gA_act(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+            gA_act(iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
             [g,gdataA] = gridSCORE(aCorrMap,'wills',0);
-            gW_act(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+            gW_act(iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
             
             %right half of box
             aCorrMap = ndautoCORR(densityPlotActSm(:,h-hRight:end));
             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-            gA_act(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+            gA_act(iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
             [g,gdataA] = gridSCORE(aCorrMap,'wills',0);
-            gW_act(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+            gW_act(iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
             
             %left
             aCorrMap = ndautoCORR(densityPlotActNormSm(:,1:hLeft));
             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-            gA_actNorm(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+            gA_actNorm(iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
             [g,gdataA] = gridSCORE(aCorrMap,'wills',0);
-            gW_actNorm(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+            gW_actNorm(iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
             
             %right half of box
             aCorrMap = ndautoCORR(densityPlotActNormSm(:,h-hRight:end));
             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-            gA_actNorm(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+            gA_actNorm(iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
             [g,gdataA] = gridSCORE(aCorrMap,'wills',0);
-            gW_actNorm(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
+            gW_actNorm(iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
         end
         
         
         
         
         %permutation testing
-        
-
-        gA_actNormPerm = nan(1,nPerm);
-        gW_actNormPerm = nan(1,nPerm);
+      
         for iPerm = 1:nPerm
-            fprintf('Perm %d\n',iPerm);
+%             fprintf('Perm %d\n',iPerm);
 %             randInd=randperm(nTrialsTest); % randomise each point
             %20s perm - better way to code this?
             randInd20 = randperm(nTrialsTest/20); %atm has to be divisible by 20
@@ -194,14 +190,14 @@ for iterI=1:nIters2run
             %compute gridness
             aCorrMap = ndautoCORR(densityPlotActNormSmPerm);
             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-            gA_actNormPerm(iPerm) = gdataA.g_score;
+            gA_actNormPerm(iPerm,iterI) = gdataA.g_score;
             
             [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
-            gW_actNormPerm(iPerm) = gdataW.g_score;
+            gW_actNormPerm(iPerm,iterI) = gdataW.g_score;
             
         end
-        permPrc_gA(iterI,:) = prctile(gA_actNormPerm,[2.5, 5, 95, 97.5]);
-        permPrc_gW(iterI,:) = prctile(gW_actNormPerm,[2.5, 5, 95, 97.5]);
-    end
+        permPrc_gA(iterI,:) = prctile(gA_actNormPerm(:,iterI),[2.5, 5, 95, 97.5]);
+        permPrc_gW(iterI,:) = prctile(gW_actNormPerm(:,iterI),[2.5, 5, 95, 97.5]);
+%     end
 end
 end
