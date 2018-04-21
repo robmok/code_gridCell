@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -19,7 +19,7 @@ dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning
 % dat = 'trapz1'; % trapz, trapzNorm (without Krupic scaling) trapzSqs,
 % dat = 'trapz2';% 
 % dat = 'trapz3';
-dat = 'trapzKrupic';  
+% dat = 'trapzKrupic';  
 % dat = 'trapzScaled1';
 % dat = 'trapzScaled2';
 %  dat = 'trapzScaled3';
@@ -74,7 +74,24 @@ jointTrls = 1;
 % clus2run = [13, 7,  23];
 % clus2run = [4,  30];
 
-clus2run = 16;
+
+% batchSize=200 - circ love01
+clus2run = [20,  8,  10]; 
+% clus2run = [3,  7,  22]; 
+% clus2run = [26,  5,  6];
+% clus2run = [15,  12,  4];
+% clus2run = [11,  17, 9];
+% clus2run = [16, 24];  
+% clus2run = [13, 23];
+% clus2run = [21, 19];
+% clus2run = [14, 25];
+% clus2run = [27];
+% clus2run = [28];
+% clus2run = [29];
+% clus2run = [30];
+
+
+% clus2run = 16;
 
 % nTrials = 5000000; %how many locations in the box / trials 
 % nTrials = 2000000;
@@ -94,7 +111,7 @@ if fixBatchSize
     %joint trials
 %     nBatches = [1000, 2500, 10000]; 
 %     nBatches = [2500, 10000]; 
-    nBatches = 2500;
+    nBatches = 5000;
 %     nBatches = 10000;
 
 %     nBatches = [2500, 10000]; 
