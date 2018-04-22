@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -14,12 +14,14 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; %?
 dat = 'square';
+dat = 'circ';
 
 %for loading
 nTrials = 1000000;
 jointTrls=1;
 % clus2run = [3:30]; 
-clus2run=[3:10 12:2:30 11:2:29];
+%clus2run=[3:10 12:2:30 11:2:29];
+clus2run=[16:2:26 11:2:25]; %up to 26 only
 % clus2run = 14;
 nIter=200;
 epsMuVals=.025;
