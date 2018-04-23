@@ -29,7 +29,18 @@ clus2run  = [8:2:28];
 epsMuVals = .025;
 nTrials   = 1000000;
 batchSizeVals = [1000, 400, 100]; 
-% batchSizeVals=400;
+
+clus2run = 16;
+batchSizeVals=400;
+
+
+locRange = [0 49];
+nXvalDataSets=2; %20
+
+nDataPtsTestVals = nTrials/10;
+iDataPtsTest = 1;
+
+
 
 %load loop
 for iClus2run = 1:length(clus2run) 
@@ -38,6 +49,7 @@ for iClus2run = 1:length(clus2run)
         epsMuOrig=epsMuVals(iEps);
         epsMuOrig1000=epsMuOrig*1000;
         for iBvals = 1:length(batchSizeVals)
+            batchSize=batchSizeVals(iBvals);
             fprintf('Loading nClus=%d, epsMu=%d, batchSize=%d\n',nClus,epsMuOrig1000,batchSize)
             
             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
@@ -46,20 +58,58 @@ for iClus2run = 1:length(clus2run)
             end
             fname = [saveDir, fname '*']; %finish with directory and * for date/time
             
+            load(fname);
+            
             %need cluster positions
-            for iter = 1:nIter
-                for iSet = 1:nSets
+            for iterI = 1:nIter
+                for iSet = 1%:nSets
+%                     [mu{iClus2run}(:,1,iSet,iterI,iEps,iBvals), mu{iClus2run}(:,2,iSet,iterI,iEps,iBvals)] = find(densityPlot(:,:,iSet,iterI)); %find cluster positions - note, only last 2 sets
                     
-                    [mu{iClus2Run}(:,1,iSet,iterI,iEps,iBvals), mu{iClus2Run}(:,2,iSet,iterI,iEps,iBvals)] = find(densityPlot(:,:,iSet,iterI)); %find cluster positions - note, only last 2 sets
+
+                    %what to do with iSet? input to xVal needs to be
+                    %nClusx2xiterI, so prob don't put iEPSand iBvals here
+                    %either
+                    
+                    
+                    
+                    [mu{iClus2run}(:,1,iterI,iEps,iBvals), mu{iClus2run}(:,2,iterI,iEps,iBvals)] = find(densityPlot(:,:,iterI)); %find cluster positions - note, only last 2 sets
                     
                     
                     
                     
+                    
+                    %NOTE : this does the xVal on the same data - good within dat
+                    %type, but different for other shapes. i suppose data
+                    %would be different with diff shapes too..
+                    
+                    %think if this is what i want. probably?
                     
                 end
             end
             
             
+            xVal_results = xVal_clusConds(mu, dat,nXvalDataSets, nDataPtsTestVals(iDataPtsTest), locRange, nIter);
+
+            
+            
         end
     end
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
