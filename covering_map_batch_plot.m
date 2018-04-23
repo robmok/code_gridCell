@@ -114,13 +114,13 @@ batchSizeVals=400;
 annEps=0;
 
 % 
-% dat='trapzKrupic';
+dat='trapzKrupic';
 % % clus2run = [8, 12, 16, 20, 24,28]; 
 % % 
 % % % 6, 10, 14, 18, 22, 26 - 
 % % clus2run = [8:2:28]; 
-% clus2run = [12:4:28]; 
-% batchSizeVals = 400; %100, 125, 200,400, 1000
+clus2run = [3:17 19:30]; %missed 18?
+batchSizeVals = 400; %100, 125, 200,400, 1000
 
 %new - slower learning rate
 % epsMuVals=.015;

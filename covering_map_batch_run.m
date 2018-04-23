@@ -25,14 +25,14 @@ dat = 'square';
 %  dat = 'trapzScaled3';
 % dat = 'trapzNorm';%not scaled, fit into square
 
-% dat = 'cat';
+dat = 'catLearn';
 
 boxSize = 1; % 1=normal, 2=double size, 3=triple size
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
-nCats   = 2; %2 categories
-sigmaG = [3 0; 0 3]; R = chol(sigmaG);    % isotropic % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
-
+catsInfo.nCats=2; %2 categories
+sigmaG = [5 0; 0 5];   % isotropic % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
+catsInfo.R=chol(sigmaG);
 
 %annealed learning rate
 annEps = 0; %1 or 0
@@ -40,7 +40,7 @@ annEps = 0; %1 or 0
 %perm testing
 doPerm = 0;
 
-jointTrls = 1;
+jointTrls = 0;
 
 % fewer trials, lower learning rate
 % clus2run = [16, 20, 18, 30];
@@ -84,22 +84,28 @@ jointTrls = 1;
 %  clus2run = [13, 23];
 %  clus2run = [21, 19];
 %  clus2run = [14, 25];
-clus2run=18; %MISSED
+% clus2run=18; %MISSED
 
- %square love06 - running first 2 sets first:
-% clus2run = [20,  8,  22,  9, 6]; 
-% clus2run = [3,   12,  18, 17, 7];
+ %square love06 - anneps, 4 sets
+% clus2run = [20,  8,  22,  9, 11, 25]; 
+% clus2run = [3,   12, 18, 16, 7,  17];
+% clus2run = [26,  5,  13, 24, 14, 4];
+% clus2run = [15,  23, 19, 10, 21, 6];
 
-clus2run = [26,  5,  13, 24];
-clus2run = [15,  23, 19, 10];
-clus2run = [11,  25, 16, 7];
-clus2run = [14,  4,  21,  6];
+%next
+% clus2run = 27;
+% clus2run = 28;
+% clus2run = 29;
+% clus2run = 30;
 
-% clus2run = 16;
+% clus2run = 18; % trapzK missed 18 - 4 batchsizes, 2 matlabs for annEps=1/0
+
+clus2run = 30; 
+
 
 % nTrials = 5000000; %how many locations in the box / trials 
 % nTrials = 2000000;
-nTrials = 1000000; %new
+nTrials = 1000000/2; %new
 
 %batch size
 fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
@@ -115,9 +121,10 @@ if fixBatchSize
     %joint trials
 %     nBatches = [1000, 2500, 10000]; 
 %     nBatches = [2500, 10000]; 
-    nBatches = 5000;
+    nBatches = 2500;
 %     nBatches = 10000;
 
+%     nBatches = [2500, 10000, 5000, 8000]; 
 %     nBatches = [2500, 10000]; 
 %     nBatches = [8000 5000];
 
@@ -162,29 +169,21 @@ sTypes = 0;%:1;% :3; %0, 1 ,2, 3
 stochasticType=0;
 c=0;
 %%
-saveDat=1; %save simulations
+saveDat=0; %save simulations
 
-nIter=200; %how many iterations (starting points)
+nIter=1; %how many iterations (starting points)
 
-switch dat
-    case 'square'
-        trials = [randsample(linspace(locRange(1),locRange(2),50),nTrials,'true'); randsample(linspace(locRange(1),locRange(2),50),nTrials,'true')]';
-        %for computing sse over trials
-%         load([saveDir '/randTrialsBox_trialsUnique']);
-        trialsUnique=[];
-    case 'cat'
-        % draw points from 2 categories (gaussian) from a 2D feature space
-        nTrials = floor(nTrials/nCats); % points to sample
-        for iCat = 1:nCats 
-            mu(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % �10 so category centres are not on the edge
-            datPtsGauss(:,:,iCat) = round(repmat(mu(iCat,:),nTrials,1) + randn(nTrials,2)*R); % key - these are the coordinates of the points
-        end
-        trials = reshape(datPtsGauss,nTrials,2);
-        trials = trials(randperm(length(trials)),:);
-        trialsUnique=[];
-    otherwise
-        trials=[]; trialsUnique=[];
+if useSameTrls
+    switch dat
+        case 'square'
+        case 'catLearn'
+        otherwise
+            trials=[]; trialsUnique=[];
+    end
+else
+    trials=[]; %trialsUnique=[];
 end
+
 
 tic
 for iClus2run = 1:length(clus2run) %nClus conditions to run
@@ -208,7 +207,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
             end
             tic
 %             [densityPlot,densityPlotAct,densityPlotActNorm,clusMu,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,rSeed] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
-            [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB, permPrc] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stochasticType,c,dat,boxSize,annEps,jointTrls,doPerm);
+            [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB, permPrc,muAll, trials] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stochasticType,c,dat,boxSize,annEps,jointTrls,doPerm);
 
             timeTaken=toc;
             if saveDat
@@ -228,15 +227,12 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                     fname = [fname '_doPerm'];
                 end
                 if jointTrls
-                    fname = [fname '_jointTrls'];
+                    fname = [fname '_jointTrls_stepSiz'];
                 end
                 
-                %temp - trying 1,1,2,4 selStepSiz; rather than 1,3,5
-%                 fname=[fname '_stepSiz'];
-%                 trying 1,2,3,4 selStepSiz;
-%                 fname=[fname '_stepSiz1'];
-                
-                fname=[fname '_stepSiz'];
+                if strcmp(dat(1:3),'cat')
+                    fname = [fname sprintf('_%dcats',catsInfo.nCats)];
+                end
 
                 
                 cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);

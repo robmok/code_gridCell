@@ -1,4 +1,4 @@
-function [trials,dataPtsTest, rSeed] = createTrls(dat,nTrials,locRange,useSameTrls,jointTrls,boxSize,h)
+function [trials,dataPtsTest, rSeed] = createTrls(dat,nTrials,locRange,useSameTrls,jointTrls,boxSize,h,catsInfo)
 
 spacing =linspace(locRange(1),locRange(2),locRange(2)+1); 
 stepSize=diff(spacing(1:2)); nSteps = length(spacing);
@@ -17,24 +17,26 @@ switch dat
             end
         end
         shapePts = sqPts;
-    case 'cat'
+    case 'catLearn'
         % draw points from 2 categories (gaussian) from a 2D feature space
-        nTrials = floor(nTrials/nCats); % points to sample
-        for iCat = 1:nCats
-            mu(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % ±10 so category centres are not on the edge
-            datPtsGauss(:,:,iCat) = round(repmat(mu(iCat,:),nTrials,1) + randn(nTrials,2)*R); % key - these are the coordinates of the points
+        nTrialsCat = floor(nTrials/catsInfo.nCats); % points to sample
+        catCentres = nan(catsInfo.nCats,2);
+        datPtsGauss = nan(nTrialsCat,2,catsInfo.nCats);
+        for iCat = 1:catsInfo.nCats
+            catCentres(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % ±10 so category centres are not on the edge
+            datPtsGauss(:,:,iCat) = round(repmat(catCentres(iCat,:),nTrialsCat,1) + randn(nTrialsCat,2)*catsInfo.R); % key - these are the coordinates of the points
         end
         trials = reshape(datPtsGauss,nTrials,2);
         trials = trials(randperm(length(trials)),:);
-        for iCat = 1:nCats
-            mu(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % ±10 so category centres are not on the edge
-            datPtsGauss(:,:,iCat) = round(repmat(mu(iCat,:),nTrials,1) + randn(nTrials,2)*R); % key - these are the coordinates of the points
-        end
-        dataPtsTest = reshape(datPtsGauss,nTrials,2);
-        dataPtsTest = dataPtsTest(randperm(length(dataPtsTest)),:);
+%         for iCat = 1:catsInfo.nCats
+%             catCentres(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % ±10 so category centres are not on the edge
+%             datPtsGauss(:,:,iCat) = round(repmat(catCentres(iCat,:),nTrialsCat,1) + randn(nTrialsCat,2)*catsInfo.R); % key - these are the coordinates of the points
+%         end
+%         dataPtsTest = reshape(datPtsGauss,nTrials,2);
+%         dataPtsTest = dataPtsTest(randperm(length(dataPtsTest)),:);
+        dataPtsTest=[];
     case 'rect' 
         %EDIT
-        
 %         trials      = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)/1.5,nTrials,'true'); randsample(spacing,nTrials,'true')]';
 %         dataPtsTest = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)/1.5,nTrials,'true'); randsample(spacing,nTrials,'true')]';
     case 'trapzKrupic'
@@ -129,6 +131,7 @@ switch dat
         shapePts = circPts;
 end
 
+if ~strcmp(dat(1:3),'cat')
 %select points from specified shape - randomly sample the space, or joint trials
 if ~useSameTrls && ~jointTrls
     trialInd=randi(length(shapePts),nTrials,1);
@@ -233,7 +236,7 @@ end
 %joint trials
 trialIndTest = randi(length(shapePts),nTrials,1);
 dataPtsTest  = shapePts(trialIndTest,:);
-
+end
 end
 
 % %checking agent's visited locations

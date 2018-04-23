@@ -1,5 +1,5 @@
 % function [densityPlot,densityPlotAct,densityPlotActNorm,clusMu,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,rSeed,muAll] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE)
-function [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,permPrc,muAll, trials] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stochasticType,c,dat,boxSize,annEps,jointTrls,doPerm)
+function [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,permPrc,muAll, trials] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stochasticType,c,dat,boxSize,annEps,jointTrls,doPerm)
 
 %if end up not using desityPlotAct and gA_act - edit out below, or no need
 %to save the iters, etc.
@@ -125,7 +125,7 @@ for iterI = 1:nIter
     
     fprintf('iter %d \n',iterI);
 
-    [trials,dataPtsTest, rSeed(iterI)] = createTrls(dat,nTrials,locRange,useSameTrls,jointTrls,boxSize,h);
+    [trials,dataPtsTest, rSeed(iterI)] = createTrls(dat,nTrials,locRange,useSameTrls,jointTrls,boxSize,h,catsInfo);
         
     % if expand box
     switch warpType
@@ -138,13 +138,17 @@ for iterI = 1:nIter
     %initialise each cluster location  
     mu = nan(nClus,2,nBatch+1);
 %     mu(:,:,1) = kmplusInit(dataPtsTest,nClus); %kmeans++ initialisation
-    mu(:,:,1) = dataPtsTest(randi(nTrials,nClus,1),:); %forgy method
+    
+    if ~strcmp(dat(1:3),'cat')
+        mu(:,:,1) = dataPtsTest(randi(nTrials,nClus,1),:); %forgy method
+    else
+        mu(:,:,1) = reshape(randsample(locRange(1):diff(spacing(1:2)):locRange(2),nClus*2,'true'),nClus,2); %random
+    end
+    
     %add one where all clusters are randomly placed within the box (need to
     %figure out how to do this for irregular shapes)
     %++
-    
-    
-    
+   
     muInit(:,:,iterI) = mu(:,:,1);
 
     actTrl = zeros(nClus,batchSize);
@@ -316,7 +320,7 @@ for iterI = 1:nIter
            clusDistB(iSet-1,iterI)=sum(sqrt(sum([(mu(:,1,round(toTrlN(iSet)./batchSize)))-(mu(:,1,round(toTrlN(iSet-1)./batchSize))),(mu(:,2,round(toTrlN(iSet)./batchSize)))-(mu(:,2,round(toTrlN(iSet-1)./batchSize)))].^2,2)));
         end
         
-        if ~strcmp(dat,'cat') %if finding cats, won't be gridlike
+        if ~strcmp(dat(1:3),'cat') %if finding cats, won't be gridlike
             %compute autocorrmap
             aCorrMap = ndautoCORR(densityPlotSm);
             %compute gridness

@@ -24,9 +24,9 @@ for iSet=1:20+2 %size(densityPlotActTNorm,3)
     
 for iterI = 1%:3%:10 
     
-densityPlotCentresSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
+% densityPlotCentresSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
 % densityPlotCentresSm = imgaussfilt(densityPlotAct(:,:,iSet,iterI),gaussSmooth);
-% densityPlotCentresSm = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);
+densityPlotCentresSm = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);
 
 figure; hold on;
 subplot(1,2,1)
@@ -160,8 +160,8 @@ end
 
 figure;
 % figure('units','normalized','outerposition',[0 0 1 1]);
-for iTrl = 100000:nTrials
-    if mod(iTrl,10)==0 %plot centers after x trials
+for iTrl = 1000:nTrials
+    if mod(iTrl,500)==0 %plot centers after x trials
         %agent
         if plotAgent
 %         scatter(trials(iTrl,1),trials(iTrl,2),1000,colAgent,'.');
@@ -171,7 +171,11 @@ for iTrl = 100000:nTrials
 
         %have to start from 1000 trials min
         plotTrls=iTrl-999:iTrl;
-        h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'Color',repmat(colAgentCh(iTrl),1,3));
+        if strcmp(dat(1:3),'cat')
+            h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'.','Color',repmat(colAgentCh(iTrl),1,3));
+        else
+            h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'Color',repmat(colAgentCh(iTrl),1,3));
+        end
         if mod(iTrl,5000)==0
             delete(h1);
         end
@@ -179,7 +183,7 @@ for iTrl = 100000:nTrials
         
         %clusters
 %         scatter(squeeze(muAll(:,1,iTrl,iterI)),squeeze(muAll(:,2,iTrl,iterI)),200,colors,'.'); hold on;
-        scatter(squeeze(muTrls(:,1,iTrl)),squeeze(muTrls(:,2,iTrl)),2000,colors,'.'); hold on;
+        scatter(squeeze(muTrls(:,1,iTrl)),squeeze(muTrls(:,2,iTrl)),1000,colors,'.'); hold on;
         drawnow;
     end
 end
