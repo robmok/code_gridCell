@@ -87,12 +87,14 @@ jointTrls = 1;
 %  clus2run = [14, 25];
 % clus2run=18; %MISSED
 
- %square love06 - anneps, 4 sets
-% clus2run = [8,  22,  9, 11, 25];  %run 2500, 10000 first ,then 8k 5k
-% clus2run = [12, 18, 16, 7,  17];
-% clus2run = [5,  13, 24, 14, 4]; % run 8000 and 5000 , then ..
+ %square love06 - anneps, 4 sets -batchsize 2500, 10000, 5000
+clus2run = [8,  22,  9, 11, 25]; 
+clus2run = [12, 18, 16, 7,  17];
+ clus2run = [20, 3, 26, 15]; %  5000 - first 2 ran, run rest of this
+
+%next run:
+% clus2run = [5,  13, 24, 14, 4];
 % clus2run = [23, 19, 10, 21, 6];
-%  clus2run = [20, 3, 26, 15]; % 8000 and 5000 - first 2 ran, run rest of this
 
 %next
 % clus2run = 27;
@@ -104,7 +106,7 @@ jointTrls = 1;
 
 % clus2run = 18; % trapzK missed 18 - 4 batchsizes, 2 matlabs for annEps=1/0
 
-clus2run = 10; 
+% clus2run = 10; 
 
 
 % nTrials = 5000000; %how many locations in the box / trials 
@@ -131,9 +133,10 @@ if fixBatchSize
 %     nBatches = 10000;
 
 %     nBatches = [2500, 10000, 5000, 8000]; 
-%     nBatches = [5000, 8000, 2500, 10000, ]; 
-%     nBatches = [2500, 10000]; 
-%     nBatches = [8000 5000];
+    nBatches = [2500, 10000, 5000]; 
+%     nBatches = [8000 5000];\
+    nBatches = 5000;
+
 
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals);
