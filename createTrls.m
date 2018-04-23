@@ -26,7 +26,18 @@ switch dat
             catCentres(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % ±10 so category centres are not on the edge
             datPtsGauss(:,:,iCat) = round(repmat(catCentres(iCat,:),nTrialsCat,1) + randn(nTrialsCat,2)*catsInfo.R); % key - these are the coordinates of the points
         end
-        trials = reshape(datPtsGauss,nTrials,2);
+        trials = reshape(datPtsGauss,numel(datPtsGauss)/2,2);
+        %if odd number of categories, create the remaining number of trials 
+        trlsRem=nTrials-nTrialsCat*catsInfo.nCats;
+        if trlsRem>0 % if remainder
+            extraTrlsCat=nan(1,trlsRem);
+            extraTrlsCat=randi(catsInfo.nCats,1,trlsRem); %select cats randomly
+            extraTrls   = nan(trlsRem,2);
+            for iExtra=1:length(extraTrlsCat)
+                extraTrls(iExtra,:) = round(catCentres(extraTrlsCat(iExtra),:) + randn(1,2)*catsInfo.R);
+            end
+            trials = [trials; extraTrls];
+        end
         trials = trials(randperm(length(trials)),:);
 %         for iCat = 1:catsInfo.nCats
 %             catCentres(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % ±10 so category centres are not on the edge

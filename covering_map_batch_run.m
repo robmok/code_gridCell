@@ -4,7 +4,7 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -30,8 +30,9 @@ dat = 'catLearn';
 boxSize = 1; % 1=normal, 2=double size, 3=triple size
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
-catsInfo.nCats=2; %2 categories
+catsInfo.nCats=5; %2 categories
 sigmaG = [5 0; 0 5];   % isotropic % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
+sigmaG = [3 0; 0 3];
 catsInfo.R=chol(sigmaG);
 
 %annealed learning rate
@@ -100,12 +101,14 @@ jointTrls = 0;
 
 % clus2run = 18; % trapzK missed 18 - 4 batchsizes, 2 matlabs for annEps=1/0
 
-clus2run = 30; 
+clus2run = 10; 
 
 
 % nTrials = 5000000; %how many locations in the box / trials 
 % nTrials = 2000000;
-nTrials = 1000000/2; %new
+nTrials = 1000000; %new
+
+nTrials = 50000; %cat learning - need less trials
 
 %batch size
 fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
@@ -174,16 +177,15 @@ saveDat=0; %save simulations
 nIter=1; %how many iterations (starting points)
 
 if useSameTrls
-    switch dat
-        case 'square'
-        case 'catLearn'
-        otherwise
+%     switch dat
+%         case 'square'
+%         case 'catLearn'
+%         otherwise
             trials=[]; trialsUnique=[];
-    end
+%     end
 else
     trials=[]; %trialsUnique=[];
 end
-
 
 tic
 for iClus2run = 1:length(clus2run) %nClus conditions to run
