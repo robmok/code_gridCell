@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -15,7 +15,7 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
-dat = 'square'; 
+% dat = 'square'; 
 % dat = 'trapz1'; % trapz, trapzNorm (without Krupic scaling) trapzSqs,
 % dat = 'trapz2';% 
 % dat = 'trapz3';
@@ -36,7 +36,7 @@ sigmaG = [3 0; 0 3];
 catsInfo.R=chol(sigmaG);
 
 %annealed learning rate
-annEps = 1; %1 or 0
+annEps = 0; %1 or 0
 
 %perm testing
 doPerm = 0;
@@ -92,9 +92,9 @@ clus2run = [8,  22,  9, 11, 25];
 clus2run = [12, 18, 16, 7,  17];
  clus2run = [20, 3, 26, 15]; %  5000 - first 2 ran, run rest of this
 
-%next run:
-% clus2run = [5,  13, 24, 14, 4];
-% clus2run = [23, 19, 10, 21, 6];
+%next run: batchsize - 5000, 2500, 10000
+clus2run = [5,  13, 24, 14, 4];
+clus2run = [23, 19, 10, 21, 6];
 
 %next
 % clus2run = 27;
@@ -102,7 +102,12 @@ clus2run = [12, 18, 16, 7,  17];
 % clus2run = 29;
 % clus2run = 30;
 
-
+%circ not annEps missed:
+%batch=400
+clus2run = [17,19];
+clus2run = [26];
+%batch=100
+% clus2run = 26;
 
 % clus2run = 18; % trapzK missed 18 - 4 batchsizes, 2 matlabs for annEps=1/0
 
@@ -129,13 +134,17 @@ if fixBatchSize
     %joint trials
 %     nBatches = [1000, 2500, 10000]; 
 %     nBatches = [2500, 10000]; 
+    
     nBatches = 2500;
 %     nBatches = 10000;
 
+    
+    
 %     nBatches = [2500, 10000, 5000, 8000]; 
-    nBatches = [2500, 10000, 5000]; 
+%     nBatches = [2500, 10000, 5000]; 
+%     nBatches = [5000, 2500, 10000]; 
 %     nBatches = [8000 5000];\
-    nBatches = 5000;
+%     nBatches = 5000;
 
 
     batchSizeVals = nTrials./nBatches;
@@ -171,9 +180,20 @@ elseif boxSize==3 %triple
     locRange(2)= locRange(2)*3;
 end
 
+%stochastic update
+% sTypes = 1;%:1;%  %0, 1 ,2, 3
+% % 0. none
+% % 1. standard stochastic update - becomes more det over time; becomes
+% % basically deterministic at some point
+% %  larger c = less stochastic over trials (becomes det quite early on); smaller c = more stochastic over trials (still a bit stochastic by the end)
+% % cValsOrig = [2/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]; %removed .1/nTrials and .25/nTrials,  too stochastic. also 3/ntrials, .5/nTrials
+% cValsOrig = 5/nTrials;
+
+
 % change box shape during learning rectangle
 warpBox = 0; %1 or 0
 warpType = 'sq2rect';
+
 
 sTypes = 0;%:1;% :3; %0, 1 ,2, 3
 stochasticType=0;

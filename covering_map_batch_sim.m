@@ -163,7 +163,6 @@ for iterI = 1:nIter
     
     for iBatch=1:nBatch
         batchInd=batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize; %trials to average over
-
         trls2Upd = trials(batchInd,:); %trials to use this batch
 
 %             %if change size of box half way
@@ -173,12 +172,11 @@ for iterI = 1:nIter
 
             %compute distances
 %             dist2Clus = sqrt(sum([mu(:,1,iTrl)'-trials(iTrl,1); mu(:,2,iTrl)'-trials(iTrl,2)].^2)); % vectorising euclid dist - sqrt(sum((a-b).^2)), since can't use xval method
-            
             %compute distances - vectorise both clusters and trials (in batch)
             dist2Clus = sqrt(sum(reshape([mu(:,1,iBatch)'-trls2Upd(:,1), mu(:,2,iBatch)'-trls2Upd(:,2)].^2,batchSize,nClus,2),3));% reshapes it into batchSize x nClus x 2 (x and y locs)
-%             dist2Clus = sqrt(sum(dist2Clus,3));
             
-            %stochastic update - select 1 of the closest clusters w random element - stochastic parameter c - large is deterministic, 0 - random            
+            
+%             %stochastic update - select 1 of the closest clusters w random element - stochastic parameter c - large is deterministic, 0 - random            
 %             if stochasticType %stochastic update
 %                 if stochasticType==1
 % %                     beta=c*(iTrl-1);         % so this gets bigger, and more deterministic with more trials
@@ -199,18 +197,16 @@ for iterI = 1:nIter
 %                 end
 %                 cParams.betaAll(iTrl)       = beta;
 %             else %deterministic update
-%                 closestC=find(min(dist2Clus)==dist2Clus);
+%                 %                 closestC=find(min(dist2Clus)==dist2Clus);
+% %             end
+% %             if numel(closestC)>1 %if more than 1, randomly choose one
+% %                 closestC = randsample(closestC,1);
 %             end
-%             if numel(closestC)>1 %if more than 1, randomly choose one
-%                 closestC = randsample(closestC,1);
-%             end
+
+           
             
-            %deterministic update
-%             closestC=find(min(dist2Clus)==dist2Clus);
 
             %deterministic update - batch; save closestC for each trial
-            %%%% -need to find min dist cluster for each trial; better way?
-            %%%% / vectorize?
             closestC = nan(1,batchSize);
             for iTrlBatch = 1:batchSize
                 closestTmp = find(min(dist2Clus(iTrlBatch,:))==dist2Clus(iTrlBatch,:));
@@ -220,7 +216,6 @@ for iterI = 1:nIter
                     a=1;
                 else
                     closestC(iTrlBatch) = closestTmp;
-                    
                 end
                 %compute activation
                 if ~strcmp(dat(1:4),'trap') %not computing for trapz

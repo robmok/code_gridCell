@@ -37,7 +37,7 @@ for iNpts = 1:length(nPointsVals)
         fprintf('Running %d dataPts, %d testDataPts\n',nPointsVals(iNpts),nDataPtsTestVals(iDataPtsTest));
         xVal_results = xVal_clusConds(muAllkVals, dat,nXvalDataSets, nDataPtsTestVals(iDataPtsTest), locRange, nIters);
         if saveDat
-            fname = [saveDir sprintf('/kmeans_xVal_nK_%d-%d_%s_%dtrainPts_%dtestPts_%diters_%sims_%ddatasets',kVals(1),kVals(end),dat,nPointsVals(iNpts),nDataPtsTestVals(iDataPtsTest),nKmeans,nSims,nXvalDataSets)];
+            fname = [saveDir sprintf('/kmeans_xVal_nK_%d-%d_%s_%dtrainPts_%dtestPts_%diters_%dsims_%ddatasets',kVals(1),kVals(end),dat,nPointsVals(iNpts),nDataPtsTestVals(iDataPtsTest),nKmeans,nSims,nXvalDataSets)];
             save(fname,'xVal_results');
         end
     end
