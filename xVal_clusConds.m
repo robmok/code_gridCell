@@ -1,4 +1,8 @@
-function xVal_results = xVal_clusConds(mu, dat,nXvalDataSets, nDataPtsTest, locRange, nIter, dataPts)
+function xVal_results = xVal_clusConds(mu, dat,nXvalDataSets, nDataPtsTest, locRange, nIter, jointTrlsXval, dataPts)
+
+if nargin < 7
+    jointTrlsXval=0;
+end
 % Crossvalidation function - save SSE and SSE per cluster (spreadoutness
 % measure) 
 
@@ -33,7 +37,7 @@ indSSE     = nan(1,nIter,nClusConds);
 indSprSd   = nan(1,nIter,nClusConds);
 indSprVar  = nan(1,nIter,nClusConds);
 
-if nargin > 6 % if no orig data, don't compute
+if nargin > 7 % if no orig data, don't compute
     for iClusCond = 1:nClusConds
         nClus   = size(mu{iClusCond},1);
         for iterI = 1:nIter
@@ -69,36 +73,43 @@ dataPtsTest    = nan(nDataPtsTest,2,nXvalDataSets);
 
 for iDataSets = 1:nXvalDataSets
     fprintf('xVal dataset %d \n',iDataSets);
-    switch dat
-        case 'square' % draw random points in a box (uniform distribution)
-            dataPtsTest(:,:,iDataSets) = [randsample(linspace(locRange(1),locRange(2),50),nDataPtsTest,'true'); randsample(linspace(locRange(1),locRange(2),50),nDataPtsTest,'true')]'; % random points in a box
-        case 'randUnique' % draw random points in a box (uniform distribution)
-            dataPtsTest(:,:,iDataSets) = [randsample(linspace(locRange(1),locRange(2),50),nDataPtsTest,'true'); randsample(linspace(locRange(1),locRange(2),50),nDataPtsTest,'true')]'; % random points in a box
-        case 'cat' % points from clusters of 2D gaussians
-            nTrialsCat = floor(nDataPtsTest/nCats); % points to sample
-            for iCat = 1:nCats
-                datPtsTmp(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % ±10 so category centres are not on the edge
-                datPtsGauss(:,:,iCat) = round(repmat(datPtsTmp(iCat,:),nTrialsCat,1) + randn(nTrialsCat,2)*R); % key - these are the coordinates of the points
-            end
-            dataPtsTestTmp = reshape(datPtsGauss,nDataPtsTest,2);
-            dataPtsTest(:,:,iDataSets) = dataPts(randperm(length(dataPtsTestTmp)),:);
-        case 'circ'
-            % Create logical image of a circle
-            nSteps = length(linspace(locRange(1),locRange(2),locRange(2)+1));
-            imageSizeX = nSteps;
-            [columnsInImage, rowsInImage] = meshgrid(1:imageSizeX, 1:imageSizeX);
-            centerX = nSteps/2; centerY = nSteps/2;
-            radius = nSteps/2-1;
-            circIm = (rowsInImage - centerY).^2 ...
-                + (columnsInImage - centerX).^2 <= radius.^2;
-            circPts=[]; % find circle points in XY coords
-            for iX=1:length(circIm)
-                yVals = find(circIm(iX,:));
-                circPts = [circPts; ones(length(yVals),1)*iX, yVals'];
-            end
-            trialIndTest = randi(length(circPts),nDataPtsTest,1);
-            dataPtsTest(:,:,iDataSets)  = circPts(trialIndTest,:);
+    
+    if jointTrlsXval
+        dataPtsTest(:,:,iDataSets) = createTrls(dat,nDataPtsTest,locRange,0,1,1) ;
+        
+    else
+        switch dat
+            case 'square' % draw random points in a box (uniform distribution)
+                dataPtsTest(:,:,iDataSets) = [randsample(linspace(locRange(1),locRange(2),50),nDataPtsTest,'true'); randsample(linspace(locRange(1),locRange(2),50),nDataPtsTest,'true')]'; % random points in a box
+            case 'randUnique' % draw random points in a box (uniform distribution)
+                dataPtsTest(:,:,iDataSets) = [randsample(linspace(locRange(1),locRange(2),50),nDataPtsTest,'true'); randsample(linspace(locRange(1),locRange(2),50),nDataPtsTest,'true')]'; % random points in a box
+            case 'cat' % points from clusters of 2D gaussians
+                nTrialsCat = floor(nDataPtsTest/nCats); % points to sample
+                for iCat = 1:nCats
+                    datPtsTmp(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % ±10 so category centres are not on the edge
+                    datPtsGauss(:,:,iCat) = round(repmat(datPtsTmp(iCat,:),nTrialsCat,1) + randn(nTrialsCat,2)*R); % key - these are the coordinates of the points
+                end
+                dataPtsTestTmp = reshape(datPtsGauss,nDataPtsTest,2);
+                dataPtsTest(:,:,iDataSets) = dataPts(randperm(length(dataPtsTestTmp)),:);
+            case 'circ'
+                % Create logical image of a circle
+                nSteps = length(linspace(locRange(1),locRange(2),locRange(2)+1));
+                imageSizeX = nSteps;
+                [columnsInImage, rowsInImage] = meshgrid(1:imageSizeX, 1:imageSizeX);
+                centerX = nSteps/2; centerY = nSteps/2;
+                radius = nSteps/2-1;
+                circIm = (rowsInImage - centerY).^2 ...
+                    + (columnsInImage - centerX).^2 <= radius.^2;
+                circPts=[]; % find circle points in XY coords
+                for iX=1:length(circIm)
+                    yVals = find(circIm(iX,:));
+                    circPts = [circPts; ones(length(yVals),1)*iX, yVals'];
+                end
+                trialIndTest = randi(length(circPts),nDataPtsTest,1);
+                dataPtsTest(:,:,iDataSets)  = circPts(trialIndTest,:);
+        end
     end
+    
     
     % Crossvalidation start
     for iClusCond = 1:nClusConds

@@ -212,8 +212,6 @@ for iterI = 1:nIter
                 closestTmp = find(min(dist2Clus(iTrlBatch,:))==dist2Clus(iTrlBatch,:));
                 if numel(closestTmp)>1
                     closestC(iTrlBatch) = randsample(closestTmp,1);
-                elseif numel(closestTmp)<1
-                    a=1;
                 else
                     closestC(iTrlBatch) = closestTmp;
                 end

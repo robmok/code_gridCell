@@ -24,10 +24,10 @@ nSets   = 20; % if just clus positions, no need last two
 % joined trials
 jointTrls = 1;
 clus2run  = [8:2:28]; 
-% clus2run  = [3:30]; %26 
+clus2run  = [3:25]; %26 
 % clus2run  = [3:16, 18, 20:24];  %batchsize400, no 17,19,25, 26, ... 30
 
-clus2run  = 3:30; %26 
+% clus2run  = 3:; %26 
 
 
 epsMuVals = .025;
@@ -35,7 +35,7 @@ nTrials   = 1000000;
 batchSizeVals = [1000, 400, 100]; 
 
 % clus2run = 18;
-batchSizeVals=100;
+batchSizeVals=400;
 
 
 locRange = [0 49];
@@ -44,6 +44,10 @@ nXvalDataSets=20; %20
 nDataPtsTestVals = nTrials/100;
 iDataPtsTest = 1;
 
+
+
+%new
+jointTrlsXval = 1; %xval dat also use jointTrls
 
 %no file
 
@@ -94,7 +98,7 @@ for iEps = 1:length(epsMuVals)
             gA_gAll(:,:,iEps,iBvals,iClus2run,:)   = gA(:,:,1,:);
 
         end
-        xVal_results = xVal_clusConds(mu, dat,nXvalDataSets, nDataPtsTestVals(iDataPtsTest), locRange, nIter);
+        xVal_results = xVal_clusConds(mu, dat,nXvalDataSets, nDataPtsTestVals(iDataPtsTest), locRange, nIter,jointTrlsXval);
 
          fname = [saveDir sprintf('/covering_map_xVal_%s_%d-%dclus_eps%d_batchSiz%d_%diters_annEps%d_%dktestPts_%dxValDatasets',dat,clus2run(1),clus2run(end),epsMuOrig1000,batchSize,nIter,annEps,nDataPtsTestVals(iDataPtsTest)/1000,nXvalDataSets)];
 %          save(fname,'xVal_results');
@@ -115,7 +119,7 @@ end
 [r;p]'
 
 
-
+ 
 
 
 

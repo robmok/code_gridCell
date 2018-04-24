@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -104,14 +104,14 @@ clus2run = [23, 19, 10, 21, 6];
 
 %circ not annEps missed:
 %batch=400
-clus2run = [17,19];
-clus2run = [26];
+% clus2run = [17,19];
+% clus2run = [26];
 %batch=100
 % clus2run = 26;
 
 % clus2run = 18; % trapzK missed 18 - 4 batchsizes, 2 matlabs for annEps=1/0
 
-% clus2run = 10; 
+clus2run = 10; 
 
 
 % nTrials = 5000000; %how many locations in the box / trials 
