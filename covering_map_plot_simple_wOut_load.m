@@ -160,8 +160,9 @@ end
 
 figure;
 % figure('units','normalized','outerposition',[0 0 1 1]);
+clear h1
 for iTrl = 1000:nTrials
-    if mod(iTrl,100)==0 %plot centers after x trials
+    if mod(iTrl,50)==0 %plot centers after x trials
         %agent
         if plotAgent
 %         scatter(trials(iTrl,1),trials(iTrl,2),1000,colAgent,'.');

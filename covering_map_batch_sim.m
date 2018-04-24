@@ -178,17 +178,8 @@ for iterI = 1:nIter
             
 %             %stochastic update - select 1 of the closest clusters w random element - stochastic parameter c - large is deterministic, 0 - random            
 %             if stochasticType %stochastic update
-%                 if stochasticType==1
-% %                     beta=c*(iTrl-1);         % so this gets bigger, and more deterministic with more trials
-%                     beta=c*(iTrl+nTrials/50);  % maybe no need to be so stochatic at start
-%                 elseif stochasticType==2
-%                     beta=c*(iTrl+nTrials/50);  % maybe no need to be so stochatic at start
-%                     if beta >= c*500 %it might be worth checking if this depends on nClusters - distances will change
-%                         beta = c*500;
-%                     end
-%                 elseif stochasticType==3
-%                     beta = c*500; % as a function of c %prev:.185; 
-%                 end
+% %                 beta=c*(iTrl-1);         % so this gets bigger, and more deterministic with more trials
+%                 beta=c*(iTrl+nTrials/50);  % maybe no need to be so stochatic at start
 %                 dist2Clus2 = exp(-beta.*dist2Clus)./ sum(exp(-beta.*dist2Clus));
 %                 distClusPr = cumsum(dist2Clus2);
 %                 closestC=find(rand(1)<distClusPr,1);
@@ -197,19 +188,27 @@ for iterI = 1:nIter
 %                 end
 %                 cParams.betaAll(iTrl)       = beta;
 %             else %deterministic update
-%                 %                 closestC=find(min(dist2Clus)==dist2Clus);
-% %             end
-% %             if numel(closestC)>1 %if more than 1, randomly choose one
-% %                 closestC = randsample(closestC,1);
 %             end
 
-           
-            
-
-            %deterministic update - batch; save closestC for each trial
             closestC = nan(1,batchSize);
             for iTrlBatch = 1:batchSize
-                closestTmp = find(min(dist2Clus(iTrlBatch,:))==dist2Clus(iTrlBatch,:));
+                if stochasticType %stochastic update
+                    %                 beta=c*(iTrl-1);         % so this gets bigger, and more deterministic with more trials
+%                     beta=c*((iBatch-1)*batchSize+iTrlBatch+nTrials/50);  % maybe no need to be so stochatic at start
+                    beta=c*((iBatch-1)*batchSize+nTrials/50);  % by batch
+                    
+                    
+                    dist2Clus2 = exp(-beta.*dist2Clus(iTrlBatch,:))./ sum(exp(-beta.*dist2Clus(iTrlBatch,:)));
+                    distClusPr = cumsum(dist2Clus2);
+                    closestTmp=find(rand(1)<distClusPr,1);
+                    if isempty(closestTmp)  %if beta is too big, just do deterministic update (already will be near deterministic anyway)
+                        closestTmp = find(min(dist2Clus(iTrlBatch,:))==dist2Clus(iTrlBatch,:));
+                    end
+                    betaAll((iBatch-1)*batchSize+iTrlBatch)     = beta;
+                else %deterministic update
+                    closestTmp = find(min(dist2Clus(iTrlBatch,:))==dist2Clus(iTrlBatch,:));
+                end
+                
                 if numel(closestTmp)>1
                     closestC(iTrlBatch) = randsample(closestTmp,1);
                 else
@@ -224,6 +223,33 @@ for iterI = 1:nIter
             if ~strcmp(dat(1:4),'trap') %not computing for trapz
                 actTrlAll(:,:,iBatch) = actTrl;
             end
+            
+            
+            
+            
+
+%             %deterministic update - batch; save closestC for each trial -
+%             from before
+% %             closestC = nan(1,batchSize);
+%             for iTrlBatch = 1:batchSize
+%                 closestTmp = find(min(dist2Clus(iTrlBatch,:))==dist2Clus(iTrlBatch,:));
+%                 if numel(closestTmp)>1
+%                     closestC(iTrlBatch) = randsample(closestTmp,1);
+%                 else
+%                     closestC(iTrlBatch) = closestTmp;
+%                 end
+%                 %compute activation
+%                 if ~strcmp(dat(1:4),'trap') %not computing for trapz
+%                     sigmaGauss = stepSize;%/3.5; %move up later - 1 seems to be fine
+%                     actTrl(closestC(iTrlBatch),iTrlBatch)=mvnpdf(trls2Upd(iTrlBatch,:),mu(closestC(iTrlBatch),:,iBatch),eye(2)*sigmaGauss); % save only the winner
+%                 end
+%             end
+%             
+%             if ~strcmp(dat(1:4),'trap') %not computing for trapz
+%                 actTrlAll(:,:,iBatch) = actTrl;
+%             end
+%             
+            
 %             %if stochastic, closestC might not be if more than 1 actual
 %             %closest, have to check if stoch update chose one of them
 %             actualClosestC = find(min(dist2Clus)==dist2Clus); 

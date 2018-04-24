@@ -25,12 +25,13 @@ dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning
 %  dat = 'trapzScaled3';
 % dat = 'trapzNorm';%not scaled, fit into square
 
-% dat = 'catLearn';
+dat = 'catLearn';
 
 boxSize = 1; % 1=normal, 2=double size, 3=triple size
 
+
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
-catsInfo.nCats=5; %2 categories
+catsInfo.nCats=3; %2 categories
 sigmaG = [5 0; 0 5];   % isotropic % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 sigmaG = [3 0; 0 3];
 catsInfo.R=chol(sigmaG);
@@ -41,7 +42,7 @@ annEps = 0; %1 or 0
 %perm testing
 doPerm = 0;
 
-jointTrls = 1;
+jointTrls = 0;
 
 % fewer trials, lower learning rate
 % clus2run = [16, 20, 18, 30];
@@ -111,14 +112,14 @@ clus2run = [23, 19, 10, 21, 6];
 
 % clus2run = 18; % trapzK missed 18 - 4 batchsizes, 2 matlabs for annEps=1/0
 
-clus2run = 10; 
+clus2run = 30; 
 
 
 % nTrials = 5000000; %how many locations in the box / trials 
 % nTrials = 2000000;
 nTrials = 1000000; %new
 
-% nTrials = 50000; %cat learning - need less trials
+nTrials = 50000; %cat learning - need less trials
 
 %batch size
 fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
@@ -181,27 +182,28 @@ elseif boxSize==3 %triple
 end
 
 %stochastic update
-% sTypes = 1;%:1;%  %0, 1 ,2, 3
+sTypes = 1;%:1;%  %0, 1 ,2, 3
+stochasticType = 1;
 % % 0. none
 % % 1. standard stochastic update - becomes more det over time; becomes
 % % basically deterministic at some point
 % %  larger c = less stochastic over trials (becomes det quite early on); smaller c = more stochastic over trials (still a bit stochastic by the end)
 % % cValsOrig = [2/nTrials, 5/nTrials, 10/nTrials, 20/nTrials]; %removed .1/nTrials and .25/nTrials,  too stochastic. also 3/ntrials, .5/nTrials
 % cValsOrig = 5/nTrials;
-
+c = 20/nTrials;
 
 % change box shape during learning rectangle
 warpBox = 0; %1 or 0
 warpType = 'sq2rect';
 
 
-sTypes = 0;%:1;% :3; %0, 1 ,2, 3
-stochasticType=0;
-c=0;
+% sTypes = 0;%:1;% :3; %0, 1 ,2, 3
+% stochasticType=0;
+% c=0;
 %%
-saveDat=1; %save simulations
+saveDat=0; %save simulations
 
-nIter=200; %how many iterations (starting points)
+nIter=1; %how many iterations (starting points)
 
 if useSameTrls
 %     switch dat
