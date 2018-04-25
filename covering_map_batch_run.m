@@ -16,19 +16,13 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
 % dat = 'square'; 
-% dat = 'trapz1'; % trapz, trapzNorm (without Krupic scaling) trapzSqs,
-% dat = 'trapz2';% 
-% dat = 'trapz3';
-% dat = 'trapzKrupic';  
-% dat = 'trapzScaled1';
-% dat = 'trapzScaled2';
-%  dat = 'trapzScaled3';
-% dat = 'trapzNorm';%not scaled, fit into square
+dat = 'trapzKrupic';
 
-dat = 'catLearn';
+% dat = 'catLearn';
+
+jointTrls = 1;
 
 boxSize = 1; % 1=normal, 2=double size, 3=triple size
-
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
 catsInfo.nCats=3; %2 categories
@@ -41,8 +35,6 @@ annEps = 0; %1 or 0
 
 %perm testing
 doPerm = 0;
-
-jointTrls = 0;
 
 % fewer trials, lower learning rate
 % clus2run = [16, 20, 18, 30];
@@ -112,14 +104,14 @@ clus2run = [23, 19, 10, 21, 6];
 
 % clus2run = 18; % trapzK missed 18 - 4 batchsizes, 2 matlabs for annEps=1/0
 
-clus2run = 30; 
+clus2run = 18; 
 
 
 % nTrials = 5000000; %how many locations in the box / trials 
 % nTrials = 2000000;
 nTrials = 1000000; %new
 
-nTrials = 50000; %cat learning - need less trials
+% nTrials = 50000; %cat learning - need less trials
 
 %batch size
 fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
@@ -182,7 +174,7 @@ elseif boxSize==3 %triple
 end
 
 %stochastic update
-sTypes = 1;%:1;%  %0, 1 ,2, 3
+sTypes = 0;%:1;%  %0, 1 ,2, 3
 stochasticType = 1;
 % % 0. none
 % % 1. standard stochastic update - becomes more det over time; becomes

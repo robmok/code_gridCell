@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -15,18 +15,22 @@ locRange = [0 49];
 nTrialsTest = 100000; %?
 dat = 'square';
 % dat = 'circ';
-% dat = 'trapzKrupic';
+dat = 'trapzKrupic';
 
 %for loading
 nTrials = 1000000;
 jointTrls=1;
 % clus2run = [3:30]; 
-% clus2run=[3:10 12:2:26 11:2:25, 27:30]; % 27:30
+clus2run=[3:10 12:2:26 11:2:25, 27:30]; % 27:30
 %split
 clus2run=[4:2:10, 12:2:26]; 
-% clus2run=[3:2:9, 11:2:25]; 
+clus2run=[3:2:9, 11:2:25]; 
 
-% clus2run = 14;
+%trapzK rest of it
+% clus2run=[11:2:25]; 
+
+clus2run = 18;
+
 nIter=200;
 epsMuVals=.025;
 nTrials=1000000;
@@ -47,8 +51,11 @@ doPerm=0;
 % perm data are about the same, then just take max, or 95th percentile as
 % the threshold value)
 nIters2run = 200; 
+nIters2run = 3; 
 
 nPerm = 500;
+
+saveDat=0;
 
 for iClus2run = 1:length(clus2run) 
     nClus = clus2run(iClus2run);
@@ -67,7 +74,7 @@ for iClus2run = 1:length(clus2run)
             %load
             fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat);
             if annEps %epsMu is different here
-                fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps*_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_annEps',nClus,round(nTrials/1000),batchSize,nIter,dat);
+                fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps*_batchSiz%d_%diters_%s_wAct_annEps_jointTrls_stepSiz',nClus,round(nTrials/1000),batchSize,nIter,dat);
             end
             %finish with directory and * for date/time
             fname = [saveDir, fname '*']; %finish with directory and * for date/time
@@ -76,6 +83,9 @@ for iClus2run = 1:length(clus2run)
             if isempty(f) %if no file, don't load/save - but print a warning
                 warning('No file for: %s\n',fname);
             elseif ~isempty(f)
+                
+                %have to fix overlapping file names
+                
                 for iF = 1%:length(f)
 %                     filesToLoad{iF} = f(iF).name;
                     load(f(iF).name);
@@ -84,7 +94,7 @@ for iClus2run = 1:length(clus2run)
                 %run
                 tic
 %                 [permPrc_gA, permPrc_gW,densityPlotAct,densityPlotActNorm,gA_act,gA_actNorm,gW_act,gW_actNorm, rSeedTest] = gridnessTestData_Perm(densityPlot,dat,locRange,nClus,nTrialsTest,nPerm,nIters2run);
-                [permPrc_gA_act, permPrc_gW_act,permPrc_gA_actNorm, permPrc_gW_actNorm,gA_act,gA_actNorm,gW_act,gW_actNorm, gA_actNormPerm, gW_actNormPerm] = gridnessTestData_Perm(densityPlot,dat,locRange,nClus,nTrialsTest,nPerm,nIters2run,doPerm);
+                [permPrc_gA_act, permPrc_gW_act,permPrc_gA_actNorm, permPrc_gW_actNorm,gA_act,gA_actNorm,gW_act,gW_actNorm, gA_actNormPerm, gW_actNormPerm, densityPlotAct,densityPlotActNorm] = gridnessTestData_Perm(densityPlot,dat,locRange,nClus,nTrialsTest,nPerm,nIters2run,doPerm);
                 timeTaken=toc;
 
                 %save
@@ -94,7 +104,9 @@ for iClus2run = 1:length(clus2run)
                 else
                     fname = [fname(1:end-1), sprintf('_noPerm_diters_%s',cTime)];
                 end
-                save(fname,'permPrc_gA_act','permPrc_gA_act','permPrc_gA_actNorm','permPrc_gA_actNorm','gA_act','gA_actNorm','gW_act','gW_actNorm','timeTaken')
+                if saveDat
+                    save(fname,'permPrc_gA_act','permPrc_gA_act','permPrc_gA_actNorm','permPrc_gA_actNorm','gA_act','gA_actNorm','gW_act','gW_actNorm','timeTaken');
+                end
             end
         end
     end

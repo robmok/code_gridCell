@@ -68,11 +68,16 @@ hLeft  = floor(halfArea/((b+c)/2)); %bigger side
 hRight = ceil(halfArea/((b+c)/2))+1; %smaller size - to equalize area more
 
 gaussSmooth=1;
-for iSet=1:22
+for iSet=3%:22
 for iterI = 1%:10
     
-    densityPlotCentresSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
+%     densityPlotCentresSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
+%     densityPlotCentresSm = imgaussfilt(densityPlotAct(:,:,iSet,iterI),gaussSmooth);
 %     densityPlotCentresSm = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);
+    
+    %no smoothing
+    densityPlotCentresSm = densityPlotAct(:,:,iSet,iterI);
+    densityPlotCentresSm = densityPlotActNorm(:,:,iSet,iterI);
     
     figure; hold on;
     subplot(1,3,1)
@@ -162,7 +167,7 @@ figure;
 % figure('units','normalized','outerposition',[0 0 1 1]);
 clear h1
 for iTrl = 1000:nTrials
-    if mod(iTrl,50)==0 %plot centers after x trials
+    if mod(iTrl,200)==0 %plot centers after x trials
         %agent
         if plotAgent
 %         scatter(trials(iTrl,1),trials(iTrl,2),1000,colAgent,'.');

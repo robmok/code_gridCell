@@ -110,7 +110,7 @@ for iterI=1:nIters2run
         %densityPlotActNorm
         for iTrl = 1:nTrialsTest
             densityPlotAct(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1,iterI)    = densityPlotAct(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1,iterI)+ nansum(actTrl(:,iTrl));
-            densityPlotActUpd(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1) = densityPlotActUpd(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)+1; %log nTimes loc was visited
+            densityPlotActUpd(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)       = densityPlotActUpd(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)+1; %log nTimes loc was visited
         end
         densityPlotActNorm(:,:,iterI) = densityPlotAct(:,:,iterI)./densityPlotActUpd; %divide by number of times that location was visited
         densityPlotActSm                   = imgaussfilt(densityPlotAct(:,:,iterI),gaussSmooth);

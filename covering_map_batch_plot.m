@@ -16,8 +16,9 @@ fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
 % dat='square';
-annEps=0;
+% annEps=0;
 boxSize=1;
+nIter=200;
 
 % clus2run = [7,8,10,12]; 
 % nTrials = 100000; 
@@ -36,15 +37,15 @@ boxSize=1;
 % have some sims with ntrials = 5000000 (less batchSizeVals)
 % clus2run = [10:2:28]; % also have 11 but left out plot
 % clus2run = 28; % plotting one nClus cond over sets
-nTrials=2500000;
-nIter=200;
-% batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
-%wAct
-clus2run = [10:2:30];
-clus2run = [10, 12 16:2:28]; %no 14 and 30 for sq, no 12, 30 for circ; epsmu=00.75
-% batchSizeVals=[1000, 2000];
-batchSizeVals = [1000, 500, 125, 50];
-epsMuVals=.075;
+% nTrials=2500000;
+% nIter=200;
+% % batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
+% %wAct
+% clus2run = [10:2:30];
+% clus2run = [10, 12 16:2:28]; %no 14 and 30 for sq, no 12, 30 for circ; epsmu=00.75
+% % batchSizeVals=[1000, 2000];
+% batchSizeVals = [1000, 500, 125, 50];
+% epsMuVals=.075;
 
  %new
 %  clus2run = [10, 12, 16:2:26]; %no 14? 28? - errored, running (0.15, circ)
@@ -106,7 +107,8 @@ epsMuVals=.075;
 % joined trials
 jointTrls=1;
 % clus2run = [8, 12, 16, 20,24, 28]; 
-clus2run = [8:2:28]; 
+% clus2run = [8:2:28]; 
+clus2run = [3:26]; 
 epsMuVals=.025;
 nTrials=1000000;
 batchSizeVals = [1000, 400, 100]; 
@@ -119,7 +121,10 @@ annEps=0;
 % % 
 % % % 6, 10, 14, 18, 22, 26 - 
 % % clus2run = [8:2:28]; 
-clus2run = [3:26]; %missed 18?
+
+clus2run = [3:26]; 
+
+% clus2run = [4:25];
 
 % clus2run=26;
 
@@ -176,20 +181,46 @@ for iClus2run = 1:length(clus2run)
                 fname = [fname sprintf('_boxSizex%d',boxSize)];
             end
             if annEps %epsMu is different here
-                fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps*_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_annEps',nClus,round(nTrials/1000),batchSize,nIter,dat)];
+%                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps*_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_annEps',nClus,round(nTrials/1000),batchSize,nIter,dat)];
+                fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps*_batchSiz%d_%diters_%s_wAct_annEps_jointTrls_stepSiz',nClus,round(nTrials/1000),batchSize,nIter,dat)];
+
 %                 fname = [fname '_annEps'];
             end            
+            
+            %problem with loading in trapzK - and maybe others; loading in
+            %the test/perm file since it's the same but with another bit..
+            
+            
+            
+            
+           
+            
+            
 %             finish with directory and * for date/time
             fname = [saveDir, fname '*'];
-                       
-
-            
+                                   
             %edit if want to load more than one file per sim, merge
             f = dir(fname); filesToLoad = cell(1,length(f));
-            for iF = 1%:length(f)
-                filesToLoad{iF} = f(iF).name;
-                load(f(iF).name);
-            end
+%             for iF = 1%:length(f)
+            
+
+            %temp -   %problem with loading in trapzK - and maybe others; loading in
+            %the test/perm file since it's the same but with another bit..
+            
+            %annEps Krupic works
+%             if length(f)>1
+%                 iF = 2;
+%             else
+%                 iF=1;
+%             end
+            
+            %no annEps krupic works
+            iF=1;
+
+            
+            filesToLoad{iF} = f(iF).name;
+            load(f(iF).name);
+%             end
             
             for iterI = 1:nIter
                 for iSet=1:nSet
@@ -708,6 +739,7 @@ iEps=1;
 
 % clus2plot=(3:26)-2;
 clus2plot=(6:26)-2;
+clus2plot = 1:length(clus2run);
 
 iBatchVals=1; %'medium' one
 
@@ -751,7 +783,8 @@ if savePlots
    print(gcf,'-depsc2',fname)
    saveas(gcf,fname,'png');
 end
-    
+   
+%%
     
 
 %plot 3:5
@@ -802,9 +835,51 @@ end
 % end
 %mean(xx) %prop grid cells, averaged across clusters
     
-    
-    
-    
+
+%%
+% 
+% if strcmp(dat(1:4),'trap')
+%     figure; hold on;
+%     dat1    = squeeze(datTmp(iSet,:,:,:,:,2));
+%     mu      = nanmean(dat1,1);
+%     sm      = nanstd(dat1)./sqrt(size(dat1,1));
+%     ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+%     plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
+%     errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+%     scatter(barpos,mu,100,colors,'d','filled');
+%     xlim([barpos(1)-.5, barpos(end)+.5]);
+%     ylim([-1.5,1.5]);
+%     title(sprintf('Left half of box %s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
+%     
+%     figure; hold on;
+%     dat1    = squeeze(datTmp(iSet,:,:,:,:,3));
+%     mu      = nanmean(dat1,1);
+%     sm      = nanstd(dat1)./sqrt(size(dat1,1));
+%     ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+%     plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
+%     errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+%     scatter(barpos,mu,100,colors,'d','filled');
+%     xlim([barpos(1)-.5, barpos(end)+.5]);
+%     ylim([-1.5,1.5]);
+%     title(sprintf('Right half of box %s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
+%     
+%     figure; hold on;
+%     dat1    = squeeze(datTmp(iSet,:,:,:,:,2))-squeeze(datTmp(iSet,:,:,:,:,3));
+%     mu      = nanmean(dat1,1);
+%     sm      = nanstd(dat1)./sqrt(size(dat1,1));
+%     ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+%     plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
+%     errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+%     scatter(barpos,mu,100,colors,'d','filled');
+%     xlim([barpos(1)-.5, barpos(end)+.5]);
+%     ylim([-1.5,1.5]);
+%     title(sprintf('Left-right half of box %s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
+%     
+%     
+% end
+%     
+%     
+%     
     
     
     
