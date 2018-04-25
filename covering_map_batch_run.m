@@ -16,7 +16,7 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
 % dat = 'square'; 
-dat = 'trapzKrupic';
+% dat = 'trapzKrupic';
 
 % dat = 'catLearn';
 
@@ -104,7 +104,7 @@ clus2run = [23, 19, 10, 21, 6];
 
 % clus2run = 18; % trapzK missed 18 - 4 batchsizes, 2 matlabs for annEps=1/0
 
-clus2run = 18; 
+clus2run = 3; 
 
 
 % nTrials = 5000000; %how many locations in the box / trials 
@@ -129,16 +129,14 @@ if fixBatchSize
 %     nBatches = [2500, 10000]; 
     
     nBatches = 2500;
+%     nBatches = 5000;
 %     nBatches = 10000;
-
-    
     
 %     nBatches = [2500, 10000, 5000, 8000]; 
 %     nBatches = [2500, 10000, 5000]; 
 %     nBatches = [5000, 2500, 10000]; 
 %     nBatches = [8000 5000];\
 %     nBatches = 5000;
-
 
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals);
@@ -193,9 +191,9 @@ warpType = 'sq2rect';
 % stochasticType=0;
 % c=0;
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
-nIter=1; %how many iterations (starting points)
+nIter=200; %how many iterations (starting points)
 
 if useSameTrls
 %     switch dat
