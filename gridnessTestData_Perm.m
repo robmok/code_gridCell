@@ -1,4 +1,4 @@
-function [permPrc_gA, permPrc_gW, gA_act,gA_actNorm,gW_act,gW_actNorm,gA_actNormPerm, gW_actNormPerm, densityPlotAct,densityPlotActNorm, rSeedTest] = gridnessTestData_Perm(densityPlot,dat,locRange,nClus,nTrialsTest,nPerm,nIters2run)
+function [permPrc_gA_act, permPrc_gW_act,permPrc_gA_actNorm, permPrc_gW_actNorm, gA_act,gA_actNorm,gW_act,gW_actNorm,gA_actNormPerm, gW_actNormPerm, densityPlotAct,densityPlotActNorm, rSeedTest] = gridnessTestData_Perm(densityPlot,dat,locRange,nClus,nTrialsTest,nPerm,nIters2run,doPerm)
 
 
 %input - 
@@ -17,7 +17,6 @@ function [permPrc_gA, permPrc_gW, gA_act,gA_actNorm,gW_act,gW_actNorm,gA_actNorm
 % dat = 'trapzKrupic';
 % nClus=20;
 
-
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1);
 boxSize     = 1;
 useSameTrls = 0;
@@ -26,10 +25,10 @@ stepSize = 1;
 sigmaGauss = stepSize;
 
 gaussSmooth = 1;
-nSets = size(densityPlot,3);
+% nSets = size(densityPlot,3);
 % nIters2run = size(densityPlot,4);
 
-nSetsTest = 1; %last 1/2 only for now
+% nSetsTest = 1; %last 1/2 only for now
 
 b = 50;
 h = 50; %for trapz - height
@@ -65,9 +64,10 @@ end
 
 %perm testing
 % nPerm = 1000;
-permPrc_gA = nan(nIters2run,4);
-permPrc_gW = nan(nIters2run,4);
-
+permPrc_gA_act = nan(nIters2run,4);
+permPrc_gW_act = nan(nIters2run,4);
+permPrc_gA_actNorm = nan(nIters2run,4);
+permPrc_gW_actNorm = nan(nIters2run,4);
 
 %% compute actNorm maps after 'training' (on a new test set of locations)
 [trialsTest,~, rSeedTest] = createTrls(dat,nTrialsTest,locRange,useSameTrls,jointTrls,boxSize,h);
@@ -165,39 +165,51 @@ for iterI=1:nIters2run
         
         
         %permutation testing
-      
-        for iPerm = 1:nPerm
-%             fprintf('Perm %d\n',iPerm);
-%             randInd=randperm(nTrialsTest); % randomise each point
-            %20s perm - better way to code this?
-            randInd20 = randperm(nTrialsTest/20); %atm has to be divisible by 20
-            randInd = [];
-            for i=1:length(randInd20)
-                randInd = [randInd randInd20(i):randInd20(i)+20];
+        if doPerm
+            for iPerm = 1:nPerm
+                %             fprintf('Perm %d\n',iPerm);
+                %             randInd=randperm(nTrialsTest); % randomise each point
+                %20s perm - better way to code this?
+                randInd20 = randperm(nTrialsTest/20); %atm has to be divisible by 20
+                randInd = [];
+                for i=1:length(randInd20)
+                    randInd = [randInd randInd20(i):randInd20(i)+20];
+                end
+                
+                actAllPerm = actTrl(:,randInd);
+                
+                densityPlotActPerm       = zeros(b,h);
+                densityPlotActUpdPerm    = zeros(b,h);
+                for iTrl = 1:nTrialsTest
+                    densityPlotActPerm(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1) = densityPlotActPerm(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)+ sum(actAllPerm(:,iTrl));
+                    densityPlotActUpdPerm(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1) = densityPlotActUpdPerm(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)+1; %log nTimes loc was visited
+                end
+                densityPlotActSmPerm     = imgaussfilt(densityPlotActPerm,gaussSmooth);
+                densityPlotActNormPerm   = densityPlotActPerm./densityPlotActUpdPerm; %divide by number of times that location was visited
+                densityPlotActNormSmPerm = imgaussfilt(densityPlotActNormPerm,gaussSmooth);
+                
+                %compute gridness
+                aCorrMap = ndautoCORR(densityPlotActSmPerm);
+                [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+                gA_actPerm(iPerm,iterI) = gdataA.g_score;
+                
+                [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+                gW_actPerm(iPerm,iterI) = gdataW.g_score;
+                
+                
+                aCorrMap = ndautoCORR(densityPlotActNormSmPerm);
+                [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+                gA_actNormPerm(iPerm,iterI) = gdataA.g_score;
+                
+                [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
+                gW_actNormPerm(iPerm,iterI) = gdataW.g_score;
+                
             end
-        
-            actAllPerm = actTrl(:,randInd);
+            permPrc_gA_act(iterI,:) = prctile(gA_actPerm(:,iterI),[2.5, 5, 95, 97.5]);
+            permPrc_gW_act(iterI,:) = prctile(gW_actPerm(:,iterI),[2.5, 5, 95, 97.5]);
             
-            densityPlotActPerm       = zeros(b,h);
-            densityPlotActUpdPerm    = zeros(b,h);
-            for iTrl = 1:nTrialsTest
-                densityPlotActPerm(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1) = densityPlotActPerm(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)+ sum(actAllPerm(:,iTrl));
-                densityPlotActUpdPerm(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1) = densityPlotActUpdPerm(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)+1; %log nTimes loc was visited
-            end
-            densityPlotActNormPerm = densityPlotActPerm./densityPlotActUpdPerm; %divide by number of times that location was visited
-            densityPlotActNormSmPerm = imgaussfilt(densityPlotActNormPerm,gaussSmooth);
-            
-            %compute gridness
-            aCorrMap = ndautoCORR(densityPlotActNormSmPerm);
-            [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
-            gA_actNormPerm(iPerm,iterI) = gdataA.g_score;
-            
-            [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
-            gW_actNormPerm(iPerm,iterI) = gdataW.g_score;
-            
+            permPrc_gA_actNorm(iterI,:) = prctile(gA_actNormPerm(:,iterI),[2.5, 5, 95, 97.5]);
+            permPrc_gW_actNorm(iterI,:) = prctile(gW_actNormPerm(:,iterI),[2.5, 5, 95, 97.5]);
         end
-        permPrc_gA(iterI,:) = prctile(gA_actNormPerm(:,iterI),[2.5, 5, 95, 97.5]);
-        permPrc_gW(iterI,:) = prctile(gW_actNormPerm(:,iterI),[2.5, 5, 95, 97.5]);
-%     end
 end
 end

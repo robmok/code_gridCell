@@ -17,7 +17,7 @@ gaussSmooth = 1;
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-dat='square';
+% dat='square';
 boxSize=1;
 nIter=200;
 
@@ -26,10 +26,11 @@ jointTrls=1;
 % clus2run = [8, 12, 16, 20,24, 28]; 
 % clus2run = [8:2:28]; 
 clus2run = [3:30]; 
+clus2run = 26; 
 epsMuVals=.025;
 nTrials=1000000;
 batchSizeVals = [1000, 400, 100]; % 125?
-% batchSizeVals=400;
+batchSizeVals=400;
 annEps=0;
 
 % dat='trapzKrupic';
@@ -94,7 +95,7 @@ for iClus2run = 1:length(clus2run)
                 
                 % save all original variables plus gW and gW_actNorm - use the EXACT same fname!!!
                 if ~strcmp(dat(1:4),'trap')
-                    save(fname,'densityPlot','densityPlotActNorm','gA','gW','gA_actNorm','gW_actNorm','rSeed','muInit','clusDistB','permPrc','timeTaken');
+                    save(fname(1:end-1),'densityPlot','densityPlotActNorm','gA','gW','gA_actNorm','gW_actNorm','rSeed','muInit','clusDistB','permPrc','timeTaken');
                 end
                 
             end
