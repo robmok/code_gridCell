@@ -14,14 +14,14 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; %?
 dat = 'square';
-% dat = 'circ';
-dat = 'trapzKrupic';
+dat = 'circ';
+% dat = 'trapzKrupic';
 
 %for loading
 nTrials = 1000000;
 jointTrls=1;
 % clus2run = [3:30]; 
-clus2run=[3:10 12:2:26 11:2:25, 27:30]; % 27:30
+% clus2run=[3:10 12:2:26 11:2:25, 27:30]; % 27:30
 %split
 clus2run=[4:2:10, 12:2:26]; 
 clus2run=[3:2:9, 11:2:25]; 
@@ -29,7 +29,7 @@ clus2run=[3:2:9, 11:2:25];
 %trapzK rest of it
 % clus2run=[11:2:25]; 
 
-clus2run = 18;
+% clus2run = 18;
 
 nIter=200;
 epsMuVals=.025;
@@ -37,13 +37,15 @@ nTrials=1000000;
 % batchSizeVals = [400, 100]; % 125?
 batchSizeVals=400;
 % batchSizeVals=100;
+batchSizeVals=200;
+
 annEps=0;
 
 %running sq, circ, cLus sets x2, batchsize x2 - 8 matlabs - love01 - again
 
 
 %running trapz batchsize x2 - 2 matlabs - love06; no perm
-doPerm=0;
+doPerm=1;
 
 
 % run perm tests on how many iters? takes a bit of time (a couple mins) per
@@ -51,11 +53,11 @@ doPerm=0;
 % perm data are about the same, then just take max, or 95th percentile as
 % the threshold value)
 nIters2run = 200; 
-nIters2run = 3; 
+% nIters2run = 3; 
 
 nPerm = 500;
 
-saveDat=0;
+saveDat=1;
 
 for iClus2run = 1:length(clus2run) 
     nClus = clus2run(iClus2run);

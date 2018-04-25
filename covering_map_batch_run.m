@@ -20,7 +20,7 @@ dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning
 
 % dat = 'catLearn';
 
-jointTrls = 1;
+jointTrls = 0;
 
 boxSize = 1; % 1=normal, 2=double size, 3=triple size
 
@@ -31,7 +31,7 @@ sigmaG = [3 0; 0 3];
 catsInfo.R=chol(sigmaG);
 
 %annealed learning rate
-annEps = 0; %1 or 0
+annEps = 1; %1 or 0
 
 %perm testing
 doPerm = 0;
@@ -129,7 +129,7 @@ if fixBatchSize
 %     nBatches = [2500, 10000]; 
     
     nBatches = 2500;
-%     nBatches = 5000;
+%     nBatches = [2500, 5000];
 %     nBatches = 10000;
     
 %     nBatches = [2500, 10000, 5000, 8000]; 
