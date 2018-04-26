@@ -20,7 +20,7 @@ dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning
 
 % dat = 'catLearn';
 
-jointTrls = 0;
+jointTrls = 1;
 
 boxSize = 1; % 1=normal, 2=double size, 3=triple size
 
@@ -46,54 +46,6 @@ doPerm = 0;
 % clus2run = [12, 20, 22]; 
 % clus2run = [28, 24, 5, 6];
 % clus2run = [3, 4, 30];
-
-%trapzK love06 more - batchSize=100 / nBatches 8k/10k
-%odd, 3 x 2 batchSizes, 6 matlabs
-% clus2run = [25, 7,9,15, 29];
-% clus2run = [11, 19, 21, 29];
-% clus2run = [13, 27, 17, 23];
-
-%now runnig trapzK annEps - 4 batchsizes - 3x nClus, 2x batchSizes
-% clus2run = [26, 8,  10, 16, 28, 7, 21, 19, 6,  17]; 
-% clus2run = [12, 20, 22, 28, 24, 5,  11,  13,  14]; 
-% clus2run = [3,  4,  30, 29, 25, 15, 27, 9,  23];
-
-
-%run the rest and odd number - 3,4,5,6, 7:2:29
-% love01 - circ and sq annEps
-% clus2run = [3,  29, 25];
-% clus2run = [15, 27,  9];
-% clus2run = [21, 19,  5];
-% clus2run = [6,  11,  17];
-% clus2run = [13, 7,  23];
-% clus2run = [4,  30];
-
-% batchSize=200 - circ love01 - 3:26
-% clus2run = [20,  8,  10]; 
-% clus2run = [3,  7,  22]; 
-% clus2run = [26,  5,  6];
-% clus2run = [15,  12,  4];
-% clus2run = [11,  17, 9];
-%  clus2run = [16, 24];  
-%  clus2run = [13, 23];
-%  clus2run = [21, 19];
-%  clus2run = [14, 25];
-% clus2run=18; %MISSED
-
- %square love06 - anneps, 4 sets -batchsize 2500, 10000, 5000
-clus2run = [8,  22,  9, 11, 25]; 
-clus2run = [12, 18, 16, 7,  17];
- clus2run = [20, 3, 26, 15]; %  5000 - first 2 ran, run rest of this
-
-%next run: batchsize - 5000, 2500, 10000
-clus2run = [5,  13, 24, 14, 4];
-clus2run = [23, 19, 10, 21, 6];
-
-%next
-% clus2run = 27;
-% clus2run = 28;
-% clus2run = 29;
-% clus2run = 30;
 
 %circ not annEps missed:
 %batch=400
