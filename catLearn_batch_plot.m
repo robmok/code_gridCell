@@ -23,11 +23,11 @@ jointTrls=0;
 clus2run = 2:26; 
 epsMuVals=.025;
 nTrials=50000;
-batchSizeVals= 10;
+batchSizeVals= 10; %5, 10, 25?
 
-nCats=2;
+nCats=2; %2,3,4
 stoch=1;
-cVals = [2,4, 10, 40];
+cVals = [2, 4, 10, 40];
 cVals = 4;
 
 catsInfo.nCats=2; %2 categories
