@@ -4,7 +4,7 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -25,7 +25,7 @@ jointTrls = 0;
 boxSize = 1; % 1=normal, 2=double size, 3=triple size
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
-catsInfo.nCats=2; %2 categories
+catsInfo.nCats=4; %2 categories
 % sigmaG = [5 0; 0 5];   % isotropic % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 sigmaG = [3 0; 0 3];
 catsInfo.R=chol(sigmaG);
@@ -54,7 +54,7 @@ annEps = 0; %1 or 0
 % clus2run = 18; % trapzK missed 18 - 4 batchsizes, 2 matlabs for annEps=1/0
 
 clus2run = [2:2:30 3:2:29]; 
-clus2run=30;
+% clus2run=30;
 
 % nTrials
 if ~strcmp(dat(1:3),'cat')
@@ -72,7 +72,7 @@ if fixBatchSize
 %     nBatches = [1000, 2500, 10000]; 
 %     nBatches = [2500, 10000]; 
     
-    nBatches = 2500;
+    nBatches = 5000;
 %     nBatches = [2500, 5000];
 %     nBatches = 10000;
     
@@ -80,6 +80,10 @@ if fixBatchSize
 %     nBatches = [2500, 10000, 5000]; 
 %     nBatches = [5000, 2500, 10000]; 
 %     nBatches = [8000 5000];
+%     nBatches = 5000;
+
+
+    nBatches = [1000 5000 2500];
 %     nBatches = 5000;
 
     if strcmp(dat(1:3),'cat')
@@ -127,7 +131,7 @@ cVals = 1/nTrials;
 % cVals = 2/nTrials; %cVals = 3/nTrials;
 % cVals = 5/nTrials;
 % cVals = 20/nTrials;
-% cVals = [1/nTrials, 2/nTrials, 5/nTrials, 20/nTrials];
+cVals = [1/nTrials, 2/nTrials, 5/nTrials, 20/nTrials];
 % cVals = [1/nTrials, 2/nTrials];
 % cVals = [5/nTrials, 20/nTrials];
 
@@ -135,9 +139,9 @@ cVals = 1/nTrials;
 warpBox = 0; %1 or 0
 warpType = 'sq2rect';
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
-nIter=1; %how many iterations (starting points)
+nIter=20; %how many iterations (starting points)
 
 if useSameTrls
 %     switch dat
