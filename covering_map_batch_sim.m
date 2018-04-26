@@ -113,7 +113,7 @@ for iterI = 1:nIter
     
     fprintf('iter %d \n',iterI);
 
-    [trials,dataPtsTest, rSeed(iterI)] = createTrls(dat,nTrials,locRange,useSameTrls,jointTrls,boxSize,h,catsInfo);
+    [trials,dataPtsTest, rSeed(iterI)] = createTrls(dat,nTrials,locRange,useSameTrls,jointTrls,boxSize,catsInfo);
         
     % if expand box
     switch warpType

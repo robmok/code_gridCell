@@ -1,10 +1,14 @@
-function [trials,dataPtsTest, rSeed] = createTrls(dat,nTrials,locRange,useSameTrls,jointTrls,boxSize,h,catsInfo)
+function [trials,dataPtsTest, rSeed] = createTrls(dat,nTrials,locRange,useSameTrls,jointTrls,boxSize,catsInfo,rSeed)
 
 spacing =linspace(locRange(1),locRange(2),locRange(2)+1); 
 stepSize=diff(spacing(1:2)); nSteps = length(spacing);
 
-rSeed=rng; % seed so can regenerate the trials later; do: rng(rSeed(iterI)); then run trials = ...
 
+if exist('rSeed','var')
+    rng(rSeed); %to recreate trials
+else
+    rSeed=rng; % seed so can regenerate the trials later; do: rng(rSeed(iterI)); then run trials = ...
+end
 % first get points in the shape
 switch dat
     case 'square' %square
@@ -60,66 +64,6 @@ switch dat
             spacingTrapz = spacing(14:37+length(14:37));
         end
         trapY=locRange(2).*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
-        trapX=spacing;
-        trapPts=[];
-        for i=1:length(trapY)
-            trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
-        end
-        shapePts = trapPts';
-    case 'trapzNorm' % not scaled - fit into square
-        spacing = spacing;
-        trapY=locRange(2).*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
-        trapX=spacing;
-        trapPts=[];
-        for i=1:length(trapY)
-            trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
-        end
-        shapePts = trapPts';
-    case 'trapz1' % new - scale differently - more like box but more squished
-        spacing = spacing(10:41);
-        trapY=locRange(2).*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
-        trapX=spacing;
-        trapPts=[];
-        for i=1:length(trapY)
-            trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
-        end
-        shapePts = trapPts';
-    case 'trapz2'
-        spacing = spacing(7:44);
-        trapY=locRange(2).*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
-        trapX=spacing;
-        trapPts=[];
-        for i=1:length(trapY)
-            trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
-        end
-        shapePts = trapPts';
-    case 'trapz3'
-        spacing = spacing(4:47);
-        trapY=locRange(2).*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
-        trapX=spacing;
-        trapPts=[];
-        for i=1:length(trapY)
-            trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
-        end
-        shapePts = trapPts';
-    case 'trapzScaled1' % new - scale differently - now loc > 50 though
-        trapY=(h-1).*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
-        trapX=spacing;
-        trapPts=[];
-        for i=1:length(trapY)
-            trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
-        end
-        shapePts = trapPts';
-    case 'trapzScaled2' % new - scale differently - now loc > 50 though
-        trapY=(h-1).*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
-        trapX=spacing;
-        trapPts=[];
-        for i=1:length(trapY)
-            trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
-        end
-        shapePts = trapPts';
-    case 'trapzScaled3' % new - scale differently - now loc > 50 though
-        trapY=(h-1).*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
         trapX=spacing;
         trapPts=[];
         for i=1:length(trapY)

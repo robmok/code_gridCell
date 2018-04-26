@@ -4,7 +4,7 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -54,7 +54,7 @@ annEps = 0; %1 or 0
 % clus2run = 18; % trapzK missed 18 - 4 batchsizes, 2 matlabs for annEps=1/0
 
 clus2run = [2:2:30 3:2:29]; 
-% clus2run=30;
+clus2run=30;
 
 % nTrials
 if ~strcmp(dat(1:3),'cat')
@@ -124,20 +124,20 @@ stoch = 1; %1 or 0
 
 % c parameter: larger c = less stochastic over trials, smaller c = more stochastic over trials
 cVals = 1/nTrials;
-cVals = 2/nTrials; %cVals = 3/nTrials;
+% cVals = 2/nTrials; %cVals = 3/nTrials;
 % cVals = 5/nTrials;
 % cVals = 20/nTrials;
-cVals = [1/nTrials, 2/nTrials, 5/nTrials, 20/nTrials];
-cVals = [1/nTrials, 2/nTrials];
-cVals = [5/nTrials, 20/nTrials];
+% cVals = [1/nTrials, 2/nTrials, 5/nTrials, 20/nTrials];
+% cVals = [1/nTrials, 2/nTrials];
+% cVals = [5/nTrials, 20/nTrials];
 
 % change box shape during learning rectangle
 warpBox = 0; %1 or 0
 warpType = 'sq2rect';
 %%
-saveDat=1; %save simulations
+saveDat=0; %save simulations
 
-nIter=20; %how many iterations (starting points)
+nIter=1; %how many iterations (starting points)
 
 if useSameTrls
 %     switch dat
