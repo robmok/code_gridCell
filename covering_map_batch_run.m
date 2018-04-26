@@ -4,7 +4,7 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -73,7 +73,7 @@ if fixBatchSize
 %     nBatches = [2500, 10000]; 
     
     nBatches = 2500;
-    nBatches = [2500, 5000];
+%     nBatches = [2500, 5000];
 %     nBatches = 10000;
     
 %     nBatches = [2500, 10000, 5000, 8000]; 
@@ -128,6 +128,8 @@ cVals = 2/nTrials; %cVals = 3/nTrials;
 % cVals = 5/nTrials;
 % cVals = 20/nTrials;
 cVals = [1/nTrials, 2/nTrials, 5/nTrials, 20/nTrials];
+cVals = [1/nTrials, 2/nTrials];
+cVals = [5/nTrials, 20/nTrials];
 
 % change box shape during learning rectangle
 warpBox = 0; %1 or 0
