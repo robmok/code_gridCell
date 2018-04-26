@@ -178,9 +178,9 @@ for iTrl = 1000:nTrials
         %have to start from 1000 trials min
         plotTrls=iTrl-999:iTrl;
         if strcmp(dat(1:3),'cat')
-            h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'.','Color',repmat(colAgentCh(iTrl),1,3));
+            h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'.','Color',repmat(colAgentCh(iTrl),1,3)); hold on;
         else
-            h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'Color',repmat(colAgentCh(iTrl),1,3));
+            h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'Color',repmat(colAgentCh(iTrl),1,3)); hold on;
         end
         if mod(iTrl,5000)==0
             delete(h1);
