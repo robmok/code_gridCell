@@ -676,7 +676,7 @@ savePlots=0;
 
 clusPosAct = 'clus'; %'clus' or 'actNorm'
 
-gridMsrType = 'w'; % 'a' or 'w' for allen or willis method - a preferred
+gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
 
 gridMeasure = 'grid';
 
@@ -753,13 +753,14 @@ figure; hold on;
         dat1     = squeeze(datTmp(iSet,:,iEps,iBatchVals,clus2plot,1));
         barpos  = .25:.5:.5*size(dat1,2);
         colors  = distinguishable_colors(size(dat1,2));
-        colgrey = [.5, .5, .5];
+        colgrey = [.6, .6, .6];
         mu      = mean(dat1,1);
         sm      = std(dat1)./sqrt(size(dat1,1));
         ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
         plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
         errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-        scatter(barpos,mu,50,colors,'filled','d');
+%         scatter(barpos,mu,50,colors,'filled','d');
+        scatter(barpos,mu,100,colgrey,'filled','d');
         xticklabels(xTickLabs);
         xlim([barpos(1)-.5, barpos(end)+.5]);
         %         ylim([0,1]);
@@ -769,15 +770,17 @@ figure; hold on;
             ylim([-1.25,1.4]);
         end
         xlabel('Number of Clusters');
-        ylabel('Grid Score');
-        
-        
-        title(sprintf('%s, %s - eps=%d, batchSize=%d',dat, gridMeasure,epsMuVals(iEps)*1000,batchSizeVals(iBatchVals)))
-        
+        ylabel('Grid Score');        
+%         title(sprintf('%s, %s - eps=%d, batchSize=%d',dat, gridMeasure,epsMuVals(iEps)*1000,batchSizeVals(iBatchVals)))
+        if strcmp(dat(1:2),'ci')
+        title('Circular box')
+        elseif strmcp(dat(1:2),'sq')
+        title('Square box')
+        end        
         set(gca,'FontSize',fontSiz,'fontname','Arial')
     end
 
-    fname = [figsDir sprintf('/gridness_%s_univarScatters_nClus%d-%d_eps%d_batchSiz%d_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
+    fname = [figsDir sprintf('/gridness_%s_univarScatters_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
 if savePlots
    set(gcf,'Renderer','painters');
    print(gcf,'-depsc2',fname)
@@ -836,6 +839,126 @@ end
 %mean(xx) %prop grid cells, averaged across clusters
     
 
+%% plot over sets
+
+savePlots = 1;
+
+iBatchVals=1;
+
+nTimePts=size(datTmp,1)-2;
+colors  = distinguishable_colors(length(clus2run));
+
+clus2plot = 1:6;
+figure; hold on;
+for iClus = clus2plot
+    subplot(2,ceil(length(clus2plot)/2),iClus); hold on;
+    %         subplot(ceil(length(clus2plot)/2),2,iClus); hold on;
+    dat1     = squeeze(datTmp(1:end-2,:,iEps,iBatchVals,iClus,:))';
+    barpos  = .25:.5:.5*size(dat1,2);
+    colgrey = [.5, .5, .5];
+    mu      = nanmean(dat1,1);
+    sm      = nanstd(dat1)./sqrt(size(dat1,1));
+    ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+    plotSpread(dat1,'xValues',barpos,'distributionColors',repmat(colors(iClus,:),nTimePts,1));
+    errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+    scatter(barpos,mu,50,colgrey,'d','filled');
+    %         scatter(barpos,mu,100,repmat(colors(iClus,:),nTimePts,1),'d','filled');
+    xlim([barpos(1)-.5, barpos(end)+.5]);
+    ylim([-.5,1.25]);
+    xticks([]); xticklabels({''});
+    %         title(sprintf('nClus=%d, batchSize=%d',clus2plot(iClus),batchSizeVals(iBatchVals)))
+    title(sprintf('%d clusters',clus2plot(iClus)+2))
+    
+end
+fname = [figsDir sprintf('/gridness_%s_univarScatters_overTime_nClus%d-%d_eps%d_batchSiz%d_%s',dat,(clus2plot(1)+2),(clus2plot(end)+2),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
+if savePlots
+    set(gcf,'Renderer','painters');
+    print(gcf,'-depsc2',fname)
+    saveas(gcf,fname,'png');
+end
+clus2plot = 7:12;
+figure; hold on;
+for iClus = clus2plot
+    subplot(2,ceil(length(clus2plot)/2),iClus-clus2plot(1)+1); hold on;
+    %         subplot(ceil(length(clus2plot)/2),2,iClus); hold on;
+    dat1     = squeeze(datTmp(1:end-2,:,iEps,iBatchVals,iClus,:))';
+    barpos  = .25:.5:.5*size(dat1,2);
+    colgrey = [.5, .5, .5];
+    mu      = nanmean(dat1,1);
+    sm      = nanstd(dat1)./sqrt(size(dat1,1));
+    ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+    plotSpread(dat1,'xValues',barpos,'distributionColors',repmat(colors(iClus,:),nTimePts,1));
+    errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+    scatter(barpos,mu,50,colgrey,'d','filled');
+    %         scatter(barpos,mu,100,repmat(colors(iClus,:),nTimePts,1),'d','filled');
+    xlim([barpos(1)-.5, barpos(end)+.5]);
+    ylim([-.5,1.25]);
+    xticks([]); xticklabels({''});
+    %         title(sprintf('nClus=%d, batchSize=%d',clus2plot(iClus),batchSizeVals(iBatchVals)))
+    title(sprintf('%d clusters',clus2plot(iClus-clus2plot(1)+1)+2));
+end
+fname = [figsDir sprintf('/gridness_%s_univarScatters_overTime_nClus%d-%d_eps%d_batchSiz%d_%s',dat,(clus2plot(1)+2),(clus2plot(end)+2),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
+if savePlots
+    set(gcf,'Renderer','painters');
+    print(gcf,'-depsc2',fname)
+    saveas(gcf,fname,'png');
+end
+
+clus2plot = 13:18;
+figure; hold on;
+for iClus = clus2plot
+    subplot(2,ceil(length(clus2plot)/2),iClus-clus2plot(1)+1); hold on;
+    %         subplot(ceil(length(clus2plot)/2),2,iClus); hold on;
+    dat1     = squeeze(datTmp(1:end-2,:,iEps,iBatchVals,iClus,:))';
+    barpos  = .25:.5:.5*size(dat1,2);
+    colgrey = [.5, .5, .5];
+    mu      = nanmean(dat1,1);
+    sm      = nanstd(dat1)./sqrt(size(dat1,1));
+    ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+    plotSpread(dat1,'xValues',barpos,'distributionColors',repmat(colors(iClus,:),nTimePts,1));
+    errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+    scatter(barpos,mu,50,colgrey,'d','filled');
+    %         scatter(barpos,mu,100,repmat(colors(iClus,:),nTimePts,1),'d','filled');
+    xlim([barpos(1)-.5, barpos(end)+.5]);
+    ylim([-.5,1.25]);
+    xticks([]); xticklabels({''});
+    %         title(sprintf('nClus=%d, batchSize=%d',clus2plot(iClus),batchSizeVals(iBatchVals)))
+    title(sprintf('%d clusters',clus2plot(iClus-clus2plot(1)+1)+2));
+end
+fname = [figsDir sprintf('/gridness_%s_univarScatters_overTime_nClus%d-%d_eps%d_batchSiz%d_%s',dat,(clus2plot(1)+2),(clus2plot(end)+2),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
+if savePlots
+    set(gcf,'Renderer','painters');
+    print(gcf,'-depsc2',fname)
+    saveas(gcf,fname,'png');
+end
+
+clus2plot = 19:24;
+figure; hold on;
+for iClus = clus2plot
+    subplot(2,ceil(length(clus2plot)/2),iClus-clus2plot(1)+1); hold on;
+    %         subplot(ceil(length(clus2plot)/2),2,iClus); hold on;
+    dat1     = squeeze(datTmp(1:end-2,:,iEps,iBatchVals,iClus,:))';
+    barpos  = .25:.5:.5*size(dat1,2);
+    colgrey = [.5, .5, .5];
+    mu      = nanmean(dat1,1);
+    sm      = nanstd(dat1)./sqrt(size(dat1,1));
+    ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+    plotSpread(dat1,'xValues',barpos,'distributionColors',repmat(colors(iClus,:),nTimePts,1));
+    errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+    scatter(barpos,mu,50,colgrey,'d','filled');
+    %         scatter(barpos,mu,100,repmat(colors(iClus,:),nTimePts,1),'d','filled');
+    xlim([barpos(1)-.5, barpos(end)+.5]);
+    ylim([-.5,1.25]);
+    xticks([]); xticklabels({''});
+    %         title(sprintf('nClus=%d, batchSize=%d',clus2plot(iClus),batchSizeVals(iBatchVals)))
+    title(sprintf('%d clusters',clus2plot(iClus-clus2plot(1)+1)+2));
+end
+fname = [figsDir sprintf('/gridness_%s_univarScatters_overTime_nClus%d-%d_eps%d_batchSiz%d_%s',dat,(clus2plot(1)+2),(clus2plot(end)+2),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
+if savePlots
+    set(gcf,'Renderer','painters');
+    print(gcf,'-depsc2',fname)
+    saveas(gcf,fname,'png');
+end
 %%
 % 
 % if strcmp(dat(1:4),'trap')
