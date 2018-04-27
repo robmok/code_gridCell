@@ -66,6 +66,7 @@ for iClus2run = 1:length(clus2run)
                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_perm_%dpermsOn%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,nPerm,nIters2run)];
             else
                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_noPerm',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+%                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_noPerm_diters_noJointTrlsTest',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
             end
                         
 %             if boxSize>1
@@ -105,7 +106,7 @@ for iClus2run = 1:length(clus2run)
             gW_wavAll_actNorm(:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,4,:);  
             
             %note this perm is only with actNorm - forgot to save for act
-            if ~strcmp(1:4,'trapz')
+            if ~strcmp(dat(1:4),'trap')
             gA_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gA(:,3,:);
             gW_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW(:,3,:);
             
@@ -122,7 +123,7 @@ figsDir = [wd '/grid_figs'];
 
 savePlots=0;
 
-clusPosAct = 'act'; %'act' or 'actNorm'
+clusPosAct = 'actNorm'; %'act' or 'actNorm'
 
 gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
 

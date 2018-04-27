@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -14,24 +14,35 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; %?
 dat = 'square';
-dat = 'circ';
-dat = 'trapzKrupic';
+% dat = 'circ';
+% dat = 'trapzKrupic';
 
 %for loading
 nTrials = 1000000;
-jointTrls=0;
 % clus2run = [3:30]; 
 % clus2run=[3:10 12:2:26 11:2:25, 27:30]; % 27:30
 %split
 clus2run=[4:2:10, 12:2:26]; 
 clus2run=[3:2:9, 11:2:25]; 
 
-% trapz jointTrls=0
-clus2run=[8:2:10, 12:2:26, 4, 6]; 
-clus2run=[7:2:9, 11:2:25,  3, 5]; 
+%batchSiz200 - rerunning after fail - love06
+clus2run=[14:2:26]; 
+clus2run=[13:2:25]; 
 
-%trapzK rest of it
-% clus2run=[11:2:25]; 
+%love01 - batchSize=400 - didn't run perms last time; sq, circ
+clus2run=[12, 4 16, 8, 24]; 
+clus2run=[6 14, 10, 18, 20]; 
+clus2run=[11, 5, 15, 9, 19]; 
+clus2run=[3, 13, 7, 17, 23]; 
+clus2run=[22, 26, 25, 21];
+
+% next, batSiz=100
+
+
+
+% % trapz jointTrls=0
+% clus2run=[8:2:10, 12:2:26, 4, 6]; 
+% clus2run=[7:2:9, 11:2:25,  3, 5]; 
 
 % clus2run = 18;
 
@@ -45,11 +56,12 @@ batchSizeVals=400;
 
 annEps=0;
 
+jointTrls=1; %for test trials
+
+
 %running sq, circ, cLus sets x2, batchsize x2 - 8 matlabs - love01 - again
 
-
-%running trapz batchsize x2 - 2 matlabs - love06; no perm
-doPerm=0;
+doPerm=1;
 
 
 % run perm tests on how many iters? takes a bit of time (a couple mins) per
@@ -106,10 +118,17 @@ for iClus2run = 1:length(clus2run)
                 %save
                 cTime=datestr(now,'HHMMSS'); 
                 if doPerm
-                    fname = [fname(1:end-1), sprintf('_perm_%dpermsOn%diters_%s',nPerm,nIters2run,cTime)];
+                    fname = [fname(1:end-1), sprintf('_perm_%dpermsOn%diters',nPerm,nIters2run)];
                 else
-                    fname = [fname(1:end-1), sprintf('_noPerm_diters_%s',cTime)];
+                    fname = [fname(1:end-1), '_noPerm'];
                 end
+                if ~jointTrls
+                    fname = [fname '_noJointTrlsTest'];
+                end
+                
+                fname = [fname sprintf('_%s',cTime)];
+                
+
                 if saveDat
                     save(fname,'permPrc_gA_act','permPrc_gA_act','permPrc_gA_actNorm','permPrc_gA_actNorm','gA_act','gA_actNorm','gW_act','gW_actNorm','timeTaken');
                 end
