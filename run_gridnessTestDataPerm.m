@@ -15,16 +15,20 @@ locRange = [0 49];
 nTrialsTest = 100000; %?
 dat = 'square';
 dat = 'circ';
-% dat = 'trapzKrupic';
+dat = 'trapzKrupic';
 
 %for loading
 nTrials = 1000000;
-jointTrls=1;
+jointTrls=0;
 % clus2run = [3:30]; 
 % clus2run=[3:10 12:2:26 11:2:25, 27:30]; % 27:30
 %split
 clus2run=[4:2:10, 12:2:26]; 
 clus2run=[3:2:9, 11:2:25]; 
+
+% trapz jointTrls=0
+clus2run=[8:2:10, 12:2:26, 4, 6]; 
+clus2run=[7:2:9, 11:2:25,  3, 5]; 
 
 %trapzK rest of it
 % clus2run=[11:2:25]; 
@@ -37,7 +41,7 @@ nTrials=1000000;
 % batchSizeVals = [400, 100]; % 125?
 batchSizeVals=400;
 % batchSizeVals=100;
-batchSizeVals=200;
+% batchSizeVals=200;
 
 annEps=0;
 
@@ -45,7 +49,7 @@ annEps=0;
 
 
 %running trapz batchsize x2 - 2 matlabs - love06; no perm
-doPerm=1;
+doPerm=0;
 
 
 % run perm tests on how many iters? takes a bit of time (a couple mins) per
