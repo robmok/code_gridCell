@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -14,7 +14,7 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; %?
 dat = 'square';
-% dat = 'circ';
+dat = 'circ';
 % dat = 'trapzKrupic';
 
 %for loading
@@ -22,19 +22,23 @@ nTrials = 1000000;
 % clus2run = [3:30]; 
 % clus2run=[3:10 12:2:26 11:2:25, 27:30]; % 27:30
 %split
-clus2run=[4:2:10, 12:2:26]; 
-clus2run=[3:2:9, 11:2:25]; 
+% clus2run=[4:2:10, 12:2:26]; 
+% clus2run=[3:2:9, 11:2:25]; 
 
 %batchSiz200 - rerunning after fail - love06
-clus2run=[14:2:26]; 
-clus2run=[13:2:25]; 
+% clus2run=[14:2:26]; 
+% clus2run=[13:2:25]; 
+%failed again
+clus2run=[24:2:26]; 
+clus2run=[23:2:25]; 
 
-%love01 - batchSize=400 - didn't run perms last time; sq, circ
-clus2run=[12, 4 16, 8, 24]; 
-clus2run=[6 14, 10, 18, 20]; 
-clus2run=[11, 5, 15, 9, 19]; 
-clus2run=[3, 13, 7, 17, 23]; 
-clus2run=[22, 26, 25, 21];
+
+% %love01 - batchSize=400 - didn't run perms last time; sq, circ
+% clus2run=[12, 4 16, 8, 24]; 
+% clus2run=[6 14, 10, 18, 20]; 
+% clus2run=[11, 5, 15, 9, 19]; 
+% clus2run=[3, 13, 7, 17, 23]; 
+% clus2run=[22, 26, 25, 21];
 
 % next, batSiz=100
 
@@ -52,7 +56,7 @@ nTrials=1000000;
 % batchSizeVals = [400, 100]; % 125?
 batchSizeVals=400;
 % batchSizeVals=100;
-% batchSizeVals=200;
+batchSizeVals=200;
 
 annEps=0;
 
