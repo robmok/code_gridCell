@@ -885,31 +885,33 @@ end
 
 %% Making figs: density plot examples
 
-savePlots = 0;
+savePlots = 1;
 
 doPlot=0; %do plot when computing gridness
 
-clus2plot = 8;%[8,13,18];
+fontSiz=15;
 
-iSet=size(densityPlotActNormAll,3);
+clusPosAct = 'actNorm'; %'clus' or 'actNorm'
+
+gridMsrType = 'a';
+
+
+clus2plot = [5,8,13,18];
+
+iSet=1;
+iSet=10;
+% iSet=size(densityPlotActNormAll,3);
+
 
 for iClus = clus2plot%:length(clus2run)
 for iBvals = 1:length(batchSizeVals)
     for iterI = 1:5%nIter
 %         densityPlotCentresSm = imgaussfilt(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus),gaussSmooth);
+        
         densityPlotCentresSm = densityPlotActNormAll(:,:,iSet,iterI,iEps,iBvals,iClus);
-       
-        densityPlotCentresSm(isnan(densityPlotCentresSm))=0;
-        
-        figure; hold on;
-        subplot(1,2,1)
-        imagesc(densityPlotCentresSm);
-        subplot(1,2,2);
-        
-        
-        aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram
-        
-        imagesc(aCorrMap);
+%         densityPlotCentresSm(isnan(densityPlotCentresSm))=0;
+                
+        aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram        
         
         [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
 %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
@@ -918,16 +920,32 @@ for iBvals = 1:length(batchSizeVals)
             aCorrMap = ndautoCORR(densityPlotCentresSm(:,1:size(densityPlotAll,1)/2));
             [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
             %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
-
-            
             aCorrMap = ndautoCORR(densityPlotCentresSm(:,size(densityPlotAll,1)/2+1:end));
             [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
             %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
-            
         end
         
+        figure; imagesc(densityPlotCentresSm);
+        xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
+        fname = [figsDir sprintf('/densityPlot_%s_nClus%d_eps%d_batchSiz%d_%s_%s_iter%d_set%d_clusters',dat,iClus+2,epsMuVals(iEps)*1000,batchSizeVals(iBvals),clusPosAct,gridMsrType,iterI,iSet)];
+        if savePlots
+        %     set(gcf,'Renderer','painters');
+        %     print(gcf,'-depsc2',fname)
+            saveas(gcf,fname,'png');
+           close all
+        end
+        figure; imagesc(aCorrMap);
         title(sprintf('Grid Score %.2f',g));
-
+        set(gca,'FontSize',fontSiz,'fontname','Arial')
+        xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
+        fname = [figsDir sprintf('/densityPlot_%s_nClus%d_eps%d_batchSiz%d_%s_%s_iter%d_set%d_autoCorr',dat,iClus+2,epsMuVals(iEps)*1000,batchSizeVals(iBvals),clusPosAct,gridMsrType,iterI,iSet)];
+        if savePlots
+        %     set(gcf,'Renderer','painters');
+        %     print(gcf,'-depsc2',fname)
+            saveas(gcf,fname,'png');
+           close all
+        end
+        
         
     end
 end
@@ -935,14 +953,7 @@ end
 
 
 
-% % clus2plot
-% fname = [figsDir sprintf('/gridness_%s_nClus%d-%d_eps%d_batchSiz%d_%s',dat,(clus2plot(iPlot)+2),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
-% if savePlots
-%     set(gcf,'Renderer','painters');
-%     print(gcf,'-depsc2',fname)
-%     saveas(gcf,fname,'png');
-%     close all
-% end
+
 
 
 

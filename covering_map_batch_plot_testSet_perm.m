@@ -38,7 +38,7 @@ dat='trapzKrupic';
 clus2run = [3:26]; 
 % clus2run=3:26;
 % clus2run=26;
-clus2run=4:2:26;
+% clus2run=4:2:26;
 
 batchSizeVals = 400; %100, 125, 200,400, 1000
 
@@ -334,7 +334,7 @@ if strcmp(dat(1:4),'trap')
     errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
     scatter(barpos,mu,100,colors,'d','filled');
     xlim([barpos(1)-.5, barpos(end)+.5]);
-    ylim([-1.5,1.5]);
+    ylim([-1.5,2]);
     title(sprintf('Left-right half of box %s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
     
     

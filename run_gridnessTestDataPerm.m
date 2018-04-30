@@ -38,7 +38,7 @@ clus2run=[10:4:26,4];
 clus2run=[3, 7:4:25]; 
 clus2run=[5, 9:4:25]; 
 
-clus2run = 18;
+% clus2run = 18;
 
 nIter=200;
 epsMuVals=.025;
