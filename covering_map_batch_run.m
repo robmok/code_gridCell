@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -15,12 +15,12 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
-dat = 'square'; 
+% dat = 'square'; 
 % dat = 'trapzKrupic';
 
-dat = 'catLearn';
+% dat = 'catLearn';
 
-jointTrls = 0;
+jointTrls = 1;
 
 boxSize = 1; % 1=normal, 2=double size, 3=triple size
 
@@ -33,28 +33,25 @@ catsInfo.R=chol(sigmaG);
 %annealed learning rate
 annEps = 0; %1 or 0
 
-% fewer trials, lower learning rate
-% clus2run = [16, 20, 18, 30];
-% clus2run = [22, 28, 26, 14];
+%rerun circ/square with correct actNorm
+%joint trials
 
-% %joint trials; 8, 12, 16, 20, 24, 28;    then 6, 10, 14, 18, 22, 26, 28
-% clus2run = [26, 8,  10]; 
-% clus2run = [16, 28, 14,];  
-% clus2run = [12, 20, 22]; 
-% clus2run = [28, 24, 5, 6];
-% clus2run = [3, 4, 30];
-
-%circ not annEps missed:
-%batch=400
-% clus2run = [17,19];
-% clus2run = [26];
-%batch=100
+%love01 - circ, batchSiz=400
+clus2run = [18, 8, 21]; 
+% clus2run = [16, 7, 14, 17];  
+% clus2run = [12, 9, 20, 6]; 
+% clus2run = [5, 10, 19, 13];
+% clus2run = [11, 3, 4, 15];
+% clus2run = 22;
+% clus2run = 23;
+% clus2run = 24;
+% clus2run = 25;
 % clus2run = 26;
 
-% clus2run = 18; % trapzK missed 18 - 4 batchsizes, 2 matlabs for annEps=1/0
 
-clus2run = [2:2:30 3:2:29]; 
-% clus2run=30;
+% clus2run = [2:2:30 3:2:29]; 
+
+% clus2run=20;
 
 % nTrials
 if ~strcmp(dat(1:3),'cat')
@@ -72,7 +69,7 @@ if fixBatchSize
 %     nBatches = [1000, 2500, 10000]; 
 %     nBatches = [2500, 10000]; 
     
-    nBatches = 5000;
+%     nBatches = 5000;
 %     nBatches = [2500, 5000];
 %     nBatches = 10000;
     
@@ -83,8 +80,8 @@ if fixBatchSize
 %     nBatches = 5000;
 
 
-    nBatches = [1000 5000 2500];
-%     nBatches = 5000;
+%     nBatches = [1000 5000 2500];
+    nBatches = 2500;
 
     if strcmp(dat(1:3),'cat')
         nBatches = nBatches.*2;
@@ -124,7 +121,7 @@ elseif boxSize==3 %triple
 end
 
 %stochastic update
-stoch = 1; %1 or 0
+stoch = 0; %1 or 0
 
 % c parameter: larger c = less stochastic over trials, smaller c = more stochastic over trials
 cVals = 1/nTrials;
@@ -134,14 +131,19 @@ cVals = 1/nTrials;
 cVals = [1/nTrials, 2/nTrials, 5/nTrials, 20/nTrials];
 % cVals = [1/nTrials, 2/nTrials];
 % cVals = [5/nTrials, 20/nTrials];
-
+nC = length(cVals);
+if ~stoch
+    nC = 1;
+else
+    nC = length(cVals);
+end
 % change box shape during learning rectangle
 warpBox = 0; %1 or 0
 warpType = 'sq2rect';
 %%
 saveDat=1; %save simulations
 
-nIter=20; %how many iterations (starting points)
+nIter=200; %200 for covering map, 20 for cat
 
 if useSameTrls
 %     switch dat
@@ -161,9 +163,9 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
         epsMuOrig=epsMuVals(iEps);
         epsMuOrig1000=epsMuOrig*1000; %for saving
         
-        for iStoch = 1:length(cVals) %
+        for iStoch = 1:nC %
             c = cVals(iStoch);
-            if stoch==0
+            if ~stoch
                 c=0;
             end
             c1=round(c.*100000); % for saving file name
@@ -176,6 +178,8 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                 fprintf('Running %s, nClus=%d, epsMu=%d, c=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000,c1, batchSize)
 %                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(batchSize),nIter)];
                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct',nClus,round(nTrials/1000),epsMuOrig1000,round(batchSize),nIter,dat)];
+                %with actNorm computed correctly (no NaNs)
+                fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm',nClus,round(nTrials/1000),epsMuOrig1000,round(batchSize),nIter,dat)];
             else % define batch size based on average number of updates per cluster 
 %                 batchSize = clus2run(iClus2run).*avgBatchUpdate(iBvals); % batch size depends on average updates per cluster (depends on nClus cond)
 %                 fprintf('Running %s, nClus=%d, epsMu=%d, avgBatchUpd=%d; batchSize=%d\n',dat,nClus,epsMuOrig1000,avgBatchUpdate(iBvals),batchSize)

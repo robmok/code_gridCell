@@ -14,39 +14,35 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; %?
 dat = 'square';
-dat = 'circ';
+% dat = 'circ';
 % dat = 'trapzKrupic';
 
 %for loading
-nTrials = 1000000;
+% nTrials = 1000000;
 % clus2run = [3:30]; 
 % clus2run=[3:10 12:2:26 11:2:25, 27:30]; % 27:30
-%split
+
+%batchSize=100
 % clus2run=[4:2:10, 12:2:26]; 
 % clus2run=[3:2:9, 11:2:25]; 
 
-%batchSiz200 - rerunning after fail - love06
-% clus2run=[14:2:26]; 
-% clus2run=[13:2:25]; 
-%failed again
-clus2run=[24:2:26]; 
-clus2run=[23:2:25]; 
 
-
-% %love01 - batchSize=400 - didn't run perms last time; sq, circ
-% clus2run=[12, 4 16, 8, 24]; 
-% clus2run=[6 14, 10, 18, 20]; 
-% clus2run=[11, 5, 15, 9, 19]; 
-% clus2run=[3, 13, 7, 17, 23]; 
-% clus2run=[22, 26, 25, 21];
-
-% next, batSiz=100
+% %love06 - batchSize=400 - square
+clus2run=[12, 4, 22, 16, 8, 24]; 
+clus2run=[6   21, 14, 10, 18, 20]; 
+clus2run=[11, 5,  15, 26, 9, 19]; 
+clus2run=[21, 3, 13, 7, 17, 23]; 
 
 
 
-% % trapz jointTrls=0
-% clus2run=[8:2:10, 12:2:26, 4, 6]; 
-% clus2run=[7:2:9, 11:2:25,  3, 5]; 
+%trapz
+% clus2run=[8:4:20, 6]; 
+% clus2run=[10:4:22,4]; 
+% clus2run=[24, 26];  
+
+%still to run
+% clus2run=[7:4:25  3]; 
+% clus2run=[9:4:25, 5]; 
 
 % clus2run = 18;
 
@@ -56,17 +52,19 @@ nTrials=1000000;
 % batchSizeVals = [400, 100]; % 125?
 batchSizeVals=400;
 % batchSizeVals=100;
-batchSizeVals=200;
+% batchSizeVals=200;
 
 annEps=0;
-
 jointTrls=1; %for test trials
 
 
-%running sq, circ, cLus sets x2, batchsize x2 - 8 matlabs - love01 - again
-
-doPerm=1;
-
+%doPerm or not
+if ~strcmp(dat(1:4),'trap')
+    doPerm=1;
+else
+    doPerm=0; 
+end
+% doPerm=0;
 
 % run perm tests on how many iters? takes a bit of time (a couple mins) per
 % iter, so with 200 iters plus many conditions, maybe too much (if all the
@@ -122,7 +120,8 @@ for iClus2run = 1:length(clus2run)
                 %save
                 cTime=datestr(now,'HHMMSS'); 
                 if doPerm
-                    fname = [fname(1:end-1), sprintf('_perm_%dpermsOn%diters',nPerm,nIters2run)];
+%                     fname = [fname(1:end-1), sprintf('_perm_%dpermsOn%diters',nPerm,nIters2run)];
+                    fname = [fname(1:end-1), sprintf('_actNorm_perm_%dpermsOn%diters',nPerm,nIters2run)]; %now correct actNorm
                 else
                     fname = [fname(1:end-1), '_noPerm'];
                 end
@@ -134,18 +133,10 @@ for iClus2run = 1:length(clus2run)
                 
 
                 if saveDat
-                    save(fname,'permPrc_gA_act','permPrc_gA_act','permPrc_gA_actNorm','permPrc_gA_actNorm','gA_act','gA_actNorm','gW_act','gW_actNorm','timeTaken');
+%                     save(fname,'permPrc_gA_act','permPrc_gA_act','permPrc_gA_actNorm','permPrc_gA_actNorm','gA_act','gA_actNorm','gW_act','gW_actNorm','timeTaken');
+                    save(fname,'permPrc_gA_act','permPrc_gW_act','permPrc_gA_actNorm','permPrc_gW_actNorm','gA_act','gA_actNorm','gW_act','gW_actNorm','timeTaken');
                 end
             end
         end
     end
 end
-
-%%
-% 
-% 
-% figure; hist([gA_actNorm(22,:,1,2); gA_actNorm(22,:,1,3)]',25)
-% % figure; hist(gA_actNorm(22,:,1,3),25)
-% figure; hist(gA_actNorm(22,:,1,2)-gA_actNorm(22,:,1,3),25)
-% 
-% [h p  c s] = ttest(gA_actNorm(22,:,1,2)-gA_actNorm(22,:,1,3))

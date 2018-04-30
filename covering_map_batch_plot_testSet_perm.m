@@ -15,7 +15,7 @@ gaussSmooth = 1;
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-% dat='square';
+dat='square';
 annEps=0;
 boxSize=1;
 
@@ -30,7 +30,7 @@ nTrials=1000000;
 annEps=0;
 nIter=200;
 
-clus2run = [3:16, 18, 20:26];  %missed 17, 19?
+% clus2run = [3:16, 18, 20:26];  %missed 17, 19?
 
 
 dat='trapzKrupic';
@@ -38,6 +38,7 @@ dat='trapzKrupic';
 clus2run = [3:26]; 
 % clus2run=3:26;
 % clus2run=26;
+clus2run=4:2:26;
 
 batchSizeVals = 400; %100, 125, 200,400, 1000
 
@@ -107,10 +108,10 @@ for iClus2run = 1:length(clus2run)
             
             %note this perm is only with actNorm - forgot to save for act
             if ~strcmp(dat(1:4),'trap')
-            gA_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gA(:,3,:);
-            gW_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW(:,3,:);
+            gA_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gA_act(:,3,:);
+%             gW_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW_act(:,3,:);
             
-%             gA_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gA_actNorm(:,1,:);
+            gA_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gA_actNorm(:,1,:);
 %             gW_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW_actNorm(:,1,:);
             end
             
@@ -187,12 +188,14 @@ iEps=1;
 
 % clus2plot=(3:26)-2;
 clus2plot=(6:26)-2;
-clus2plot=([6:24])-2;
+% clus2plot=([6:24])-2;
+
+clus2plot=1:length(clus2run);
 
 %trapz
-clus2plot = 1:length(clus2run)
+% clus2plot = 1:length(clus2run);
 
-iBatchVals=1; %'medium' one
+iBatchVals=1;
 
 %fig specs
 xTickLabs = num2cell(clus2run(clus2plot));
@@ -204,13 +207,14 @@ figure; hold on;
         dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,1));
         barpos  = .25:.5:.5*size(dat1,2);
         colors  = distinguishable_colors(size(dat1,2));
-        colgrey = [.5, .5, .5];
+        colgrey = [.6, .6, .6];
         mu      = mean(dat1,1);
         sm      = std(dat1)./sqrt(size(dat1,1));
         ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
         plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-        errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-        scatter(barpos,mu,50,colors,'filled','d');
+%         errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+%         scatter(barpos,mu,50,colors,'filled','d');
+        scatter(barpos,mu,50,colgrey,'filled','d');
         xticklabels(xTickLabs);
         xlim([barpos(1)-.5, barpos(end)+.5]);
         %         ylim([0,1]);
@@ -222,13 +226,18 @@ figure; hold on;
         xlabel('Number of Clusters');
         ylabel('Grid Score');
         
-        
-        title(sprintf('%s, %s - eps=%d, batchSize=%d',dat, gridMeasure,epsMuVals(iEps)*1000,batchSizeVals(iBatchVals)))
+%         title(sprintf('%s, %s - eps=%d, batchSize=%d',dat, gridMeasure,epsMuVals(iEps)*1000,batchSizeVals(iBatchVals)))
+        if strcmp(dat(1:2),'ci')
+        title('Circular box')
+        elseif strcmp(dat(1:2),'sq')
+        title('Square box')
+        end        
         
         set(gca,'FontSize',fontSiz,'fontname','Arial')
     end
 
-    fname = [figsDir sprintf('/gridness_%s_univarScatters_nClus%d-%d_eps%d_batchSiz%d_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
+    fname = [figsDir sprintf('/gridness_%s_univarScatters_testSet_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
+
 if savePlots
    set(gcf,'Renderer','painters');
    print(gcf,'-depsc2',fname)

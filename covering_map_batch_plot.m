@@ -16,7 +16,7 @@ gaussSmooth = 1;
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-dat='square';
+% dat='square';
 % annEps=0;
 boxSize=1;
 nIter=200;
@@ -124,7 +124,7 @@ annEps=0;
 % % clus2run = [8:2:28]; 
 
 clus2run = [3:26]; 
-
+% clus2run = [10,15,20,25];
 % clus2run = [4:25];
 
 % clus2run=26;
@@ -621,7 +621,7 @@ nnz(peaksW~=6)
 %% density plots
 close all
 
-iSet=size(datTmp,1);
+iSet=5;
 iEps=1;
 gaussSmooth=1;
 
@@ -633,7 +633,7 @@ else
 end
 
 %set
-iClus2run = 5;
+iClus2run = 3;
 iBvals    = 1;
 
 iters2plot = 1:5;
@@ -642,7 +642,11 @@ fprintf(sprintf('clus %d batchSizeVals %d\n',clus2run(iClus2run),batchSizeVals(i
 for iterI = iters2plot
 %     densityPlotCentresSm = imgaussfilt(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
 %     densityPlotCentresSm = imgaussfilt(densityPlotActAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
+
     densityPlotCentresSm = imgaussfilt(densityPlotActNormAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
+    densityPlotActNormTmp = densityPlotActNormAll(:,:,iSet,iterI,iEps,iBvals,iClus2run);
+    densityPlotActNormTmp(isnan(densityPlotActNormTmp))=0;
+%     densityPlotCentresSm = imgaussfilt(densityPlotActNormTmp,gaussSmooth);
     
     figure; hold on;
     subplot(subPlt(1),subPlt(2),1)
