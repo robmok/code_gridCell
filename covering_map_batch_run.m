@@ -38,16 +38,13 @@ annEps = 0; %1 or 0
 
 %love01 - circ, batchSiz=400
 clus2run = [18, 8, 21]; 
-% clus2run = [16, 7, 14, 17];  
-% clus2run = [12, 9, 20, 6]; 
-% clus2run = [5, 10, 19, 13];
-% clus2run = [11, 3, 4, 15];
-% clus2run = 22;
-% clus2run = 23;
-% clus2run = 24;
-% clus2run = 25;
-% clus2run = 26;
-
+ clus2run = [16, 7, 14, 17];  
+clus2run = [12, 9, 20, 6]; 
+ clus2run = [5, 10, 19, 13];
+ clus2run = [11, 3, 4, 15];
+clus2run = [22 23];
+clus2run = [24, 25];
+clus2run = 26;
 
 % clus2run = [2:2:30 3:2:29]; 
 
