@@ -126,7 +126,7 @@ savePlots=0;
 
 clusPosAct = 'actNorm'; %'act' or 'actNorm'
 
-gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
+gridMsrType = 'w'; % 'a' or 'w' for allen or willis method - a preferred
 
 gridMeasure = 'grid';
 

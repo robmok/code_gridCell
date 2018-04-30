@@ -113,7 +113,7 @@ for iterI=1:nIters2run
             densityPlotActUpd(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)       = densityPlotActUpd(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)+1; %log nTimes loc was visited
         end
         densityPlotActNormTmp = densityPlotAct(:,:,iterI)./densityPlotActUpd; %divide by number of times that location was visited
-        densityPlotActNormTmp(isnan(densityPlotActNormTmp)) = 0; %locations not visited are 0, which makes nans. revert to 0s.
+%         densityPlotActNormTmp(isnan(densityPlotActNormTmp)) = 0; %locations not visited are 0, which makes nans. revert to 0s.
         densityPlotActNorm(:,:,iterI) = densityPlotActNormTmp;
         %no need to smooth
         densityPlotActTmp                   = densityPlotAct(:,:,iterI); 

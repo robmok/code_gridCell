@@ -298,7 +298,7 @@ for iterI = 1:nIter
             densityPlotActUpd(trials(iTrl,1)+1, trials(iTrl,2)+1) = densityPlotActUpd(trials(iTrl,1)+1, trials(iTrl,2)+1)+1; %log nTimes loc was visited
         end
         densityPlotActNormTmp = densityPlotAct./densityPlotActUpd; %divide by number of times that location was visited
-        densityPlotActNormTmp(isnan(densityPlotActNormTmp)) = 0; %locations not visited are 0, which makes nans. revert to 0s.
+%         densityPlotActNormTmp(isnan(densityPlotActNormTmp)) = 0; %locations not visited are 0, which makes nans. revert to 0s.
         densityPlotActNorm(:,:,iSet,iterI) = densityPlotActNormTmp;
 %         end
         %compute the sum of the distances between each cluster and itself over batches 

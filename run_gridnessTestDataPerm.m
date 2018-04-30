@@ -14,8 +14,8 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; %?
 dat = 'square';
-% dat = 'circ';
-% dat = 'trapzKrupic';
+dat = 'circ';
+dat = 'trapzKrupic';
 
 %for loading
 % nTrials = 1000000;
@@ -26,25 +26,19 @@ dat = 'square';
 % clus2run=[4:2:10, 12:2:26]; 
 % clus2run=[3:2:9, 11:2:25]; 
 
-
 % %love06 - batchSize=400 - square
 clus2run=[12, 4, 22, 16, 8, 24]; 
 clus2run=[6   21, 14, 10, 18, 20]; 
 clus2run=[11, 5,  15, 26, 9, 19]; 
 clus2run=[21, 3, 13, 7, 17, 23]; 
 
-
-
 %trapz
-% clus2run=[8:4:20, 6]; 
-% clus2run=[10:4:22,4]; 
-% clus2run=[24, 26];  
+clus2run=[8:4:24, 6]; 
+clus2run=[10:4:26,4]; 
+clus2run=[3, 7:4:25]; 
+clus2run=[5, 9:4:25]; 
 
-%still to run
-% clus2run=[7:4:25  3]; 
-% clus2run=[9:4:25, 5]; 
-
-% clus2run = 18;
+clus2run = 18;
 
 nIter=200;
 epsMuVals=.025;
@@ -75,7 +69,7 @@ nIters2run = 200;
 
 nPerm = 500;
 
-saveDat=1;
+saveDat=0;
 
 for iClus2run = 1:length(clus2run) 
     nClus = clus2run(iClus2run);
@@ -134,7 +128,10 @@ for iClus2run = 1:length(clus2run)
 
                 if saveDat
 %                     save(fname,'permPrc_gA_act','permPrc_gA_act','permPrc_gA_actNorm','permPrc_gA_actNorm','gA_act','gA_actNorm','gW_act','gW_actNorm','timeTaken');
-                    save(fname,'permPrc_gA_act','permPrc_gW_act','permPrc_gA_actNorm','permPrc_gW_actNorm','gA_act','gA_actNorm','gW_act','gW_actNorm','timeTaken');
+%                     save(fname,'permPrc_gA_act','permPrc_gW_act','permPrc_gA_actNorm','permPrc_gW_actNorm','gA_act','gA_actNorm','gW_act','gW_actNorm','timeTaken');
+
+                    %also save some density plots for figures
+                    save(fname,'permPrc_gA_act','permPrc_gW_act','permPrc_gA_actNorm','permPrc_gW_actNorm','gA_act','gA_actNorm','gW_act','gW_actNorm','densityPlotAct','densityPlotActNorm','timeTaken');
                 end
             end
         end
