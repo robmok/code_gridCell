@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -15,7 +15,7 @@ locRange = [0 49];
 nTrialsTest = 100000; %?
 dat = 'square';
 % dat = 'circ';
-% dat = 'trapzKrupic';
+dat = 'trapzKrupic';
 
 %for loading
 % nTrials = 1000000;
@@ -27,11 +27,15 @@ dat = 'square';
 % clus2run=[3:2:9, 11:2:25]; 
 
 % %love06 - batchSize=400 - square
-clus2run=[4, 22, 16, 8, 24, 12]; 
-clus2run=[25, 10, 7, 20, 14, 6];  
-clus2run=[5,  15, 26, 9, 19, 11]; 
-clus2run=[3, 13, 18, 17, 23, 21]; 
-
+% clus2run=[4, 22, 16, 8, 24, 12]; 
+% clus2run=[25, 10, 7, 20, 14, 6];  
+% clus2run=[5,  15, 26, 9, 19, 11]; 
+% clus2run=[3, 13, 18, 17, 23, 21]; 
+%rerunning
+clus2run=[24, 12]; 
+clus2run=[14, 6];  
+clus2run=[19, 11]; 
+% clus2run=[23, 21]; 
 
 %trapz
 % clus2run=[8:4:24, 6]; 
@@ -40,9 +44,9 @@ clus2run=[3, 13, 18, 17, 23, 21];
 % clus2run=[5, 9:4:25]; 
 
 %split into 4
-% clus2run=[8:8:24]; 
-% clus2run=[12, 20,6]; 
-% clus2run=[10:8:26]; 
+clus2run=[8:8:24]; 
+clus2run=[12, 20,6]; 
+clus2run=[10:8:26]; 
 % clus2run=[14, 22,4];
 
 %odd all in one
@@ -145,6 +149,7 @@ for iClus2run = 1:length(clus2run)
                     %also save some density plots for figures
                     save(fname,'permPrc_gA_act','permPrc_gW_act','permPrc_gA_actNorm','permPrc_gW_actNorm','gA_act','gA_actNorm','gW_act','gW_actNorm','densityPlotAct','densityPlotActNorm','timeTaken');
                 end
+                clear densityPlotAct densityPlotActNorm
             end
         end
     end
