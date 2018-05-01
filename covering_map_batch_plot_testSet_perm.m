@@ -38,7 +38,7 @@ dat='trapzKrupic';
 clus2run = [3:26]; 
 % clus2run=3:26;
 % clus2run=26;
-% clus2run=4:2:26;
+clus2run=4:2:26;
 
 batchSizeVals = 400; %100, 125, 200,400, 1000
 
@@ -67,7 +67,7 @@ for iClus2run = 1:length(clus2run)
                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_perm_%dpermsOn%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,nPerm,nIters2run)];
             else
                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_noPerm',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
-%                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_noPerm_diters_noJointTrlsTest',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+%                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_noPerm_noJointTrlsTest',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
             end
                         
 %             if boxSize>1
@@ -126,7 +126,7 @@ savePlots=0;
 
 clusPosAct = 'actNorm'; %'act' or 'actNorm'
 
-gridMsrType = 'w'; % 'a' or 'w' for allen or willis method - a preferred
+gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
 
 gridMeasure = 'grid';
 

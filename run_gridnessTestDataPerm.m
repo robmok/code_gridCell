@@ -14,8 +14,8 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; %?
 dat = 'square';
-dat = 'circ';
-dat = 'trapzKrupic';
+% dat = 'circ';
+% dat = 'trapzKrupic';
 
 %for loading
 % nTrials = 1000000;
@@ -27,16 +27,28 @@ dat = 'trapzKrupic';
 % clus2run=[3:2:9, 11:2:25]; 
 
 % %love06 - batchSize=400 - square
-clus2run=[12, 4, 22, 16, 8, 24]; 
-clus2run=[6   21, 14, 10, 18, 20]; 
-clus2run=[11, 5,  15, 26, 9, 19]; 
-clus2run=[21, 3, 13, 7, 17, 23]; 
+clus2run=[4, 22, 16, 8, 24, 12]; 
+clus2run=[25, 10, 7, 20, 14, 6];  
+clus2run=[5,  15, 26, 9, 19, 11]; 
+clus2run=[3, 13, 18, 17, 23, 21]; 
+
 
 %trapz
-clus2run=[8:4:24, 6]; 
-clus2run=[10:4:26,4]; 
-clus2run=[3, 7:4:25]; 
-clus2run=[5, 9:4:25]; 
+% clus2run=[8:4:24, 6]; 
+% clus2run=[10:4:26,4]; 
+% clus2run=[3, 7:4:25]; 
+% clus2run=[5, 9:4:25]; 
+
+%split into 4
+% clus2run=[8:8:24]; 
+% clus2run=[12, 20,6]; 
+% clus2run=[10:8:26]; 
+% clus2run=[14, 22,4];
+
+%odd all in one
+% clus2run=[3, 7:4:25, 5, 9:4:25]; 
+
+
 
 % clus2run = 18;
 
@@ -69,7 +81,7 @@ nIters2run = 200;
 
 nPerm = 500;
 
-saveDat=0;
+saveDat=1;
 
 for iClus2run = 1:length(clus2run) 
     nClus = clus2run(iClus2run);

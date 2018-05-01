@@ -15,7 +15,7 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
-% dat = 'square'; 
+dat = 'square'; 
 % dat = 'trapzKrupic';
 
 % dat = 'catLearn';
@@ -36,6 +36,7 @@ annEps = 0; %1 or 0
 %rerun circ/square with correct actNorm
 %joint trials
 %love01 - circ, batchSiz=400
+%love01 - sq, batchSiz=400
 clus2run = [18, 8, 21]; 
 %  clus2run = [16, 7, 14, 17];  
 % clus2run = [12, 9, 20, 6]; 
@@ -45,9 +46,9 @@ clus2run = [18, 8, 21];
 % clus2run = [24, 25];
 % clus2run = 26;
 
-%next: sq / trapz
+%next:  trapz
 
-% clus2run=20;
+% clus2run=16;
 
 % nTrials
 if ~strcmp(dat(1:3),'cat')
@@ -187,7 +188,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
             if strcmp(dat(1:3),'cat') %save muAll
                 [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll,trials] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls);
             else
-                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls);
+                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll,trials] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls);
             end
             
             timeTaken=toc;

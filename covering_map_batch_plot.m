@@ -934,7 +934,7 @@ for iBvals = 1:length(batchSizeVals)
             saveas(gcf,fname,'png');
            close all
         end
-        figure; imagesc(aCorrMap);
+        figure; imagesc(aCorrMap,[-.7,.7]);
         title(sprintf('Grid Score %.2f',g));
         set(gca,'FontSize',fontSiz,'fontname','Arial')
         xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
@@ -1001,7 +1001,140 @@ end
 %     
 %     
 %     
+%% Making figs - cluster positions over time, with agent - needs muAll and trials
+
+savePlots=0;
+
+fntSiz=25;
+
+%if plotAgent, need trials as an output argument
+plotAgent = 1;
+
+nClus = size(muAll,1);
+iterI = 1;
+colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
+colAgent = [.75, .75, .75];
+
+% make cluster positions same over trials in a batch
+muTrls = nan(nClus,2,nTrials);
+for iBatch = 1:nBatches
+    muTrls(:,1,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(muAll(:,1,iBatch),1,batchSize);
+    muTrls(:,2,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(muAll(:,2,iBatch),1,batchSize);
+end
+
+figure;
+clear h1
+fromTrl = 1;
+iTrl = 100; %end trial
+%agent - have to start from X trials min
+plotTrls=fromTrl:iTrl;
+h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'Color',colAgent); hold on;
+%clusters
+h2(iTrl)=scatter(squeeze(muTrls(:,1,iTrl)),squeeze(muTrls(:,2,iTrl)),1000,colors,'.'); hold on;
+xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
+title(sprintf('Trials 1-100 (start)'),'fontname','Arial','fontsize',fntSiz);
+
+fname = [figsDir sprintf('/learnOverTime_clus_wAgent_%s_nClus%d_eps%d_batchSiz%d_trls%d-%d',dat,nClus,epsMuVals(iEps)*1000,batchSizeVals(iBvals),fromTrl,iTrl)];
+if savePlots
+        set(gcf,'Renderer','painters');
+        print(gcf,'-depsc2',fname)
+    saveas(gcf,fname,'png');
+    close all
+end
+        
+
+figure;
+clear h1
+%plot previous trials plotted above
+plotTrls=fromTrl:iTrl;
+h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'Color',colAgent); hold on;
+
+fromTrl = 10000;
+iTrl = fromTrl+2000;
+plotTrls=fromTrl:iTrl;
+h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'Color',colAgent); hold on;
+
+%clusters
+h2(iTrl)=scatter(squeeze(muTrls(:,1,iTrl)),squeeze(muTrls(:,2,iTrl)),1000,colors,'.'); hold on;
+xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
+title(sprintf('Trials %d-%d (1%%)',fromTrl,iTrl),'fontname','Arial','fontsize',fntSiz);
+
+fname = [figsDir sprintf('/learnOverTime_clus_wAgent_%s_nClus%d_eps%d_batchSiz%d_trls%dk-%dk',dat,nClus,epsMuVals(iEps)*1000,batchSizeVals(iBvals),fromTrl/1000,iTrl/1000)];
+if savePlots
+        set(gcf,'Renderer','painters');
+        print(gcf,'-depsc2',fname)
+    saveas(gcf,fname,'png');
+    close all
+end
+
+figure;
+clear h1
+fromTrl = nTrials*.4;
+iTrl = fromTrl+7500;
+plotTrls=fromTrl:iTrl;
+h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'Color',colAgent); hold on;
+%clusters
+h2(iTrl)=scatter(squeeze(muTrls(:,1,iTrl)),squeeze(muTrls(:,2,iTrl)),1000,colors,'.'); hold on;
+xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
+title(sprintf('Trials %d-%d (40%%)',fromTrl,iTrl),'fontname','Arial','fontsize',fntSiz);
+fname = [figsDir sprintf('/learnOverTime_clus_wAgent_%s_nClus%d_eps%d_batchSiz%d_trls%dkplus7500trls',dat,nClus,epsMuVals(iEps)*1000,batchSizeVals(iBvals),fromTrl/1000)];
+if savePlots
+        set(gcf,'Renderer','painters');
+        print(gcf,'-depsc2',fname)
+    saveas(gcf,fname,'png');
+    close all
+end
+
+figure;
+clear h1
+fromTrl = nTrials*.75;
+iTrl = fromTrl+7500;
+plotTrls=fromTrl:iTrl;
+h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'Color',colAgent); hold on;
+%clusters
+h2(iTrl)=scatter(squeeze(muTrls(:,1,iTrl)),squeeze(muTrls(:,2,iTrl)),1000,colors,'.'); hold on;
+xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
+title(sprintf('Trials %d-%d (75%%)',fromTrl,iTrl),'fontname','Arial','fontsize',fntSiz);
+fname = [figsDir sprintf('/learnOverTime_clus_wAgent_%s_nClus%d_eps%d_batchSiz%d_trls%dkplus7500trls',dat,nClus,epsMuVals(iEps)*1000,batchSizeVals(iBvals),fromTrl/1000)];
+if savePlots
+        set(gcf,'Renderer','painters');
+        print(gcf,'-depsc2',fname)
+    saveas(gcf,fname,'png');
+    close all
+end
+%%
+
+
+figure;
+clear h1
+for iTrl = 500
+    if mod(iTrl,200)==0 %plot centers after x trials
+        %agent
+        if plotAgent
+            
+        %have to start from 1000 trials min
+        plotTrls=iTrl-499:iTrl;
+        if strcmp(dat(1:3),'cat')
+            h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'.','Color',repmat(colAgentCh(iTrl),1,3)); hold on;
+        else
+            h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'Color',repmat(colAgentCh(iTrl),1,3)); hold on;
+        end
+        
+        if mod(iTrl,5000)==0
+            delete(h1);
+        end
+        end
+        
+        %clusters
+        h2(iTrl)=scatter(squeeze(muTrls(:,1,iTrl)),squeeze(muTrls(:,2,iTrl)),1000,colors,'.'); hold on;
+        drawnow;
+%         if mod(iTrl,15000)==0
+%             delete(h2);
+%         end
+        
+    end
+end
+
     
-    
-    
+ 
     
