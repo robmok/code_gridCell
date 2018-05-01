@@ -124,7 +124,7 @@ figsDir = [wd '/grid_figs'];
 
 savePlots=0;
 
-clusPosAct = 'actNorm'; %'act' or 'actNorm'
+clusPosAct = 'act'; %'act' or 'actNorm'
 
 gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
 
@@ -346,7 +346,7 @@ savePlots=0;
 
 clusPosAct = 'actNorm'; %'act' or 'actNorm'
 
-gridMsrType = 'w'; % 'a' or 'w' for allen or willis method - a preferred
+gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
 
 gridMeasure = 'grid';
 

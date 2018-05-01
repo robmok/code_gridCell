@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -38,15 +38,15 @@ clus2run=[19, 11];
 % clus2run=[23, 21]; 
 
 %trapz
-% clus2run=[8:4:24, 6]; 
-% clus2run=[10:4:26,4]; 
+clus2run=[8:4:24, 6]; 
+clus2run=[10:4:26,4]; 
 % clus2run=[3, 7:4:25]; 
 % clus2run=[5, 9:4:25]; 
 
 %split into 4
-clus2run=[8:8:24]; 
-clus2run=[12, 20,6]; 
-clus2run=[10:8:26]; 
+% clus2run=[8:8:24]; 
+% clus2run=[12, 20,6]; 
+% clus2run=[10:8:26]; 
 % clus2run=[14, 22,4];
 
 %odd all in one
