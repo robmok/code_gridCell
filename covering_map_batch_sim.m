@@ -289,7 +289,9 @@ for iterI = 1:nIter
             end
         end
         densityPlot(:,:,iSet,iterI) = nansum(densityPlotClus,3);
-        densityPlotSm               = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth); %smooth
+        densityPlotTmp              = densityPlot(:,:,iSet,iterI);
+        densityPlotTmp(densityPlotTmp==0) = nan; %for circ, and prob trapz, to ignore points not in the shape
+        densityPlotSm               = imgaussfilt(densityPlotTmp,gaussSmooth); %smooth
 
         %densityPlotActNorm
 %         if ~strcmp(dat(1:4),'trap') %not computing for trapz
@@ -299,7 +301,12 @@ for iterI = 1:nIter
         end
         densityPlotActNormTmp = densityPlotAct./densityPlotActUpd; %divide by number of times that location was visited
 %         densityPlotActNormTmp(isnan(densityPlotActNormTmp)) = 0; %locations not visited are 0, which makes nans. revert to 0s.
-        densityPlotActNorm(:,:,iSet,iterI) = densityPlotActNormTmp;
+
+%%%%%%%%%%%%%%%
+         % IF COMPUTING GRIDNESS FOR ACT ITSELF
+%         densityPlotAct(densityPlotAct==0) =  nan; %for circ, and prob trapz, to ignore points not in the shape - if computing this at all (atm not)
+
+          densityPlotActNorm(:,:,iSet,iterI) = densityPlotActNormTmp;
 %         end
         %compute the sum of the distances between each cluster and itself over batches 
         if iSet>1 
