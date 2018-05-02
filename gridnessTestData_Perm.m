@@ -1,4 +1,4 @@
-function [permPrc_gA_act, permPrc_gW_act,permPrc_gA_actNorm, permPrc_gW_actNorm, gA_act,gA_actNorm,gW_act,gW_actNorm,gA_actNormPerm, gW_actNormPerm, densityPlotAct,densityPlotActNorm, rSeedTest] = gridnessTestData_Perm(densityPlot,dat,locRange,nClus,nTrialsTest,nPerm,nIters2run,doPerm)
+function [permPrc_gA_act, permPrc_gW_act,permPrc_gA_actNorm, permPrc_gW_actNorm, gA_act,gA_actNorm,gW_act,gW_actNorm,gA_actNormPerm, gW_actNormPerm, densityPlotActTmp,densityPlotActNorm, rSeedTest] = gridnessTestData_Perm(densityPlot,dat,locRange,nClus,nTrialsTest,nPerm,nIters2run,doPerm)
 
 
 %input - 
@@ -76,6 +76,7 @@ permPrc_gW_actNorm = nan(nIters2run,4);
 %% compute actNorm maps after 'training' (on a new test set of locations)
 [trialsTest,~, rSeedTest] = createTrls(dat,nTrialsTest,locRange,useSameTrls,jointTrls,boxSize,h);
 
+densityPlotActTmp     = zeros(b,h);
 densityPlotAct     = zeros(b,h,nIters2run);
 densityPlotActNorm = zeros(b,h,nIters2run);
 gA_act = nan(nIters2run,9);
@@ -113,15 +114,17 @@ for iterI=1:nIters2run
         end  %find closestC
         %densityPlotActNorm
         for iTrl = 1:nTrialsTest
-            densityPlotAct(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1,iterI)    = densityPlotAct(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1,iterI)+ nansum(actTrl(:,iTrl));
+            densityPlotActTmp(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)    = densityPlotActTmp(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)+ nansum(actTrl(:,iTrl));
             densityPlotActUpd(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)       = densityPlotActUpd(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)+1; %log nTimes loc was visited
         end
-        densityPlotActNormTmp = densityPlotAct(:,:,iterI)./densityPlotActUpd; %divide by number of times that location was visited
-%         densityPlotActNormTmp(isnan(densityPlotActNormTmp)) = 0; %locations not visited are 0, which makes nans. revert to 0s.
-        densityPlotActNorm(:,:,iterI) = densityPlotActNormTmp;
-        %no need to smooth
-        densityPlotActTmp                   = densityPlotAct(:,:,iterI); 
-        densityPlotActNormTmp               = densityPlotActNorm(:,:,iterI);
+        densityPlotActNormTmp = densityPlotActTmp./densityPlotActUpd; %divide by number of times that location was visited
+%         densityPlotActNormTmp(isnan(densityPlotActNormTmp)) = 0;
+%         %locations not visited are 0, which makes nans. revert to 0s. -
+%         acutally wrong; need the nans for places that are not in shape -
+%         for act:
+        densityPlotActTmp(densityPlotActTmp==0) =  nan;
+        densityPlotAct(:,:,iterI)               =  densityPlotActTmp;
+        densityPlotActNorm(:,:,iterI)           =  densityPlotActNormTmp;
         
         aCorrMap = ndautoCORR(densityPlotActTmp);
         [g,gdataA] = gridSCORE(aCorrMap,'allen',0);

@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -15,7 +15,9 @@ locRange = [0 49];
 nTrialsTest = 100000; %?
 dat = 'square';
 % dat = 'circ';
-dat = 'trapzKrupic';
+% dat = 'trapzKrupic';
+
+saveDat=1;
 
 %for loading
 % nTrials = 1000000;
@@ -26,20 +28,25 @@ dat = 'trapzKrupic';
 % clus2run=[4:2:10, 12:2:26]; 
 % clus2run=[3:2:9, 11:2:25]; 
 
-% %love06 - batchSize=400 - square
+% %love06 - batchSize=400 - circ; actNorm
 % clus2run=[4, 22, 16, 8, 24, 12]; 
 % clus2run=[25, 10, 7, 20, 14, 6];  
 % clus2run=[5,  15, 26, 9, 19, 11]; 
 % clus2run=[3, 13, 18, 17, 23, 21]; 
-%rerunning
-clus2run=[24, 12]; 
-clus2run=[14, 6];  
-clus2run=[19, 11]; 
-% clus2run=[23, 21]; 
+
+%love01 - sq - batchSize=400;actNorm
+clus2run=[4, 22, 16]; 
+% clus2run=[8, 12, 24];
+% clus2run=[25, 10, 7];
+% clus2run=[20, 14, 6];
+% clus2run=[5,  15, 26];
+% clus2run=[9, 19, 11];
+% clus2run=[3, 13, 18];
+% clus2run=[17, 23, 21];
 
 %trapz
-clus2run=[8:4:24, 6]; 
-clus2run=[10:4:26,4]; 
+% clus2run=[8:4:24, 6]; 
+% clus2run=[10:4:26,4]; 
 % clus2run=[3, 7:4:25]; 
 % clus2run=[5, 9:4:25]; 
 
@@ -51,8 +58,6 @@ clus2run=[10:4:26,4];
 
 %odd all in one
 % clus2run=[3, 7:4:25, 5, 9:4:25]; 
-
-
 
 % clus2run = 18;
 
@@ -85,8 +90,6 @@ nIters2run = 200;
 
 nPerm = 500;
 
-saveDat=1;
-
 for iClus2run = 1:length(clus2run) 
     nClus = clus2run(iClus2run);
     for iEps = 1%:length(epsMuVals) 
@@ -102,7 +105,9 @@ for iClus2run = 1:length(clus2run)
             end
             
             %load
-            fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat);
+%             fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat);
+            %new
+            fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat);
             if annEps %epsMu is different here
                 fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps*_batchSiz%d_%diters_%s_wAct_annEps_jointTrls_stepSiz',nClus,round(nTrials/1000),batchSize,nIter,dat);
             end
