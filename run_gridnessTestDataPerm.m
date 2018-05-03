@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -14,7 +14,7 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; %?
 dat = 'square';
-% dat = 'circ';
+dat = 'circ';
 % dat = 'trapzKrupic';
 
 saveDat=1;
@@ -33,10 +33,15 @@ saveDat=1;
 % clus2run=[25, 10, 7, 20, 14, 6];  
 % clus2run=[5,  15, 26, 9, 19, 11]; 
 % clus2run=[3, 13, 18, 17, 23, 21]; 
+%re running
+clus2run=[24, 12]; 
+clus2run=[14, 6];  
+clus2run=[ 19, 11]; 
+clus2run=[23, 21]; 
 
 %love01 - sq - batchSize=400;actNorm
-clus2run=[4, 22, 16]; 
-% clus2run=[8, 12, 24];
+% clus2run=[4, 22, 16]; 
+% % clus2run=[8, 12, 24];
 % clus2run=[25, 10, 7];
 % clus2run=[20, 14, 6];
 % clus2run=[5,  15, 26];
