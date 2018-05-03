@@ -112,7 +112,7 @@ for iterI = 1:nIter
     
     fprintf('iter %d \n',iterI);
 
-    [trials,dataPtsTest, rSeed(iterI)] = createTrls(dat,nTrials,locRange,useSameTrls,jointTrls,boxSize,catsInfo);
+    [trials,dataPtsTest, rSeed(iterI),ntInSq] = createTrls(dat,nTrials,locRange,useSameTrls,jointTrls,boxSize,catsInfo);
         
     % if expand box
     switch warpType
@@ -207,31 +207,6 @@ for iterI = 1:nIter
                 actTrlAll(:,:,iBatch) = actTrl;
 %             end
             
-            
-
-%             %deterministic update - batch; save closestC for each trial -
-%             from before
-% %             closestC = nan(1,batchSize);
-%             for iTrlBatch = 1:batchSize
-%                 closestTmp = find(min(dist2Clus(iTrlBatch,:))==dist2Clus(iTrlBatch,:));
-%                 if numel(closestTmp)>1
-%                     closestC(iTrlBatch) = randsample(closestTmp,1);
-%                 else
-%                     closestC(iTrlBatch) = closestTmp;
-%                 end
-%                 %compute activation
-%                 if ~strcmp(dat(1:4),'trap') %not computing for trapz
-%                     sigmaGauss = stepSize;%/3.5; %move up later - 1 seems to be fine
-%                     actTrl(closestC(iTrlBatch),iTrlBatch)=mvnpdf(trls2Upd(iTrlBatch,:),mu(closestC(iTrlBatch),:,iBatch),eye(2)*sigmaGauss); % save only the winner
-%                 end
-%             end
-%             
-%             if ~strcmp(dat(1:4),'trap') %not computing for trapz
-%                 actTrlAll(:,:,iBatch) = actTrl;
-%             end
-%             
-
-            
             %learning rate
             if annEps %if use annealed learning rate
                 epsMu = epsMuOrig./(1+annEpsDecay+iBatch); %need to check if it's actually epsMuOrig*(1/(1+annEpsDecay+iBatch);
@@ -244,9 +219,8 @@ for iterI = 1:nIter
             end
             
             %batch update - save all updates for each cluster for X
-            %trials, update it, then again
-            % - goes through each cluster, compute distances, average,
-            %then update
+            %trials, update it, then again - goes through each cluster,
+            %compute distances, average, then update
             for iClus = 1:nClus
                 updInd = closestC==iClus;
                 if any(nnz(updInd)) %if not, no need to update
@@ -276,9 +250,7 @@ for iterI = 1:nIter
         densityPlotClus      = zeros(b,h,nClus);
         densityPlotAct       = zeros(b,h);
         densityPlotActUpd    = zeros(b,h); %start with ones, so won't divide by 0
-      
-        clus = round(mu(:,:,round(toTrlN(iSet)./batchSize))); %mu is in batches
-        ind=clus<=0; clus(ind)=1; %indices <= 0 make to 1
+        clus = round(mu(:,:,round(toTrlN(iSet)./batchSize))); %mu is in batches     
         for iClus=1:nClus
             ntNanInd = squeeze(~isnan(clus(iClus,1,:)));
             clusTmp = []; %clear else dimensions change over clus/sets
@@ -288,8 +260,7 @@ for iterI = 1:nIter
                 densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus)+1;
             end
         end
-        densityPlot(:,:,iSet,iterI) = nansum(densityPlotClus,3);
-        densityPlotSm               = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth); %smooth
+        densityPlotTmp = nansum(densityPlotClus,3);
 
         %densityPlotActNorm
 %         if ~strcmp(dat(1:4),'trap') %not computing for trapz
@@ -297,9 +268,23 @@ for iterI = 1:nIter
             densityPlotAct(trials(iTrl,1)+1, trials(iTrl,2)+1)    = densityPlotAct(trials(iTrl,1)+1, trials(iTrl,2)+1)+ nansum(actAll(:,iTrl));
             densityPlotActUpd(trials(iTrl,1)+1, trials(iTrl,2)+1) = densityPlotActUpd(trials(iTrl,1)+1, trials(iTrl,2)+1)+1; %log nTimes loc was visited
         end
+        %turn 0s outside of the shape into nans
+        if strcmp(dat(1:4),'circ') % trapz too?
+            for i=1:length(ntInSq)
+                densityPlotTmp(ntInSq(i,1)+1,ntInSq(i,2)+1) = nan;
+                densityPlotAct(ntInSq(i,1)+1,ntInSq(i,2)+1) = nan;
+            end
+        end
+        densityPlot(:,:,iSet,iterI) = densityPlotTmp;
+%         densityPlotTmp(densityPlotTmp==0) = nan; %for circ, and prob trapz, to ignore points not in the shape - do this above now; for actNorm already does it by dividing by 0
+        densityPlotSm               = imgaussfilt(densityPlotTmp,gaussSmooth); %smooth
         densityPlotActNormTmp = densityPlotAct./densityPlotActUpd; %divide by number of times that location was visited
-%         densityPlotActNormTmp(isnan(densityPlotActNormTmp)) = 0; %locations not visited are 0, which makes nans. revert to 0s.
-        densityPlotActNorm(:,:,iSet,iterI) = densityPlotActNormTmp;
+
+%%%%%%%%%%%%%%%
+         % IF COMPUTING GRIDNESS FOR ACT ITSELF
+%         densityPlotAct(densityPlotAct==0) =  nan; %for circ, and prob trapz, to ignore points not in the shape - if computing this at all (atm not)
+
+          densityPlotActNorm(:,:,iSet,iterI) = densityPlotActNormTmp;
 %         end
         %compute the sum of the distances between each cluster and itself over batches 
         if iSet>1 

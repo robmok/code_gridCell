@@ -6,6 +6,7 @@ cd(wd);
 
 codeDir = [wd '/code_gridCell'];
 saveDir = [wd '/data_gridCell'];
+% saveDir = [wd '/data_gridCell/toRmv'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed']));
 
@@ -33,12 +34,12 @@ nIter=200;
 % clus2run = [3:16, 18, 20:26];  %missed 17, 19?
 
 
-dat='trapzKrupic';
-
-clus2run = [3:26]; 
-% clus2run=3:26;
-% clus2run=26;
-clus2run=4:2:26;
+% dat='trapzKrupic';
+% 
+% clus2run = [3:26]; 
+clus2run=3:26;
+% % clus2run=26;
+% clus2run=4:2:26;
 
 batchSizeVals = 400; %100, 125, 200,400, 1000
 
@@ -65,6 +66,7 @@ for iClus2run = 1:length(clus2run)
             fprintf('Loading %s, nClus=%d, epsMu=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000,batchSize)
             if ~strcmp(dat(1:4),'trap')
                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_perm_%dpermsOn%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,nPerm,nIters2run)];
+%                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_perm_%dpermsOn%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,nPerm,nIters2run)];
             else
                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_noPerm',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
 %                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_noPerm_noJointTrlsTest',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];

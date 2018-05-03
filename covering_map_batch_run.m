@@ -15,7 +15,7 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
-dat = 'square'; 
+% dat = 'square'; 
 % dat = 'trapzKrupic';
 
 % dat = 'catLearn';
@@ -37,19 +37,19 @@ annEps = 0; %1 or 0
 %joint trials
 %love01 - circ, batchSiz=400
 %love01 - sq, batchSiz=400
-clus2run = [18, 8, 21]; 
-% clus2run = [16, 7, 14, 17];  
-% clus2run = [12, 9, 20, 6]; 
-%  clus2run = [5, 10, 19, 13];
-%  clus2run = [11, 3, 4, 15];
-% clus2run = [22 23];
-% clus2run = [24, 25];
-% clus2run = 26;
+
+%rerunning 400 circ with nans for clus and act
+clus2run = [18, 8, 21,6]; 
+% clus2run = [16, 7, 14,15];  
+% clus2run = [12, 9, 20, 19]; 
+%  clus2run = [11, 17, 25, 10];
+% clus2run = [22, 3, 23, 4];
+% clus2run = [24, 5, 13,26];
 
 %next - batchSize=200
 %next:  trapz
 
-%clus2run=16;
+% clus2run=16;
 
 % nTrials
 if ~strcmp(dat(1:3),'cat')

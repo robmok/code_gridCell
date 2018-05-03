@@ -1,4 +1,4 @@
-function [trials,dataPtsTest, rSeed] = createTrls(dat,nTrials,locRange,useSameTrls,jointTrls,boxSize,catsInfo,rSeed)
+function [trials,dataPtsTest, rSeed,ntInSq] = createTrls(dat,nTrials,locRange,useSameTrls,jointTrls,boxSize,catsInfo,rSeed)
 
 spacing =linspace(locRange(1),locRange(2),locRange(2)+1); 
 stepSize=diff(spacing(1:2)); nSteps = length(spacing);
@@ -192,8 +192,17 @@ end
 trialIndTest = randi(length(shapePts),nTrials,1);
 dataPtsTest  = shapePts(trialIndTest,:);
 end
+if nargout > 3
+    sq=linspace(locRange(1),locRange(2),nSteps);
+    sqPts=[];
+    for i=1:length(sq)
+        for j=1:length(sq)
+            sqPts = [sqPts; [sq(i), sq(j)]];
+        end
+    end
+    ntInSq = setdiff(sqPts,shapePts,'rows');
 end
-
+end
 % %checking agent's visited locations
 % densityPlot=zeros(locRange(2)+1,locRange(2)+1);
 % % densityPlot=zeros(50,62); %trapzScaled1
