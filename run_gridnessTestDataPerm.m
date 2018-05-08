@@ -74,8 +74,11 @@ clus2run=[12, 20,6];
 clus2run=[10:8:26]; 
 clus2run=[14, 22,4];
 
-%odd all in one
-% clus2run=[3, 7:4:25, 5, 9:4:25]; 
+%odd
+clus2run=[7:4:19]; 
+clus2run=[9:4:21]; 
+clus2run=[23,25];
+clus2run = [3,5];
 
 % clus2run = 18;
 

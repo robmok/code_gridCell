@@ -39,9 +39,19 @@ nIter2run = nIter;
 
 % clus2run = 3:26; 
 
-% Split, even
-clus2run=[8:4:24, 6]; 
-% clus2run=[10:4:26,4];
+%love06
+clus2run=[4, 8:4:24]; 
+clus2run=[3, 5, 7, 9,11, 13];
+%     
+% %love01
+clus2run=[10, 18, 19];
+% clus2run=[14, 22, 15];
+% clus2run=[26, 6, 17];
+
+%still to run - 21:2:25
+
+%
+% clus2run=[10:4:26,4 6];
 
 %testing
 % clus2run = 20;
@@ -77,7 +87,7 @@ for iClus2run = 1:length(clus2run)
                 
                 % run - allow starting clus positions (even
                 % outside the trapz box)
-                
+                tic
                 [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,rSeed,muAll,trials] = covering_map_batch_sim_clusPosIn(clusPos,nClus,locRange,epsMuOrig,nTrials2,batchSize,nIter2run,dat2,annEps,jointTrls);
                 
                 
