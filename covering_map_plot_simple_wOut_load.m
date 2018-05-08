@@ -29,7 +29,7 @@ for iterI = 1%:3%:10
 densityPlotCentresSm = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);
 
 figure; hold on;
-% subplot(1,2,1)
+subplot(1,2,1)
 imagesc(densityPlotCentresSm);
 aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram
 % subplot(1,3,2)
@@ -63,9 +63,12 @@ h = length(spacing);
 halfArea = (((a+b)/2)*h)/2;
 c = sqrt(((a^2)+(b^2))/2);
 % hLeft  = round(halfArea/((b+c)/2)); %bigger side
-hLeft  = floor(halfArea/((b+c)/2)); %bigger side
-hRight = ceil(halfArea/((b+c)/2))+1; %smaller size - to equalize area more
-
+% hLeft  = floor(halfArea/((b+c)/2)); %bigger side
+% hRight = ceil(halfArea/((b+c)/2))+1; %smaller size - to equalize area more
+%equal number of points in trapz (301 each; nPoints in trap 877/2=438.5)
+hLeft = 14;
+hRight = 20;
+    
 gaussSmooth=1;
 for iSet=1%:22
 for iterI = 1%:10
@@ -76,7 +79,7 @@ for iterI = 1%:10
     
     %no smoothing
 %     densityPlotCentresSm = densityPlotAct(:,:,iSet,iterI);
-%     densityPlotCentresSm = densityPlotActNorm(:,:,iSet,iterI);
+    densityPlotCentresSm = densityPlotActNorm(:,:,iSet,iterI);
     
     figure; hold on;
     subplot(1,3,1)
@@ -154,8 +157,8 @@ colAgentCh = fliplr(linspace(0,.9,nTrials));
 %if plotting agent over batches - need make cluster positions same over
 %trials in a batch
 % if plotAgent
-muTrls = nan(nClus,2,nTrials);
-for iBatch = 1:nBatches
+muTrls = nan(nClus,2,nTrials); %nTrials/2 - for trapzKfrmSq
+for iBatch = 1:nBatches%/2  - for trapzKfrmSq
     muTrls(:,1,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(muAll(:,1,iBatch),1,batchSize);
     muTrls(:,2,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(muAll(:,2,iBatch),1,batchSize);
 end

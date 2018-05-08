@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -16,7 +16,7 @@ nTrialsTest = 100000; %?
 dat = 'square';
 dat = 'circ';
 % dat = 'trapzKrupic';
-% dat = 'trapzKfrmSq1'; % run covering map on sq, then assess gridness in trapz
+dat = 'trapzKfrmSq1'; % run covering map on sq, then assess gridness in trapz
 
 saveDat=1;
 
@@ -43,7 +43,7 @@ clus2run=[3, 13];
 % clus2run=[6, 16]; 
 
 
-% clus2run = 20;
+clus2run = 20;
 
 %love01 - sq - batchSize=400;actNorm
 %for now run a few on love01
@@ -69,10 +69,10 @@ clus2run=[3, 13];
 % clus2run=[5, 9:4:25]; 
 
 %split into 4 - running trapzKfrmSq1 love06
-% clus2run=[8:8:24]; 
-% clus2run=[12, 20,6];    
-% clus2run=[10:8:26]; 
-% clus2run=[14, 22,4];
+clus2run=[8:8:24]; 
+clus2run=[12, 20,6];    
+clus2run=[10:8:26]; 
+clus2run=[14, 22,4];
 
 %odd all in one
 % clus2run=[3, 7:4:25, 5, 9:4:25]; 
@@ -131,7 +131,6 @@ for iClus2run = 1:length(clus2run)
                 fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat);
             else %trapzKfrmSq1 or 2
                 fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,'square');
-
             end
                        
 %             if annEps %epsMu is different here
@@ -156,6 +155,7 @@ for iClus2run = 1:length(clus2run)
                 % if doing trapzKfrmSq, record and run and save square gridness; no perm
                 if length(dat)==12 
                     [~,~,~,~,gA_act_sq,gA_actNorm_sq,gW_act_sq,gW_actNorm_sq] = gridnessTestData_Perm(densityPlot,'square',locRange,nClus,nTrialsTest,nPerm,nIters2run,0);
+                    gA_sq = gA;
                 end
                     
                 %run
@@ -184,7 +184,7 @@ for iClus2run = 1:length(clus2run)
 
                 if saveDat 
                     if length(dat)==12
-                        save(fname,'gA_act_sq','gA_actNorm_sq','gW_act_sq','gW_actNorm_sq','gA_act','gA_actNorm','gW_act','gW_actNorm','densityPlotAct','densityPlotActNorm','timeTaken');
+                        save(fname,'gA_sq','gA_act_sq','gA_actNorm_sq','gW_act_sq','gW_actNorm_sq','gA_act','gA_actNorm','gW_act','gW_actNorm','densityPlotAct','densityPlotActNorm','timeTaken');
                     else
                         %                     save(fname,'permPrc_gA_act','permPrc_gA_act','permPrc_gA_actNorm','permPrc_gA_actNorm','gA_act','gA_actNorm','gW_act','gW_actNorm','timeTaken');
                         %also save some density plots for figures

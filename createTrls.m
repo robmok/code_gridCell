@@ -79,6 +79,15 @@ switch dat
             trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
         end
         shapePts = trapPts';
+    case 'trapzKfrmSq2'
+        spacing = spacing(14:37);
+        trapY=locRange(2).*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
+        trapX=spacing;
+        trapPts=[];
+        for i=1:length(trapY)
+            trapPts = [trapPts, [repmat(trapX(i),1,length(0:stepSize:trapY(i))); 0:stepSize:trapY(i)]];
+        end
+        shapePts = trapPts';
     case 'circ'
         % Create logical image of a circle
         imageSizeX = nSteps;

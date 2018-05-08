@@ -34,12 +34,13 @@ nIter=200;
 % clus2run = [3:16, 18, 20:26];  %missed 17, 19?
 
 
-% dat='trapzKrupic';
+% dat='trapzKrupic';    
+dat='trapzKfrmSq';
 % 
 % clus2run = [3:26]; 
-clus2run=3:26;
+% clus2run=3:26;
 % % clus2run=26;
-% clus2run=4:2:26;
+clus2run=4:2:26;
 
 batchSizeVals = 400; %100, 125, 200,400, 1000
 
