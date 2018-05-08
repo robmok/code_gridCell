@@ -1,4 +1,4 @@
-function [permPrc_gA_act, permPrc_gW_act,permPrc_gA_actNorm, permPrc_gW_actNorm, gA_act,gA_actNorm,gW_act,gW_actNorm,gA_actNormPerm, gW_actNormPerm, densityPlotActTmp,densityPlotActNorm, rSeedTest] = gridnessTestData_Perm(densityPlot,dat,locRange,nClus,nTrialsTest,nPerm,nIters2run,doPerm)
+function [permPrc_gA_act, permPrc_gW_act,permPrc_gA_actNorm, permPrc_gW_actNorm, gA_act,gA_actNorm,gW_act,gW_actNorm,gA_actNormPerm, gW_actNormPerm, densityPlotAct,densityPlotActNorm, rSeedTest] = gridnessTestData_Perm(densityPlot,dat,locRange,nClus,nTrialsTest,nPerm,nIters2run,doPerm)
 
 
 %input - 
@@ -34,12 +34,12 @@ b = 50;
 h = 50; %for trapz - height
 
 if strcmp(dat(1:4),'trap') && length(dat)>10
-    if strcmp(dat(1:11),'trapzScaled')
+    if strcmp(dat(1:6),'trapzS')
         spacingTrapz = trapzSpacing{str2double(dat(12))}; %trapzScaled1,2,3
         a=length(spacingTrapz); %trapz length1
         b=locRange(2)+1; %50 - trapz length2 - +1 to let density plot go from 1:50 (rather than 0:49)
         h=round(((locRange(2)+1)^2)/((a+b)/2))+1; %trapz height (area = 50^2; like square)
-    elseif strcmp(dat(1:11),'trapzKrupic')
+    elseif strcmp(dat(1:6),'trapzK')
         spacingTrapz = spacing(14:37);
         if boxSize==1.5
             spacingTrapz = spacing(14:37+length(14:37)*.5);
@@ -76,7 +76,7 @@ permPrc_gW_actNorm = nan(nIters2run,4);
 %% compute actNorm maps after 'training' (on a new test set of locations)
 [trialsTest,~, rSeedTest,ntInSq] = createTrls(dat,nTrialsTest,locRange,useSameTrls,jointTrls,boxSize,h);
 
-densityPlotActTmp     = zeros(b,h);
+densityPlotActTmp  = zeros(b,h);
 densityPlotAct     = zeros(b,h,nIters2run);
 densityPlotActNorm = zeros(b,h,nIters2run);
 gA_act = nan(nIters2run,9);
