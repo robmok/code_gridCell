@@ -5,7 +5,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -16,7 +16,6 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 
 locRange = [0 49];
 dat1 = 'square';
-
 dat2 = 'trapzKfrmSq1'; % run covering map on sq, then assess gridness in trapz
 
 saveDat=1;
@@ -27,7 +26,6 @@ epsMuVals=.025;
 nTrials=1000000;
 % batchSizeVals = [400, 100]; % 125/200?
 batchSizeVals=400;
-
 
 annEps=0;
 jointTrls=1;
@@ -41,9 +39,13 @@ nIter2run = nIter;
 
 % clus2run = 3:26; 
 
+% Split, even
+clus2run=[8:4:24, 6]; 
+% clus2run=[10:4:26,4];
+
 %testing
-clus2run = 20;
-nIter2run = 1;
+% clus2run = 20;
+% nIter2run = 1;
 %%
 
 for iClus2run = 1:length(clus2run)

@@ -216,7 +216,8 @@ for iterI = 1:nIter
 %         densityPlotTmp(densityPlotTmp==0) = nan; %for circ, and prob trapz, to ignore points not in the shape - do this above now; for actNorm already does it by dividing by 0
         densityPlotSm               = imgaussfilt(densityPlotTmp,gaussSmooth); %smooth
         densityPlotActNormTmp = densityPlotAct./densityPlotActUpd; %divide by number of times that location was visited
-
+        %added smooth
+        densityPlotActNormTmp =  imgaussfilt(densityPlotActNormTmp,gaussSmooth); %smooth - here only, before i don't since here less trials
 %%%%%%%%%%%%%%%
          % IF COMPUTING GRIDNESS FOR ACT ITSELF
 %         densityPlotAct(densityPlotAct==0) =  nan; %for circ, and prob trapz, to ignore points not in the shape - if computing this at all (atm not)
