@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -39,12 +39,14 @@ annEps = 0; %1 or 0
 %love01 - sq, batchSiz=400
 
 %rerunning 400 circ with nans for clus and act
-clus2run = [18, 8, 21,6]; 
+
+% clus2run = [18, 8, 21,6]; 
 % clus2run = [16, 7, 14,15];  
-% clus2run = [12, 9, 20, 19]; 
-%  clus2run = [11, 17, 25, 10];
-% clus2run = [22, 3, 23, 4];
 % clus2run = [24, 5, 13,26];
+%runnning on love06:
+clus2run = [12, 9, 20, 19]; 
+ clus2run = [11, 17, 25, 10];
+clus2run = [22, 3, 23, 4];
 
 %next - batchSize=200
 %next:  trapz

@@ -63,8 +63,8 @@ rSeedAll  = cell(length(clus2run),length(batchSizeVals),length(cVals));
                 %just load in those to plot
                 nBatches = size(muAll,3)-1;
 %                 trls2Plt = [1, nBatches*.25, nBatches*.5, nBatches*.75, nBatches+1];
-                trls2Plt = [1, nBatches*.5, nBatches+1];
-                muAllClus{iClus}(:,:,:,:,iBvals,iC)=muAll(:,:,trls2Plt,:);
+                trls2plt = [1, nBatches*.5, nBatches+1];
+                muAllClus{iClus}(:,:,:,:,iBvals,iC)=muAll(:,:,trls2plt,:);
                 rSeedAll{iClus,iBvals,iC} = rSeed;
 
 %                 muAllClus{iClus}(:,:,:,:,iBvals,iC)=muAll;
@@ -80,26 +80,34 @@ end
 savePlots = 1;
 
 fontSiz=15;
+datPtSiz=15;
 
 % iterI=1;
 
+trls2plt = {1:25, 1:100, 1:2000};
+
 for iterI=1:5
     
-    iBvals=3;
-    iC = 3;
+    for iBvals= 1:length(batchSizeVals)
+    for iC = 1:length(cVals)
     
     ctr=0;
     figure; hold on;
     for iClus = 1:length(clus2run)
         colors  = distinguishable_colors(clus2run(iClus));
         %     figure; hold on;
-        for iPlot = 1:length(trls2Plt)
+        for iPlot = 1:length(trls2plt)
             ctr=ctr+1;
-            subplot(length(clus2run),length(trls2Plt),ctr); hold on;
+            subplot(length(clus2run),length(trls2plt),ctr); hold on;
             %         subplot(1,length(trls2Plt),iPlot);
             trials = createTrls(dat,nTrials,locRange,1,jointTrls,boxSize,catsInfo,rSeedAll{iClus,iBvals,iC}(iterI)); hold on;
-            scatter(trials(:,1),trials(:,2),5,[.5 .5 .5],'.');
-            %         scatter(muAllClus{iClus}(:,1,trls2Plt(iPlot),iterI),muAllClus{iClus}(:,2,trls2Plt(iPlot),iterI),750,colors,'.');hold on;
+            
+            
+%             scatter(trials(:,1),trials(:,2),5,[.5 .5 .5],'.');
+            scatter(trials(trls2plt{iPlot},1),trials(trls2plt{iPlot},2),datPtSiz,[.5 .5 .5],'.');
+
+            
+            
             scatter(muAllClus{iClus}(:,1,iPlot,iterI,iBvals,iC),muAllClus{iClus}(:,2,iPlot,iterI,iBvals,iC),200,colors,'.');hold on;
             
             xlim([locRange(1) locRange(2)+1]);
@@ -107,7 +115,7 @@ for iterI=1:5
             %         xticks([0, 50]); xticklabels({'0', '50'}); yticks(50); yticklabels({'50'});
             xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
             
-            if iClus==1 && iPlot==ceil(length(trls2Plt)/2)
+            if iClus==1 && iPlot==ceil(length(trls2plt)/2)
 %                 title(sprintf('Category Learning, %d categories; batchSize=%d',nCats, batchSizeVals(iBvals)))
                 title(sprintf('Category Learning, %d categories',nCats))
             end
@@ -126,6 +134,9 @@ for iterI=1:5
         set(gcf,'Renderer','painters');
         print(gcf,'-depsc2',fname)
         saveas(gcf,fname,'png');
+        close all
+    end
+    end
     end
     
 end

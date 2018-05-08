@@ -269,7 +269,7 @@ for iterI = 1:nIter
             densityPlotActUpd(trials(iTrl,1)+1, trials(iTrl,2)+1) = densityPlotActUpd(trials(iTrl,1)+1, trials(iTrl,2)+1)+1; %log nTimes loc was visited
         end
         %turn 0s outside of the shape into nans
-        if strcmp(dat(1:4),'circ') % trapz too?
+        if ~strcmp(dat(1:2),'sq') % if circ/trapz
             for i=1:length(ntInSq)
                 densityPlotTmp(ntInSq(i,1)+1,ntInSq(i,2)+1) = nan;
                 densityPlotAct(ntInSq(i,1)+1,ntInSq(i,2)+1) = nan;

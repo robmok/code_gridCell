@@ -11,7 +11,7 @@ addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed']));
 
 % load
-nSet        = 22;
+nSet        = 21; %was 22 now 21
 gaussSmooth = 1; 
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
@@ -178,6 +178,9 @@ for iClus2run = 1:length(clus2run)
             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
 %             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSizLR',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
 
+            fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+
+
             if boxSize>1
                 fname = [fname sprintf('_boxSizex%d',boxSize)];
             end
@@ -280,11 +283,13 @@ for iClus2run = 1:length(clus2run)
 end
 %% plot univar scatters
 
-clusPosAct = 'clus'; %'clus' or 'actNorm'
+clusPosAct = 'actNorm'; %'clus' or 'actNorm'
 
 gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
 
 gridMeasure = 'grid';
+
+plotOverSets = 0;
 
 switch clusPosAct
 case 'clus'
@@ -476,7 +481,7 @@ end
 
 
 %plot over sets
-if 1
+if plotOverSets
    
 % if size(gridness,3)>1 || size(gridness,4)>1 
     for iClus = 1:length(clus2run)
@@ -675,7 +680,7 @@ end
 %% Making figs - univar scatters 1 - training set
 
 
-savePlots=1;
+savePlots=0;
 
 clusPosAct = 'clus'; %'clus' or 'actNorm'
 
@@ -846,42 +851,78 @@ end
 
 savePlots = 0;
 
+plotSubPlots = 0;
+
+fontSiz = 25;
+
 iBatchVals=1;
 
 nTimePts=size(datTmp,1)-2;
 colors  = distinguishable_colors(length(clus2run));
 
-clus2plot = (6:26)-2;
-figure; hold on;
-for iClus = clus2plot
-%     subplot(2,ceil(length(clus2plot)/2),iClus); hold on;
-    subplot(3,7,iClus-clus2plot(1)+1); hold on;
-    %         subplot(ceil(length(clus2plot)/2),2,iClus); hold on;
-    dat1     = squeeze(datTmp(1:end-2,:,iEps,iBatchVals,iClus,:))';
-    barpos  = .25:.5:.5*size(dat1,2);
-    colgrey = [.5, .5, .5];
-    mu      = nanmean(dat1,1);
-    sm      = nanstd(dat1)./sqrt(size(dat1,1));
-    ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
-    plotSpread(dat1,'xValues',barpos,'distributionColors',repmat(colors(iClus,:),nTimePts,1));
-%     errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-    scatter(barpos,mu,10,colgrey,'d','filled');
-    %         scatter(barpos,mu,100,repmat(colors(iClus,:),nTimePts,1),'d','filled');
-    xlim([barpos(1)-.5, barpos(end)+.5]);
-    ylim([-.5,1.25]);
-    xticks([]); xticklabels({''});
-    %         title(sprintf('nClus=%d, batchSize=%d',clus2plot(iClus),batchSizeVals(iBatchVals)))
-    title(sprintf('%d clusters',clus2plot(iClus-clus2plot(1)+1)+2));
+if plotSubPlots
+    clus2plot = (6:26)-2;
+    figure; hold on;
+    for iClus = clus2plot
+        %     subplot(2,ceil(length(clus2plot)/2),iClus); hold on;
+        subplot(3,7,iClus-clus2plot(1)+1); hold on;
+        %         subplot(ceil(length(clus2plot)/2),2,iClus); hold on;
+        dat1     = squeeze(datTmp(1:end-2,:,iEps,iBatchVals,iClus,:))';
+        barpos  = .25:.5:.5*size(dat1,2);
+        colgrey = [.5, .5, .5];
+        mu      = nanmean(dat1,1);
+        sm      = nanstd(dat1)./sqrt(size(dat1,1));
+        ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+        plotSpread(dat1,'xValues',barpos,'distributionColors',repmat(colors(iClus,:),nTimePts,1));
+        %     errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+        scatter(barpos,mu,10,colgrey,'d','filled');
+        %         scatter(barpos,mu,100,repmat(colors(iClus,:),nTimePts,1),'d','filled');
+        xlim([barpos(1)-.5, barpos(end)+.5]);
+        ylim([-.5,1.25]);
+        xticks([]); xticklabels({''});
+        %         title(sprintf('nClus=%d, batchSize=%d',clus2plot(iClus),batchSizeVals(iBatchVals)))
+        title(sprintf('%d clusters',clus2plot(iClus-clus2plot(1)+1)+2));
+        
+    end
+    fname = [figsDir sprintf('/gridness_%s_univarScatters_overTime_nClus%d-%d_eps%d_batchSiz%d_%s',dat,(clus2plot(1)+2),(clus2plot(end)+2),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
+    if savePlots
+        set(gcf,'Renderer','painters');
+        print(gcf,'-depsc2',fname)
+        saveas(gcf,fname,'png');
+        close all
+    end
+else
     
-end
-fname = [figsDir sprintf('/gridness_%s_univarScatters_overTime_nClus%d-%d_eps%d_batchSiz%d_%s',dat,(clus2plot(1)+2),(clus2plot(end)+2),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
-if savePlots
-    set(gcf,'Renderer','painters');
-    print(gcf,'-depsc2',fname)
-    saveas(gcf,fname,'png');
-    close all
-end
+    %subset of nClus conds
+    clus2plot = [7,10,12,25]-2;
+    for iClus = clus2plot
+        figure;
+        dat1     = squeeze(datTmp(1:end-2,:,iEps,iBatchVals,iClus,:))';
+        barpos  = .25:.5:.5*size(dat1,2);
+        colgrey = [.5, .5, .5];
+        mu      = nanmean(dat1,1);
+        sm      = nanstd(dat1)./sqrt(size(dat1,1));
+        ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+        plotSpread(dat1,'xValues',barpos,'distributionColors',repmat(colors(iClus,:),nTimePts,1));
+        %     errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+        scatter(barpos,mu,100,colgrey,'d','filled');
+        %         scatter(barpos,mu,100,repmat(colors(iClus,:),nTimePts,1),'d','filled');
+        xlim([barpos(1)-.5, barpos(end)+.5]);
+        ylim([-.5,1.3]);
+        xticks([]); xticklabels({''});
+        %         title(sprintf('nClus=%d, batchSize=%d',clus2plot(iClus),batchSizeVals(iBatchVals)))
+        title(sprintf('%d clusters',iClus+2));
+        set(gca,'FontSize',fontSiz,'fontname','Arial')
 
+        fname = [figsDir sprintf('/gridness_%s_univarScatters_overTime_singlePlot_nClus%d_eps%d_batchSiz%d_%s',dat,iClus+2,epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
+        if savePlots
+            set(gcf,'Renderer','painters');
+            print(gcf,'-depsc2',fname)
+            saveas(gcf,fname,'png');
+            close all
+        end 
+    end
+end
 
 %% Making figs: density plot examples
 

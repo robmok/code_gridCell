@@ -74,7 +74,7 @@ permPrc_gA_actNorm = nan(nIters2run,4);
 permPrc_gW_actNorm = nan(nIters2run,4);
 
 %% compute actNorm maps after 'training' (on a new test set of locations)
-[trialsTest,~, rSeedTest] = createTrls(dat,nTrialsTest,locRange,useSameTrls,jointTrls,boxSize,h);
+[trialsTest,~, rSeedTest,ntInSq] = createTrls(dat,nTrialsTest,locRange,useSameTrls,jointTrls,boxSize,h);
 
 densityPlotActTmp     = zeros(b,h);
 densityPlotAct     = zeros(b,h,nIters2run);
@@ -98,7 +98,7 @@ for iterI=1:nIters2run
         actTrl = zeros(nClus,nTrialsTest);
         densityPlotActUpd = zeros(b,h);
         
-        [muTrain(:,1,iterI), muTrain(:,2,iterI)] = find(densityPlot(:,:,end,iterI)); %find cluster positions
+        [muTrain(:,1,iterI), muTrain(:,2,iterI)] = find(densityPlot(:,:,end,iterI)>0); %find cluster positions - added >0 since counts nans as well
         
         dist2Clus = sqrt(sum(reshape([muTrain(:,1,iterI)'-trialsTest(:,1), muTrain(:,2,iterI)'-trialsTest(:,2)].^2,nTrialsTest,nClus,2),3));
         closestC = nan(1,nTrialsTest);
@@ -117,12 +117,18 @@ for iterI=1:nIters2run
             densityPlotActTmp(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)    = densityPlotActTmp(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)+ nansum(actTrl(:,iTrl));
             densityPlotActUpd(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)       = densityPlotActUpd(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)+1; %log nTimes loc was visited
         end
-        densityPlotActNormTmp = densityPlotActTmp./densityPlotActUpd; %divide by number of times that location was visited
-%         densityPlotActNormTmp(isnan(densityPlotActNormTmp)) = 0;
-%         %locations not visited are 0, which makes nans. revert to 0s. -
-%         acutally wrong; need the nans for places that are not in shape -
+%         % need the nans for places that are not in shape -
 %         for act:
-        densityPlotActTmp(densityPlotActTmp==0) =  nan;
+%         densityPlotActTmp(densityPlotActTmp==0) =  nan;
+
+        %turn 0s outside of the shape into nans
+        if ~strcmp(dat(1:2),'sq') % if circ/trapz
+            for i=1:length(ntInSq)
+                densityPlotActTmp(ntInSq(i,1)+1,ntInSq(i,2)+1) = nan;
+            end
+        end
+        densityPlotActNormTmp = densityPlotActTmp./densityPlotActUpd; %divide by number of times that location was visited
+
         densityPlotAct(:,:,iterI)               =  densityPlotActTmp;
         densityPlotActNorm(:,:,iterI)           =  densityPlotActNormTmp;
         

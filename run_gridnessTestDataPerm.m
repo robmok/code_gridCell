@@ -29,15 +29,21 @@ saveDat=1;
 % clus2run=[3:2:9, 11:2:25]; 
 
 % %love06 - batchSize=400 - circ; actNorm
-% clus2run=[4, 22, 16, 8, 24, 12]; 
-% clus2run=[25, 10, 7, 20, 14, 6];  
-% clus2run=[5,  15, 26, 9, 19, 11]; 
-% clus2run=[3, 13, 18, 17, 23, 21]; 
-%re running
-clus2run=[24, 12]; 
-clus2run=[14, 6];  
-clus2run=[ 19, 11]; 
-clus2run=[23, 21]; 
+clus2run=[4, 22, 8, 24]; 
+clus2run=[25, 10, 7, 20];  
+clus2run=[5,  15, 26, 9]; 
+
+% love01
+% clus2run=[3, 13]; 
+% clus2run=[17, 23]; 
+% clus2run=[18, 21]; 
+% clus2run=[11, 12]; 
+% clus2run=[19, 14]; 
+% clus2run=[6, 16]; 
+
+
+% clus2run = 10;
+
 
 %love01 - sq - batchSize=400;actNorm
 % clus2run=[4, 22, 16]; 
@@ -91,9 +97,11 @@ end
 % perm data are about the same, then just take max, or 95th percentile as
 % the threshold value)
 nIters2run = 200; 
-% nIters2run = 3; 
-
 nPerm = 500;
+
+% %testing
+% nIters2run = 3; 
+% nPerm=250;
 
 for iClus2run = 1:length(clus2run) 
     nClus = clus2run(iClus2run);
