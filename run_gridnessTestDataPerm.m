@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -44,8 +44,15 @@ clus2run=[5,  15, 26, 9];
 
 % clus2run = 10;
 
-
 %love01 - sq - batchSize=400;actNorm
+%for now run a few on love01
+clus2run=[4, 22, 8, 24]; 
+% clus2run=[25, 10, 7, 20];  
+% clus2run=[5,  15, 26, 9]; 
+
+
+
+%old
 % clus2run=[4, 22, 16]; 
 % % clus2run=[8, 12, 24];
 % clus2run=[25, 10, 7];
