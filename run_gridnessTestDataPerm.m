@@ -14,7 +14,7 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; %?
 dat = 'square';
-dat = 'circ';
+%dat = 'circ';
 % dat = 'trapzKrupic';
 
 saveDat=1;
@@ -47,8 +47,8 @@ clus2run=[5,  15, 26, 9];
 %love01 - sq - batchSize=400;actNorm
 %for now run a few on love01
 clus2run=[4, 22, 8, 24]; 
-% clus2run=[25, 10, 7, 20];  
-% clus2run=[5,  15, 26, 9]; 
+ clus2run=[25, 10, 7, 20];  
+clus2run=[5,  15, 26, 9]; 
 
 
 
