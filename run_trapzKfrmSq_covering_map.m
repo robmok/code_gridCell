@@ -5,7 +5,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -42,15 +42,21 @@ nIter2run = nIter;
 %love06
 clus2run=[4, 8:4:24]; 
 clus2run=[3, 5, 7, 9,11, 13];
-%     
+
+%still to run- 
+clus2run = [21 15];
+clus2run = [26, 6];
+clus2run = [17, 25];
+clus2run = [19 24];
+clus2run = 22;
+
 % %love01
-clus2run=[10, 18, 19];
+% clus2run=[10, 18, 19]; %stop 19 and 15 when 18/22 are done!
 % clus2run=[14, 22, 15];
-% clus2run=[26, 6, 17];
 
-%still to run - 21:2:25
 
-%
+
+
 % clus2run=[10:4:26,4 6];
 
 %testing
@@ -65,7 +71,7 @@ for iClus2run = 1:length(clus2run)
         epsMuOrig1000=epsMuOrig*1000;
         for iBvals = 1:length(batchSizeVals)
             batchSize = batchSizeVals(iBvals);
-            
+            fprintf('Running %s, nClus=%d, epsMu=%d, batchSize=%d\n',dat2,nClus,epsMuOrig1000, batchSize)
             %load in sq
             fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat1);
             fname = [saveDir, fname '*']; %finish with directory and * for date/time

@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -16,7 +16,7 @@ nTrialsTest = 100000; %?
 dat = 'square';
 dat = 'circ';
 % dat = 'trapzKrupic';
-dat = 'trapzKfrmSq1'; % run covering map on sq, then assess gridness in trapz
+% dat = 'trapzKfrmSq1'; % run covering map on sq, then assess gridness in trapz
 
 saveDat=1;
 
@@ -43,7 +43,7 @@ clus2run=[3, 13];
 % clus2run=[6, 16]; 
 
 
-clus2run = 20;
+% clus2run = 20;
 
 %love01 - sq - batchSize=400;actNorm
 %for now run a few on love01
@@ -68,17 +68,17 @@ clus2run = 20;
 % clus2run=[3, 7:4:25]; 
 % clus2run=[5, 9:4:25]; 
 
-%split into 4 - running trapzKfrmSq1 love06
-clus2run=[8:8:24]; 
-clus2run=[12, 20,6];    
-clus2run=[10:8:26]; 
-clus2run=[14, 22,4];
-
-%odd
-clus2run=[7:4:19]; 
-clus2run=[9:4:21]; 
-clus2run=[23,25];
-clus2run = [3,5];
+% %split into 4 - running trapzKfrmSq1 love06
+% clus2run=[8:8:24]; 
+% clus2run=[12, 20,6];    
+% clus2run=[10:8:26]; 
+% clus2run=[14, 22,4];
+% 
+% %odd
+% clus2run=[7:4:19]; 
+% clus2run=[9:4:21]; 
+% clus2run=[23,25];
+% clus2run = [3,5];
 
 % clus2run = 18;
 

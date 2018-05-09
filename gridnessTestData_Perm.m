@@ -76,7 +76,6 @@ permPrc_gW_actNorm = nan(nIters2run,4);
 %% compute actNorm maps after 'training' (on a new test set of locations)
 [trialsTest,~, rSeedTest,ntInSq] = createTrls(dat,nTrialsTest,locRange,useSameTrls,jointTrls,boxSize,h);
 
-densityPlotActTmp  = zeros(b,h);
 densityPlotAct     = zeros(b,h,nIters2run);
 densityPlotActNorm = zeros(b,h,nIters2run);
 gA_act = nan(nIters2run,9);
@@ -96,6 +95,7 @@ gW_actNormPerm = nan(nPerm,nIters2run);
 for iterI=1:nIters2run
     fprintf('Running iter %d\n',iterI);
         actTrl = zeros(nClus,nTrialsTest);
+        densityPlotActTmp = zeros(b,h);
         densityPlotActUpd = zeros(b,h);
         
         [muTrain(:,1,iterI), muTrain(:,2,iterI)] = find(densityPlot(:,:,end,iterI)>0); %find cluster positions - added >0 since counts nans as well
