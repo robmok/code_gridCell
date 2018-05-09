@@ -45,6 +45,7 @@ end
 
 %% gridness - left vs right half
 
+locRange = [0, 49];
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1)+1;
 
 %spacing split into 2 equal areas - trapzKrupic only for now]
@@ -70,16 +71,16 @@ hLeft = 14;
 hRight = 20;
     
 gaussSmooth=1;
-for iSet=1%:22
+for iSet=1:21%:22
 for iterI = 1%:10
     
-%     densityPlotCentresSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
+    densityPlotCentresSm = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
 %     densityPlotCentresSm = imgaussfilt(densityPlotAct(:,:,iSet,iterI),gaussSmooth);
-    densityPlotCentresSm = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);
+%     densityPlotCentresSm = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);
     
     %no smoothing
 %     densityPlotCentresSm = densityPlotAct(:,:,iSet,iterI);
-    densityPlotCentresSm = densityPlotActNorm(:,:,iSet,iterI);
+%     densityPlotCentresSm = densityPlotActNorm(:,:,iSet,iterI);
     
     figure; hold on;
     subplot(1,3,1)
@@ -157,8 +158,8 @@ colAgentCh = fliplr(linspace(0,.9,nTrials));
 %if plotting agent over batches - need make cluster positions same over
 %trials in a batch
 % if plotAgent
-muTrls = nan(nClus,2,nTrials); %nTrials/2 - for trapzKfrmSq
-for iBatch = 1:nBatches%/2  - for trapzKfrmSq
+muTrls = nan(nClus,2,nTrials/4); %nTrials/2 - for trapzKfrmSq
+for iBatch = 1:nBatches/4 % - for trapzKfrmSq
     muTrls(:,1,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(muAll(:,1,iBatch),1,batchSize);
     muTrls(:,2,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(muAll(:,2,iBatch),1,batchSize);
 end

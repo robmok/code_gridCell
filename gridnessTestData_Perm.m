@@ -98,7 +98,13 @@ for iterI=1:nIters2run
         densityPlotActTmp = zeros(b,h);
         densityPlotActUpd = zeros(b,h);
         
+        if length(dat)==12 %sometimes clus not in shape, not counted, so fewer clusters than expected
+            indTmp=find(densityPlot(:,:,end,iterI)>0);
+            [muTrain(1:length(indTmp),1,iterI), muTrain(1:length(indTmp),2,iterI)] = find(densityPlot(:,:,end,iterI)>0); %find cluster positions - added >0 since counts nans as well
+        else
         [muTrain(:,1,iterI), muTrain(:,2,iterI)] = find(densityPlot(:,:,end,iterI)>0); %find cluster positions - added >0 since counts nans as well
+        end
+        
         
         dist2Clus = sqrt(sum(reshape([muTrain(:,1,iterI)'-trialsTest(:,1), muTrain(:,2,iterI)'-trialsTest(:,2)].^2,nTrialsTest,nClus,2),3));
         closestC = nan(1,nTrialsTest);

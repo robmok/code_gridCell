@@ -37,24 +37,32 @@ batchSizeVals = nTrials./nBatches;
 nBvals = length(batchSizeVals);
 nIter2run = nIter;
 
+%new
+% epsMuTrapz = 0.0025;
+epsMuTrapz = 0.005; %running
+
 % clus2run = 3:26; 
 
 %love06
-clus2run=[4, 8:4:24]; 
-clus2run=[3, 5, 7, 9,11, 13];
+clus2run=[8:4:20, 23, 6, 10:4:22,4, 25]; 
+clus2run=[3, 26, 7:4:19, 24, 5, 9:4:21]; 
 
-%still to run- 
-clus2run = [21 15];
-clus2run = [26, 6];
-clus2run = [17, 25];
-clus2run = [19 24];
-clus2run = 22;
+% clus2run=[3:4:19]; 
+% clus2run=[5:4:21]; 
+% clus2run=[4:4:20];
+% clus2run=[6:4:22];
+% clus2run=[23, 25, 24, 26];
+
+%split
+% clus2run = [21 15];
+% clus2run = [26, 6];
+% clus2run = [17, 25];
+% clus2run = [19 24];
+% clus2run = 22;
 
 % %love01
-% clus2run=[10, 18, 19]; %stop 19 and 15 when 18/22 are done!
-% clus2run=[14, 22, 15];
-
-
+% clus2run=[10, 18]; 
+% clus2run=[14, 22];
 
 
 % clus2run=[10:4:26,4 6];
@@ -94,10 +102,10 @@ for iClus2run = 1:length(clus2run)
                 % run - allow starting clus positions (even
                 % outside the trapz box)
                 tic
-                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,rSeed,muAll,trials] = covering_map_batch_sim_clusPosIn(clusPos,nClus,locRange,epsMuOrig,nTrials2,batchSize,nIter2run,dat2,annEps,jointTrls);
+                [densityPlot,~,gA,gW,~,~,rSeed,muAll,trials] = covering_map_batch_sim_clusPosIn(clusPos,nClus,locRange,epsMuTrapz,nTrials2,batchSize,nIter2run,dat2,annEps,jointTrls);
                 
                 
-                fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm',nClus,round(nTrials2/1000),epsMuOrig1000,round(batchSize),nIter,dat2)];
+                fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_%d',nClus,round(nTrials2/1000),epsMuOrig1000,round(batchSize),nIter,dat2,epsMuTrapz*10000)];
                 
                 timeTaken=toc;
                 if saveDat
@@ -105,7 +113,9 @@ for iClus2run = 1:length(clus2run)
                         fname = [fname '_jointTrls_stepSiz'];
                     end
                     cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
-                    save(fname,'densityPlot','densityPlotActNorm','gA','gW','gA_actNorm','gW_actNorm','rSeed','timeTaken');
+%                     save(fname,'densityPlot','densityPlotActNorm','gA','gW','gA_actNorm','gW_actNorm','rSeed','timeTaken');
+                    save(fname,'densityPlot','gA','gW','rSeed','timeTaken');
+                    clear densityPlot 
                 end
             end
         end

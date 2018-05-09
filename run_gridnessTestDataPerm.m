@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -14,9 +14,11 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; %?
 dat = 'square';
-%dat = 'circ';
+dat = 'circ';
 % dat = 'trapzKrupic';
-% dat = 'trapzKfrmSq1'; % run covering map on sq, then assess gridness in trapz
+
+% dat = 'trapzKfrmSq1'; % load covering map on sq, then run it on trapz; then assess gridness in trapz
+% dat = 'trapzKfrmSq2'; % load covering map on sq, then assess gridness in trapz
 
 saveDat=1;
 
@@ -30,12 +32,14 @@ saveDat=1;
 % clus2run=[3:2:9, 11:2:25]; 
 
 % %love06 - batchSize=400 - circ; actNorm
-clus2run=[4, 22, 8, 24]; 
-clus2run=[25, 10, 7, 20];  
-clus2run=[5,  15, 26, 9]; 
+clus2run=[4, 22, 8, 24, 5,  15,]; 
+% clus2run=[25, 10, 7, 20, 26, 9];  
+
+
+% clus2run=[5,  15, 26, 9]; 
 
 % love01
-clus2run=[3, 13]; 
+% clus2run=[3, 13]; 
 % clus2run=[17, 23]; 
 % clus2run=[18, 21]; 
 % clus2run=[11, 12]; 
@@ -47,7 +51,7 @@ clus2run=[3, 13];
 
 %love01 - sq - batchSize=400;actNorm
 %for now run a few on love01
- clus2run=[4, 22]; %8, 24 
+%  clus2run=[4, 22]; %8, 24 
 %  clus2run=[25, 10]; % 7, 20 
 % clus2run=[5,  15];  %26, 9
 
@@ -62,18 +66,25 @@ clus2run=[3, 13];
 % clus2run=[3, 13, 18];
 % clus2run=[17, 23, 21];
 
-%trapz - trapzKfrmSq
-% clus2run=[8:4:24, 6]; 
-% clus2run=[10:4:26,4]; 
-% clus2run=[3, 7:4:25]; 
-% clus2run=[5, 9:4:25]; 
+%trapz - trapzKfrmSq2 - running - epsmu
+% clus2run=[8:4:20, 23, 6, 10:4:22,4, 25]; 
+% clus2run=[3, 26, 7:4:19, 24, 5, 9:4:21]; 
 
-% %split into 4 - running trapzKfrmSq1 love06
+% clus2run=[8:4:20, 6]; 
+% clus2run=[10:4:22,4]; 
+% clus2run=[3, 7:4:19]; 
+% clus2run=[5, 9:4:21];
+% clus2run=[24, 26, 23,25];
+
+
+
+
+
+% %split into 4 - love06
 % clus2run=[8:8:24]; 
 % clus2run=[12, 20,6];    
 % clus2run=[10:8:26]; 
 % clus2run=[14, 22,4];
-% 
 % %odd
 % clus2run=[7:4:19]; 
 % clus2run=[9:4:21]; 
@@ -92,6 +103,14 @@ batchSizeVals=400;
 
 annEps=0;
 jointTrls=1; %for test trials
+
+
+%EDIT = if trapKfrmSq1...
+
+%trapzKfrmSq1
+nTrials=1000000/2;
+% epsMuTrapz10 = 25; %this is 10% of orig learning rate
+% epsMuTrapz10 = 50;  - need to run
 
 
 %doPerm or not
@@ -133,7 +152,11 @@ for iClus2run = 1:length(clus2run)
             if ~(length(dat)==12) 
                 fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat);
             else %trapzKfrmSq1 or 2
-                fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,'square');
+                if strcmp(dat(12),'1')
+                    fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_%d_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,epsMuTrapz10);
+                elseif strcmp(dat(12),'2')
+                    fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,'square');
+                end
             end
                        
 %             if annEps %epsMu is different here
@@ -157,8 +180,10 @@ for iClus2run = 1:length(clus2run)
                 %run                
                 % if doing trapzKfrmSq, record and run and save square gridness; no perm
                 if length(dat)==12 
+                    if strcmp(dat(12),'2') %only doing withut learning atm
                     [~,~,~,~,gA_act_sq,gA_actNorm_sq,gW_act_sq,gW_actNorm_sq] = gridnessTestData_Perm(densityPlot,'square',locRange,nClus,nTrialsTest,nPerm,nIters2run,0);
                     gA_sq = gA;
+                    end
                 end
                     
                 %run
@@ -171,9 +196,9 @@ for iClus2run = 1:length(clus2run)
                 cTime=datestr(now,'HHMMSS'); 
                 if doPerm
 %                     fname = [fname(1:end-1), sprintf('_perm_%dpermsOn%diters',nPerm,nIters2run)];
-                    fname = [fname(1:end-1), sprintf('_actNorm_perm_%dpermsOn%diters',nPerm,nIters2run)]; %now correct actNorm
+                    fname = [fname(1:end-1), sprintf('_actNorm_perm_%dpermsOn%diters',nPerm,nIters2run)]; %now correct actNorm; add 'trlsTest'?
                 else
-                    fname = [fname(1:end-1), '_noPerm'];
+                    fname = [fname(1:end-1), '_trlsTest_noPerm'];
                 end
                 if length(dat)==12
                     fname = [fname sprintf('_%s',dat)];
@@ -186,8 +211,10 @@ for iClus2run = 1:length(clus2run)
                 
 
                 if saveDat 
-                    if length(dat)==12
+                    if length(dat)==12 && strcmp(dat(12),'2') 
                         save(fname,'gA_sq','gA_act_sq','gA_actNorm_sq','gW_act_sq','gW_actNorm_sq','gA_act','gA_actNorm','gW_act','gW_actNorm','densityPlotAct','densityPlotActNorm','timeTaken');
+                    elseif length(dat)==12 && strcmp(dat(12),'1') 
+                        save(fname,'gA_act','gA_actNorm','gW_act','gW_actNorm','densityPlotAct','densityPlotActNorm','timeTaken');
                     else
                         %                     save(fname,'permPrc_gA_act','permPrc_gA_act','permPrc_gA_actNorm','permPrc_gA_actNorm','gA_act','gA_actNorm','gW_act','gW_actNorm','timeTaken');
                         %also save some density plots for figures

@@ -224,7 +224,6 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                     save(fname,'muAll','densityPlot','densityPlotActNorm','rSeed','muInit','timeTaken');
                 else 
                     save(fname,'densityPlot','densityPlotActNorm','gA','gW','gA_actNorm','gW_actNorm','rSeed','muInit','clusDistB','timeTaken'); 
-                    
                 end
             end
         end
