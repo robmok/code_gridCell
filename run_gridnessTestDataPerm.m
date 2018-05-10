@@ -32,7 +32,7 @@ saveDat=1;
 % clus2run=[3:2:9, 11:2:25]; 
 
 % %love06 - batchSize=400 - circ; actNorm
-clus2run=[4, 22, 8, 24, 5,  15,]; 
+% clus2run=[4, 22, 8, 24, 5,  15,]; 
 % clus2run=[25, 10, 7, 20, 26, 9];  
 
 
@@ -54,17 +54,15 @@ clus2run=[4, 22, 8, 24, 5,  15,];
 %  clus2run=[4, 22]; %8, 24 
 %  clus2run=[25, 10]; % 7, 20 
 % clus2run=[5,  15];  %26, 9
-%next torun on love01
+%next to run on love01
  clus2run=[8, 24];
 %  clus2run=[7, 20];
 % clus2run=[26, 9];
 
 
 %sq love06
-% clus2run=[6,12,14,21];
-% clus2run=[16,13, 26,17];
-% clus2run=[3,11,18,23];
-
+% clus2run=[12,14,21,11,18]; %6, 3
+% clus2run=[13, 26,17, 23]; %16
 
 
 %old
@@ -81,14 +79,12 @@ clus2run=[4, 22, 8, 24, 5,  15,];
 % clus2run=[8:4:20, 23, 6, 10:4:22,4, 25]; 
 % clus2run=[3, 26, 7:4:19, 24, 5, 9:4:21]; 
 
+
 % clus2run=[8:4:20, 6]; 
 % clus2run=[10:4:22,4]; 
 % clus2run=[3, 7:4:19]; 
 % clus2run=[5, 9:4:21];
 % clus2run=[24, 26, 23,25];
-
-
-
 
 
 % %split into 4 - love06
@@ -122,7 +118,7 @@ jointTrls=1; %for test trials
 % nTrials=1000000/2;
 % epsMuTrapz10 = 25; %this is 10% of orig learning rate
 % epsMuTrapz10 = 50;  
-% epsMuTrapz10 = 10;  %to run
+% epsMuTrapz10 = 15;  %to run
 
 
 %doPerm or not

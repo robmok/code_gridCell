@@ -45,8 +45,11 @@ epsMuTrapz = 0.0015; %to run - slower
 % clus2run = 3:26; 
 
 %love06
-clus2run=[8:4:20, 23, 6, 10:4:22,4, 25]; 
-clus2run=[3, 26, 7:4:19, 24, 5, 9:4:21]; 
+% clus2run=[8:4:20, 23, 6, 10:4:22,4, 25]; 
+% clus2run=[3, 26, 7:4:19, 24, 5, 9:4:21]; 
+% %rerun
+clus2run=[18, 22,4,25];
+clus2run=[9:4:21];
 
 % clus2run=[3:4:19]; 
 % clus2run=[5:4:21]; 
