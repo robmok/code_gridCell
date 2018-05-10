@@ -39,7 +39,8 @@ nIter2run = nIter;
 
 %new
 % epsMuTrapz = 0.0025;
-epsMuTrapz = 0.005; %running
+% epsMuTrapz = 0.005;
+epsMuTrapz = 0.0015; %to run - slower
 
 % clus2run = 3:26; 
 
@@ -68,7 +69,7 @@ clus2run=[3, 26, 7:4:19, 24, 5, 9:4:21];
 % clus2run=[10:4:26,4 6];
 
 %testing
-% clus2run = 20;
+% clus2run = 13;
 % nIter2run = 1;
 %%
 

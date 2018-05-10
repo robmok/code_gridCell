@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -14,7 +14,7 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; %?
 dat = 'square';
-dat = 'circ';
+% dat = 'circ';
 % dat = 'trapzKrupic';
 
 % dat = 'trapzKfrmSq1'; % load covering map on sq, then run it on trapz; then assess gridness in trapz
@@ -54,6 +54,17 @@ clus2run=[4, 22, 8, 24, 5,  15,];
 %  clus2run=[4, 22]; %8, 24 
 %  clus2run=[25, 10]; % 7, 20 
 % clus2run=[5,  15];  %26, 9
+%next torun on love01
+ clus2run=[8, 24];
+%  clus2run=[7, 20];
+% clus2run=[26, 9];
+
+
+%sq love06
+% clus2run=[6,12,14,21];
+% clus2run=[16,13, 26,17];
+% clus2run=[3,11,18,23];
+
 
 
 %old
@@ -66,7 +77,7 @@ clus2run=[4, 22, 8, 24, 5,  15,];
 % clus2run=[3, 13, 18];
 % clus2run=[17, 23, 21];
 
-%trapz - trapzKfrmSq2 - running - epsmu
+%trapz - trapzKfrmSq1 - running - epsmu2=10
 % clus2run=[8:4:20, 23, 6, 10:4:22,4, 25]; 
 % clus2run=[3, 26, 7:4:19, 24, 5, 9:4:21]; 
 
@@ -108,9 +119,10 @@ jointTrls=1; %for test trials
 %EDIT = if trapKfrmSq1...
 
 %trapzKfrmSq1
-nTrials=1000000/2;
+% nTrials=1000000/2;
 % epsMuTrapz10 = 25; %this is 10% of orig learning rate
-% epsMuTrapz10 = 50;  - need to run
+% epsMuTrapz10 = 50;  
+% epsMuTrapz10 = 10;  %to run
 
 
 %doPerm or not

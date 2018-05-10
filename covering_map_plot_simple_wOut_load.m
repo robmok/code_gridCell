@@ -143,6 +143,10 @@ end
 
 %% over time - one plot
 
+if ~exist('dat')
+    dat=dat2;
+end
+
 %if plotAgent, need trials as an output argument
 plotAgent = 1;
 
