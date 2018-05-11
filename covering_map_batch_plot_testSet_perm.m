@@ -10,6 +10,8 @@ saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed']));
 
+figsDir = [wd '/grid_figs'];
+
 % load
 nSet        = 22;
 gaussSmooth = 1; 
@@ -34,22 +36,21 @@ nIter=200;
 % clus2run = [3:16, 18, 20:26];  %missed 17, 19?
 
 
-% dat='trapzKrupic';    
-dat='trapzKfrmSq1';
-%trapzKfrmSq1
-nTrials=1000000/2;
-epsMuTrapz10 = 25; 
+% % % dat='trapzKrupic';    
+% dat='trapzKfrmSq1';
+% %trapzKfrmSq1
+% nTrials=1000000/2;
+% epsMuTrapz10 = 25; 
 
 
-dat='trapzKfrmSq2';
-nTrials=1000000;
+% dat='trapzKfrmSq2';
+% nTrials=1000000;
 
-% clus2run = [3:26]; 
-clus2run=6:26;
+
+clus2run = [3:26]; 
+% clus2run=6:26;
 % % clus2run=26;
 % clus2run=4:2:26;
-
-
 
 batchSizeVals = 400; %100, 125, 200,400, 1000
 
@@ -60,10 +61,15 @@ batchSizeVals = 400; %100, 125, 200,400, 1000
 
 rHex=0; %if choose raw 60deg corr values, not gridness
 
-
 %perm
 nPerm=500;
 nIters2run=nIter;
+
+doPerm = 0; 
+
+if strcmp(dat(1:4),'trap')
+    doPerm=0;
+end
 
 %load loop
 for iClus2run = 1:length(clus2run) 
@@ -74,13 +80,13 @@ for iClus2run = 1:length(clus2run)
         for iBvals = 1:length(batchSizeVals)
             batchSize = batchSizeVals(iBvals);
             fprintf('Loading %s, nClus=%d, epsMu=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000,batchSize)
-            if ~strcmp(dat(1:4),'trap')
+            if doPerm
 %                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_perm_%dpermsOn%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,nPerm,nIters2run)];
                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_actNorm_perm_%dpermsOn%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,nPerm,nIters2run)];
             else
-                if ~length(dat)==12
-                    fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_noPerm',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
-%                     fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_noPerm',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+                if ~(length(dat)==12)
+%                     fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_noPerm',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+                    fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_trlsTest_noPerm',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
                     % fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_noPerm_noJointTrlsTest',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
                 else
                     if strcmp(dat(12),'1')
@@ -128,13 +134,18 @@ for iClus2run = 1:length(clus2run)
             gW_radAll_actNorm(:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,3,:);
             gW_wavAll_actNorm(:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,4,:);  
             
-            %note this perm is only with actNorm - forgot to save for act
-            if ~strcmp(dat(1:4),'trap')
+            
+            for iterI = 1:nIter
+                densityPlotActAll(:,:,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlotAct(:,:,iterI),gaussSmooth);
+                densityPlotActNormAll(:,:,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlotActNorm(:,:,iterI),gaussSmooth);
+            end
+            
+            if doPerm
             gA_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gA_act(:,3,:);
-%             gW_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW_act(:,3,:);
+            gW_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW_act(:,3,:);
             
             gA_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gA_actNorm(:,1,:);
-%             gW_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW_actNorm(:,1,:);
+            gW_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW_actNorm(:,1,:);
             end
             
         end 
@@ -142,15 +153,15 @@ for iClus2run = 1:length(clus2run)
 end
 %% Making figs - univar scatters 1 - test set
 
-figsDir = [wd '/grid_figs'];
-
-savePlots=0;
+savePlots=1;
 
 clusPosAct = 'actNorm'; %'act' or 'actNorm'
 
 gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
 
 gridMeasure = 'grid';
+
+plotFewClus = 1; %plot 3:5 clusters separately
 
 switch clusPosAct
 % case 'clus'
@@ -210,9 +221,10 @@ iEps=1;
 
 % clus2plot=(3:26)-2;
 clus2plot=(6:26)-2;
+clus2plot=(10:26)-2;
 % clus2plot=([6:24])-2;
 
-clus2plot=1:length(clus2run);
+% clus2plot=1:length(clus2run);
 
 %trapz
 % clus2plot = 1:length(clus2run);
@@ -250,11 +262,12 @@ figure; hold on;
         
 %         title(sprintf('%s, %s - eps=%d, batchSize=%d',dat, gridMeasure,epsMuVals(iEps)*1000,batchSizeVals(iBatchVals)))
         if strcmp(dat(1:2),'ci')
-        title('Circular box')
+            title('Circular box')
         elseif strcmp(dat(1:2),'sq')
-        title('Square box')
-        end        
-        
+            title('Square box')
+        elseif strcmp(dat(1:2),'tr')
+            title('Trapezoid box')
+        end
         set(gca,'FontSize',fontSiz,'fontname','Arial')
     end
 
@@ -267,100 +280,250 @@ if savePlots
 end
 
 
-% %prop grid cells, averaged across clusters
-if ~strcmp(dat(1:4),'trap')
-    maxThresh=squeeze(max(max(gA_act_permPrc(:,1,1,:))));
-propGrid=nan(1,size(dat1,2));
-for i=1:size(dat1,2) %length(clus2run)
-propGrid(i)=nnz(dat1(:,i)>maxThresh)/200;
-end
-mean(propGrid)
-std(propGrid)/sqrt(length(propGrid))
-end
-% 
-% 
-% %plot 3:5
-% clus2plot=(3:5)-2;
-% %fig specs
-% xTickLabs = num2cell(clus2run(clus2plot));
-% fontSiz=15;
-% figure; hold on;
-%     for iEps = 1:length(epsMuVals)
-%         %     subplot(2,3,iEps);
-%         dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,1));
-%         barpos  = .25:.5:.5*size(dat1,2);
-%         colors  = distinguishable_colors(size(dat1,2));
-%         colgrey = [.5, .5, .5];
-%         mu      = mean(dat1,1);
-%         sm      = std(dat1)./sqrt(size(dat1,1));
-%         ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
-%         plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-%         errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-%         scatter(barpos,mu,50,colors,'filled','d');
-%         xticklabels(xTickLabs);
-%         xlim([barpos(1)-.5, barpos(end)+.5]);
-%         %         ylim([0,1]);
-%         
-%         if strcmp(gridMsrType,'a')
-%             ylim([-.45,1.4]);
-%         elseif strcmp(gridMsrType,'w')
-%             ylim([-1.25,1.4]);
-%         end
-%         xlabel('Number of Clusters');
-%         ylabel('Grid Score');
-%         
-%         title(sprintf('%s, %s - eps=%d, batchSize=%d',dat, gridMeasure,epsMuVals(iEps)*1000,batchSizeVals(iBatchVals)))
-%         set(gca,'FontSize',fontSiz,'fontname','Arial')
-%     end
-% 
-%     fname = [figsDir sprintf('/gridness_%s_univarScatters_nClus%d-%d_eps%d_batchSiz%d_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
-% if savePlots
-%    set(gcf,'Renderer','painters');
-%    print(gcf,'-depsc2',fname)
-%    saveas(gcf,fname,'png');
+% % %prop grid cells, averaged across clusters
+% if ~strcmp(dat(1:4),'trap')
+%     maxThresh=squeeze(max(max(gA_act_permPrc(:,1,1,:))));
+%     maxThresh=0.4;
+%     propGrid=nan(1,size(dat1,2));
+% for i=1:size(dat1,2) %length(clus2run)
+% propGrid(i)=nnz(dat1(:,i)>maxThresh)/200;
+% end
+% mean(propGrid)
+% std(propGrid)/sqrt(length(propGrid))
 % end
 
-%%
 
 if strcmp(dat(1:4),'trap')
     figure; hold on;
-    dat1    = squeeze(datTmp(:,:,:,:,2));
+    dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,2));
     mu      = nanmean(dat1,1);
     sm      = nanstd(dat1)./sqrt(size(dat1,1));
     ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
     plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-    errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-    scatter(barpos,mu,100,colors,'d','filled');
+    scatter(barpos,mu,50,colgrey,'filled','d');
+    xticklabels(xTickLabs);
     xlim([barpos(1)-.5, barpos(end)+.5]);
-    ylim([-1.5,1.5]);
-    title(sprintf('Left half of box %s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
+    ylim([-.5,1.5]);
+    title('Left half of Trapezoid box')
+    xlabel('Number of Clusters');
+    ylabel('Grid Score');
+    set(gca,'FontSize',fontSiz,'fontname','Arial')
+    
+    fname = [figsDir sprintf('/gridness_%s_L_univarScatters_testSet_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
+    
+    if savePlots
+        set(gcf,'Renderer','painters');
+        print(gcf,'-depsc2',fname)
+        saveas(gcf,fname,'png');
+    end
+    
     
     figure; hold on;
-    dat1    = squeeze(datTmp(:,:,:,:,3));
+    dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,3));
     mu      = nanmean(dat1,1);
     sm      = nanstd(dat1)./sqrt(size(dat1,1));
     ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
     plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-    errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-    scatter(barpos,mu,100,colors,'d','filled');
+    scatter(barpos,mu,50,colgrey,'filled','d');
+    xticklabels(xTickLabs);
     xlim([barpos(1)-.5, barpos(end)+.5]);
-    ylim([-1.5,1.5]);
-    title(sprintf('Right half of box %s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
+    ylim([-.5,1.5]);
+    title('Right half of Trapezoid box')
+    xlabel('Number of Clusters');
+    ylabel('Grid Score');
+    set(gca,'FontSize',fontSiz,'fontname','Arial')
+    
+    fname = [figsDir sprintf('/gridness_%s_R_univarScatters_testSet_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
+    
+    if savePlots
+        set(gcf,'Renderer','painters');
+        print(gcf,'-depsc2',fname)
+        saveas(gcf,fname,'png');
+    end
     
     figure; hold on;
-    dat1    = squeeze(datTmp(:,:,:,:,2))-squeeze(datTmp(:,:,:,:,3));
+    dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,2)-datTmp(:,iEps,iBatchVals,clus2plot,3));
     mu      = nanmean(dat1,1);
     sm      = nanstd(dat1)./sqrt(size(dat1,1));
     ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
     plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-    errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-    scatter(barpos,mu,100,colors,'d','filled');
+    scatter(barpos,mu,50,colgrey,'filled','d');
+    xticklabels(xTickLabs);
     xlim([barpos(1)-.5, barpos(end)+.5]);
     ylim([-1.5,2]);
-    title(sprintf('Left-right half of box %s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
+    xlabel('Number of Clusters');
+    ylabel('Grid Score');
+    set(gca,'FontSize',fontSiz,'fontname','Arial')
     
+    title('Left-right half of Trapezoid box')
+    
+    fname = [figsDir sprintf('/gridness_%s_L-R_univarScatters_testSet_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
+    
+    if savePlots
+        set(gcf,'Renderer','painters');
+        print(gcf,'-depsc2',fname)
+        saveas(gcf,fname,'png');
+    end
     
 end
+
+if plotFewClus
+%plot 3:5
+clus2plot=(3:5)-2;
+clus2plot=(3:9)-2;
+%fig specs
+xTickLabs = num2cell(clus2run(clus2plot));
+fontSiz=15;
+figure; hold on;
+    for iEps = 1:length(epsMuVals)
+        %     subplot(2,3,iEps);
+        dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,1));
+        barpos  = .25:.5:.5*size(dat1,2);
+        colors  = distinguishable_colors(size(dat1,2));
+        colgrey = [.5, .5, .5];
+        mu      = mean(dat1,1);
+        sm      = std(dat1)./sqrt(size(dat1,1));
+        ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+        plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
+        errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+        scatter(barpos,mu,50,colors,'filled','d');
+        xticklabels(xTickLabs);
+        xlim([barpos(1)-.5, barpos(end)+.5]);
+        %         ylim([0,1]);
+        
+        if strcmp(gridMsrType,'a')
+            ylim([-.45,1.4]);
+        elseif strcmp(gridMsrType,'w')
+            ylim([-1.25,1.4]);
+        end
+        xlabel('Number of Clusters');
+        ylabel('Grid Score');
+        
+        title(sprintf('%s, %s - eps=%d, batchSize=%d',dat, gridMeasure,epsMuVals(iEps)*1000,batchSizeVals(iBatchVals)))
+        set(gca,'FontSize',fontSiz,'fontname','Arial')
+    end
+
+    fname = [figsDir sprintf('/gridness_%s_univarScatters_nClus%d-%d_eps%d_batchSiz%d_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
+if savePlots
+   set(gcf,'Renderer','painters');
+   print(gcf,'-depsc2',fname)
+   saveas(gcf,fname,'png');
+    close all
+end
+end
+
+%% Making figs: density plot examples
+
+savePlots = 1;
+
+doPlot=0; %do plot when computing gridness
+
+fontSiz=15;
+
+clusPosAct = 'actNorm'; %'clus' or 'actNorm'
+
+gridMsrType = 'a';
+
+clus2plot = [7,10,12,25]-2;%[5,8,13,18];
+% clus2plot = 10-2;
+%
+clus2plot = [10,12,18,25]-2;
+clus2plot = [7,10,12,18,25]-2;
+
+for iClus = clus2plot%:length(clus2run)
+for iBvals = 1:length(batchSizeVals)
+    for iterI = 1:5%nIter
+        switch clusPosAct
+            case 'act'
+                densityPlotCentresSm = densityPlotActAll(:,:,iterI,iEps,iBvals,iClus);
+                if strcmp(dat(1:2),'ci')
+                    zlims=[0,6];
+                elseif strcmp(dat(1:2),'sq')
+                    zlims=[0,3.5];
+                elseif strcmp(dat(1:2),'tr')
+                    zlims=[0,11.5];
+                end
+            case 'actNorm'
+                densityPlotCentresSm = densityPlotActNormAll(:,:,iterI,iEps,iBvals,iClus);
+                zlims=[0,.08];
+                if strcmp(dat(1:2),'ci') || strcmp(dat(1:2),'tr') 
+                zlims=[0,.08];
+                elseif strcmp(dat(1:2),'sq')
+                zlims=[0,.06];
+                end
+        end
+
+        aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram        
+        [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
+%         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
+                
+%         %make nans into black to edit out
+        densityPlotTmp = densityPlotCentresSm;
+        densityPlotTmp(isnan(densityPlotCentresSm))=2;
+        aCorrMap(isnan(aCorrMap))=.5;
+        
+        figure; imagesc(densityPlotTmp,zlims); %colorbar;
+%         figure; imagesc(densityPlotTmp); colorbar;
+        xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
+        fname = [figsDir sprintf('/densityPlot_testSet_%s_nClus%d_eps%d_batchSiz%d_%s_%s_iter%d_clusters',dat,iClus+2,epsMuVals(iEps)*1000,batchSizeVals(iBvals),clusPosAct,gridMsrType,iterI)];
+        if savePlots
+            set(gcf,'Renderer','painters');
+            print(gcf,'-depsc2',fname)
+            saveas(gcf,fname,'png');
+           close all
+        end
+        figure; imagesc(aCorrMap,[-1.01 1.01]);
+%         figure; imagesc(aCorrMap); colorbar
+        title(sprintf('Grid Score %.2f',g));
+        set(gca,'FontSize',fontSiz,'fontname','Arial')
+        xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
+        fname = [figsDir sprintf('/densityPlot_testSet_%s_nClus%d_eps%d_batchSiz%d_%s_%s_iter%d__autoCorr',dat,iClus+2,epsMuVals(iEps)*1000,batchSizeVals(iBvals),clusPosAct,gridMsrType,iterI)];
+        if savePlots
+            set(gcf,'Renderer','painters');
+            print(gcf,'-depsc2',fname)
+            saveas(gcf,fname,'png');
+           close all
+        end
+        
+        if strcmp(dat(1:4),'trap')
+            h=50; hLeft = 14; hRight = 20;
+            aCorrMap = ndautoCORR(densityPlotCentresSm(:,1:hLeft));
+            [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
+            %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
+            
+            aCorrMap(isnan(aCorrMap))=.5;
+            figure; imagesc(aCorrMap,[-1.01 1.01]);
+            title(sprintf('Grid Score %.2f',g));
+            set(gca,'FontSize',fontSiz,'fontname','Arial')
+            xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
+            fname = [figsDir sprintf('/densityPlot_testSet_%s_L_nClus%d_eps%d_batchSiz%d_%s_%s_iter%d__autoCorr',dat,iClus+2,epsMuVals(iEps)*1000,batchSizeVals(iBvals),clusPosAct,gridMsrType,iterI)];
+            if savePlots
+                set(gcf,'Renderer','painters');
+                print(gcf,'-depsc2',fname)
+                saveas(gcf,fname,'png');
+                close all
+            end
+            
+            aCorrMap = ndautoCORR(densityPlotCentresSm(:,h-hRight+1:end));
+            [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
+            %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
+            aCorrMap(isnan(aCorrMap))=.5;
+            figure; imagesc(aCorrMap,[-1.01 1.01]);
+            title(sprintf('Grid Score %.2f',g));
+            set(gca,'FontSize',fontSiz,'fontname','Arial')
+            xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
+            fname = [figsDir sprintf('/densityPlot_testSet_%s_R_nClus%d_eps%d_batchSiz%d_%s_%s_iter%d__autoCorr',dat,iClus+2,epsMuVals(iEps)*1000,batchSizeVals(iBvals),clusPosAct,gridMsrType,iterI)];
+            if savePlots
+                set(gcf,'Renderer','painters');
+                print(gcf,'-depsc2',fname)
+                saveas(gcf,fname,'png');
+                close all
+            end
+        end
+    end
+end
+end
+
 %% Thresholds from perm stats
 figsDir = [wd '/grid_figs'];
 

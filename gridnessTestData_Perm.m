@@ -24,7 +24,7 @@ jointTrls   = 1;
 stepSize = 1;
 sigmaGauss = stepSize;
 
-% gaussSmooth = 1;
+gaussSmooth = 1;
 % nSets = size(densityPlot,3);
 % nIters2run = size(densityPlot,4);
 
@@ -135,8 +135,13 @@ for iterI=1:nIters2run
         end
         densityPlotActNormTmp = densityPlotActTmp./densityPlotActUpd; %divide by number of times that location was visited
 
-        densityPlotAct(:,:,iterI)               =  densityPlotActTmp;
-        densityPlotActNorm(:,:,iterI)           =  densityPlotActNormTmp;
+%         densityPlotAct(:,:,iterI)               =  densityPlotActTmp;
+%         densityPlotActNorm(:,:,iterI)           =  densityPlotActNormTmp;
+
+        %smooth - not nec but to compare with perm (which need smoothing)
+        densityPlotAct(:,:,iterI)               =  imgaussfilt(densityPlotActTmp,gaussSmooth);
+        densityPlotActNorm(:,:,iterI)           =  imgaussfilt(densityPlotActNormTmp,gaussSmooth);
+        
         
         aCorrMap = ndautoCORR(densityPlotActTmp);
         [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
@@ -205,6 +210,9 @@ for iterI=1:nIters2run
                     densityPlotActUpdPerm(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1) = densityPlotActUpdPerm(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)+1; %log nTimes loc was visited
                 end
                 densityPlotActNormPerm   = densityPlotActPerm./densityPlotActUpdPerm; %divide by number of times that location was visited
+                
+                densityPlotActPerm = imgaussfilt(densityPlotActPerm,gaussSmooth);
+                densityPlotActNormPerm = imgaussfilt(densityPlotActNormPerm,gaussSmooth);
                 
                 %compute gridness
                 aCorrMap = ndautoCORR(densityPlotActPerm);

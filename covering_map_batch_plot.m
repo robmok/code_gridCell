@@ -949,7 +949,7 @@ clusPosAct = 'actNorm'; %'clus' or 'actNorm'
 gridMsrType = 'a';
 
 
-clus2plot = [5,8,13,18];
+clus2plot = [5,8,13,18];%[7,10,12,25]
 
 iSet=1;
 iSet=10;

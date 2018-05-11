@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -14,7 +14,7 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; %?
 dat = 'square';
-% dat = 'circ';
+dat = 'circ';
 % dat = 'trapzKrupic';
 
 % dat = 'trapzKfrmSq1'; % load covering map on sq, then run it on trapz; then assess gridness in trapz
@@ -27,47 +27,9 @@ saveDat=1;
 % clus2run = [3:30]; 
 % clus2run=[3:10 12:2:26 11:2:25, 27:30]; % 27:30
 
-%batchSize=100
-% clus2run=[4:2:10, 12:2:26]; 
-% clus2run=[3:2:9, 11:2:25]; 
-
-% %love06 - batchSize=400 - circ; actNorm
-% clus2run=[4, 22, 8, 24, 5,  15,]; 
-% clus2run=[25, 10, 7, 20, 26, 9];  
-
-
-% clus2run=[5,  15, 26, 9]; 
-
-% love01
-% clus2run=[3, 13]; 
-% clus2run=[17, 23]; 
-% clus2run=[18, 21]; 
-% clus2run=[11, 12]; 
-% clus2run=[19, 14]; 
-% clus2run=[6, 16]; 
-
-
-% clus2run = 20;
-
-%love01 - sq - batchSize=400;actNorm
-%for now run a few on love01
-%  clus2run=[4, 22]; %8, 24 
-%  clus2run=[25, 10]; % 7, 20 
-% clus2run=[5,  15];  %26, 9
-%next to run on love01
- clus2run=[8, 24];
-%  clus2run=[7, 20];
-% clus2run=[26, 9];
-
-
-%sq love06
-% clus2run=[12,14,21,11,18]; %6, 3
-% clus2run=[13, 26,17, 23]; %16
-
-
-%old
-% clus2run=[4, 22, 16]; 
-% % clus2run=[8, 12, 24];
+% circ; actNorm love01
+clus2run=[4, 22, 16]; 
+% clus2run=[8, 12, 24];
 % clus2run=[25, 10, 7];
 % clus2run=[20, 14, 6];
 % clus2run=[5,  15, 26];
@@ -75,16 +37,17 @@ saveDat=1;
 % clus2run=[3, 13, 18];
 % clus2run=[17, 23, 21];
 
-%trapz - trapzKfrmSq1 - running - epsmu2=10
+
+%sq start perms love06
+% clus2run=[3,6, 12,14,21,11,18]; %one at a time here
+%NEXT...
+
+
+
+
+%trapz - trapzKfrmSq1
 % clus2run=[8:4:20, 23, 6, 10:4:22,4, 25]; 
 % clus2run=[3, 26, 7:4:19, 24, 5, 9:4:21]; 
-
-
-% clus2run=[8:4:20, 6]; 
-% clus2run=[10:4:22,4]; 
-% clus2run=[3, 7:4:19]; 
-% clus2run=[5, 9:4:21];
-% clus2run=[24, 26, 23,25];
 
 
 % %split into 4 - love06
@@ -116,8 +79,8 @@ jointTrls=1; %for test trials
 
 %trapzKfrmSq1
 % nTrials=1000000/2;
-% epsMuTrapz10 = 25; %this is 10% of orig learning rate
-% epsMuTrapz10 = 50;  
+% % epsMuTrapz10 = 25; %this is 10% of orig learning rate
+% % epsMuTrapz10 = 50;  
 % epsMuTrapz10 = 15;  %to run
 
 
@@ -127,6 +90,8 @@ if ~strcmp(dat(1:4),'trap')
 else
     doPerm=0; 
 end
+
+%tmp - for getting sq density plots
 % doPerm=0;
 
 % run perm tests on how many iters? takes a bit of time (a couple mins) per
