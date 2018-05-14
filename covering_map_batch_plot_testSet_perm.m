@@ -36,11 +36,11 @@ nIter=200;
 % clus2run = [3:16, 18, 20:26];  %missed 17, 19?
 
 
-% % % dat='trapzKrupic';    
-% dat='trapzKfrmSq1';
-% %trapzKfrmSq1
-% nTrials=1000000/2;
-% epsMuTrapz10 = 25; 
+% % dat='trapzKrupic';    
+dat='trapzKfrmSq1';
+%trapzKfrmSq1
+nTrials=1000000/2;
+epsMuTrapz10 = 25; 
 
 
 % dat='trapzKfrmSq2';
@@ -414,7 +414,7 @@ end
 
 %% Making figs: density plot examples
 
-savePlots = 1;
+savePlots = 0;
 
 doPlot=0; %do plot when computing gridness
 
@@ -428,7 +428,10 @@ clus2plot = [7,10,12,25]-2;%[5,8,13,18];
 % clus2plot = 10-2;
 %
 clus2plot = [10,12,18,25]-2;
-clus2plot = [7,10,12,18,25]-2;
+% clus2plot = [7,10,12,18,25]-2;
+
+% clus2plot = 25-2;
+
 
 for iClus = clus2plot%:length(clus2run)
 for iBvals = 1:length(batchSizeVals)
@@ -457,7 +460,7 @@ for iBvals = 1:length(batchSizeVals)
         [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
 %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
                 
-%         %make nans into black to edit out
+%         %make nans into yellow to edit out
         densityPlotTmp = densityPlotCentresSm;
         densityPlotTmp(isnan(densityPlotCentresSm))=2;
         aCorrMap(isnan(aCorrMap))=.5;

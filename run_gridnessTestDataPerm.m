@@ -14,7 +14,7 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; %?
 dat = 'square';
-dat = 'circ';
+% dat = 'circ';
 % dat = 'trapzKrupic';
 
 % dat = 'trapzKfrmSq1'; % load covering map on sq, then run it on trapz; then assess gridness in trapz
@@ -40,7 +40,10 @@ clus2run=[4, 22, 16];
 
 %sq start perms love06
 % clus2run=[3,6, 12,14,21,11,18]; %one at a time here
-%NEXT...
+% clus2run=[4, 22, 16, 8, 24, 25, 10, 7, 20, 5, 15, 26]; 
+clus2run=[9, 13, 17, 19, 23];
+clus2run=23;
+%next-  run circ perms here (remember to delete the right things)
 
 
 

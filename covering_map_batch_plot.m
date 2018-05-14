@@ -110,6 +110,8 @@ jointTrls=1;
 % clus2run = [8, 12, 16, 20,24, 28]; 
 % clus2run = [8:2:28]; 
 clus2run = [3:26]; 
+clus2run = [6:26]; 
+clus2run = [10:26]; 
 epsMuVals=.025;
 nTrials=1000000;
 batchSizeVals = [1000, 400, 100]; 
@@ -759,7 +761,7 @@ iEps=1;
 
 % clus2plot=(3:26)-2;
 clus2plot=(6:26)-2;
-% clus2plot = 1:length(clus2run);
+clus2plot = 1:length(clus2run);
 
 iBatchVals=1; %'medium' one
 
@@ -861,7 +863,7 @@ end
 
 %% Making figs: plot over sets
 
-savePlots = 0;
+savePlots = 1;
 
 plotSubPlots = 0;
 
@@ -874,6 +876,7 @@ colors  = distinguishable_colors(length(clus2run));
 
 if plotSubPlots
     clus2plot = (6:26)-2;
+    clus2plot = 1:length(clus2run);
     figure; hold on;
     for iClus = clus2plot
         %     subplot(2,ceil(length(clus2plot)/2),iClus); hold on;
@@ -906,7 +909,10 @@ if plotSubPlots
 else
     
     %subset of nClus conds
-    clus2plot = [7,10,12,25]-2;
+%     clus2plot = [7,10,12,18,25]-2;
+    clus2plot = [10,12,18,25]-9;
+    
+%     clus2plot = 18-2;
     for iClus = clus2plot
         figure;
         dat1     = squeeze(datTmp(1:end-2,:,iEps,iBatchVals,iClus,:))';
@@ -923,10 +929,10 @@ else
         ylim([-.5,1.3]);
         xticks([]); xticklabels({''});
         %         title(sprintf('nClus=%d, batchSize=%d',clus2plot(iClus),batchSizeVals(iBatchVals)))
-        title(sprintf('%d clusters',iClus+2));
+        title(sprintf('%d clusters',iClus+9));
         set(gca,'FontSize',fontSiz,'fontname','Arial')
 
-        fname = [figsDir sprintf('/gridness_%s_univarScatters_overTime_singlePlot_nClus%d_eps%d_batchSiz%d_%s',dat,iClus+2,epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
+        fname = [figsDir sprintf('/gridness_%s_univarScatters_overTime_singlePlot_nClus%d_eps%d_batchSiz%d_%s',dat,iClus+9,epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
         if savePlots
             set(gcf,'Renderer','painters');
             print(gcf,'-depsc2',fname)
