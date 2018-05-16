@@ -36,11 +36,11 @@ nIter=200;
 % clus2run = [3:16, 18, 20:26];  %missed 17, 19?
 
 
-% % dat='trapzKrupic';    
-dat='trapzKfrmSq1';
-%trapzKfrmSq1
-nTrials=1000000/2;
-epsMuTrapz10 = 25; 
+% % % dat='trapzKrupic';    
+% dat='trapzKfrmSq1';
+% %trapzKfrmSq1
+% nTrials=1000000/2;
+% epsMuTrapz10 = 25; 
 
 
 % dat='trapzKfrmSq2';
@@ -65,7 +65,7 @@ rHex=0; %if choose raw 60deg corr values, not gridness
 nPerm=500;
 nIters2run=nIter;
 
-doPerm = 0; 
+doPerm = 1; 
 
 if strcmp(dat(1:4),'trap')
     doPerm=0;
@@ -144,8 +144,8 @@ for iClus2run = 1:length(clus2run)
             gA_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gA_act(:,3,:);
             gW_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW_act(:,3,:);
             
-            gA_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gA_actNorm(:,1,:);
-            gW_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW_actNorm(:,1,:);
+            gA_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gA_actNorm(:,3,:);
+            gW_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW_actNorm(:,3,:);
             end
             
         end 
@@ -153,7 +153,7 @@ for iClus2run = 1:length(clus2run)
 end
 %% Making figs - univar scatters 1 - test set
 
-savePlots=1;
+savePlots=0;
 
 clusPosAct = 'actNorm'; %'act' or 'actNorm'
 
@@ -280,17 +280,20 @@ if savePlots
 end
 
 
-% % %prop grid cells, averaged across clusters
-% if ~strcmp(dat(1:4),'trap')
-%     maxThresh=squeeze(max(max(gA_act_permPrc(:,1,1,:))));
+% %prop grid cells, averaged across clusters
+if ~strcmp(dat(1:4),'trap')
+%     maxThresh=squeeze(max(max(gA_actNorm_permPrc(:,1,1,8:end))));
+    maxThresh=squeeze(max(max(gA_actNorm_permPrc(:,1,1,:))));
+%     maxThresh=squeeze(max(max(gW_actNorm_permPrc(:,1,1,8:end))));
+%     maxThresh=squeeze(max(max(gW_actNorm_permPrc(:,1,1,:))));
 %     maxThresh=0.4;
-%     propGrid=nan(1,size(dat1,2));
-% for i=1:size(dat1,2) %length(clus2run)
-% propGrid(i)=nnz(dat1(:,i)>maxThresh)/200;
-% end
-% mean(propGrid)
-% std(propGrid)/sqrt(length(propGrid))
-% end
+    propGrid=nan(1,size(dat1,2));
+for i=1:size(dat1,2) %length(clus2run)
+propGrid(i)=nnz(dat1(:,i)>maxThresh)/200;
+end
+mean(propGrid)
+std(propGrid)/sqrt(length(propGrid))
+end
 
 
 if strcmp(dat(1:4),'trap')
@@ -549,18 +552,14 @@ switch clusPosAct
     case 'actNorm'
         switch gridMsrType
             case 'a'
-                %ATM WRONG NAMES
-                
-                permThresh = gA_act_permPrc;
-%                 permThresh = gA_actNorm_permPrc;
+                permThresh = gA_actNorm_permPrc;
             case 'w'
-                permThresh = gW_act_permPrc;
-%                 permThresh = gW_actNorm_permPrc;
+                permThresh = gW_actNorm_permPrc;
         end
 end
 
 % clus2plot=([6:26])-2;
-clus2plot=([6:24])-2;
+clus2plot=([10:26])-2;
 
 iBatchVals=1; %'medium' one
 
@@ -602,7 +601,7 @@ figure; hold on;
         set(gca,'FontSize',fontSiz,'fontname','Arial')
     end
 
-    fname = [figsDir sprintf('/gridness_%s_univarScatters_permThresh_nClus%d-%d_eps%d_batchSiz%d_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
+    fname = [figsDir sprintf('/gridness_%s_univarScatters_permThresh_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
 if savePlots
    set(gcf,'Renderer','painters');
    print(gcf,'-depsc2',fname)

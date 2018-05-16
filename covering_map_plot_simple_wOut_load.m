@@ -20,7 +20,7 @@ xlim(locRange); ylim(locRange);
 %% gridness, autocorrelogram
 
 gaussSmooth=1;
-for iSet=21%1:20+2 %size(densityPlotActTNorm,3)
+for iSet=1:21%1:20+2 %size(densityPlotActTNorm,3)
     
 for iterI = 1%:3%:10 
     

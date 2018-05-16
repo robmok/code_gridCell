@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -20,6 +20,12 @@ dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning
 
 % dat = 'catLearn';
 
+%compute activation and densityPlotActNorm over time? takes longer
+actOverTime = 1; 
+
+%annealed learning rate
+annEps = 1; %1 or 0
+
 jointTrls = 1;
 
 boxSize = 1; % 1=normal, 2=double size, 3=triple size
@@ -30,28 +36,21 @@ catsInfo.nCats=4; %2 categories
 sigmaG = [3 0; 0 3];
 catsInfo.R=chol(sigmaG);
 
-%annealed learning rate
-annEps = 0; %1 or 0
+%circ annEps
+clus2run = [18, 8, 21, 6, 12]; 
+clus2run = [16, 7, 14, 15, 9];  
+clus2run = [24, 5, 13, 26, 20];
 
-%rerun circ/square with correct actNorm
-%joint trials
-%love01 - circ, batchSiz=400
-%love01 - sq, batchSiz=400
+%love01 - circ annEps, sq annEps
+clus2run  = [19,22]; 
+%  clus2run = [11, 17];
+%  clus2run = [25, 10];
+% clus2run  = [3, 23, 4];
 
-%rerunning 400 circ with nans for clus and act
-
-% clus2run = [18, 8, 21,6]; 
-% clus2run = [16, 7, 14,15];  
-% clus2run = [24, 5, 13,26];
-%runnning on love06:
-clus2run = [12, 9, 20, 19]; 
- clus2run = [11, 17, 25, 10];
-clus2run = [22, 3, 23, 4];
 
 %next - batchSize=200
-%next:  trapz
 
-% clus2run=16;
+% clus2run=14;
 
 % nTrials
 if ~strcmp(dat(1:3),'cat')
@@ -63,38 +62,21 @@ end
 %batch size
 fixBatchSize = 1; %fixed, or batchSize depends on mean updates per cluster
 
-% 13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000
 if fixBatchSize
     % for 100k trials, joint trials
-%     nBatches = [1000, 2500, 10000]; 
-%     nBatches = [2500, 10000]; 
-    
-%     nBatches = 5000;
-%     nBatches = [2500, 5000];
-%     nBatches = 10000;
-    
-%     nBatches = [2500, 10000, 5000, 8000]; 
-%     nBatches = [2500, 10000, 5000]; 
 %     nBatches = [5000, 2500, 10000]; 
 %     nBatches = [8000 5000];
-%     nBatches = 5000;
-
-
 %     nBatches = [1000 5000 2500];
     nBatches = 2500;
-
     if strcmp(dat(1:3),'cat')
         nBatches = nBatches.*2;
     end
-    
     batchSizeVals = nTrials./nBatches;
     nBvals = length(batchSizeVals);
 else % define batch size based on average number of updates per cluster
-    avgBatchUpdate = [10, 25, 35, 50]; % 
+%     avgBatchUpdate = [10, 25, 35, 50]; % 
     avgBatchUpdate = [1, 2, 5]; % avgBatchUpdate = 25;
     nBvals = length(avgBatchUpdate);
-%     batchSizePerClus = clus2run.*avgBatchUpdate %just to check
-    % nBatches = nTrials./batchSizePerClus; %per clus cond %this is not used..
 end
 
 % parameters
@@ -124,10 +106,6 @@ end
 stoch = 0; %1 or 0
 
 % c parameter: larger c = less stochastic over trials, smaller c = more stochastic over trials
-cVals = 1/nTrials;
-% cVals = 2/nTrials; %cVals = 3/nTrials;
-% cVals = 5/nTrials;
-% cVals = 20/nTrials;
 cVals = [1/nTrials, 2/nTrials, 5/nTrials, 20/nTrials];
 % cVals = [1/nTrials, 2/nTrials];
 % cVals = [5/nTrials, 20/nTrials];
@@ -171,13 +149,14 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
             c1=round(c.*100000); % for saving file name
         for iBvals = 1:nBvals
             if annEps
-                epsMuOrig1000 = nBatches(iBvals)/100;%for saving
+%                 epsMuOrig1000 = nBatches(iBvals)/100;%for saving
+                epsMuOrig1000 = nBatches*.6; %temp - defined in the function now
             end
             if fixBatchSize
                 batchSize = batchSizeVals(iBvals); %fixed batch size
                 fprintf('Running %s, nClus=%d, epsMu=%d, c=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000,c1, batchSize)
 %                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(batchSize),nIter)];
-                fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct',nClus,round(nTrials/1000),epsMuOrig1000,round(batchSize),nIter,dat)];
+%                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct',nClus,round(nTrials/1000),epsMuOrig1000,round(batchSize),nIter,dat)];
                 %with actNorm computed correctly (no NaNs)
                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm',nClus,round(nTrials/1000),epsMuOrig1000,round(batchSize),nIter,dat)];
             else % define batch size based on average number of updates per cluster 
@@ -189,9 +168,9 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
 %             [densityPlot,densityPlotAct,densityPlotActNorm,clusMu,gA,gW,gA_act,gW_act,gA_actNorm,gW_actNorm,rSeed] = covering_map_batch_sim(nClus,locRange,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,alpha,trials,useSameTrls,trialsUnique,stochasticType,c,dat,weightEpsSSE);
             
             if strcmp(dat(1:3),'cat') %save muAll
-                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll,trials] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls);
+                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll,trials] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls,actOverTime);
             else
-                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls);
+                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll, trials] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls,actOverTime);
             end
             
             timeTaken=toc;
@@ -210,6 +189,9 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                 end
                 if jointTrls
                     fname = [fname '_jointTrls_stepSiz'];
+                end
+                if ~actOverTime && ~strcmp(dat(1:3),'cat')
+                    fname = [fname '_noActOverTime'];
                 end
                 
                 if strcmp(dat(1:3),'cat')

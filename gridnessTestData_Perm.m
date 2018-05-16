@@ -50,12 +50,12 @@ if strcmp(dat(1:4),'trap') && length(dat)>10
         b = length(spacing);
         h = length(spacing);
     end
-    halfArea = (((a+b)/2)*h)/2;
-    c = sqrt(((a^2)+(b^2))/2);
+%     halfArea = (((a+b)/2)*h)/2;
+%     c = sqrt(((a^2)+(b^2))/2);
+%     hLeft  = floor(halfArea/((b+c)/2)); %bigger side
+%     hRight = ceil(halfArea/((a+c)/2))+1; %smaller side
+
     % new to equalize area - Krupic
-    hLeft  = floor(halfArea/((b+c)/2)); %bigger side
-    hRight = ceil(halfArea/((a+c)/2))+1; %smaller side
-    
     %equal number of points in trapz (301 each; nPoints in trap 877/2=438.5)
     hLeft = 14;
     hRight = 20;
@@ -90,6 +90,9 @@ if strcmp(dat(1:4),'trap') %if trapz - compute gridness of left/right half of bo
 end
 muTrain = nan(nClus,2,nIters2run);
 
+
+gA_actPerm = nan(nPerm,nIters2run);
+gW_actPerm = nan(nPerm,nIters2run);
 gA_actNormPerm = nan(nPerm,nIters2run);
 gW_actNormPerm = nan(nPerm,nIters2run);
 for iterI=1:nIters2run
@@ -210,7 +213,7 @@ for iterI=1:nIters2run
                     densityPlotActUpdPerm(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1) = densityPlotActUpdPerm(trialsTest(iTrl,1)+1, trialsTest(iTrl,2)+1)+1; %log nTimes loc was visited
                 end
                 densityPlotActNormPerm   = densityPlotActPerm./densityPlotActUpdPerm; %divide by number of times that location was visited
-                
+                %smooth
                 densityPlotActPerm = imgaussfilt(densityPlotActPerm,gaussSmooth);
                 densityPlotActNormPerm = imgaussfilt(densityPlotActNormPerm,gaussSmooth);
                 
