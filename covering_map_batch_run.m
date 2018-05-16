@@ -15,7 +15,7 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
-% dat = 'square'; 
+dat = 'square'; 
 % dat = 'trapzKrupic';
 
 % dat = 'catLearn';
@@ -38,8 +38,8 @@ catsInfo.R=chol(sigmaG);
 
 %circ annEps
 clus2run = [18, 8, 21, 6, 12]; 
-clus2run = [16, 7, 14, 15, 9];  
-clus2run = [24, 5, 13, 26, 20];
+% clus2run = [16, 7, 14, 15, 9];  
+% clus2run = [24, 5, 13, 26, 20];
 
 %love01 - circ annEps, sq annEps
 clus2run  = [19,22]; 

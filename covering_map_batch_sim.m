@@ -246,8 +246,11 @@ for iterI = 1:nIter
             clusTmp = []; %clear else dimensions change over clus/sets
             clusTmp(1,:) = squeeze(clus(iClus,1,ntNanInd)); %split into two to keep array dim constant - when only 1 location, the array flips.
             clusTmp(2,:) = squeeze(clus(iClus,2,ntNanInd));
+            if any(clusTmp>49) || any(clusTmp<1) %if out of box, don't add to densityplot
+                clusTmp=[];
+            end
             for iTrlUpd=1:size(clusTmp,2)
-                densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus)+1;
+                densityPlotClus(clusTmp(1,iTrlUpd)+1,clusTmp(2,iTrlUpd)+1,iClus) = densityPlotClus(clusTmp(1,iTrlUpd)+1,clusTmp(2,iTrlUpd)+1,iClus)+1;
             end
         end
         densityPlotTmp = nansum(densityPlotClus,3);
