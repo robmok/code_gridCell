@@ -38,15 +38,27 @@ catsInfo.R=chol(sigmaG);
 
 %circ annEps
 clus2run = [18, 8, 21, 6, 12]; 
-% clus2run = [16, 7, 14, 15, 9];  
-% clus2run = [24, 5, 13, 26, 20];
+clus2run = [16, 7, 14, 15, 9];  
+clus2run = [24, 5, 13, 26, 20];
 
 %love01 - circ annEps, sq annEps
-clus2run  = [19,22]; 
+% clus2run  = [19,22]; 
 %  clus2run = [11, 17];
 %  clus2run = [25, 10];
 % clus2run  = [3, 23, 4];
 
+%sq annEps on love06
+clus2run = [18, 8, 21]; 
+clus2run = [16, 7, 14];  
+clus2run = [24, 5, 13];
+
+%sq annEps on love01
+clus2run = [6]; 
+% clus2run = [15];  
+% clus2run = [26];
+% clus2run = [12]; 
+% clus2run = [9];  
+% clus2run = [20];
 
 %next - batchSize=200
 
