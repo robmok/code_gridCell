@@ -15,16 +15,16 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
-dat = 'square'; 
+% dat = 'square'; 
 % dat = 'trapzKrupic';
 
 % dat = 'catLearn';
 
 %compute activation and densityPlotActNorm over time? takes longer
-actOverTime = 1; 
+actOverTime = 0; 
 
 %annealed learning rate
-annEps = 1; %1 or 0
+annEps = 0; %1 or 0
 
 jointTrls = 1;
 
@@ -36,31 +36,24 @@ catsInfo.nCats=4; %2 categories
 sigmaG = [3 0; 0 3];
 catsInfo.R=chol(sigmaG);
 
-%circ annEps
-clus2run = [18, 8, 21, 6, 12]; 
-clus2run = [16, 7, 14, 15, 9];  
-clus2run = [24, 5, 13, 26, 20];
-
-%love01 - circ annEps, sq annEps
-% clus2run  = [19,22]; 
-%  clus2run = [11, 17];
-%  clus2run = [25, 10];
-% clus2run  = [3, 23, 4];
 
 %sq annEps on love06
 clus2run = [18, 8, 21]; 
 clus2run = [16, 7, 14];  
 clus2run = [24, 5, 13];
 
-%sq annEps on love01
-clus2run = [6]; 
-% clus2run = [15];  
-% clus2run = [26];
-% clus2run = [12]; 
-% clus2run = [9];  
-% clus2run = [20];
 
 %next - batchSize=200
+%circ 
+clus2run = [18, 8, 21, 6, 12]; 
+clus2run = [16, 7, 14, 15, 9];  
+clus2run = [24, 5, 13, 26, 20];
+
+%love01 - circ, sq
+clus2run  = [19,22]; 
+%  clus2run = [11, 17];
+%  clus2run = [25, 10];
+% clus2run  = [3, 23, 4];
 
 % clus2run=14;
 
@@ -80,6 +73,7 @@ if fixBatchSize
 %     nBatches = [8000 5000];
 %     nBatches = [1000 5000 2500];
     nBatches = 2500;
+    nBatches = 5000;
     if strcmp(dat(1:3),'cat')
         nBatches = nBatches.*2;
     end
