@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -13,8 +13,8 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 
 locRange = [0 49];
 nTrialsTest = 100000; %?
-dat = 'square';
-% dat = 'circ';
+dat = 'circ';
+% dat = 'square';
 % dat = 'trapzKrupic';
 
 % dat = 'trapzKfrmSq1'; % load covering map on sq, then run it on trapz; then assess gridness in trapz
@@ -27,7 +27,7 @@ saveDat=1;
 % clus2run = [3:30]; 
 % clus2run=[3:10 12:2:26 11:2:25, 27:30]; % 27:30
 
-% circ; actNorm love01
+% circ; annEps love01
 clus2run=[4, 22, 16]; 
 % clus2run=[8, 12, 24];
 % clus2run=[25, 10, 7];
@@ -38,31 +38,15 @@ clus2run=[4, 22, 16];
 % clus2run=[17, 23, 21];
 
 
-%sq start perms love06
+% love06
 % clus2run=[3,6, 12,14,21,11,18]; %one at a time here
 % clus2run=[4, 22, 16, 8, 24, 25, 10, 7, 20, 5, 15, 26]; 
-clus2run=[9, 13, 17, 19, 23];
-clus2run=23;
-%next-  run circ perms here (remember to delete the right things)
+% clus2run=[9, 13, 17, 19, 23];
 
 
-
-
-%trapz - trapzKfrmSq1
-% clus2run=[8:4:20, 23, 6, 10:4:22,4, 25]; 
-% clus2run=[3, 26, 7:4:19, 24, 5, 9:4:21]; 
-
-
-% %split into 4 - love06
-% clus2run=[8:8:24]; 
-% clus2run=[12, 20,6];    
-% clus2run=[10:8:26]; 
-% clus2run=[14, 22,4];
-% %odd
-% clus2run=[7:4:19]; 
-% clus2run=[9:4:21]; 
-% clus2run=[23,25];
-% clus2run = [3,5];
+% batchsiz=200 - no perm
+% clus2run = [3:26]; %c
+% clus2run = fliplr(3:26);%s
 
 % clus2run = 18;
 
@@ -71,8 +55,8 @@ epsMuVals=.025;
 nTrials=1000000;
 % batchSizeVals = [400, 100]; % 125?
 batchSizeVals=400;
-% batchSizeVals=100;
 % batchSizeVals=200;
+% batchSizeVals=100;
 
 annEps=0;
 jointTrls=1; %for test trials
@@ -95,7 +79,7 @@ else
 end
 
 %tmp - for getting sq density plots
-% doPerm=0;
+doPerm=1;
 
 % run perm tests on how many iters? takes a bit of time (a couple mins) per
 % iter, so with 200 iters plus many conditions, maybe too much (if all the

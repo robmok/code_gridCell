@@ -18,7 +18,7 @@ gaussSmooth = 1;
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-dat='square';
+% dat='square';
 annEps=0;
 boxSize=1;
 
@@ -48,11 +48,13 @@ nIter=200;
 
 
 clus2run = [3:26]; 
+
 % clus2run=6:26;
 % % clus2run=26;
 % clus2run=4:2:26;
 
 batchSizeVals = 400; %100, 125, 200,400, 1000
+% batchSizeVals = 200;
 
 %new - slower learning rate
 % epsMuVals=.015;
@@ -65,7 +67,7 @@ rHex=0; %if choose raw 60deg corr values, not gridness
 nPerm=500;
 nIters2run=nIter;
 
-doPerm = 1; 
+doPerm = 0; 
 
 if strcmp(dat(1:4),'trap')
     doPerm=0;

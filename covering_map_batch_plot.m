@@ -87,24 +87,6 @@ nIter=200;
 % batchSizeVals=1000;
 % dat='trapzKrupic3'; %trapz1, trapz2, trapz3, trapzKrupic, trapzNorm (or rename to trapz)
 
-%trapz size x2
-% clus2run = [16, 18]; 
-% nTrials=2500000;
-% batchSizeVals=1000;
-% dat='trapzScaled3'; %trapz1, trapz2, trapz3, trapzKrupic, trapzNorm (or rename to trapz)
-% boxSize=2;
-
-
-%new - annealed learning rate
-% clus2run = [10:2:30]; 
-% epsMuVals=[.2, .05]; %"starting" learning rate - actually these are just numbers, not actualy starting eps
-% nTrials=2000000; %new
-% % batchSizeVals = [400, 100]; % only 1 batchsize val per learning rate
-% batchSizeVals = 0;
-% annEps=1;
-% covering_map_batch_dat_22clus_2000ktrls_eps200_batchSiz100_200iters_circ_wAct_annEps_132454
-
-
 % joined trials
 jointTrls=1;
 % clus2run = [8, 12, 16, 20,24, 28]; 
@@ -137,6 +119,17 @@ batchSizeVals = 400; %100, 125, 200,400, 1000
 % epsMuVals=.015;
 % batchSizeVals = 100; %100, 125, 200, 400
 % clus2run = [12, 16, 24, 28]; %batchSize200 missed 20?
+
+
+
+%new - annealed learning rate
+clus2run = [10:26]; 
+epsMuVals=1500; %"starting" learning rate - actually these are just numbers, not actualy starting eps
+nTrials=1000000;
+batchSizeVals = 400;
+annEps=1;
+% covering_map_batch_dat_9clus_1000ktrls_eps1500_batchSiz400_200iters_square_wActNorm_annEps_jointTrls_stepSiz_154025
+
 
 rHex=0; %if choose raw 60deg corr values, not gridness
 
@@ -191,16 +184,22 @@ for iClus2run = 1:length(clus2run)
             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
 
             
+            
+            
             %tmp - to check if works
 %             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_25_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+
+
 
 
             if boxSize>1
                 fname = [fname sprintf('_boxSizex%d',boxSize)];
             end
             if annEps %epsMu is different here
-%                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps*_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_annEps',nClus,round(nTrials/1000),batchSize,nIter,dat)];
-                fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps*_batchSiz%d_%diters_%s_wAct_annEps_jointTrls_stepSiz',nClus,round(nTrials/1000),batchSize,nIter,dat)];
+%                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps*_batchSiz%d_%diters_%s_wAct_annEps_jointTrls_stepSiz',nClus,round(nTrials/1000),batchSize,nIter,dat)];
+                fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_annEps_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000/1000,batchSize,nIter,dat)];
+
+%                 covering_map_batch_dat_9clus_1000ktrls_eps1500_batchSiz400_200iters_square_wActNorm_annEps_jointTrls_stepSiz_154025
 
 %                 fname = [fname '_annEps'];
             end            
@@ -297,7 +296,7 @@ for iClus2run = 1:length(clus2run)
 end
 %% plot univar scatters
 
-clusPosAct = 'clus'; %'clus' or 'actNorm'
+clusPosAct = 'actNorm'; %'clus' or 'actNorm'
 
 gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
 
@@ -863,7 +862,7 @@ end
 
 %% Making figs: plot over sets
 
-savePlots = 1;
+savePlots = 0;
 
 plotSubPlots = 0;
 
@@ -944,7 +943,7 @@ end
 
 %% Making figs: density plot examples
 
-savePlots = 1;
+savePlots = 0;
 
 doPlot=0; %do plot when computing gridness
 
