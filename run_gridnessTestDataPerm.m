@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -12,9 +12,9 @@ addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed']));
 
 locRange = [0 49];
-nTrialsTest = 100000; %?
+nTrialsTest = 100000; % orig nTrials/10
 dat = 'circ';
-% dat = 'square';
+dat = 'square';
 % dat = 'trapzKrupic';
 
 % dat = 'trapzKfrmSq1'; % load covering map on sq, then run it on trapz; then assess gridness in trapz
@@ -27,7 +27,7 @@ saveDat=1;
 % clus2run = [3:30]; 
 % clus2run=[3:10 12:2:26 11:2:25, 27:30]; % 27:30
 
-% circ; annEps love01
+% sq; annEps love01
 clus2run=[4, 22, 16]; 
 % clus2run=[8, 12, 24];
 % clus2run=[25, 10, 7];
@@ -58,7 +58,7 @@ batchSizeVals=400;
 % batchSizeVals=200;
 % batchSizeVals=100;
 
-annEps=0;
+annEps=1;
 jointTrls=1; %for test trials
 
 
@@ -79,7 +79,7 @@ else
 end
 
 %tmp - for getting sq density plots
-doPerm=1;
+% doPerm=1;
 
 % run perm tests on how many iters? takes a bit of time (a couple mins) per
 % iter, so with 200 iters plus many conditions, maybe too much (if all the

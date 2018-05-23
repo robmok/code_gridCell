@@ -19,7 +19,7 @@ fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
 % dat='square';
-annEps=0;
+% annEps=0;
 boxSize=1;
 
 % joined trials
