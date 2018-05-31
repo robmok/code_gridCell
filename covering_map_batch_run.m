@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -37,10 +37,17 @@ sigmaG = [3 0; 0 3];
 catsInfo.R=chol(sigmaG);
 
 
-%sq annEps on love06
-clus2run = [18, 8, 21]; 
-clus2run = [16, 7, 14];  
-clus2run = [24, 5, 13];
+%1k sims, batsiz=400
+%sq - love 06
+clus2run = [18, 8, 21, 6]; 
+clus2run = [16, 13, 14, 15];  
+
+%sq - love01
+clus2run = [3,4,10,24];
+% clus2run = [17,19,22,5];
+% clus2run = [23,25,7];
+% clus2run = [20, 9, 12,26];
+
 
 
 %next - batchSize=200
@@ -55,10 +62,6 @@ clus2run = [24, 5, 13];
 %  clus2run = [25, 10];
 % clus2run  = [3, 23, 4];
 
-%sq - love06 
-clus2run = [18, 8, 21, 6, 12]; 
-clus2run = [16, 7, 14, 15, 9];  
-clus2run = [24, 5, 13, 26, 20];
 
 % clus2run=14;
 
@@ -78,7 +81,7 @@ if fixBatchSize
 %     nBatches = [8000 5000];
 %     nBatches = [1000 5000 2500];
     nBatches = 2500;
-    nBatches = 5000;
+%     nBatches = 5000;
     if strcmp(dat(1:3),'cat')
         nBatches = nBatches.*2;
     end
@@ -132,7 +135,7 @@ warpType = 'sq2rect';
 %%
 saveDat=1; %save simulations
 
-nIter=200; %200 for covering map, 20 for cat
+nIter=1000; %200 for covering map, 20 for cat; 1k for covering map new
 
 if useSameTrls
 %     switch dat
@@ -181,7 +184,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
             if strcmp(dat(1:3),'cat') %save muAll
                 [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll,trials] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls,actOverTime);
             else
-                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll, trials] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls,actOverTime);
+                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls,actOverTime);
             end
             
             timeTaken=toc;
