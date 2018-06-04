@@ -49,6 +49,8 @@ clus2run = [3,4,10];
 % clus2run = [20, 12,26];
 
 % Next: 1000 iters - run 27:30 for circ and sq on love01
+clus2run = 27:30;
+
 % Next: annEps
 
 
