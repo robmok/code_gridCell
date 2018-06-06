@@ -15,7 +15,7 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
-dat = 'square'; 
+% dat = 'square'; 
 % dat = 'trapzKrupic';
 
 % dat = 'catLearn';
@@ -24,7 +24,7 @@ dat = 'square';
 actOverTime = 0; 
 
 %annealed learning rate
-annEps = 1; %1 or 0
+annEps = 0; %1 or 0
 
 jointTrls = 1;
 
@@ -55,8 +55,8 @@ clus2run = 22;
 % clus2run = [23,25,7];
 % clus2run = [20, 12,26];
 
-% 1000 iters - run 27:30 for circ and sq on love01 - check if ran these
-% clus2run = 27:30;
+% 1000 iters - run 27:30 for circ and sq on love01
+clus2run = 27:30;
 
 % Next: annEps / batchsize=200 (will take a bit longer)
 
