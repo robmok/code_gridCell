@@ -120,14 +120,23 @@ batchSizeVals = 400; %100, 125, 200,400, 1000
 % batchSizeVals = 100; %100, 125, 200, 400
 % clus2run = [12, 16, 24, 28]; %batchSize200 missed 20?
 
+% %1000 iters
+nIter=1000;
+actOverTime = 0;
+nSet = 1;
+clus2run = [10, 12:26]; 
+
+% covering_map_batch_dat_29clus_1000ktrls_eps25_batchSiz400_1000iters_circ_wActNorm_jointTrls_stepSiz_noActOverTime_033755
+
+
 
 
 %new - annealed learning rate
-clus2run = [10:26]; 
-epsMuVals=1500; %"starting" learning rate - actually these are just numbers, not actualy starting eps
-nTrials=1000000;
-batchSizeVals = 400;
-annEps=1;
+% clus2run = [10:26]; 
+% epsMuVals=1500; %"starting" learning rate - actually these are just numbers, not actualy starting eps
+% nTrials=1000000;
+% batchSizeVals = 400;
+% annEps=1;
 % covering_map_batch_dat_9clus_1000ktrls_eps1500_batchSiz400_200iters_square_wActNorm_annEps_jointTrls_stepSiz_154025
 
 
@@ -151,28 +160,7 @@ for iClus2run = 1:length(clus2run)
         epsMuOrig=epsMuVals(iEps);
         epsMuOrig1000=epsMuOrig*1000;
         for iBvals = 1:length(batchSizeVals)
-            
-%             %fixed batch
-%             if fixBatchSize
-%                 batchSize = batchSizeVals(iBvals);
-%                 fprintf('Loading nClus=%d, epsMu=%d, batchSize=%d\n',nClus,epsMuOrig1000,batchSize)
-%                 if ~strcmp(dat,'square')
-%                     fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
-%                 else
-%                     fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter)];
-%                 end
-%             else %avgBatch
-%                 avgBatch = batchSizeVals(iBvals);
-%                 fprintf('Loading nClus=%d, epsMu=%d, avgBatchSize=%d\n',nClus,epsMuOrig1000,avgBatch)
-%                 if ~strcmp(dat,'square')
-%                     fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz*_%diters*_%s',nClus,round(nTrials/1000),epsMuOrig1000,avgBatch,nIter,dat)];
-%                 else
-%                     fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz*_%diters*',nClus,round(nTrials/1000),epsMuOrig1000,avgBatch,nIter)];
-%                 end
-%             end
-            
-
-            %tmp - wAct and boxSizex2
+           
             batchSize = batchSizeVals(iBvals);
             fprintf('Loading %s, nClus=%d, epsMu=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000,batchSize)
 %             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_wAct_%s*',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
@@ -183,14 +171,8 @@ for iClus2run = 1:length(clus2run)
 
             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
 
-            
-            
-            
             %tmp - to check if works
 %             fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_25_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
-
-
-
 
             if boxSize>1
                 fname = [fname sprintf('_boxSizex%d',boxSize)];
@@ -198,32 +180,24 @@ for iClus2run = 1:length(clus2run)
             if annEps %epsMu is different here
 %                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps*_batchSiz%d_%diters_%s_wAct_annEps_jointTrls_stepSiz',nClus,round(nTrials/1000),batchSize,nIter,dat)];
                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_annEps_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000/1000,batchSize,nIter,dat)];
-
-%                 covering_map_batch_dat_9clus_1000ktrls_eps1500_batchSiz400_200iters_square_wActNorm_annEps_jointTrls_stepSiz_154025
-
 %                 fname = [fname '_annEps'];
             end            
             
             %problem with loading in trapzK - and maybe others; loading in
             %the test/perm file since it's the same but with another bit..
+
             
+            if ~actOverTime
+               fname = [fname '_noActOverTime']; 
+            end
             
-            
-            
-           
-            
-            
-%             finish with directory and * for date/time
+            %finish with directory and * for date/time
             fname = [saveDir, fname '*'];
                                    
             %edit if want to load more than one file per sim, merge
             f = dir(fname); filesToLoad = cell(1,length(f));
 %             for iF = 1%:length(f)
-            
 
-            %temp -   %problem with loading in trapzK - and maybe others; loading in
-            %the test/perm file since it's the same but with another bit..
-            
             %annEps Krupic works
 %             if length(f)>1
 %                 iF = 2;
@@ -234,7 +208,6 @@ for iClus2run = 1:length(clus2run)
             %no annEps krupic works
             iF=1;
 
-            
             filesToLoad{iF} = f(iF).name;
             load(f(iF).name);
 %             end
