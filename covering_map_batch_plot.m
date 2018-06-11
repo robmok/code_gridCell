@@ -16,7 +16,7 @@ gaussSmooth = 1;
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-dat='square';
+% dat='square';
 % annEps=0;
 boxSize=1;
 nIter=200;
@@ -124,9 +124,10 @@ batchSizeVals = 400; %100, 125, 200,400, 1000
 nIter=1000;
 actOverTime = 0;
 nSet = 1;
-clus2run = [10, 12:26]; 
+clus2run = [3:10, 12:30];  % sq missing 11
+% clus2run = [10, 12:26]; 
 
-% covering_map_batch_dat_29clus_1000ktrls_eps25_batchSiz400_1000iters_circ_wActNorm_jointTrls_stepSiz_noActOverTime_033755
+% clus2run = [3:5 ,7, 9, 10, 12, 15:30];  % circ missing 6,8, 11,13,14 , 15, 16,18, 21
 
 
 
@@ -217,15 +218,17 @@ for iClus2run = 1:length(clus2run)
                     densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
                 end
             end
+            
+            iSet = 1:nSet; %added this and to ga_gAll (and actNorm) - when iSet = 1
             %organise gridness values (allen vs willis method)
-            gA_gAll(:,:,iEps,iBvals,iClus2run,:)   = gA(:,:,1,:);
-            gA_oAll(:,:,iEps,iBvals,iClus2run,:)   = gA(:,:,2,:);
-            gA_radAll(:,:,iEps,iBvals,iClus2run,:) = gA(:,:,3,:);
-            gA_wavAll(:,:,iEps,iBvals,iClus2run,:) = gA(:,:,4,:);
-            gW_gAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,1,:);
-            gW_oAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,2,:);
-            gW_radAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,3,:);
-            gW_wavAll(:,:,iEps,iBvals,iClus2run,:) = gW(:,:,4,:);
+            gA_gAll(iSet,:,:,iEps,iBvals,iClus2run,:)   = gA(iSet,:,1,:);
+            gA_oAll(iSet,:,:,iEps,iBvals,iClus2run,:)   = gA(iSet,:,2,:);
+            gA_radAll(iSet,:,:,iEps,iBvals,iClus2run,:) = gA(iSet,:,3,:);
+            gA_wavAll(iSet,:,:,iEps,iBvals,iClus2run,:) = gA(iSet,:,4,:);
+            gW_gAll(iSet,:,:,iEps,iBvals,iClus2run,:)   = gW(iSet,:,1,:);
+            gW_oAll(iSet,:,:,iEps,iBvals,iClus2run,:)   = gW(iSet,:,2,:);
+            gW_radAll(iSet,:,:,iEps,iBvals,iClus2run,:) = gW(iSet,:,3,:);
+            gW_wavAll(iSet,:,:,iEps,iBvals,iClus2run,:) = gW(iSet,:,4,:);
             
                         
             if exist('rSeed','var')
@@ -249,19 +252,19 @@ for iClus2run = 1:length(clus2run)
 %                 gW_radAll_act(:,:,iEps,iBvals,iClus2run,:) = gW_act(:,:,3,:);
 %                 gW_wavAll_act(:,:,iEps,iBvals,iClus2run,:) = gW_act(:,:,4,:);
 %                 
-                gA_gAll_actNorm(:,:,iEps,iBvals,iClus2run,:)   = gA_actNorm(:,:,1,:);
-                if rHex
+                gA_gAll_actNorm(iSet,:,:,iEps,iBvals,iClus2run,:)   = gA_actNorm(iSet,:,1,:);
+                if rHex % note changes to iSet, for when iSet=1
 %                     gA_gAll_actNorm(:,:,iEps,iBvals,iClus2run,:)   = (gA_actNorm(:,:,6,:)+gA_actNorm(:,:,8,:))./2; %rHex 60/120
-                    gA_gAll_actNorm(:,:,iEps,iBvals,iClus2run,:)   = (gA_actNorm(:,:,5,:)+gA_actNorm(:,:,7,:)+(gA_actNorm(:,:,9,:)))./3; %rHex 30,90,150
+                    gA_gAll_actNorm(iSet,:,:,iEps,iBvals,iClus2run,:)   = (gA_actNorm(iSet,:,5,:)+gA_actNorm(iSet,:,7,:)+(gA_actNorm(iSet,:,9,:)))./3; %rHex 30,90,150
 %                     gA_gAll_actNorm(:,:,iEps,iBvals,iClus2run,:)   = (gA_actNorm(:,:,8,:)); %rHex 
                 end
-                gA_oAll_actNorm(:,:,iEps,iBvals,iClus2run,:)   = gA_actNorm(:,:,2,:);
-                gA_radAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gA_actNorm(:,:,3,:);
-                gA_wavAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gA_actNorm(:,:,4,:);
-                gW_gAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,1,:);
-                gW_oAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,2,:);
-                gW_radAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,3,:);
-                gW_wavAll_actNorm(:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,:,4,:);
+                gA_oAll_actNorm(iSet,:,:,iEps,iBvals,iClus2run,:)   = gA_actNorm(iSet,:,2,:);
+                gA_radAll_actNorm(iSet,:,:,iEps,iBvals,iClus2run,:) = gA_actNorm(iSet,:,3,:);
+                gA_wavAll_actNorm(iSet,:,:,iEps,iBvals,iClus2run,:) = gA_actNorm(iSet,:,4,:);
+                gW_gAll_actNorm(iSet,:,:,iEps,iBvals,iClus2run,:)   = gW_actNorm(iSet,:,1,:);
+                gW_oAll_actNorm(iSet,:,:,iEps,iBvals,iClus2run,:)   = gW_actNorm(iSet,:,2,:);
+                gW_radAll_actNorm(iSet,:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(iSet,:,3,:);
+                gW_wavAll_actNorm(iSet,:,:,iEps,iBvals,iClus2run,:) = gW_actNorm(iSet,:,4,:);
 
             end            
         end
@@ -339,7 +342,7 @@ iEps=1;
 %plot univar scatters - over clusters (e.g. one batch size)
 if size(gridness,4)==1 %only 1 batchSize
     figure; hold on;
-    dat1     = squeeze(datTmp(iSet,:,iEps,:,:,1));
+    dat1     = squeeze(datTmp(iSet,:,:,iEps,:,:,1));
     barpos  = .25:.5:.5*size(dat1,2);
     colors  = distinguishable_colors(size(dat1,2));
     colgrey = [.5, .5, .5];
@@ -357,7 +360,7 @@ if size(gridness,4)==1 %only 1 batchSize
     
     if strcmp(dat(1:4),'trap')
         figure; hold on;
-        dat1    = squeeze(datTmp(iSet,:,:,:,:,2));
+        dat1    = squeeze(datTmp(iSet,:,:,:,:,:,2));
         mu      = nanmean(dat1,1);
         sm      = nanstd(dat1)./sqrt(size(dat1,1));
         ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
@@ -369,7 +372,7 @@ if size(gridness,4)==1 %only 1 batchSize
         title(sprintf('Left half of box %s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
         
         figure; hold on;
-        dat1    = squeeze(datTmp(iSet,:,:,:,:,3));
+        dat1    = squeeze(datTmp(iSet,:,:,:,:,:,3));
         mu      = nanmean(dat1,1);
         sm      = nanstd(dat1)./sqrt(size(dat1,1));
         ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
@@ -381,7 +384,7 @@ if size(gridness,4)==1 %only 1 batchSize
         title(sprintf('Right half of box %s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
         
         figure; hold on;
-        dat1    = squeeze(datTmp(iSet,:,:,:,:,2))-squeeze(datTmp(iSet,:,:,:,:,3));
+        dat1    = squeeze(datTmp(iSet,:,:,:,:,:,2))-squeeze(datTmp(iSet,:,:,:,:,:,3));
         mu      = nanmean(dat1,1);
         sm      = nanstd(dat1)./sqrt(size(dat1,1));
         ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
@@ -423,7 +426,7 @@ for iClus2Run = 1:length(clus2run)
     subplot(ceil(length(clus2run)/2),2,iClus2Run);
     for iEps = 1:length(epsMuVals)
         %     subplot(2,3,iEps);
-        dat1     = squeeze(datTmp(iSet,:,iEps,:,iClus2Run,1));
+        dat1     = squeeze(datTmp(iSet,:,:,iEps,:,iClus2Run,1));
         barpos  = .25:.5:.5*size(dat1,2);
         colors  = distinguishable_colors(size(dat1,2));
         colgrey = [.5, .5, .5];
@@ -444,7 +447,7 @@ for iClus2Run = 1:length(clus2run)
     % figure; hold on;
     % for iBvals = 1:length(batchSizeVals)
     %     subplot(2,3,iBvals);
-    %     dat1     = squeeze(datTmp(iSet,:,:,iBvals));
+    %     dat1     = squeeze(datTmp(iSet,:,:,:,iBvals));
     %     barpos  = .25:.5:.5*size(dat1,2);
     %     colors  = distinguishable_colors(size(dat1,2));
     %     colgrey = [.5, .5, .5];
@@ -744,7 +747,7 @@ fontSiz=15;
 figure; hold on;
     for iEps = 1:length(epsMuVals)
         %     subplot(2,3,iEps);
-        dat1     = squeeze(datTmp(iSet,:,iEps,iBatchVals,clus2plot,1));
+        dat1     = squeeze(datTmp(iSet,:,:,iEps,iBatchVals,clus2plot,1));
         barpos  = .25:.5:.5*size(dat1,2);
         colors  = distinguishable_colors(size(dat1,2));
         colgrey = [.6, .6, .6];
@@ -794,7 +797,7 @@ fontSiz=15;
 figure; hold on;
     for iEps = 1:length(epsMuVals)
         %     subplot(2,3,iEps);
-        dat1     = squeeze(datTmp(iSet,:,iEps,iBatchVals,clus2plot,1));
+        dat1     = squeeze(datTmp(iSet,:,:,iEps,iBatchVals,clus2plot,1));
         barpos  = .25:.5:.5*size(dat1,2);
         colors  = distinguishable_colors(size(dat1,2));
         colgrey = [.5, .5, .5];
@@ -992,7 +995,7 @@ end
 % 
 % if strcmp(dat(1:4),'trap')
 %     figure; hold on;
-%     dat1    = squeeze(datTmp(iSet,:,:,:,:,2));
+%     dat1    = squeeze(datTmp(iSet,:,:,:,:,:,2));
 %     mu      = nanmean(dat1,1);
 %     sm      = nanstd(dat1)./sqrt(size(dat1,1));
 %     ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
@@ -1004,7 +1007,7 @@ end
 %     title(sprintf('Left half of box %s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
 %     
 %     figure; hold on;
-%     dat1    = squeeze(datTmp(iSet,:,:,:,:,3));
+%     dat1    = squeeze(datTmp(iSet,:,:,:,:,:,3));
 %     mu      = nanmean(dat1,1);
 %     sm      = nanstd(dat1)./sqrt(size(dat1,1));
 %     ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
@@ -1016,7 +1019,7 @@ end
 %     title(sprintf('Right half of box %s - eps=%d',gridMeasure,epsMuVals(iEps)*1000))
 %     
 %     figure; hold on;
-%     dat1    = squeeze(datTmp(iSet,:,:,:,:,2))-squeeze(datTmp(iSet,:,:,:,:,3));
+%     dat1    = squeeze(datTmp(iSet,:,:,:,:,:,2))-squeeze(datTmp(iSet,:,:,:,:,:,3));
 %     mu      = nanmean(dat1,1);
 %     sm      = nanstd(dat1)./sqrt(size(dat1,1));
 %     ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
