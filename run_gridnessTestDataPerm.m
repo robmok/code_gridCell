@@ -27,21 +27,17 @@ saveDat=1;
 % clus2run = [3:30]; 
 % clus2run=[3:10 12:2:26 11:2:25, 27:30]; % 27:30
 
-% sq; annEps love01
-clus2run=[4, 22, 16]; 
-% clus2run=[8, 12, 24];
-% clus2run=[25, 10, 7];
-% clus2run=[20, 14, 6];
-% clus2run=[5,  15, 26];
-% clus2run=[9, 19, 11];
-% clus2run=[3, 13, 18];
-% clus2run=[17, 23, 21];
-
-
 % love06
 % clus2run=[3,6, 12,14,21,11,18]; %one at a time here
 % clus2run=[4, 22, 16, 8, 24, 25, 10, 7, 20, 5, 15, 26]; 
 % clus2run=[9, 13, 17, 19, 23];
+
+
+% 1k trials, sq, no perm - RUNNING
+clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 30, 29,  5, 25, 10,  7, 19]; %sq done
+clus2run = [10,  7, 19, 28, 17, 11, 21, 12,  3]; %sq running
+
+% clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 30, 29,  5, 25, 10,  7, 19, 10,  7, 19, 28, 17, 11, 21, 12,  3]; % circ running
 
 
 % batchsiz=200 - no perm
@@ -58,8 +54,11 @@ batchSizeVals=400;
 % batchSizeVals=200;
 % batchSizeVals=100;
 
-annEps=1;
+annEps=0;
 jointTrls=1; %for test trials
+
+
+nIter=1000;
 
 
 %EDIT = if trapKfrmSq1...
@@ -79,13 +78,13 @@ else
 end
 
 %tmp - for getting sq density plots
-% doPerm=1;
+doPerm=0;
 
 % run perm tests on how many iters? takes a bit of time (a couple mins) per
 % iter, so with 200 iters plus many conditions, maybe too much (if all the
 % perm data are about the same, then just take max, or 95th percentile as
 % the threshold value)
-nIters2run = 200; 
+nIters2run = nIter; %200
 nPerm = 500;
 
 % %testing

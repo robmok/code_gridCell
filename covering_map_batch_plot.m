@@ -1169,6 +1169,134 @@ for iTrl = 500
     end
 end
 
-    
- 
+%% Inspect properties of only 'grid' cells (> some threshold)
+
+savePlots=0;
+
+clusPosAct = 'clus'; %'clus' or 'actNorm'
+
+gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
+
+gridMeasure = 'grid';
+
+switch clusPosAct
+case 'clus'
+    switch gridMsrType
+        case 'a'
+            gridness    = gA_gAll;
+            orientation = gA_oAll;
+            rad         = gA_radAll;
+            wav         = gA_wavAll;
+        case 'w'
+            gridness    = gW_gAll;
+            orientation = gW_oAll;
+            rad         = gW_radAll;
+            wav         = gW_wavAll;
+    end
+    case 'act'
+        switch gridMsrType
+            case 'a'
+                gridness    = gA_gAll_act;
+                orientation = gA_oAll_act;
+                rad         = gA_radAll_act;
+                wav         = gA_wavAll_act;
+            case 'w'
+                gridness    = gW_gAll_act;
+                orientation = gW_oAll_act;
+                rad         = gW_radAll_act;
+                wav         = gW_wavAll_act;
+        end
+    case 'actNorm'
+        switch gridMsrType
+            case 'a'
+                gridness    = gA_gAll_actNorm;
+                orientation = gA_oAll_actNorm;
+                rad         = gA_radAll_actNorm;
+                wav         = gA_wavAll_actNorm;
+            case 'w'
+                gridness    = gW_gAll_actNorm;
+                orientation = gW_oAll_actNorm;
+                rad         = gW_radAll_actNorm;
+                wav         = gW_wavAll_actNorm;
+        end
+end
+
+switch gridMeasure
+    case 'grid'
+        datTmp=gridness;
+    case 'angle'
+        datTmp=orientation;
+    case 'rad'
+        datTmp=rad;
+    case 'wav'
+        datTmp=wav;
+end
+
+
+iSet=1; %size(datTmp,1); %last or second last (add -1)
+iEps=1;
+
+% clus2plot=(3:26)-2;
+% clus2plot=(6:26)-2;
+clus2plot = 1:length(clus2run);
+
+iBatchVals=1;
+
+% %fig specs
+% xTickLabs = num2cell(clus2run(clus2plot));
+% fontSiz=15;
+% 
+% figure; hold on;
+%     for iEps = 1:length(epsMuVals)
+%         %     subplot(2,3,iEps);
+%         dat1     = squeeze(datTmp(iSet,:,:,iEps,iBatchVals,clus2plot,1));
+%         barpos  = .25:.5:.5*size(dat1,2);
+%         colors  = distinguishable_colors(size(dat1,2));
+%         colgrey = [.6, .6, .6];
+%         mu      = mean(dat1,1);
+%         sm      = std(dat1)./sqrt(size(dat1,1));
+%         ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+%         plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
+% %         errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+% %         scatter(barpos,mu,50,colors,'filled','d');
+%         scatter(barpos,mu,50,colgrey,'filled','d');
+%         xticklabels(xTickLabs);
+%         xlim([barpos(1)-.5, barpos(end)+.5]);
+%         %         ylim([0,1]);
+%         if strcmp(gridMsrType,'a')
+%             ylim([-.45,1.4]);
+%         elseif strcmp(gridMsrType,'w')
+%             ylim([-1.25,1.4]);
+%         end
+%         xlabel('Number of Clusters');
+%         ylabel('Grid Score');        
+% %         title(sprintf('%s, %s - eps=%d, batchSize=%d',dat, gridMeasure,epsMuVals(iEps)*1000,batchSizeVals(iBatchVals)))
+%         if strcmp(dat(1:2),'ci')
+%         title('Circular box')
+%         elseif strcmp(dat(1:2),'sq')
+%         title('Square box')
+%         end        
+%         set(gca,'FontSize',fontSiz,'fontname','Arial')
+%     end
+
+
+
+gridInd=dat1>0.35;
+
+
+gScore=squeeze(gridness);
+oScore=squeeze(orientation);
+rScore=squeeze(rad);
+wScore=squeeze(wav);
+
+
+figure; hold on;
+for iClus = 1:length(clus2run)
+    subplot(6,5,iClus);
+    hist(oScore(gridInd(:,iClus),iClus),15);
+%     hist(rScore(gridInd(:,iClus),iClus),15);
+end
+
+
+
     
