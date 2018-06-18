@@ -24,7 +24,7 @@ dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning
 actOverTime = 0; 
 
 %annealed learning rate
-annEps = 1; %1 or 0
+annEps = 0; %1 or 0
 
 jointTrls = 1;
 
@@ -37,49 +37,14 @@ sigmaG = [3 0; 0 3];
 catsInfo.R=chol(sigmaG);
 
 
-%1k sims, batsiz=400
+%1k sims, batsiz=200
 
-%circ - love01
-% clus2run = [3,4];
-% clus2run = [17,19];
-% clus2run = [23,25,7];
-% clus2run = [20, 12,26];
-% 1000 iters - run 27:30 for circ and sq on love01
-% clus2run = 27:30;
-
-%MISSED
-% clus 11 -  sq on love01, running on screen c1
-% clus2run = 11;
-
-%circ, no annEps, missing 6,8, 11,13,14 , 15, 16,18, 21
-%love06
-% clus2run = [6,8,11,13,14,21];
-%love01 - screen c2
-% clus2run=[15,16,18];
-
-% annEps; circ - running
-%love06
-% clus2run = [8, 21, 6, 24,7]; %done - 18
-% clus2run = [13, 14, 15,5,9];  %done -16
-%in one go
-clus2run = [8, 21, 6, 24,7,13, 14, 15,5,9]; %finalizing this - 9 finishing on love06
-
-%love01 - circ and sq
-clus2run = [12, 22, 30];  % running this now
-% clus2run = [28, 29];  % running this now
-
-
-%love01 - circ - done
-% clus2run = [3,26,4];
-% clus2run = [20,23,10];
-% clus2run = [23,19, 11];
-% clus2run = [17, 25, 27];
-
-
-%then - sq/circ
-% clus2run = 28:30;
-
-%next - batchSize=200
+%circ - love01 - no annEps, and annEps
+clus2run = [14, 15, 23,  6, 20, 24, 18];
+% clus2run = [16, 13, 22, 27, 26,  9, 28]; 
+% clus2run = [5,  25, 7,  10, 19,  29, 8]; 
+% clus2run = [11, 21, 12,  30, 3,  4, 17]; 
+%next - sq
 
 % clus2run=14;
 
