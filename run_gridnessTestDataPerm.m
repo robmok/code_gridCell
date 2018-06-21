@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -15,6 +15,7 @@ locRange = [0 49];
 nTrialsTest = 100000; % orig nTrials/10
 dat = 'circ';
 % dat = 'square';
+
 % dat = 'trapzKrupic';
 
 % dat = 'trapzKfrmSq1'; % load covering map on sq, then run it on trapz; then assess gridness in trapz
@@ -27,21 +28,25 @@ saveDat=1;
 % clus2run = [3:30]; 
 % clus2run=[3:10 12:2:26 11:2:25, 27:30]; % 27:30
 
-% love06
-% clus2run=[3,6, 12,14,21,11,18]; %one at a time here
-% clus2run=[4, 22, 16, 8, 24, 25, 10, 7, 20, 5, 15, 26]; 
-% clus2run=[9, 13, 17, 19, 23];
 
-
-% 1k trials, sq/circ annEps, no perm - RUNNING
-clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 29,  5, 25, 7, 10, 19, 28, 17, 11, 21, 12,  30, 3]; % circ/sq running
-
+% 1k trials, sq/circ annEps, no perm - % done 14, 15, 23,  6, 20, 24. all done
+% clus2run = [18,  8, 16,  4, 22, 27, 26,  9, 13, 29,  5, 25, 7, 10, 19, 28, 17, 11, 21, 12,  30, 3]; % circ/sq running % done
 % clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 30, 29,  5, 25, 10,  7, 19]; 
 % clus2run = [10,  7, 19, 28, 17, 11, 21, 12,  3]; 
+% clus2run=11;
 
-% batchsiz=200 - no perm
-% clus2run = [3:26]; %c
-% clus2run = fliplr(3:26);%s
+
+% new fixed perm - 200iters
+%no annEps, circ and sq - no 27:30 (need to run the standard covmaps first.. can do this?)
+clus2run = [14, 15, 23,  6, 20];
+clus2run = [16, 8, 22, 26,  9]; 
+clus2run = [5,  13, 7,  10, 19]; 
+clus2run = [11, 21, 12, 3,  4]; 
+clus2run = [18, 24, 25, 17];
+
+%next annEps
+
+
 
 % clus2run = 18;
 
@@ -53,11 +58,11 @@ batchSizeVals=400;
 % batchSizeVals=200;
 % batchSizeVals=100;
 
-annEps=1;
+annEps=0;
 jointTrls=1; %for test trials
 
 
-nIter=1000;
+% nIter=1000;
 
 
 %EDIT = if trapKfrmSq1...

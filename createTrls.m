@@ -150,12 +150,12 @@ elseif ~useSameTrls && jointTrls  %joined trials
                 if trials(i-1,2)+moveDir(2) > median(locRangeY(1):locRangeY(2))
                     moveDir(2) = randsample(selStepSiz(1:end-4),1);
                 end
-                if trials(i-1,1)+moveDir(1) == median(locRangeX(1):locRangeX(2)) %if middle, move a little or stay
-                    moveDir(1) = randsample([-1,0,1],1);
-                end
-                if trials(i-1,2)+moveDir(2) == median(locRangeY(1):locRangeY(2)) %if middle, move a little or stay
-                    moveDir(2) = randsample([-1,0,1],1);
-                end
+%                 if trials(i-1,1)+moveDir(1) == median(locRangeX(1):locRangeX(2)) %if middle, move a little or stay
+%                     moveDir(1) = randsample([-1,0,1],1);
+%                 end
+%                 if trials(i-1,2)+moveDir(2) == median(locRangeY(1):locRangeY(2)) %if middle, move a little or stay
+%                     moveDir(2) = randsample([-1,0,1],1);
+%                 end
             end
             trials(i,:)=trials(i-1,:)+moveDir;% add 1 or -1
         end
@@ -169,9 +169,9 @@ elseif ~useSameTrls && jointTrls  %joined trials
         %double the width
         if strcmp(dat(1:6),'trapzK')
             selStepSizLR = [-stepSize,-stepSize,0,0,0,stepSize,stepSize]; %stepSizLR - combined with stepSiz
-        elseif strcmp(dat(1:6),'trapzS') %for now, trapzScaled1
-            %trapzScaled1 - larger LR dim
-            selStepSizLR = [-stepSize*2,-stepSize,-stepSize,0,0,0,stepSize,stepSize*2]; %stepSizLR - combined with stepSiz
+%         elseif strcmp(dat(1:6),'trapzS') %for now, trapzScaled1
+%             %trapzScaled1 - larger LR dim
+%             selStepSizLR = [-stepSize*2,-stepSize,-stepSize,0,0,0,stepSize,stepSize*2]; %stepSizLR - combined with stepSiz
         end
         
         locRangeX = [min(trapX), max(trapX)];

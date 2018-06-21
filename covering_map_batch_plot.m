@@ -16,7 +16,7 @@ gaussSmooth = 1;
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-% dat='square';
+dat='square';
 % annEps=0;
 boxSize=1;
 nIter=200;
@@ -124,7 +124,7 @@ batchSizeVals = 400; %100, 125, 200,400, 1000
 nIter=1000;
 actOverTime = 0;
 nSet = 1;
-clus2run = [3:10, 12:30];  % sq missing 11
+clus2run = 3:30;  % sq missing 11
 % clus2run = [10, 12:26]; 
 
 % clus2run = [3:5 ,7, 9, 10, 12, 15:30];  % circ missing 6,8, 11,13,14 , 15, 16,18, 21
@@ -669,9 +669,9 @@ end
 %% Making figs - univar scatters 1 - training set
 
 
-savePlots=0;
+savePlots=1;
 
-clusPosAct = 'clus'; %'clus' or 'actNorm'
+clusPosAct = 'actNorm'; %'clus' or 'actNorm'
 
 gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
 
@@ -735,7 +735,7 @@ iSet=size(datTmp,1); %last or second last (add -1)
 iEps=1;
 
 % clus2plot=(3:26)-2;
-clus2plot=(6:26)-2;
+% clus2plot=(6:26)-2;
 clus2plot = 1:length(clus2run);
 
 iBatchVals=1; %'medium' one
@@ -777,7 +777,7 @@ figure; hold on;
         set(gca,'FontSize',fontSiz,'fontname','Arial')
     end
 
-    fname = [figsDir sprintf('/gridness_%s_univarScatters_trainSetEnd_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
+    fname = [figsDir sprintf('/gridness_%s_univarScatters_trainSetEnd_nClus%d-%d_eps%d_nIter%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,nIter,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
 if savePlots
    set(gcf,'Renderer','painters');
    print(gcf,'-depsc2',fname)
@@ -823,7 +823,7 @@ figure; hold on;
         set(gca,'FontSize',fontSiz,'fontname','Arial')
     end
 
-    fname = [figsDir sprintf('/gridness_%s_univarScatters_nClus%d-%d_eps%d_batchSiz%d_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
+    fname = [figsDir sprintf('/gridness_%s_univarScatters_nClus%d-%d_eps%d_nIter%d_batchSiz%d_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,nIter,batchSizeVals(iBatchVals),gridMsrType)];
 if savePlots
    set(gcf,'Renderer','painters');
    print(gcf,'-depsc2',fname)
@@ -919,7 +919,7 @@ end
 
 %% Making figs: density plot examples
 
-savePlots = 0;
+savePlots = 1;
 
 doPlot=0; %do plot when computing gridness
 
@@ -931,9 +931,10 @@ gridMsrType = 'a';
 
 
 clus2plot = [5,8,13,18];%[7,10,12,25]
+clus2plot = ([7,9,10,11,12,18,20,23,25,28])-2;
 
 iSet=1;
-iSet=10;
+% iSet=10;
 % iSet=size(densityPlotActNormAll,3);
 
 
@@ -984,13 +985,6 @@ for iBvals = 1:length(batchSizeVals)
     end
 end
 end
-
-
-
-
-
-
-
 %%
 % 
 % if strcmp(dat(1:4),'trap')

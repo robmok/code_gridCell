@@ -14,11 +14,12 @@ figsDir = [wd '/grid_figs'];
 
 % load
 nSet        = 22;
+gaussSmooth = .8; 
 gaussSmooth = 1; 
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-% dat='square';
+dat='square';
 % annEps=0;
 boxSize=1;
 
@@ -33,6 +34,8 @@ nTrials=1000000;
 annEps=0;
 nIter=200;
 
+nIter=1000;
+
 % clus2run = [3:16, 18, 20:26];  %missed 17, 19?
 
 
@@ -46,8 +49,9 @@ nIter=200;
 % dat='trapzKfrmSq2';
 % nTrials=1000000;
 
-
 clus2run = [3:26]; 
+clus2run = [3:30]; 
+% clus2run = 20:23; 
 
 % clus2run=6:26;
 % % clus2run=26;
@@ -138,8 +142,10 @@ for iClus2run = 1:length(clus2run)
             
             
             for iterI = 1:nIter
-                densityPlotActAll(:,:,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlotAct(:,:,iterI),gaussSmooth);
-                densityPlotActNormAll(:,:,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlotActNorm(:,:,iterI),gaussSmooth);
+%                 densityPlotActAll(:,:,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlotAct(:,:,iterI),gaussSmooth);
+%                 densityPlotActNormAll(:,:,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlotActNorm(:,:,iterI),gaussSmooth);
+                densityPlotActAll(:,:,iterI,iEps,iBvals,iClus2run) = densityPlotAct(:,:,iterI);
+                densityPlotActNormAll(:,:,iterI,iEps,iBvals,iClus2run) = densityPlotActNorm(:,:,iterI);
             end
             
             if doPerm
@@ -226,6 +232,9 @@ clus2plot=(6:26)-2;
 clus2plot=(10:26)-2;
 % clus2plot=([6:24])-2;
 
+clus2plot=(3:30)-2;
+
+
 % clus2plot=1:length(clus2run);
 
 %trapz
@@ -255,7 +264,7 @@ figure; hold on;
         xlim([barpos(1)-.5, barpos(end)+.5]);
         %         ylim([0,1]);
         if strcmp(gridMsrType,'a')
-            ylim([-.45,1.4]);
+%             ylim([-.45,1.4]);
         elseif strcmp(gridMsrType,'w')
             ylim([-1.25,1.4]);
         end
@@ -282,20 +291,20 @@ if savePlots
 end
 
 
-% %prop grid cells, averaged across clusters
-if ~strcmp(dat(1:4),'trap')
-%     maxThresh=squeeze(max(max(gA_actNorm_permPrc(:,1,1,8:end))));
-    maxThresh=squeeze(max(max(gA_actNorm_permPrc(:,1,1,:))));
-%     maxThresh=squeeze(max(max(gW_actNorm_permPrc(:,1,1,8:end))));
-%     maxThresh=squeeze(max(max(gW_actNorm_permPrc(:,1,1,:))));
-%     maxThresh=0.4;
-    propGrid=nan(1,size(dat1,2));
-for i=1:size(dat1,2) %length(clus2run)
-propGrid(i)=nnz(dat1(:,i)>maxThresh)/200;
-end
-mean(propGrid)
-std(propGrid)/sqrt(length(propGrid))
-end
+% % %prop grid cells, averaged across clusters
+% if ~strcmp(dat(1:4),'trap')
+% %     maxThresh=squeeze(max(max(gA_actNorm_permPrc(:,1,1,8:end))));
+%     maxThresh=squeeze(max(max(gA_actNorm_permPrc(:,1,1,:))));
+% %     maxThresh=squeeze(max(max(gW_actNorm_permPrc(:,1,1,8:end))));
+% %     maxThresh=squeeze(max(max(gW_actNorm_permPrc(:,1,1,:))));
+% %     maxThresh=0.4;
+%     propGrid=nan(1,size(dat1,2));
+% for i=1:size(dat1,2) %length(clus2run)
+% propGrid(i)=nnz(dat1(:,i)>maxThresh)/200;
+% end
+% mean(propGrid)
+% std(propGrid)/sqrt(length(propGrid))
+% end
 
 
 if strcmp(dat(1:4),'trap')
@@ -435,12 +444,14 @@ clus2plot = [7,10,12,25]-2;%[5,8,13,18];
 clus2plot = [10,12,18,25]-2;
 % clus2plot = [7,10,12,18,25]-2;
 
-% clus2plot = 25-2;
+clus2plot = ([7,9,10,11,12,18,20,23,25,28])-2;
+
+% clus2plot = (3:5)-2;
 
 
 for iClus = clus2plot%:length(clus2run)
 for iBvals = 1:length(batchSizeVals)
-    for iterI = 1:5%nIter
+    for iterI = 1:10%nIter
         switch clusPosAct
             case 'act'
                 densityPlotCentresSm = densityPlotActAll(:,:,iterI,iEps,iBvals,iClus);
@@ -457,7 +468,7 @@ for iBvals = 1:length(batchSizeVals)
                 if strcmp(dat(1:2),'ci') || strcmp(dat(1:2),'tr') 
                 zlims=[0,.08];
                 elseif strcmp(dat(1:2),'sq')
-                zlims=[0,.06];
+                zlims=[0,.08];
                 end
         end
 
@@ -485,7 +496,7 @@ for iBvals = 1:length(batchSizeVals)
         title(sprintf('Grid Score %.2f',g));
         set(gca,'FontSize',fontSiz,'fontname','Arial')
         xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
-        fname = [figsDir sprintf('/densityPlot_testSet_%s_nClus%d_eps%d_batchSiz%d_%s_%s_iter%d__autoCorr',dat,iClus+2,epsMuVals(iEps)*1000,batchSizeVals(iBvals),clusPosAct,gridMsrType,iterI)];
+        fname = [figsDir sprintf('/densityPlot_testSet_%s_nClus%d_eps%d_batchSiz%d_%s_%s_iter%d_autoCorr',dat,iClus+2,epsMuVals(iEps)*1000,batchSizeVals(iBvals),clusPosAct,gridMsrType,iterI)];
         if savePlots
             set(gcf,'Renderer','painters');
             print(gcf,'-depsc2',fname)

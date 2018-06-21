@@ -37,14 +37,21 @@ sigmaG = [3 0; 0 3];
 catsInfo.R=chol(sigmaG);
 
 
-%1k sims, batsiz=200
 
-%circ - love01 - no annEps, and annEps
-clus2run = [14, 15, 23,  6, 20, 24, 18];
-% clus2run = [16, 13, 22, 27, 26,  9, 28]; 
-% clus2run = [5,  25, 7,  10, 19,  29, 8]; 
-% clus2run = [11, 21, 12,  30, 3,  4, 17]; 
+
+%%%%%
+%STILL TO RUN
+%%%%%
+%1k sims, batsiz=200 - STOPPED - run this when perms done
+%circ - love01 - no annEps, and annEps - was running 8 matlabs
+clus2run = [6, 20, 24, 18]; %14, 15, 23; - waiting 23 noAnnEps (screen c2)
+% clus2run = [ 27, 26,  9, 28]; %done 16, 13, 22,
+% clus2run = [ 10, 19,  29, 8]; %done 5,  25, 7,
+% clus2run = [ 30, 3,  4, 17]; %done - 11, 21, 12; waiting 12 noAnnEps (screen c5)
 %next - sq
+
+
+
 
 % clus2run=14;
 
@@ -64,7 +71,7 @@ if fixBatchSize
 %     nBatches = [8000 5000];
 %     nBatches = [1000 5000 2500];
     nBatches = 2500;
-%     nBatches = 5000;
+    nBatches = 5000;
     if strcmp(dat(1:3),'cat')
         nBatches = nBatches.*2;
     end

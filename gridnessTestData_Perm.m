@@ -1,6 +1,5 @@
 function [permPrc_gA_act, permPrc_gW_act,permPrc_gA_actNorm, permPrc_gW_actNorm, gA_act,gA_actNorm,gW_act,gW_actNorm,gA_actNormPerm, gW_actNormPerm, densityPlotAct,densityPlotActNorm, rSeedTest] = gridnessTestData_Perm(densityPlot,dat,locRange,nClus,nTrialsTest,nPerm,nIters2run,doPerm)
 
-
 %input - 
 % densityPlot(unsmoothed)
 % dat - shape
@@ -193,18 +192,25 @@ for iterI=1:nIters2run
 
         
         %permutation testing
+        minTime = 20; % shuffle setting - each activation at least 20 time points away from orig
+        
         if doPerm
             for iPerm = 1:nPerm
                 %             fprintf('Perm %d\n',iPerm);
-                %             randInd=randperm(nTrialsTest); % randomise each point
-                %20s perm - better way to code this?
-                randInd20 = randperm(nTrialsTest/20); %atm has to be divisible by 20
-                randInd = [];
-                for i=1:length(randInd20)
-                    randInd = [randInd randInd20(i):randInd20(i)+20];
+                tic
+                randVec = zeros(1,nTrialsTest);
+                cnter=0;
+                for iTrl = 1:nTrialsTest %takes <20s
+                    randInd = randsample(nTrialsTest,1);
+                    while (abs(randInd-iTrl)<minTime)
+                        randInd = randsample(nTrialsTest,1);
+                        cnter=cnter+1;
+                    end
+                    randVec(iTrl) = randInd;
                 end
+                toc
                 
-                actAllPerm = actTrl(:,randInd);
+                actAllPerm = actTrl(:,randVec);
                 
                 densityPlotActPerm       = zeros(b,h);
                 densityPlotActUpdPerm    = zeros(b,h);
