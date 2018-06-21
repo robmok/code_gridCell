@@ -104,14 +104,35 @@ for iClus2run = 1:length(clus2run)
                 end
             end
                         
-%             if boxSize>1
-%                 fname = [fname sprintf('_boxSizex%d',boxSize)];
+%%% 
+%edit ABOVE
+%%%
+%             %note, annEps slightly different file name
+%             if ~annEps
+%                 if ~(length(dat)==12)
+%                     fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat);
+%                 else %trapzKfrmSq1 or 2 - i think only 1 now
+%                     if strcmp(dat(12),'1')
+%                         fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_%d_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,epsMuTrapz10);
+%                     elseif strcmp(dat(12),'2')
+%                         fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,'square');
+%                     end
+%                 end
+%             else
+%                 if ~(length(dat)==12)
+%                     fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_annEps_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat);
+%                 else %trapzKfrmSq1 
+%                     fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_%d_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,epsMuTrapz10);
+% 
+%                 end
 %             end
-%             if annEps %epsMu is different here
-%                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps*_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_annEps',nClus,round(nTrials/1000),batchSize,nIter,dat)];
-%             end            
-%             finish with directory and * for date/time
+            
 
+
+
+
+
+%             finish with directory and * for date/time
             fname = [saveDir, fname '*'];
             
             %edit if want to load more than one file per sim, merge

@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -14,7 +14,7 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; % orig nTrials/10
 dat = 'circ';
-% dat = 'square';
+dat = 'square';
 
 % dat = 'trapzKrupic';
 
@@ -29,20 +29,22 @@ saveDat=1;
 % clus2run=[3:10 12:2:26 11:2:25, 27:30]; % 27:30
 
 
-% 1k trials, sq/circ annEps, no perm - % done 14, 15, 23,  6, 20, 24. all done
-% clus2run = [18,  8, 16,  4, 22, 27, 26,  9, 13, 29,  5, 25, 7, 10, 19, 28, 17, 11, 21, 12,  30, 3]; % circ/sq running % done
-% clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 30, 29,  5, 25, 10,  7, 19]; 
-% clus2run = [10,  7, 19, 28, 17, 11, 21, 12,  3]; 
-% clus2run=11;
+% 1k trials, sq/circ annEps, no perm - % rerun
+% clus2run = [18,  8, 16,  4, 22, 27, 26,  9, 13, 29,  5, 25, 7, 10, 19, 28, 17, 11, 21, 12,  30, 3]; % 
+clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 30, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3]; %all
 
 
+
+
+%%%%%%%
 % new fixed perm - 200iters
+%running on love01, 10 matlabs
 %no annEps, circ and sq - no 27:30 (need to run the standard covmaps first.. can do this?)
-clus2run = [14, 15, 23,  6, 20];
-clus2run = [16, 8, 22, 26,  9]; 
-clus2run = [5,  13, 7,  10, 19]; 
-clus2run = [11, 21, 12, 3,  4]; 
-clus2run = [18, 24, 25, 17];
+% clus2run = [14, 15, 23,  6, 20];
+% clus2run = [16, 8, 22, 26,  9]; 
+% clus2run = [5,  13, 7,  10, 19]; 
+% clus2run = [11, 21, 12, 3,  4]; 
+% clus2run = [18, 24, 25, 17];
 
 %next annEps
 
@@ -58,7 +60,10 @@ batchSizeVals=400;
 % batchSizeVals=200;
 % batchSizeVals=100;
 
-annEps=0;
+annEps=1;
+if annEps
+   epsMuVals=1.5; %below multiplies this by 1k 
+end
 jointTrls=1; %for test trials
 
 
@@ -109,22 +114,30 @@ for iClus2run = 1:length(clus2run)
                 fprintf('Computing test trials gridness on %s, nClus=%d, epsMu=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000,batchSize)
             end
             
-            %load
-%             fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat);
-            %new
-            if ~(length(dat)==12) 
-                fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat);
-            else %trapzKfrmSq1 or 2
-                if strcmp(dat(12),'1')
+            %note, annEps slightly different file name
+            if ~annEps
+                if ~(length(dat)==12)
+                    fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat);
+                else %trapzKfrmSq1 or 2 - i think only 1 now
+                    if strcmp(dat(12),'1')
+                        fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_%d_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,epsMuTrapz10);
+                    elseif strcmp(dat(12),'2')
+                        fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,'square');
+                    end
+                end
+            else
+                if ~(length(dat)==12)
+                    fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_annEps_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat);
+                else %trapzKfrmSq1 
                     fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_%d_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,epsMuTrapz10);
-                elseif strcmp(dat(12),'2')
-                    fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,'square');
+
                 end
             end
-                       
-%             if annEps %epsMu is different here
-%                 fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps*_batchSiz%d_%diters_%s_wAct_annEps_jointTrls_stepSiz',nClus,round(nTrials/1000),batchSize,nIter,dat);
-%             end
+            
+
+%covering_map_batch_dat_14clus_1000ktrls_eps25_batchSiz400_1000iters_circ_wActNorm_jointTrls_stepSiz*'
+% covering_map_batch_dat_9clus_1000ktrls_eps1500_batchSiz400_1000iters_circ_wActNorm_annEps_jointTrls_stepSiz_noActOverTime_185914.mat
+
 
             %finish with directory and * for date/time
             fname = [saveDir, fname '*']; %finish with directory and * for date/time

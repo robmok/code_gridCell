@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -15,13 +15,13 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
-% dat = 'square'; 
+dat = 'square'; 
 % dat = 'trapzKrupic';
 
 % dat = 'catLearn';
 
 %compute activation and densityPlotActNorm over time? takes longer
-actOverTime = 0; 
+actOverTime = 1; 
 
 %annealed learning rate
 annEps = 0; %1 or 0
@@ -37,23 +37,29 @@ sigmaG = [3 0; 0 3];
 catsInfo.R=chol(sigmaG);
 
 
+%love06
+%200 sims - 27:30 - circ/sq; batchSiz=400, no annEps, w/ act over time
+clus2run = 27:30;
+
+%next on love06:  27:30 - no annEps, w/ act over time
+
+
+
+
 
 
 %%%%%
-%STILL TO RUN
+%STILL TO RUN on love01 - 
+%NOTE edit to actOverTime=0 when run, AND batchSiz=200
 %%%%%
 %1k sims, batsiz=200 - STOPPED - run this when perms done
 %circ - love01 - no annEps, and annEps - was running 8 matlabs
-clus2run = [6, 20, 24, 18]; %14, 15, 23; - waiting 23 noAnnEps (screen c2)
+% clus2run = [6, 20, 24, 18]; %14, 15, 23; - waiting 23 noAnnEps (screen c2)
 % clus2run = [ 27, 26,  9, 28]; %done 16, 13, 22,
 % clus2run = [ 10, 19,  29, 8]; %done 5,  25, 7,
 % clus2run = [ 30, 3,  4, 17]; %done - 11, 21, 12; waiting 12 noAnnEps (screen c5)
 %next - sq
 
-
-
-
-% clus2run=14;
 
 % nTrials
 if ~strcmp(dat(1:3),'cat')
@@ -71,7 +77,7 @@ if fixBatchSize
 %     nBatches = [8000 5000];
 %     nBatches = [1000 5000 2500];
     nBatches = 2500;
-    nBatches = 5000;
+%     nBatches = 5000;
     if strcmp(dat(1:3),'cat')
         nBatches = nBatches.*2;
     end
@@ -125,7 +131,7 @@ warpType = 'sq2rect';
 %%
 saveDat=1; %save simulations
 
-nIter=1000; %200 for covering map, 20 for cat; 1k for covering map new
+nIter=200; %200 for covering map, 20 for cat; 1k for covering map new
 
 if useSameTrls
 %     switch dat
