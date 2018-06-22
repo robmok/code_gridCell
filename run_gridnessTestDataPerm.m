@@ -29,7 +29,7 @@ saveDat=1;
 % clus2run=[3:10 12:2:26 11:2:25, 27:30]; % 27:30
 
 
-% 1k trials, sq/circ annEps, no perm - % rerun
+% 1k iters, sq/circ annEps, no perm - % rerun
 % clus2run = [18,  8, 16,  4, 22, 27, 26,  9, 13, 29,  5, 25, 7, 10, 19, 28, 17, 11, 21, 12,  30, 3]; % 
 clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 30, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3]; %all
 
@@ -67,7 +67,7 @@ end
 jointTrls=1; %for test trials
 
 
-% nIter=1000;
+nIter=1000;
 
 
 %EDIT = if trapKfrmSq1...
