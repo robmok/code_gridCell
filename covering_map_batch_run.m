@@ -24,7 +24,7 @@ dat = 'square';
 actOverTime = 1; 
 
 %annealed learning rate
-annEps = 0; %1 or 0
+annEps = 1; %1 or 0
 
 jointTrls = 1;
 
