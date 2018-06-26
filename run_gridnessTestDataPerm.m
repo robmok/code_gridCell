@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -14,7 +14,7 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; % orig nTrials/10
 dat = 'circ';
-dat = 'square';
+% dat = 'square';
 
 % dat = 'trapzKrupic';
 
@@ -31,26 +31,24 @@ saveDat=1;
 
 % 1k iters, sq/circ annEps, no perm - % rerun
 % clus2run = [18,  8, 16,  4, 22, 27, 26,  9, 13, 29,  5, 25, 7, 10, 19, 28, 17, 11, 21, 12,  30, 3]; % 
-clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 30, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3]; %all
+% clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 30, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3]; %all
 
 
 
 %%%%%%%
 % new fixed perm - 200iters
 %running on love01, 5 matlabs- circ
-%no annEps, circ and sq - no 27:30 (need to run the standard covmaps first.. can do this?)
-% clus2run = [14, 15, 23,  6, 20];
-% clus2run = [16, 8, 22, 26,  9]; 
-% clus2run = [5,  13, 7,  10, 19]; 
-% clus2run = [11, 21, 12, 3,  4]; 
-% clus2run = [18, 24, 25, 17];
+%no annEps, circ and sq
+clus2run = [14, 15, 23,  26, 20];
+% clus2run = [16, 8, 22, 6,  9,30]; 
+% clus2run = [5,  13, 7,  10, 19, 29]; 
+% clus2run = [11, 21, 12, 3,  4,28]; 
+% clus2run = [18, 24, 25, 17, 27];
 
 %love06 - sq - see if OK with RAM/fast enough
-clus2run = [14, 15, 23,  6, 20, 16, 8, 22, 26,  9];
-clus2run = [5,  13, 7,  10, 19, 11, 21, 12, 3,  4]; 
-%%%
-% still to run!
-% clus2run = [18, 24, 25, 17]; % still to run
+% clus2run = [14, 15, 23,  30, 6, 20, 16, 22, 26];
+% clus2run = [5,  13, 7,  10, 19, 29, 11, 21, 12]; 
+% clus2run = [9, 18, 24,4, 25, 17, 27, 28, 3, 8];
 
 
 

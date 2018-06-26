@@ -199,31 +199,40 @@ for iterI=1:nIters2run
         if doPerm
             for iPerm = 1:nPerm
                 %             fprintf('Perm %d\n',iPerm);
-                tic
-                randVec = zeros(1,nTrialsTest);
-                selVals = 1:nTrialsTest;
-                cnter=0;
-                for iTrl = 1:nTrialsTest %takes <20s
-                    randInd = randsample(selVals,1);
-                    while (abs(randInd-iTrl)<minTime)
-                        randInd = randsample(selVals,1);
-                        cnter=cnter+1;
+                
+                %shuffle trials, and log trials < 20 timepoints to orig
+                ind2short = zeros(1,nTrialsTest);
+                start=0; %get the while loop running
+                while ~start || length(find(ind2short))==1 %if only 1, can't shuffle
+                    randVec = randperm(nTrialsTest); %shuffle
+                    for iTrl = 1:nTrialsTest
+                        if (abs(randVec(iTrl)-iTrl)<minTime)
+                            ind2short(iTrl) = iTrl; %log shuffled trials that are <20 timepoints to orig
+                        end
                     end
-                    randVec(iTrl) = randInd;
-                    selVals((selVals==randInd)) = [];
+                    start=1;
                 end
-                toc
-                
-                
-                %either 
-                % -do above, but then randsample only from other ones
-                %- rand whole thing, then go through each one to check if
-                % within ±20s, log them, then shuffle those, check again
-                
-                
-                
-                
-                
+                % shuffle  timepoints logged <20s, apply shuffled timepoints, double check all <20s
+                ind2shuf = find(ind2short);
+                start2=0;
+                while ~start2 || any(ind2short2) %if any still < min time, perm again
+                    permInd  = randperm(length(ind2shuf));
+                    while any(permInd==1:length(permInd)) %if any stay in the same place, shuffle again
+                        permInd  = randperm(length(ind2shuf));
+                    end
+                    indShuf = ind2shuf(permInd);
+                    randVec(ind2shuf) = randVec(indShuf);
+                    
+                    %double check if any shuffled timings too short
+                    ind2short2 = zeros(1,length(ind2shuf));
+                    for i = ind2shuf
+                        if (abs(randVec(ind2shuf)-ind2shuf)<minTime)
+                            ind2short2(i) = i;
+                            warning('perm shuffling stuck on < min time?');
+                        end
+                    end
+                    start2=1;
+                end
                 
                 actAllPerm = actTrl(:,randVec);
                 
