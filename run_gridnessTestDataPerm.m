@@ -35,16 +35,26 @@ clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 30, 29, 
 
 
 
-
 %%%%%%%
 % new fixed perm - 200iters
-%running on love01, 10 matlabs
+%running on love01, 5 matlabs- circ
 %no annEps, circ and sq - no 27:30 (need to run the standard covmaps first.. can do this?)
 % clus2run = [14, 15, 23,  6, 20];
 % clus2run = [16, 8, 22, 26,  9]; 
 % clus2run = [5,  13, 7,  10, 19]; 
 % clus2run = [11, 21, 12, 3,  4]; 
 % clus2run = [18, 24, 25, 17];
+
+%love06 - sq - see if OK with RAM/fast enough
+clus2run = [14, 15, 23,  6, 20, 16, 8, 22, 26,  9];
+clus2run = [5,  13, 7,  10, 19, 11, 21, 12, 3,  4]; 
+%%%
+% still to run!
+% clus2run = [18, 24, 25, 17]; % still to run
+
+
+
+
 
 %next annEps
 
@@ -60,14 +70,14 @@ batchSizeVals=400;
 % batchSizeVals=200;
 % batchSizeVals=100;
 
-annEps=1;
+annEps=0;
 if annEps
    epsMuVals=1.5; %below multiplies this by 1k 
 end
 jointTrls=1; %for test trials
 
 
-nIter=1000;
+% nIter=1000;
 
 
 %EDIT = if trapKfrmSq1...
@@ -87,7 +97,7 @@ else
 end
 
 %tmp - for getting sq density plots
-doPerm=0;
+% doPerm=0;
 
 % run perm tests on how many iters? takes a bit of time (a couple mins) per
 % iter, so with 200 iters plus many conditions, maybe too much (if all the

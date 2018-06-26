@@ -199,16 +199,31 @@ for iterI=1:nIters2run
         if doPerm
             for iPerm = 1:nPerm
                 %             fprintf('Perm %d\n',iPerm);
+                tic
                 randVec = zeros(1,nTrialsTest);
+                selVals = 1:nTrialsTest;
                 cnter=0;
                 for iTrl = 1:nTrialsTest %takes <20s
-                    randInd = randsample(nTrialsTest,1);
+                    randInd = randsample(selVals,1);
                     while (abs(randInd-iTrl)<minTime)
-                        randInd = randsample(nTrialsTest,1);
+                        randInd = randsample(selVals,1);
                         cnter=cnter+1;
                     end
                     randVec(iTrl) = randInd;
+                    selVals((selVals==randInd)) = [];
                 end
+                toc
+                
+                
+                %either 
+                % -do above, but then randsample only from other ones
+                %- rand whole thing, then go through each one to check if
+                % within ±20s, log them, then shuffle those, check again
+                
+                
+                
+                
+                
                 
                 actAllPerm = actTrl(:,randVec);
                 
