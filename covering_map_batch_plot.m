@@ -673,7 +673,6 @@ for iterI = iters2plot
 end
 %% Making figs - univar scatters 1 - training set
 
-
 savePlots=0;
 
 clusPosAct = 'actNorm'; %'clus' or 'actNorm'
@@ -781,14 +780,24 @@ figure; hold on;
         end        
         set(gca,'FontSize',fontSiz,'fontname','Arial')
     end
-
+    
     fname = [figsDir sprintf('/gridness_%s_univarScatters_trainSetEnd_nClus%d-%d_eps%d_nIter%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,nIter,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
 if savePlots
    set(gcf,'Renderer','painters');
    print(gcf,'-depsc2',fname)
    saveas(gcf,fname,'png');
 end
-   
+
+
+
+% % dat1
+nBoot = nIter;
+clear ciTrain
+for iClus=clus2plot
+    ciTrain(iClus,:) = bootci(nBoot,@mean,dat1(:,iClus));
+end
+
+
 %%
     
 
@@ -923,29 +932,59 @@ else
     end
 end
 
-
 %% gridness over time stats
 
 clus2plot = 1:length(clus2run);
 clus2plot = 4:length(clus2run); %skip 3:5
 clus2plot = 8:length(clus2run); %skip 3:9
-clus2plot = 8:length(clus2run)-4; %skip 3:9, 27:30 % turns out last few
-% are positive!
+clus2plot = 8:length(clus2run)-4; %skip 3:9, 27:30 % turns out last few are positive!
 
-clear gt_b gt_p
+% clear gt_b gt_p
+% cnter=0;
+% for iClus = clus2plot
+%     dat1 = squeeze(datTmp(1:end-1,:,iEps,iBatchVals,:,iClus))';
+%     [b,d,s]=glmfit(1:nTimePts,mean(dat1,1)');
+%     cnter=cnter+1;
+%     gt_b(cnter) = b(2);
+%     gt_p(cnter) = s.p(2);
+% end
+% [h p c s] = ttest(gt_b); %sig 0.0363 for 3:30; 0.031 for 6:30; 0.0068 for 10:30; 0.0079 for 10:26
+% 
+% ci = bootci(length(gt_b),@mean,gt_b);
+% fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; p=%0.3f, %d sig betas > 0, out of %d sig betas. %0.2f percent\n',clus2plot(1)+2,clus2plot(end)+2,mean(gt_b),ci(1),ci(2),p,nnz(gt_b(gt_p<0.05)>0),nnz(gt_b(gt_p<0.05)),(nnz(gt_b(gt_p<0.05)>0)/numel(gt_b(gt_p<0.05)))*100);
+
+
+%CORRECT:
+% or - get each sim, glmfit, get that beta; use the mean of those betas. calc
+% CIs for each nClus cond, report proportions; and over all nClus conds for the main stat
+
+clear gt_b gt_p ciClus ciClusSig
 cnter=0;
 for iClus = clus2plot
     dat1 = squeeze(datTmp(1:end-1,:,iEps,iBatchVals,:,iClus))';
-    [b,d,s]=glmfit(1:nTimePts,mean(dat1,1)');
     cnter=cnter+1;
-    gt_b(cnter) = b(2);
-    gt_p(cnter) = s.p(2);
+    for iterI=1:nIter
+        [b,d,s]=glmfit(1:nTimePts,dat1(iterI,:)');
+        gt_b(cnter,iterI) = b(2);
+    end
+    ciClus(:,cnter) = bootci(nIter,@mean,gt_b(cnter,:));
+    
+    %check CIs sig
+    posInd=ciClus(:,cnter)>0;
+    negInd=ciClus(:,cnter)<0;
+    if all(posInd)
+       ciClusSig(cnter)=1;
+    end
+    if all(negInd)
+        ciClusSig(cnter)=-1;
+    end
+    if ~all(posInd) && ~all(negInd)
+        ciClusSig(cnter)=0;
+    end
 end
-[h p c s] = ttest(gt_b); %sig 0.0363 for 3:30; 0.031 for 6:30; 0.0068 for 10:30; 0.0079 for 10:26
+ci = bootci(length(gt_b),@mean,mean(gt_b,2));
 
-fprintf('%d to %d clusters: p=%0.3f, %d sig betas > 0, out of %d sig betas. %0.2f percent\n',clus2plot(1)+2,clus2plot(end)+2,p,nnz(gt_b(gt_p<0.05)>0),nnz(gt_b(gt_p<0.05)),(nnz(gt_b(gt_p<0.05)>0)/numel(gt_b(gt_p<0.05)))*100);
-
-% 95% CIs for the betas?
+fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig betas > 0, out of %d sig betas. %0.2f percent\n',clus2plot(1)+2,clus2plot(end)+2,mean(mean(gt_b,2)),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
 
 %% Making figs: density plot examples
 
