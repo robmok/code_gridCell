@@ -16,10 +16,10 @@ gaussSmooth = 1;
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-dat='square';
+% dat='square';
 % annEps=0;
 boxSize=1;
-nIter=200;
+% nIter=200;
 
 % clus2run = [7,8,10,12]; 
 % nTrials = 100000; 
@@ -120,11 +120,15 @@ batchSizeVals = 400; %100, 125, 200,400, 1000
 % batchSizeVals = 100; %100, 125, 200, 400
 % clus2run = [12, 16, 24, 28]; %batchSize200 missed 20?
 
+%200 iters orig
+nIter=200;
+actOverTime = 1;
+
 % %1000 iters
-nIter=1000;
-actOverTime = 0;
-nSet = 1;
-clus2run = 3:30;  % sq missing 11
+% nIter=1000;
+% actOverTime = 0;
+% nSet = 1;
+clus2run = 3:30;
 % clus2run = [10, 12:26]; 
 
 % clus2run = [3:5 ,7, 9, 10, 12, 15:30];  % circ missing 6,8, 11,13,14 , 15, 16,18, 21
@@ -243,6 +247,7 @@ for iClus2run = 1:length(clus2run)
                     end
                 end
                 
+                iSet = 1:nSet;
 %                 gA_gAll_act(:,:,iEps,iBvals,iClus2run,:)   = gA_act(:,:,1,:);
 %                 gA_oAll_act(:,:,iEps,iBvals,iClus2run,:)   = gA_act(:,:,2,:);
 %                 gA_radAll_act(:,:,iEps,iBvals,iClus2run,:) = gA_act(:,:,3,:);
@@ -669,7 +674,7 @@ end
 %% Making figs - univar scatters 1 - training set
 
 
-savePlots=1;
+savePlots=0;
 
 clusPosAct = 'actNorm'; %'clus' or 'actNorm'
 
@@ -840,24 +845,25 @@ end
 
 savePlots = 0;
 
-plotSubPlots = 0;
+plotSubPlots = 1;
 
 fontSiz = 25;
 
 iBatchVals=1;
 
-nTimePts=size(datTmp,1)-2;
+nTimePts=size(datTmp,1)-1;
 colors  = distinguishable_colors(length(clus2run));
 
 if plotSubPlots
-    clus2plot = (6:26)-2;
+%     clus2plot = (6:26)-2;
     clus2plot = 1:length(clus2run);
     figure; hold on;
     for iClus = clus2plot
         %     subplot(2,ceil(length(clus2plot)/2),iClus); hold on;
-        subplot(3,7,iClus-clus2plot(1)+1); hold on;
+%         subplot(3,7,iClus-clus2plot(1)+1); hold on;
+        subplot(4,7,iClus-clus2plot(1)+1); hold on;
         %         subplot(ceil(length(clus2plot)/2),2,iClus); hold on;
-        dat1     = squeeze(datTmp(1:end-2,:,iEps,iBatchVals,iClus,:))';
+        dat1     = squeeze(datTmp(1:end-1,:,iEps,iBatchVals,:,iClus))';
         barpos  = .25:.5:.5*size(dat1,2);
         colgrey = [.5, .5, .5];
         mu      = nanmean(dat1,1);
@@ -916,6 +922,30 @@ else
         end 
     end
 end
+
+
+%% gridness over time stats
+
+clus2plot = 1:length(clus2run);
+clus2plot = 4:length(clus2run); %skip 3:5
+clus2plot = 8:length(clus2run); %skip 3:9
+clus2plot = 8:length(clus2run)-4; %skip 3:9, 27:30 % turns out last few
+% are positive!
+
+clear gt_b gt_p
+cnter=0;
+for iClus = clus2plot
+    dat1 = squeeze(datTmp(1:end-1,:,iEps,iBatchVals,:,iClus))';
+    [b,d,s]=glmfit(1:nTimePts,mean(dat1,1)');
+    cnter=cnter+1;
+    gt_b(cnter) = b(2);
+    gt_p(cnter) = s.p(2);
+end
+[h p c s] = ttest(gt_b); %sig 0.0363 for 3:30; 0.031 for 6:30; 0.0068 for 10:30; 0.0079 for 10:26
+
+fprintf('%d to %d clusters: p=%0.3f, %d sig betas > 0, out of %d sig betas. %0.2f percent\n',clus2plot(1)+2,clus2plot(end)+2,p,nnz(gt_b(gt_p<0.05)>0),nnz(gt_b(gt_p<0.05)),(nnz(gt_b(gt_p<0.05)>0)/numel(gt_b(gt_p<0.05)))*100);
+
+% 95% CIs for the betas?
 
 %% Making figs: density plot examples
 

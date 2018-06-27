@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -14,7 +14,7 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; % orig nTrials/10
 dat = 'circ';
-% dat = 'square';
+dat = 'square';
 
 % dat = 'trapzKrupic';
 
@@ -50,7 +50,9 @@ clus2run = [14, 15, 23,  26, 20];
 % clus2run = [5,  13, 7,  10, 19, 29, 11, 21, 12]; 
 % clus2run = [9, 18, 24,4, 25, 17, 27, 28, 3, 8];
 
-
+%running after froze
+clus2run = [27, 12, 8, 28];
+clus2run = [16, 21, 22, 3,  26];
 
 
 
@@ -205,8 +207,7 @@ for iClus2run = 1:length(clus2run)
                         save(fname,'permPrc_gA_act','permPrc_gW_act','permPrc_gA_actNorm','permPrc_gW_actNorm','gA_act','gA_actNorm','gW_act','gW_actNorm','densityPlotAct','densityPlotActNorm','timeTaken');
                     end
                 end
-                clear densityPlotAct densityPlotActNorm
-            end
+                clear densityPlotAct densityPlotActNorm gA_act gA_actNorm gW_act gW_actNorm permPrc_gA_act permPrc_gW_act
         end
     end
 end

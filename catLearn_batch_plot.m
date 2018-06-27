@@ -21,8 +21,8 @@ locRange = [0, 49];
 % clus2run = [10, 15,20,25,30]; 
 
 clus2run = [2,3,4]; 
-clus2run = [5,8,10]; 
-clus2run = [15, 25, 30]; 
+% clus2run = [5,8,10]; 
+% clus2run = [15, 25, 30]; 
 
 
 jointTrls=0;
@@ -77,7 +77,7 @@ rSeedAll  = cell(length(clus2run),length(batchSizeVals),length(cVals));
 end
     
 %%
-savePlots = 1;
+savePlots = 0;
 
 fontSiz=15;
 datPtSiz=15;
