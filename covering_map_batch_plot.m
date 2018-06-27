@@ -16,7 +16,7 @@ gaussSmooth = 1;
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-% dat='square';
+dat='square';
 % annEps=0;
 boxSize=1;
 % nIter=200;
@@ -123,6 +123,7 @@ batchSizeVals = 400; %100, 125, 200,400, 1000
 %200 iters orig
 nIter=200;
 actOverTime = 1;
+clus2run = 3:30;
 
 % %1000 iters
 % nIter=1000;
@@ -740,7 +741,11 @@ iEps=1;
 
 % clus2plot=(3:26)-2;
 % clus2plot=(6:26)-2;
+
 clus2plot = 1:length(clus2run);
+% clus2plot=(6:30)-2;
+% clus2plot=(10:30)-2;
+% clus2plot=(10:26)-2;
 
 iBatchVals=1; %'medium' one
 
@@ -788,14 +793,20 @@ if savePlots
    saveas(gcf,fname,'png');
 end
 
-
-
-% % dat1
+% mean & bootstrap 95 CIs
 nBoot = nIter;
-clear ciTrain
-for iClus=clus2plot
-    ciTrain(iClus,:) = bootci(nBoot,@mean,dat1(:,iClus));
+clear ciTrain ciTmp
+for iClus=1:length(clus2plot)
+    ciTmp = bootci(nBoot,@mean,dat1(:,iClus));
+    ciTrain(iClus,:) = [mean(dat1(:,iClus),1); ciTmp]; % mean & CIs
 end
+
+% ciTrain %print 
+
+
+%overall mean
+ci = bootci(length(clus2run),@mean,mean(dat1,1));
+fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2plot(1)+2,clus2plot(end)+2,mean(mean(dat1,1)),ci(1),ci(2));
 
 
 %%
@@ -986,6 +997,22 @@ ci = bootci(length(gt_b),@mean,mean(gt_b,2));
 
 fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig betas > 0, out of %d sig betas. %0.2f percent\n',clus2plot(1)+2,clus2plot(end)+2,mean(mean(gt_b,2)),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
 
+
+%TO DO:
+
+% % mean & bootstrap 95 CIs - taken from above. - edit here to compute
+% means as well. note: ciClus is 2 x nClus above. below flipped so can
+% print to copy and paste
+
+% nBoot = nIter;
+% clear ciTrain
+% for iClus=clus2plot
+%     ciTmp = bootci(nBoot,@mean,dat1(:,iClus));
+%     ciTrain(iClus,:) = [mean(dat1(:,iClus),1); ciTmp]; % mean & CIs
+% end
+% ciTrain
+
+
 %% Making figs: density plot examples
 
 savePlots = 1;
@@ -1049,8 +1076,6 @@ for iBvals = 1:length(batchSizeVals)
             saveas(gcf,fname,'png');
            close all
         end
-        
-        
     end
 end
 end

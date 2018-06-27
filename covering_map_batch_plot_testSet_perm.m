@@ -14,12 +14,11 @@ figsDir = [wd '/grid_figs'];
 
 % load
 nSet        = 22;
-gaussSmooth = .8; 
 gaussSmooth = 1; 
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-dat='square';
+% dat='square';
 % annEps=0;
 boxSize=1;
 
@@ -34,7 +33,7 @@ nTrials=1000000;
 annEps=0;
 nIter=200;
 
-nIter=1000;
+% nIter=1000;
 
 % clus2run = [3:16, 18, 20:26];  %missed 17, 19?
 
@@ -254,6 +253,9 @@ clus2plot=(10:26)-2;
 % clus2plot=([6:24])-2;
 
 clus2plot=(3:30)-2;
+% clus2plot=(6:30)-2;
+% clus2plot=(10:30)-2;
+% clus2plot=(10:26)-2;
 
 
 % clus2plot=1:length(clus2run);
@@ -402,6 +404,20 @@ if strcmp(dat(1:4),'trap')
     
 end
 
+% mean & bootstrap 95 CIs
+nBoot = nIter;
+clear ciTrain ciTmp
+for iClus=1:length(clus2plot)
+    ciTmp = bootci(nBoot,@mean,dat1(:,iClus));
+    ciTrain(iClus,:) = [mean(dat1(:,iClus),1); ciTmp]; % mean & CIs
+end
+% ciTrain
+
+ci = bootci(length(clus2run),@mean,mean(dat1,1));
+fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2plot(1)+2,clus2plot(end)+2,mean(mean(dat1,1)),ci(1),ci(2));
+
+%%
+
 if plotFewClus
 %plot 3:5
 clus2plot=(3:5)-2;
@@ -446,7 +462,6 @@ if savePlots
     close all
 end
 end
-
 %% Making figs: density plot examples
 
 savePlots = 0;

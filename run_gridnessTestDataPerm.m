@@ -14,7 +14,7 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; % orig nTrials/10
 dat = 'circ';
-dat = 'square';
+% dat = 'square';
 
 % dat = 'trapzKrupic';
 
@@ -39,10 +39,10 @@ saveDat=1;
 % new fixed perm - 200iters
 %running on love01, 5 matlabs- circ
 %no annEps, circ and sq
-clus2run = [14, 15, 23,  26, 20];
+% clus2run = [14, 15, 23,  26, 20];
 % clus2run = [16, 8, 22, 6,  9,30]; 
-% clus2run = [5,  13, 7,  10, 19, 29]; 
-% clus2run = [11, 21, 12, 3,  4,28]; 
+% clus2run = [5,  13, 7,  10, 19, 29]; % stopped at 7
+% clus2run = [11, 21, 12, 3,  4,28]; %stopped at 12
 % clus2run = [18, 24, 25, 17, 27];
 
 %love06 - sq - see if OK with RAM/fast enough
@@ -54,13 +54,14 @@ clus2run = [14, 15, 23,  26, 20];
 clus2run = [27, 12, 8, 28];
 clus2run = [16, 21, 22, 3,  26];
 
-
+%love06 taking over circle
+clus2run= [7,  10, 19, 29, 12, 3,  4,  28];
 
 %next annEps
 
 
 
-% clus2run = 18;
+% clus2run = 11;
 
 nIter=200;
 epsMuVals=.025;
@@ -145,10 +146,6 @@ for iClus2run = 1:length(clus2run)
             end
             
 
-%covering_map_batch_dat_14clus_1000ktrls_eps25_batchSiz400_1000iters_circ_wActNorm_jointTrls_stepSiz*'
-% covering_map_batch_dat_9clus_1000ktrls_eps1500_batchSiz400_1000iters_circ_wActNorm_annEps_jointTrls_stepSiz_noActOverTime_185914.mat
-
-
             %finish with directory and * for date/time
             fname = [saveDir, fname '*']; %finish with directory and * for date/time
             
@@ -210,4 +207,5 @@ for iClus2run = 1:length(clus2run)
                 clear densityPlotAct densityPlotActNorm gA_act gA_actNorm gW_act gW_actNorm permPrc_gA_act permPrc_gW_act
         end
     end
+end
 end
