@@ -30,6 +30,10 @@ batchSizeVals=400;
 annEps=0;
 jointTrls=1;
 
+%new running
+nIter=1000;
+
+
 % for current
 nTrials2 = nTrials/2; %/4?
 nBatches = 2500;
@@ -38,38 +42,18 @@ nBvals = length(batchSizeVals);
 nIter2run = nIter;
 
 %new
-% epsMuTrapz = 0.0025;
+epsMuTrapz = 0.0025;
 % epsMuTrapz = 0.005;
-epsMuTrapz = 0.0015; %to run - slower
+% epsMuTrapz = 0.0015; %to run - slower
 
 % clus2run = 3:26; 
 
 %love06
-% clus2run=[8:4:20, 23, 6, 10:4:22,4, 25]; 
-% clus2run=[3, 26, 7:4:19, 24, 5, 9:4:21]; 
-% %rerun
-clus2run=[18, 22,4,25];
-clus2run=[9:4:21];
-
-% clus2run=[3:4:19]; 
-% clus2run=[5:4:21]; 
-% clus2run=[4:4:20];
-% clus2run=[6:4:22];
-% clus2run=[23, 25, 24, 26];
-
-%split
-% clus2run = [21 15];
-% clus2run = [26, 6];
-% clus2run = [17, 25];
-% clus2run = [19 24];
-% clus2run = 22;
-
-% %love01
-% clus2run=[10, 18]; 
-% clus2run=[14, 22];
+clus2run=[8:4:20, 23, 10:4:22, 27, 4];
+clus2run=[26, 24, 9:4:21,29, 3, 6]; 
+clus2run=[7:4:19, 25, 5, 28, 30]; 
 
 
-% clus2run=[10:4:26,4 6];
 
 %testing
 % clus2run = 13;
@@ -106,8 +90,7 @@ for iClus2run = 1:length(clus2run)
                 % run - allow starting clus positions (even
                 % outside the trapz box)
                 tic
-                [densityPlot,~,gA,gW,~,~,rSeed,muAll,trials] = covering_map_batch_sim_clusPosIn(clusPos,nClus,locRange,epsMuTrapz,nTrials2,batchSize,nIter2run,dat2,annEps,jointTrls);
-                
+                [densityPlot,~,gA,gW,~,~,rSeed] = covering_map_batch_sim_clusPosIn(clusPos,nClus,locRange,epsMuTrapz,nTrials2,batchSize,nIter2run,dat2,annEps,jointTrls);
                 
                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_%d',nClus,round(nTrials2/1000),epsMuOrig1000,round(batchSize),nIter,dat2,epsMuTrapz*10000)];
                 
@@ -119,7 +102,7 @@ for iClus2run = 1:length(clus2run)
                     cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
 %                     save(fname,'densityPlot','densityPlotActNorm','gA','gW','gA_actNorm','gW_actNorm','rSeed','timeTaken');
                     save(fname,'densityPlot','gA','gW','rSeed','timeTaken');
-                    clear densityPlot 
+                    clear densityPlot gA gW
                 end
             end
         end
