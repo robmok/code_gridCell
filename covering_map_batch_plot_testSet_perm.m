@@ -39,10 +39,10 @@ nIter=200;
 
 
 % % % dat='trapzKrupic';    
-% dat='trapzKfrmSq1';
-% %trapzKfrmSq1
-% nTrials=1000000/2;
-% epsMuTrapz10 = 25; 
+dat='trapzKfrmSq1';
+%trapzKfrmSq1
+nTrials=1000000/2;
+epsMuTrapz10 = 25; 
 
 
 % dat='trapzKfrmSq2';
@@ -50,6 +50,7 @@ nIter=200;
 
 clus2run = [3:26]; 
 clus2run = [3:30]; 
+clus2run = [3:26]; 
 % clus2run = 20:23; 
 
 % clus2run=6:26;
@@ -252,10 +253,13 @@ clus2plot=(6:26)-2;
 clus2plot=(10:26)-2;
 % clus2plot=([6:24])-2;
 
-clus2plot=(3:30)-2;
+% clus2plot=(3:30)-2;
 % clus2plot=(6:30)-2;
 % clus2plot=(10:30)-2;
-% clus2plot=(10:26)-2;
+clus2plot=(10:26)-2;
+
+% clus2plot=(3:26)-2;
+
 
 
 % clus2plot=1:length(clus2run);
@@ -405,16 +409,34 @@ if strcmp(dat(1:4),'trap')
 end
 
 % mean & bootstrap 95 CIs
-nBoot = nIter;
-clear ciTrain ciTmp
-for iClus=1:length(clus2plot)
-    ciTmp = bootci(nBoot,@mean,dat1(:,iClus));
-    ciTrain(iClus,:) = [mean(dat1(:,iClus),1); ciTmp]; % mean & CIs
-end
-% ciTrain
+% nBoot = nIter;
+% clear ciTest ciTmp
+% for iClus=1:length(clus2plot)
+%     ciTmp = bootci(nBoot,@nanmean,dat1(:,iClus));
+%     ciTest(iClus,:) = [nanmean(dat1(:,iClus),1); ciTmp]; % mean & CIs
+% end
+% 
+% ci = bootci(length(clus2run),@nanmean,nanmean(dat1,1));
+% fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2plot(1)+2,clus2plot(end)+2,mean(mean(dat1,1)),ci(1),ci(2));
 
-ci = bootci(length(clus2run),@mean,mean(dat1,1));
-fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2plot(1)+2,clus2plot(end)+2,mean(mean(dat1,1)),ci(1),ci(2));
+
+%trapz
+
+%also include individual nClus cond CIs ++
+
+dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,1));
+ci = bootci(length(clus2run),@nanmean,nanmean(dat1,1));
+fprintf('trapz %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2plot(1)+2,clus2plot(end)+2,nanmean(nanmean(dat1,1)),ci(1),ci(2));
+dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,2));
+ci = bootci(length(clus2run),@nanmean,nanmean(dat1,1));
+fprintf('trapzL %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2plot(1)+2,clus2plot(end)+2,nanmean(nanmean(dat1,1)),ci(1),ci(2));
+dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,3));
+ci = bootci(length(clus2run),@nanmean,nanmean(dat1,1));
+fprintf('trapzR %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2plot(1)+2,clus2plot(end)+2,nanmean(nanmean(dat1,1)),ci(1),ci(2));
+dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,2))-squeeze(datTmp(:,iEps,iBatchVals,clus2plot,3));
+ci = bootci(length(clus2run),@nanmean,nanmean(dat1,1));
+fprintf('trapzL-R %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2plot(1)+2,clus2plot(end)+2,nanmean(nanmean(dat1,1)),ci(1),ci(2));
+
 
 %%
 
