@@ -1,23 +1,31 @@
+function bootstrapVals = bootrm(dat,nBoot,type,threshVal)
 %function for getting bootstrap intervals on any value
-% dat is a vector
-function [bootstrapVals] = bootrm(dat,nBoot)
+% dat is a vector nSamples x 1
+% type is a string - mean, percentGr, percentLs
+% threshVal is a single number to find percent greater/less than threshVal
 
-if vargin==1
+if nargin==1
     nBoot = numel(dat); 
 end
+if nargin<3 % if compute mean only, nanmean 2nd arg is dimension
+    threshVal = 1; 
+end   
 
-%bootstrapping
-
-    
-%add an option for what function you want to do, means, percent, std;
-%maybe use stuf like @mean for the function
-    
-    
-means=nan(1,nBoot);
-for iBoot = 1:nBoot
-    s = randsample(dat,length(dat),true); %sample with replacement
-    means(iBoot) = nanmean(s);
+%what to bootstrap: means, percentGr, percentLs, std
+switch type
+    case 'mean'
+        func=@nanmean;
+    case 'percentGr'
+        func=@(n,thresh)nanmean(n>thresh);
+    case 'percentLs'
+        func=@(n,thresh)nanmean(n<thresh);
 end
 
-bootstrapVals = prctile(means,[2.5, 97.5]);
+%do bootstrap
+bootVal=nan(1,nBoot);
+for iBoot = 1:nBoot
+    s = randsample(dat,length(dat),true); %sample with replacement
+    bootVal(iBoot) = func(s,threshVal);    
+end
+bootstrapVals = prctile(bootVal,[2.5, 97.5]);
 end
