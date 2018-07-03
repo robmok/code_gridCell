@@ -12,13 +12,12 @@ batchSize = floor(batchSize); % when have decimal points, above needed
 
 %if decrease learning rate over time: 1/(1+decay+timestep); Decay - set a param
 if annEps
-    nBatches = nTrials./batchSize; %2500, 5000, 250000, 50000
-%     epsMuOrig = nBatches/100;
-% %     epsMuOrig = nBatches/150; %200
-%     annEpsDecay = nBatches/40;
-    
-    epsMuOrig = nBatches*.6;
-    annEpsDecay = nBatches/10;
+    nBatches = nTrials./batchSize; %2500, 5000, 250000, 50000  
+%     epsMuOrig = 0.05;
+%     annEpsDecay = 1.6e-07*(nBatches*20); % eps stays high till 1/annEpsDecay batches; here 125
+    epsMuOrig = 0.1;
+    annEpsDecay = 1.6e-07*(nBatches*39); % eps stays high till 1/annEpsDecay batches; here 64.1026
+
 end
 
 %compute gridness over time %20 timepoints; - 21 sets now - last one is last quarter
@@ -197,15 +196,13 @@ for iterI = 1:nIter
             
             %learning rate
             if annEps %if use annealed learning rate
-                epsMu = epsMuOrig./(1+(annEpsDecay*iBatch*250));
-%                 epsMuOrig = 2;%nBatches*.6;
-%                 annEpsDecay = nBatches/10;
+                epsMu = epsMuOrig/(1+(annEpsDecay*iBatch)); %new
 %                 clear epsAll
+%                 epsMuOrig = 0.1;
+%                 annEpsDecay = 1.6e-07*(nBatches*39); % eps stays high till 1/annEpsDecay batches; here 64.1026
 %                 for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+(annEpsDecay*iBatch)); end
-% %                 for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+(annEpsDecay*iBatch*250)); end
-% %                 for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+annEpsDecay+iBatch*250); end   %i used this! incorrect..!
-%                  figure; plot(epsAll); hold on;
-%                 epsAll(nBatches.*[.05, .25, .5, .75, .95]) % eps at 25%, 50%, 75% of trials: 0.0396    0.0199    0.0133
+%                 figure; plot(epsAll); hold on;
+%                 epsAll(nBatches.*[.05, .25, .5, .75, .95, 1]) % eps at 25%, 50%, 75% of trials: 
             else
                 epsMu = epsMuOrig;
             end
