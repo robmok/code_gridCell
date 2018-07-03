@@ -202,12 +202,13 @@ for iterI = 1:nIter
             
             %learning rate
             if annEps %if use annealed learning rate
-                epsMu = epsMuOrig./(1+annEpsDecay+iBatch*250); %need to check if it's actually epsMuOrig*(1/(1+annEpsDecay+iBatch);
-%                 clear epsAll
-% %                 for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+annEpsDecay+iBatch); end
-%                 for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+annEpsDecay+iBatch*250); end
-%                 figure; plot(epsAll);
-%                 epsAll(nBatches.*[.05, .25, .5, .75, .95]) % eps at 25%, 50%, 75% of trials: 0.0396    0.0199    0.0133
+                epsMu = epsMuOrig./(1+annEpsDecay+iBatch*250); % should be *ibatch! 
+                clear epsAll
+%                 for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+annEpsDecay+iBatch); end
+%                 for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+annEpsDecay+iBatch*250); end   %i used this! incorrect..!
+                for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+annEpsDecay*iBatch*250); end
+                figure; plot(epsAll);
+                epsAll(nBatches.*[.05, .25, .5, .75, .95]) % eps at 25%, 50%, 75% of trials: 0.0396    0.0199    0.0133
             else
                 epsMu = epsMuOrig;
             end

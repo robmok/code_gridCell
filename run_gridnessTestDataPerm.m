@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -14,11 +14,11 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; % orig nTrials/10
 dat = 'circ';
-% dat = 'square';
+dat = 'square';
 
 % dat = 'trapzKrupic';
 
-% dat = 'trapzKfrmSq1'; % load covering map on sq, then run it on trapz; then assess gridness in trapz
+dat = 'trapzKfrmSq1'; % load covering map on sq, then run it on trapz; then assess gridness in trapz
 % dat = 'trapzKfrmSq2'; % load covering map on sq, then assess gridness in trapz
 
 saveDat=1;
@@ -55,8 +55,15 @@ clus2run = [3, 15, 23,  26, 20, 18, 4];
 
 % % next: sq2trapz 1kiters
 % clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 30, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3]; %all
+% clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26, 9]; %half
+% clus2run = [13, 30, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3]; %half
+clus2run = [13, 30, 29,  5, 25, 10,  7, ]; %quarter
+clus2run = [19, 28, 17, 11, 21, 12,  3]; %quarter
 
 % clus2run = 11;
+
+%sq 200 iters no annEps no perm
+% clus2run = 27:30;
 
 nIter=200;
 epsMuVals=.025;
@@ -66,23 +73,21 @@ batchSizeVals=400;
 % batchSizeVals=200;
 % batchSizeVals=100;
 
-annEps=1;
+annEps=0;
 if annEps
     epsMuVals=1.5; %below multiplies this by 1k
 end
 jointTrls=1; %for test trials
 
+nIter=1000;
 
-% nIter=1000;
-
-
-%EDIT = if trapKfrmSq1...
-
-%trapzKfrmSq1
-% nTrials=1000000/2;
-% epsMuTrapz10 = 25; %this is 10% of orig learning rate - using this 
-% % epsMuTrapz10 = 50;
-% epsMuTrapz10 = 15;  %
+% if trapKfrmSq1
+if strcmp(dat,'trapzKfrmSq1')
+    nTrials=1000000/2;
+    epsMuTrapz10 = 25; %this is 10% of orig learning rate - using this
+    % epsMuTrapz10 = 50;
+    % epsMuTrapz10 = 15;  %
+end
 
 
 %doPerm or not
@@ -93,7 +98,7 @@ else
 end
 
 %tmp - for getting sq density plots
-% doPerm=1;
+% doPerm=0;
 
 % run perm tests on how many iters? takes a bit of time (a couple mins) per
 % iter, so with 200 iters plus many conditions, maybe too much (if all the

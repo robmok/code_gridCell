@@ -32,9 +32,11 @@ nTrials=1000000;
 annEps=0;
 nIter=200;
 
-% nIter=1000;
+nIter=1000;
 
-clus2run = [3:26]; 
+clus2run = 3:30; 
+
+% clus2run = 10:30; 
 % clus2run = [27:30]; 
 
 batchSizeVals = 400; %100, 125, 200,400, 1000
@@ -196,7 +198,7 @@ for iClus2run = 1:length(clus2run)
             gW_radAll_actNorm(:,iEps,iBvals,iClus2run,:) = gW_actNorm_sq(:,3,:);
             gW_wavAll_actNorm(:,iEps,iBvals,iClus2run,:) = gW_actNorm_sq(:,4,:);  
             
-            fname = [fname(1:92) sprintf('_sqSplitInHalf_gridness_%d',nClus) fname(end-91:end-1)];
+            fname = [fname(1:92) sprintf('_sqSplitInHalf_gridness_%d',nClus) fname(end-92:end-1)]; %92 if 1000iters, 91 if 200 iters..
 
             %save
             if saveDat
@@ -211,10 +213,7 @@ end
 % mean(squeeze(gA_actNorm_sq(:,1,2)-gA_actNorm_sq(:,1,3)))
 
 
-%% univar scatters
-
-
-%% Making figs - univar scatters 1 - test set
+%% sq L-R gridness
 
 savePlots=0;
 
@@ -224,47 +223,26 @@ gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
 
 gridMeasure = 'grid';
 
-plotFewClus = 0; %plot 3:5 clusters separately
-
 switch clusPosAct
-% case 'clus'
-%     switch gridMsrType
-%         case 'a'
-%             gridness    = gA_gAll;
-%             orientation = gA_oAll;
-%             rad         = gA_radAll;
-%             wav         = gA_wavAll;
-%         case 'w'
-%             gridness    = gW_gAll;
-%             orientation = gW_oAll;
-%             rad         = gW_radAll;
-%             wav         = gW_wavAll;
-%     end
-    case 'act'
-        switch gridMsrType
-            case 'a'
-                gridness    = gA_gAll_act;
-                orientation = gA_oAll_act;
-                rad         = gA_radAll_act;
-                wav         = gA_wavAll_act;
-            case 'w'
-                gridness    = gW_gAll_act;
-                orientation = gW_oAll_act;
-                rad         = gW_radAll_act;
-                wav         = gW_wavAll_act;
-        end
+%     case 'act'
+%         switch gridMsrType
+%             case 'a'
+%                 gridness    = gA_gAll_act;
+%                 orientation = gA_oAll_act;
+%                 rad         = gA_radAll_act;
+%                 wav         = gA_wavAll_act;
+%             case 'w'
+%                 gridness    = gW_gAll_act;
+%                 orientation = gW_oAll_act;
+%                 rad         = gW_radAll_act;
+%                 wav         = gW_wavAll_act;
+%         end
     case 'actNorm'
         switch gridMsrType
             case 'a'
-                gridness    = gA_gAll_actNorm;
-                orientation = gA_oAll_actNorm;
-                rad         = gA_radAll_actNorm;
-                wav         = gA_wavAll_actNorm;
+                gridness    = gA_gAll_actNorm(:,:,:,:,2)-gA_gAll_actNorm(:,:,:,:,3);
             case 'w'
-                gridness    = gW_gAll_actNorm;
-                orientation = gW_oAll_actNorm;
-                rad         = gW_radAll_actNorm;
-                wav         = gW_wavAll_actNorm;
+                gridness    = gW_gAll_actNorm(:,:,:,:,2)-gW_gAll_actNorm(:,:,:,:,3);
         end
 end
 
@@ -282,29 +260,25 @@ end
 
 iEps=1;
 
+
+clus2plot=(3:30)-2;
+clus2plot=(6:30)-2;
+clus2plot=(10:30)-2;
+clus2plot=(10:26)-2;
+
 % clus2plot=(3:26)-2;
-clus2plot=(6:26)-2;
-% clus2plot=(10:26)-2;
-% clus2plot=([6:24])-2;
-
-% clus2plot=(3:30)-2;
-
-
-% clus2plot=1:length(clus2run);
-
-%trapz
-% clus2plot = 1:length(clus2run);
 
 iBatchVals=1;
 
 %fig specs
-xTickLabs = num2cell(clus2run(clus2plot));
+% xTickLabs = num2cell(clus2run(clus2plot));
+xTickLabs = num2cell((clus2plot));
 fontSiz=15;
 
 figure; hold on;
     for iEps = 1:length(epsMuVals)
-        %     subplot(2,3,iEps);
         dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,1));
+%         dat1     = squeeze(datTmp(:,iEps,iBatchVals,:,1));
         barpos  = .25:.5:.5*size(dat1,2);
         colors  = distinguishable_colors(size(dat1,2));
         colgrey = [.6, .6, .6];
@@ -319,154 +293,50 @@ figure; hold on;
         xlim([barpos(1)-.5, barpos(end)+.5]);
         %         ylim([0,1]);
         if strcmp(gridMsrType,'a')
-%             ylim([-.45,1.4]);
+            ylim([-1.5,2]);
         elseif strcmp(gridMsrType,'w')
-            ylim([-1.25,1.4]);
+%             ylim([-1.25,1.4]);
         end
         xlabel('Number of Clusters');
         ylabel('Grid Score');
-        
-%         title(sprintf('%s, %s - eps=%d, batchSize=%d',dat, gridMeasure,epsMuVals(iEps)*1000,batchSizeVals(iBatchVals)))
-        if strcmp(dat(1:2),'ci')
-            title('Circular box')
-        elseif strcmp(dat(1:2),'sq')
-            title('Square box')
-        elseif strcmp(dat(1:2),'tr')
-            title('Trapezoid box')
-        end
+        title('Left-Right Square box')
+
         set(gca,'FontSize',fontSiz,'fontname','Arial')
     end
 
-%     fname = [figsDir sprintf('/gridness_%s_univarScatters_testSet_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
-% 
-% if savePlots
-%    set(gcf,'Renderer','painters');
-%    print(gcf,'-depsc2',fname)
-%    saveas(gcf,fname,'png');
-% end
+    fname = [figsDir sprintf('/gridness_%s_univarScatters_testSet_nClus%d-%d_eps%d_batchSiz%d_%s_%s','sqL-R',clus2plot(1)+2,clus2plot(end)+2,epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
 
-
-figure; hold on;
-dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,2));
-mu      = nanmean(dat1,1);
-sm      = nanstd(dat1)./sqrt(size(dat1,1));
-ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
-plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-scatter(barpos,mu,50,colgrey,'filled','d');
-xticklabels(xTickLabs);
-xlim([barpos(1)-.5, barpos(end)+.5]);
-ylim([-.5,1.5]);
-title('Left half of Square box')
-xlabel('Number of Clusters');
-ylabel('Grid Score');
-set(gca,'FontSize',fontSiz,'fontname','Arial')
-    
-%     fname = [figsDir sprintf('/gridness_%s_L_univarScatters_testSet_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
-    
-%     if savePlots
-%         set(gcf,'Renderer','painters');
-%         print(gcf,'-depsc2',fname)
-%         saveas(gcf,fname,'png');
-%     end
-    
-
-figure; hold on;
-dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,3));
-mu      = nanmean(dat1,1);
-sm      = nanstd(dat1)./sqrt(size(dat1,1));
-ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
-plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-scatter(barpos,mu,50,colgrey,'filled','d');
-xticklabels(xTickLabs);
-xlim([barpos(1)-.5, barpos(end)+.5]);
-ylim([-.5,1.5]);
-title('Right half of Square box')
-xlabel('Number of Clusters');
-ylabel('Grid Score');
-set(gca,'FontSize',fontSiz,'fontname','Arial')
-
-%     fname = [figsDir sprintf('/gridness_%s_R_univarScatters_testSet_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
-%     
-%     if savePlots
-%         set(gcf,'Renderer','painters');
-%         print(gcf,'-depsc2',fname)
-%         saveas(gcf,fname,'png');
-%     end
-    
-figure; hold on;
-dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,2)-datTmp(:,iEps,iBatchVals,clus2plot,3));
-mu      = nanmean(dat1,1);
-sm      = nanstd(dat1)./sqrt(size(dat1,1));
-ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
-plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-scatter(barpos,mu,50,colgrey,'filled','d');
-xticklabels(xTickLabs);
-xlim([barpos(1)-.5, barpos(end)+.5]);
-ylim([-1.5,2]);
-xlabel('Number of Clusters');
-ylabel('Grid Score');
-set(gca,'FontSize',fontSiz,'fontname','Arial')
-
-title('Left-right half of Square box')
-
-%     fname = [figsDir sprintf('/gridness_%s_L-R_univarScatters_testSet_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
-    
-%     if savePlots
-%         set(gcf,'Renderer','painters');
-%         print(gcf,'-depsc2',fname)
-%         saveas(gcf,fname,'png');
-%     end
-    
-
-if plotFewClus
-%plot 3:5
-clus2plot=(3:5)-2;
-clus2plot=(3:9)-2;
-%fig specs
-xTickLabs = num2cell(clus2run(clus2plot));
-fontSiz=15;
-figure; hold on;
-    for iEps = 1:length(epsMuVals)
-        %     subplot(2,3,iEps);
-        dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,1));
-        barpos  = .25:.5:.5*size(dat1,2);
-        colors  = distinguishable_colors(size(dat1,2));
-        colgrey = [.5, .5, .5];
-        mu      = mean(dat1,1);
-        sm      = std(dat1)./sqrt(size(dat1,1));
-        ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
-        plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-        errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-        scatter(barpos,mu,50,colors,'filled','d');
-        xticklabels(xTickLabs);
-        xlim([barpos(1)-.5, barpos(end)+.5]);
-        %         ylim([0,1]);
-        
-        if strcmp(gridMsrType,'a')
-            ylim([-.45,1.4]);
-        elseif strcmp(gridMsrType,'w')
-            ylim([-1.25,1.4]);
-        end
-        xlabel('Number of Clusters');
-        ylabel('Grid Score');
-        
-        title(sprintf('%s, %s - eps=%d, batchSize=%d',dat, gridMeasure,epsMuVals(iEps)*1000,batchSizeVals(iBatchVals)))
-        set(gca,'FontSize',fontSiz,'fontname','Arial')
-    end
-
-    fname = [figsDir sprintf('/gridness_%s_univarScatters_nClus%d-%d_eps%d_batchSiz%d_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
 if savePlots
    set(gcf,'Renderer','painters');
    print(gcf,'-depsc2',fname)
    saveas(gcf,fname,'png');
-    close all
-end
 end
 
+% mean & bootstrap 95 CIs
+nBoot = nIter;
+clear ciTest ciTmp ciClusSig
+cnter=0;
+for iClus=1:length(clus2plot)
+    cnter = cnter+1;
+    ciTmp = bootci(nBoot,@nanmean,dat1(:,iClus));
+    ciTest(:,cnter) = [nanmean(dat1(:,iClus),1); ciTmp]; % mean & CIs
+    
+    %check CIs sig
+    posInd=ciTest(:,cnter)>0;
+    negInd=ciTest(:,cnter)<0;
+    if all(posInd)
+       ciClusSig(cnter)=1;
+    end
+    if all(negInd)
+        ciClusSig(cnter)=-1;
+    end
+    if ~all(posInd) && ~all(negInd)
+        ciClusSig(cnter)=0;
+    end
+end
 
-
-
-
+ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs
+fprintf('Sq_L-R, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig L-R, %d sig R-L, %d n.s.\n',clus2plot(1)+2,clus2plot(end)+2,mean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig==-1),nnz(ciClusSig==0));
 %% Making figs: density plot examples
 
 savePlots = 0;
