@@ -18,7 +18,7 @@ gaussSmooth = 1;
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-dat='square';
+% dat='square';
 compareCircSq = 0; %if compare circ-sq gridness, dat=circ, but load sq too
 
 % annEps=0;
@@ -37,8 +37,10 @@ nIter=200;
 
 nIter=1000;
 
-% clus2run = [3:16, 18, 20:26];  %missed 17, 19?
+%load perm data when nIter=1000- this is with nIter=200. doPerm should=0
+loadPerm = 1;
 
+% clus2run = [3:16, 18, 20:26];  %missed 17, 19?
 
 % % % dat='trapzKrupic';    
 % dat='trapzKfrmSq1';
@@ -144,6 +146,7 @@ for iClus2run = 1:length(clus2run)
                 load(f(iF).name);
             end
             
+            
             %organise gridness values (allen vs willis method)
             gA_gAll_act(:,iEps,iBvals,iClus2run,:)   = gA_act(:,1,:);
             gA_oAll_act(:,iEps,iBvals,iClus2run,:)   = gA_act(:,2,:);
@@ -171,12 +174,22 @@ for iClus2run = 1:length(clus2run)
                 densityPlotActNormAll(:,:,iterI,iEps,iBvals,iClus2run) = densityPlotActNorm(:,:,iterI);
             end
             
-            if doPerm
-            gA_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gA_act(:,3,:);
-            gW_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW_act(:,3,:);
+            %load perm data when nIter=1000- this is with nIter=200.
+            if loadPerm
+                nIterOrig = nIter; nIter=200; nIters2run=nIter;
+                fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_actNorm_perm_%dpermsOn%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,nPerm,nIters2run)];
+                fname = [saveDir, fname '*'];
+                f = dir(fname); filesToLoad = cell(1,length(f));
+                filesToLoad{1} = f(1).name;
+                load(f(1).name);
+                nIter = nIterOrig; nIters2run = nIter;
+            end
             
-            gA_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gA_actNorm(:,3,:);
-            gW_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW_actNorm(:,3,:);
+            if doPerm || loadPerm
+%                 gA_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gA_act(:,3,:);
+%                 gW_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW_act(:,3,:);
+                gA_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gA_actNorm(:,3,:);
+                gW_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW_actNorm(:,3,:);
             end
             
         end 
@@ -731,9 +744,10 @@ switch clusPosAct
         end
 end
 
-% clus2plot=([6:26])-2;
-clus2plot=([10:26])-2;
 clus2plot=([3:30])-2;
+% clus2plot=([6:26])-2;
+% clus2plot=([10:26])-2;
+% clus2plot=([10:30])-2;
 
 iBatchVals=1; %'medium' one
 
@@ -753,12 +767,14 @@ figure; hold on;
         colors  = distinguishable_colors(size(dat1,2));
         colgrey = [.5, .5, .5];
         mu      = mean(dat1,1);
-        sm      = std(dat1)./sqrt(size(dat1,1));
-        ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+%         sm      = std(dat1)./sqrt(size(dat1,1));
+%         ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
         plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-        scatter(barpos,min(dat1),dSize,colors,'d');  %min
         scatter(barpos,mean(dat1),dSize,colors,'d'); %mean
-        scatter(barpos,max(dat1),dSize,colors,'d');  %max
+%         scatter(barpos,max(dat1),dSize,colors,'d');  %max
+        scatter(barpos,prctile(dat1,99),dSize,colors,'d');  %
+
+%         prctile(dat1,[2.5, 97.5])
         xticklabels(xTickLabs);
         xlim([barpos(1)-.5, barpos(end)+.5]);
 %         if strcmp(gridMsrType,'a')
