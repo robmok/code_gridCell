@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -15,19 +15,18 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
-dat = 'square'; 
+% dat = 'square'; 
 % dat = 'trapzKrupic';
 
 % dat = 'catLearn';
 
 %compute activation and densityPlotActNorm over time? takes longer
-actOverTime = 1; 
+actOverTime = 0; 
 
 %annealed learning rate
 annEps = 1; %1 or 0
 
 jointTrls = 1;
-
 boxSize = 1; % 1=normal, 2=double size, 3=triple size
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
@@ -36,17 +35,27 @@ catsInfo.nCats=4; %2 categories
 sigmaG = [3 0; 0 3];
 catsInfo.R=chol(sigmaG);
 
-
 %love06
 %200 sims - 27:30 - circ/sq; batchSiz=400, no annEps, w/ act over time
-clus2run = 27:30;
-
-%next on love06:  27:30 - no annEps, w/ act over time
-
+% clus2run = 27:30;
+% clus2run = 14;
 
 
+% annEps new - now correct
+%love06 - circ
+clus2run = [3, 15, 23, 26, 20, 18, 4, 16, 8, 5];
+clus2run = [13, 7,  10, 19, 29, 25, 11, 21, 12];
+clus2run = [14, 27, 28, 17, 22, 6, 9, 30, 24];
+
+%love01 - sq
+clus2run = [3, 15, 23,  26, 20, 18];
+% clus2run = [16, 8, 22, 6, 9, 30];
+% clus2run = [5,  13, 7, 10,19, 29];
+% clus2run = [11, 21, 12, 14, 27, 25]; 
+% clus2run = [4, 24, 17, 28]; 
 
 
+% clus2run = 25;
 
 %%%%%
 %STILL TO RUN on love01 - 
@@ -95,6 +104,9 @@ end
 % epsMuVals = [0.05, 0.025]; 
 epsMuVals = 0.025;
 % epsMuVals = 0.015; 
+if annEps
+    epsMuVals = 0.1; %new
+end
 
 % use the same training data (trials) across current sims or gen new data
 useSameTrls=0;
@@ -131,7 +143,7 @@ warpType = 'sq2rect';
 %%
 saveDat=1; %save simulations
 
-nIter=200; %200 for covering map, 20 for cat; 1k for covering map new
+nIter=1000; %200 for covering map, 20 for cat; 1k for covering map new
 
 if useSameTrls
 %     switch dat
@@ -158,10 +170,6 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
             end
             c1=round(c.*100000); % for saving file name
         for iBvals = 1:nBvals
-            if annEps
-%                 epsMuOrig1000 = nBatches(iBvals)/100;%for saving
-                epsMuOrig1000 = nBatches*.6; %temp - defined in the function now
-            end
             if fixBatchSize
                 batchSize = batchSizeVals(iBvals); %fixed batch size
                 fprintf('Running %s, nClus=%d, epsMu=%d, c=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000,c1, batchSize)
@@ -180,7 +188,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
             if strcmp(dat(1:3),'cat') %save muAll
                 [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll,trials] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls,actOverTime);
             else
-                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls,actOverTime);
+                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll,trials] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls,actOverTime);
             end
             
             timeTaken=toc;
@@ -191,25 +199,20 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                 if warpBox
                     fname = [fname '_warpBox'];
                 end
-                if boxSize>1
-                    fname = [fname sprintf('_boxSizex%d',boxSize)];
-                end
-                if annEps
-                    fname = [fname '_annEps'];
-                end
                 if jointTrls
                     fname = [fname '_jointTrls_stepSiz'];
                 end
                 if ~actOverTime && ~strcmp(dat(1:3),'cat')
                     fname = [fname '_noActOverTime'];
                 end
+                if annEps
+                    fname = [fname '_annEps'];
+                end
                 
                 if strcmp(dat(1:3),'cat')
                     fname = [fname sprintf('_%dcats_stoch%d_c%d',catsInfo.nCats,stoch,c1)];
                 end
-                
                 cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
-
                 if strcmp(dat(1:4),'trap')
                     save(fname,'densityPlot','gA','gW','rSeed','muInit','clusDistB','timeTaken'); 
                 elseif strcmp(dat(1:3),'cat')

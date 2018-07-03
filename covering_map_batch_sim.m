@@ -12,13 +12,12 @@ batchSize = floor(batchSize); % when have decimal points, above needed
 
 %if decrease learning rate over time: 1/(1+decay+timestep); Decay - set a param
 if annEps
-    nBatches = nTrials./batchSize; %2500, 5000, 250000, 50000
-%     epsMuOrig = nBatches/100;
-% %     epsMuOrig = nBatches/150; %200
-%     annEpsDecay = nBatches/40;
-    
-    epsMuOrig = nBatches*.6;
-    annEpsDecay = nBatches/10;
+    nBatches = nTrials./batchSize; %2500, 5000, 250000, 50000  
+%     epsMuOrig = 0.05;
+%     annEpsDecay = 1.6e-07*(nBatches*20); % eps stays high till 1/annEpsDecay batches; here 125
+    epsMuOrig = 0.1;
+    annEpsDecay = 1.6e-07*(nBatches*39); % eps stays high till 1/annEpsDecay batches; here 64.1026
+
 end
 
 %compute gridness over time %20 timepoints; - 21 sets now - last one is last quarter
@@ -130,10 +129,6 @@ for iterI = 1:nIter
     end
     % mu(:,:,1) = kmplusInit(dataPtsTest,nClus); %kmeans++ initialisation
     
-    %add one where all clusters are randomly placed within the box (need to
-    %figure out how to do this for irregular shapes)
-    %++
-   
     muInit(:,:,iterI) = mu(:,:,1);
     actTrl = zeros(nClus,batchSize);
     %%
@@ -144,7 +139,6 @@ for iterI = 1:nIter
     
     actTrlAll = nan(nClus,batchSize,nBatch); %check
 
-    
     for iBatch=1:nBatch
         batchInd=batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize; %trials to average over
         trls2Upd = trials(batchInd,:); %trials to use this batch
@@ -202,12 +196,13 @@ for iterI = 1:nIter
             
             %learning rate
             if annEps %if use annealed learning rate
-                epsMu = epsMuOrig./(1+annEpsDecay+iBatch*250); %need to check if it's actually epsMuOrig*(1/(1+annEpsDecay+iBatch);
+                epsMu = epsMuOrig/(1+(annEpsDecay*iBatch)); %new
 %                 clear epsAll
-% %                 for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+annEpsDecay+iBatch); end
-%                 for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+annEpsDecay+iBatch*250); end
-%                 figure; plot(epsAll);
-%                 epsAll(nBatches.*[.05, .25, .5, .75, .95]) % eps at 25%, 50%, 75% of trials: 0.0396    0.0199    0.0133
+%                 epsMuOrig = 0.1;
+%                 annEpsDecay = 1.6e-07*(nBatches*39); % eps stays high till 1/annEpsDecay batches; here 64.1026
+%                 for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+(annEpsDecay*iBatch)); end
+%                 figure; plot(epsAll); hold on;
+%                 epsAll(nBatches.*[.05, .25, .5, .75, .95, 1]) % eps at 25%, 50%, 75% of trials: 
             else
                 epsMu = epsMuOrig;
             end

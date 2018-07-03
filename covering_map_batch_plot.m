@@ -89,14 +89,13 @@ boxSize=1;
 
 % joined trials
 jointTrls=1;
-% clus2run = [8, 12, 16, 20,24, 28]; 
-% clus2run = [8:2:28]; 
+% clus2run = [3:26]; 
+% clus2run = [6:26]; 
+% clus2run = [10:26]; 
 clus2run = [3:26]; 
-clus2run = [6:26]; 
-clus2run = [10:26]; 
 epsMuVals=.025;
 nTrials=1000000;
-batchSizeVals = [1000, 400, 100]; 
+% batchSizeVals = [1000, 400, 100]; 
 batchSizeVals=400;
 annEps=0;
 
@@ -111,8 +110,6 @@ annEps=0;
 % clus2run = [10,15,20,25];
 % clus2run = [4:25];
 
-% clus2run=26;
-
 batchSizeVals = 400; %100, 125, 200,400, 1000
 
 %new - slower learning rate
@@ -125,14 +122,12 @@ nIter=200;
 actOverTime = 1;
 clus2run = 3:30;
 
-% %1000 iters
-% nIter=1000;
-% actOverTime = 0;
-% nSet = 1;
+% % %1000 iters
+nIter=1000;
+actOverTime = 0;
+nSet = 1;
 clus2run = 3:30;
 % clus2run = [10, 12:26]; 
-
-% clus2run = [3:5 ,7, 9, 10, 12, 15:30];  % circ missing 6,8, 11,13,14 , 15, 16,18, 21
 
 
 
@@ -743,9 +738,9 @@ iEps=1;
 % clus2plot=(6:26)-2;
 
 clus2plot = 1:length(clus2run);
-% clus2plot=(6:30)-2;
-% clus2plot=(10:30)-2;
-% clus2plot=(10:26)-2;
+clus2plot=(6:30)-2;
+clus2plot=(10:30)-2;
+clus2plot=(10:26)-2;
 
 iBatchVals=1; %'medium' one
 
@@ -805,9 +800,8 @@ end
 
 
 %overall mean
-ci = bootci(length(clus2run),@mean,mean(dat1,1));
-fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2plot(1)+2,clus2plot(end)+2,mean(mean(dat1,1)),ci(1),ci(2));
-
+ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs
+fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2plot(1)+2,clus2plot(end)+2,nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2));
 
 %%
     
@@ -993,9 +987,10 @@ for iClus = clus2plot
         ciClusSig(cnter)=0;
     end
 end
-ci = bootci(length(gt_b),@mean,mean(gt_b,2));
+% ci = bootci(length(gt_b),@mean,mean(gt_b,2));
+ci = bootci(numel(gt_b),@nanmean,reshape(gt_b,1,numel(gt_b))); %CI over ALL runs
 
-fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig betas > 0, out of %d sig betas. %0.2f percent\n',clus2plot(1)+2,clus2plot(end)+2,mean(mean(gt_b,2)),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
+fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig betas > 0, out of %d sig betas. %0.2f percent\n',clus2plot(1)+2,clus2plot(end)+2,mean(reshape(gt_b,1,numel(gt_b))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
 
 
 %TO DO:

@@ -19,6 +19,8 @@ fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
 % dat='square';
+compareCircSq = 0; %if compare circ-sq gridness, dat=circ, but load sq too
+
 % annEps=0;
 boxSize=1;
 
@@ -33,10 +35,12 @@ nTrials=1000000;
 annEps=0;
 nIter=200;
 
-% nIter=1000;
+nIter=1000;
+
+%load perm data when nIter=1000- this is with nIter=200. doPerm should=0
+loadPerm = 1;
 
 % clus2run = [3:16, 18, 20:26];  %missed 17, 19?
-
 
 % % % dat='trapzKrupic';    
 % dat='trapzKfrmSq1';
@@ -48,8 +52,9 @@ nIter=200;
 % dat='trapzKfrmSq2';
 % nTrials=1000000;
 
-clus2run = [3:26]; 
+% clus2run = [3:26]; 
 clus2run = [3:30]; 
+% clus2run = [3:26]; 
 % clus2run = 20:23; 
 
 % clus2run=6:26;
@@ -141,6 +146,7 @@ for iClus2run = 1:length(clus2run)
                 load(f(iF).name);
             end
             
+            
             %organise gridness values (allen vs willis method)
             gA_gAll_act(:,iEps,iBvals,iClus2run,:)   = gA_act(:,1,:);
             gA_oAll_act(:,iEps,iBvals,iClus2run,:)   = gA_act(:,2,:);
@@ -168,20 +174,85 @@ for iClus2run = 1:length(clus2run)
                 densityPlotActNormAll(:,:,iterI,iEps,iBvals,iClus2run) = densityPlotActNorm(:,:,iterI);
             end
             
-            if doPerm
-            gA_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gA_act(:,3,:);
-            gW_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW_act(:,3,:);
+            %load perm data when nIter=1000- this is with nIter=200.
+            if loadPerm
+                nIterOrig = nIter; nIter=200; nIters2run=nIter;
+                fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_actNorm_perm_%dpermsOn%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,nPerm,nIters2run)];
+                fname = [saveDir, fname '*'];
+                f = dir(fname); filesToLoad = cell(1,length(f));
+                filesToLoad{1} = f(1).name;
+                load(f(1).name);
+                nIter = nIterOrig; nIters2run = nIter;
+            end
             
-            gA_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gA_actNorm(:,3,:);
-            gW_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW_actNorm(:,3,:);
+            if doPerm || loadPerm
+%                 gA_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gA_act(:,3,:);
+%                 gW_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW_act(:,3,:);
+                gA_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gA_actNorm(:,3,:);
+                gW_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW_actNorm(:,3,:);
             end
             
         end 
     end
 end
+
+
+if strcmp(dat,'trapzKfrmSq1') || compareCircSq %added compare circ vs sq - should work?
+    
+    datOrig = dat;
+    dat = 'square';
+    doPerm=0; % sq 200iter noPerm not run yet
+    nTrials=1000000;
+
+%load sq gridness to compare with trapz
+for iClus2run = 1:length(clus2run) 
+    nClus = clus2run(iClus2run);
+    for iEps = 1:length(epsMuVals) 
+        epsMuOrig=epsMuVals(iEps);
+        epsMuOrig1000=epsMuOrig*1000;
+        for iBvals = 1:length(batchSizeVals)
+            batchSize = batchSizeVals(iBvals);
+            fprintf('Loading %s, nClus=%d, epsMu=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000,batchSize)
+
+            if doPerm
+                fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_actNorm_perm_%dpermsOn%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,nPerm,nIters2run)];
+            else
+                
+                fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_trlsTest_noPerm',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+            end
+%             %note, annEps slightly different file name
+
+
+
+
+            %finish with directory and * for date/time
+            fname = [saveDir, fname '*'];
+            
+            %edit if want to load more than one file per sim, merge
+            f = dir(fname); filesToLoad = cell(1,length(f));
+            for iF = 1%:length(f)
+                filesToLoad{iF} = f(iF).name;
+                load(f(iF).name);
+            end
+            
+            %organise gridness values (allen vs willis method)
+            gA_gAll_actNormSq(:,iEps,iBvals,iClus2run,:)   = gA_actNorm(:,1,:);
+            gA_oAll_actNormSq(:,iEps,iBvals,iClus2run,:)   = gA_actNorm(:,2,:);
+            gA_radAll_actNormSq(:,iEps,iBvals,iClus2run,:) = gA_actNorm(:,3,:);
+            gA_wavAll_actNormSq(:,iEps,iBvals,iClus2run,:) = gA_actNorm(:,4,:);
+            gW_gAll_actNormSq(:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,1,:);
+            gW_oAll_actNormSq(:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,2,:);
+            gW_radAll_actNormSq(:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,3,:);
+            gW_wavAll_actNormSq(:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,4,:);  
+            
+        end 
+    end
+end
+dat = datOrig;
+end
 %% Making figs - univar scatters 1 - test set
 
-savePlots=0;
+savePlots=1;
 
 clusPosAct = 'actNorm'; %'act' or 'actNorm'
 
@@ -189,7 +260,9 @@ gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
 
 gridMeasure = 'grid';
 
-plotFewClus = 1; %plot 3:5 clusters separately
+plotFewClus = 0; %plot 3:5 clusters separately
+
+computeCIs = 0; %takes a bit of time
 
 switch clusPosAct
 % case 'clus'
@@ -253,9 +326,11 @@ clus2plot=(10:26)-2;
 % clus2plot=([6:24])-2;
 
 clus2plot=(3:30)-2;
-% clus2plot=(6:30)-2;
-% clus2plot=(10:30)-2;
-% clus2plot=(10:26)-2;
+clus2plot=(6:30)-2;
+clus2plot=(10:30)-2;
+clus2plot=(10:26)-2;
+
+% clus2plot=(3:26)-2;
 
 
 % clus2plot=1:length(clus2run);
@@ -311,6 +386,7 @@ if savePlots
    set(gcf,'Renderer','painters');
    print(gcf,'-depsc2',fname)
    saveas(gcf,fname,'png');
+   close all
 end
 
 
@@ -400,22 +476,83 @@ if strcmp(dat(1:4),'trap')
         set(gcf,'Renderer','painters');
         print(gcf,'-depsc2',fname)
         saveas(gcf,fname,'png');
+        close all
     end
     
 end
 
 % mean & bootstrap 95 CIs
-nBoot = nIter;
-clear ciTrain ciTmp
-for iClus=1:length(clus2plot)
-    ciTmp = bootci(nBoot,@mean,dat1(:,iClus));
-    ciTrain(iClus,:) = [mean(dat1(:,iClus),1); ciTmp]; % mean & CIs
+if computeCIs
+if ~strcmp(dat,'trapzKfrmSq1')
+    nBoot = nIter;
+    clear ciTest ciTmp
+    for iClus=1:length(clus2plot)
+        ciTmp = bootci(nBoot,@nanmean,dat1(:,iClus));
+        ciTest(iClus,:) = [nanmean(dat1(:,iClus),1); ciTmp]; % mean & CIs
+    end
+%     ci = bootci(length(clus2run),@nanmean,nanmean(dat1,1)); %CI over mean of nClus conds - prob not as gd
+    ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs 
+    fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2plot(1)+2,clus2plot(end)+2,nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2))
+else
+    %trapz 
+    dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,1));
+    ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs 
+    % individual nClus cond CIs, whole trapz
+    nBoot = nIter;
+    clear ciTest ciTmp ciClusSig
+    cnter=0;
+    for iClus=1:length(clus2plot)
+        cnter = cnter+1;
+        ciTmp = bootci(nBoot,@nanmean,dat1(:,iClus));
+        ciTest(:,cnter) = [nanmean(dat1(:,iClus),1); ciTmp]; % mean & CIs
+        
+        %check CIs sig
+        posInd=ciTest(:,cnter)>0;
+        negInd=ciTest(:,cnter)<0;
+        if all(posInd)
+            ciClusSig(cnter)=1;
+        end
+        if all(negInd)
+            ciClusSig(cnter)=-1;
+        end
+        if ~all(posInd) && ~all(negInd)
+            ciClusSig(cnter)=0;
+        end
+    end
+    fprintf('trapz, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f];  %d sig > 0, out of %d sig conds. %0.2f percent\n',clus2plot(1)+2,clus2plot(end)+2,nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
+    dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,2));
+    ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs 
+    fprintf('trapzL %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2plot(1)+2,clus2plot(end)+2,nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2));
+    dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,3));
+    ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs 
+    fprintf('trapzR %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2plot(1)+2,clus2plot(end)+2,nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2));
+    % individual nClus cond CIs, L-R
+    dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,2))-squeeze(datTmp(:,iEps,iBatchVals,clus2plot,3));
+    nBoot = nIter;
+    clear ciTest ciTmp ciClusSig
+    cnter=0;
+    for iClus=1:length(clus2plot)
+        cnter = cnter+1;
+        ciTmp = bootci(nBoot,@nanmean,dat1(:,iClus));
+        ciTest(:,cnter) = [nanmean(dat1(:,iClus),1); ciTmp]; % mean & CIs
+        
+        %check CIs sig
+        posInd=ciTest(:,cnter)>0;
+        negInd=ciTest(:,cnter)<0;
+        if all(posInd)
+            ciClusSig(cnter)=1;
+        end
+        if all(negInd)
+            ciClusSig(cnter)=-1;
+        end
+        if ~all(posInd) && ~all(negInd)
+            ciClusSig(cnter)=0;
+        end
+    end
+    ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs 
+    fprintf('trapzL-R, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f];  %d sig > 0, out of %d sig conds. %0.2f percent\n',clus2plot(1)+2,clus2plot(end)+2,nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
 end
-% ciTrain
-
-ci = bootci(length(clus2run),@mean,mean(dat1,1));
-fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2plot(1)+2,clus2plot(end)+2,mean(mean(dat1,1)),ci(1),ci(2));
-
+end
 %%
 
 if plotFewClus
@@ -607,8 +744,10 @@ switch clusPosAct
         end
 end
 
+clus2plot=([3:30])-2;
 % clus2plot=([6:26])-2;
-clus2plot=([10:26])-2;
+% clus2plot=([10:26])-2;
+% clus2plot=([10:30])-2;
 
 iBatchVals=1; %'medium' one
 
@@ -628,12 +767,14 @@ figure; hold on;
         colors  = distinguishable_colors(size(dat1,2));
         colgrey = [.5, .5, .5];
         mu      = mean(dat1,1);
-        sm      = std(dat1)./sqrt(size(dat1,1));
-        ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+%         sm      = std(dat1)./sqrt(size(dat1,1));
+%         ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
         plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-        scatter(barpos,min(dat1),dSize,colors,'d');  %min
         scatter(barpos,mean(dat1),dSize,colors,'d'); %mean
-        scatter(barpos,max(dat1),dSize,colors,'d');  %max
+%         scatter(barpos,max(dat1),dSize,colors,'d');  %max
+        scatter(barpos,prctile(dat1,99),dSize,colors,'d');  %
+
+%         prctile(dat1,[2.5, 97.5])
         xticklabels(xTickLabs);
         xlim([barpos(1)-.5, barpos(end)+.5]);
 %         if strcmp(gridMsrType,'a')
@@ -664,4 +805,138 @@ end
 % squeeze(mean(mean(permThresh(:,1,1,:))))
 % squeeze(max(max(permThresh(:,1,1,:))))
     
+
+
+%% trapz vs orig sq gridness / circ vs sq
+
+savePlots=0;
+
+clusPosAct = 'actNorm'; %'act' or 'actNorm'
+
+gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
+
+gridMeasure = 'grid';
+
+switch clusPosAct
+%     case 'act'
+%         switch gridMsrType
+%             case 'a'
+%                 gridness    = gA_gAll_act;
+%                 orientation = gA_oAll_act;
+%                 rad         = gA_radAll_act;
+%                 wav         = gA_wavAll_act;
+%             case 'w'
+%                 gridness    = gW_gAll_act;
+%                 orientation = gW_oAll_act;
+%                 rad         = gW_radAll_act;
+%                 wav         = gW_wavAll_act;
+%         end
+    case 'actNorm'
+        switch gridMsrType
+            case 'a'
+                gridness    = gA_gAll_actNormSq-gA_gAll_actNorm;
+            case 'w'
+                gridness    = gW_gAll_actNormSq-gW_gAll_actNorm;
+        end
+end
+
+%flip sign for circ, so plotting circ>sq gridness
+if strcmp(dat(1:4),'circ')
+    gridness = -gridness;
+end
+
+switch gridMeasure
+    case 'grid'
+        datTmp=gridness;
+    case 'angle'
+        datTmp=orientation;
+    case 'rad'
+        datTmp=rad;
+    case 'wav'
+        datTmp=wav;
+end
+
+
+
+iEps=1;
+
+
+clus2plot=(3:30)-2;
+clus2plot=(6:30)-2;
+clus2plot=(10:30)-2;
+clus2plot=(10:26)-2;
+
+clus2plot=(3:26)-2;
+
+iBatchVals=1;
+
+%fig specs
+xTickLabs = num2cell(clus2run(clus2plot));
+fontSiz=15;
+
+figure; hold on;
+    for iEps = 1:length(epsMuVals)
+        dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,1));
+        barpos  = .25:.5:.5*size(dat1,2);
+        colors  = distinguishable_colors(size(dat1,2));
+        colgrey = [.6, .6, .6];
+        mu      = mean(dat1,1);
+%         sm      = std(dat1)./sqrt(size(dat1,1));
+%         ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+        plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
+%         errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+%         scatter(barpos,mu,50,colors,'filled','d');
+        scatter(barpos,mu,50,colgrey,'filled','d');
+        xticklabels(xTickLabs);
+        xlim([barpos(1)-.5, barpos(end)+.5]);
+        %         ylim([0,1]);
+        if strcmp(gridMsrType,'a')
+            ylim([-1.5,2]);
+        elseif strcmp(gridMsrType,'w')
+%             ylim([-1.25,1.4]);
+        end
+        xlabel('Number of Clusters');
+        ylabel('Grid Score');
+        title('Square-Trapezoid box')
+
+        set(gca,'FontSize',fontSiz,'fontname','Arial')
+    end
+    fname = [figsDir sprintf('/gridness_%s_univarScatters_testSet_nClus%d-%d_eps%d_batchSiz%d_%s_%s','trapzKfrmSq1_Sq-Trapz',clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
+if savePlots
+   set(gcf,'Renderer','painters');
+   print(gcf,'-depsc2',fname)
+   saveas(gcf,fname,'png');
+end
+
+% mean & bootstrap 95 CIs
+nBoot = nIter;
+clear ciTest ciTmp ciClusSig
+cnter=0;
+for iClus=1:length(clus2plot)
+    cnter = cnter+1;
+    ciTmp = bootci(nBoot,@nanmean,dat1(:,iClus));
+    ciTest(:,cnter) = [nanmean(dat1(:,iClus),1); ciTmp]; % mean & CIs
     
+    %check CIs sig
+    posInd=ciTest(:,cnter)>0;
+    negInd=ciTest(:,cnter)<0;
+    if all(posInd)
+       ciClusSig(cnter)=1;
+    end
+    if all(negInd)
+        ciClusSig(cnter)=-1;
+    end
+    if ~all(posInd) && ~all(negInd)
+        ciClusSig(cnter)=0;
+    end
+end
+
+ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs
+if strcmp(dat(1:4),'trap')
+    fprintf('Square-Trapezoid box, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig Square-Trapezoid, %d sig Trapezoid-Square , %0.2f percent Sq>T\n',clus2plot(1)+2,clus2plot(end)+2,mean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig==-1),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
+elseif strcmp(dat(1:4),'circ')
+    fprintf('Circ-Square box, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig Circ-Square, %d sig Square-Circ, %0.2f percent C>Sq\n',clus2plot(1)+2,clus2plot(end)+2,mean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig==-1),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
+end
+      
+
+
