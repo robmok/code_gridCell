@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -41,17 +41,18 @@ catsInfo.R=chol(sigmaG);
 % clus2run = 14;
 
 
-
 % annEps new - now correct
 %love06 - circ
-clus2run = [3, 15, 23,  26, 20, 18, 4, 16, 8, 22, 6, 9, 30, 24 ];
-% clus2run = [5,  13, 7, 10,19, 29, 25, 11, 21, 12, 14, 27, 28, 17];
+clus2run = [3, 15, 23, 26, 20, 18, 4, 16, 8, 5];
+clus2run = [13, 7,  10, 19, 29, 25, 11, 21, 12];
+clus2run = [14, 27, 28, 17, 22, 6, 9, 30, 24];
 
 %love01 - sq
-% clus2run = [3, 15, 23,  26, 20, 18, 4];
-% clus2run = [16, 8, 22, 6, 9, 30, 24];
-% clus2run = [5,  13, 7, 10,19, 29, 25];
-% clus2run = [11, 21, 12, 14, 27, 28, 17]; 
+clus2run = [3, 15, 23,  26, 20, 18];
+% clus2run = [16, 8, 22, 6, 9, 30];
+% clus2run = [5,  13, 7, 10,19, 29];
+% clus2run = [11, 21, 12, 14, 27, 25]; 
+% clus2run = [4, 24, 17, 28]; 
 
 
 % clus2run = 25;
