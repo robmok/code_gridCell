@@ -130,10 +130,6 @@ for iterI = 1:nIter
     end
     % mu(:,:,1) = kmplusInit(dataPtsTest,nClus); %kmeans++ initialisation
     
-    %add one where all clusters are randomly placed within the box (need to
-    %figure out how to do this for irregular shapes)
-    %++
-   
     muInit(:,:,iterI) = mu(:,:,1);
     actTrl = zeros(nClus,batchSize);
     %%
@@ -144,7 +140,6 @@ for iterI = 1:nIter
     
     actTrlAll = nan(nClus,batchSize,nBatch); %check
 
-    
     for iBatch=1:nBatch
         batchInd=batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize; %trials to average over
         trls2Upd = trials(batchInd,:); %trials to use this batch
@@ -202,13 +197,15 @@ for iterI = 1:nIter
             
             %learning rate
             if annEps %if use annealed learning rate
-                epsMu = epsMuOrig./(1+annEpsDecay+iBatch*250); % should be *ibatch! 
-                clear epsAll
-%                 for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+annEpsDecay+iBatch); end
-%                 for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+annEpsDecay+iBatch*250); end   %i used this! incorrect..!
-                for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+annEpsDecay*iBatch*250); end
-                figure; plot(epsAll);
-                epsAll(nBatches.*[.05, .25, .5, .75, .95]) % eps at 25%, 50%, 75% of trials: 0.0396    0.0199    0.0133
+                epsMu = epsMuOrig./(1+(annEpsDecay*iBatch*250));
+%                 epsMuOrig = 2;%nBatches*.6;
+%                 annEpsDecay = nBatches/10;
+%                 clear epsAll
+%                 for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+(annEpsDecay*iBatch)); end
+% %                 for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+(annEpsDecay*iBatch*250)); end
+% %                 for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+annEpsDecay+iBatch*250); end   %i used this! incorrect..!
+%                  figure; plot(epsAll); hold on;
+%                 epsAll(nBatches.*[.05, .25, .5, .75, .95]) % eps at 25%, 50%, 75% of trials: 0.0396    0.0199    0.0133
             else
                 epsMu = epsMuOrig;
             end

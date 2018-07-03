@@ -41,6 +41,8 @@ catsInfo.R=chol(sigmaG);
 %200 sims - 27:30 - circ/sq; batchSiz=400, no annEps, w/ act over time
 clus2run = 27:30;
 
+clus2run = 14;
+
 %next on love06:  27:30 - no annEps, w/ act over time
 
 
