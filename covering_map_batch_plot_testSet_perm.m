@@ -18,7 +18,7 @@ gaussSmooth = 1;
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-% dat='square';
+dat='square';
 compareCircSq = 0; %if compare circ-sq gridness, dat=circ, but load sq too
 
 % annEps=0;
@@ -181,15 +181,15 @@ for iClus2run = 1:length(clus2run)
                 fname = [saveDir, fname '*'];
                 f = dir(fname); filesToLoad = cell(1,length(f));
                 filesToLoad{1} = f(1).name;
-                load(f(1).name);
+                perm=load(f(1).name);
                 nIter = nIterOrig; nIters2run = nIter;
             end
             
             if doPerm || loadPerm
 %                 gA_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gA_act(:,3,:);
 %                 gW_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW_act(:,3,:);
-                gA_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gA_actNorm(:,3,:);
-                gW_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW_actNorm(:,3,:);
+                gA_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = perm.permPrc_gA_actNorm(:,3,:);
+                gW_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = perm.permPrc_gW_actNorm(:,3,:);
             end
             
         end 
@@ -252,7 +252,7 @@ dat = datOrig;
 end
 %% Making figs - univar scatters 1 - test set
 
-savePlots=1;
+savePlots=0;
 
 clusPosAct = 'actNorm'; %'act' or 'actNorm'
 
@@ -326,9 +326,9 @@ clus2plot=(10:26)-2;
 % clus2plot=([6:24])-2;
 
 clus2plot=(3:30)-2;
-clus2plot=(6:30)-2;
-clus2plot=(10:30)-2;
-clus2plot=(10:26)-2;
+% clus2plot=(6:30)-2;
+% clus2plot=(10:30)-2;
+% clus2plot=(10:26)-2;
 
 % clus2plot=(3:26)-2;
 
@@ -353,7 +353,7 @@ figure; hold on;
         colgrey = [.6, .6, .6];
         mu      = mean(dat1,1);
         sm      = std(dat1)./sqrt(size(dat1,1));
-        ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
+%         ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
         plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
 %         errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
 %         scatter(barpos,mu,50,colors,'filled','d');
@@ -382,28 +382,51 @@ figure; hold on;
 
     fname = [figsDir sprintf('/gridness_%s_univarScatters_testSet_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
 
-if savePlots
-   set(gcf,'Renderer','painters');
-   print(gcf,'-depsc2',fname)
-   saveas(gcf,fname,'png');
-   close all
+% if savePlots
+%    set(gcf,'Renderer','painters');
+%    print(gcf,'-depsc2',fname)
+%    saveas(gcf,fname,'png');
+%    close all
+% end
+
+
+%prop grid cells
+permPrc = 100; %use top x prctile of the perm distributions - 97.5/99/99.5/100
+if ~strcmp(dat(1:4),'trap')
+    propGrid = nan(size(dat1,2),1);
+    propGridCI = nan(size(dat1,2),2);
+    for i=1:size(dat1,2)
+        propGrid(i)     = nnz(dat1(:,i)>squeeze(prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot(i)),permPrc)))/nIter;
+        propGridCI(i,:) = bootrm(dat1(:,i),[2.5, 97.5],'percentGr',nIter,prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot(i)),permPrc));
+    end
+    
+    %plot mean + CI as errorbars
+    figure; hold on;
+    mu = propGrid;
+    ci = propGridCI;
+    barpos  = .25:.5:.5*size(dat1,2);
+    colors  = distinguishable_colors(size(dat1,2));
+    colgrey = [.6, .6, .6];
+    scatter(barpos,mu,200,colors,'.');
+    errorbar(barpos,mu,mu-ci(:,1),abs(mu-ci(:,2)),'Color',colgrey,'LineStyle','None','LineWidth',1);
+    xticks(barpos);
+    xticklabels(xTickLabs);
+    xlim([barpos(1)-.5, barpos(end)+.5]);
+    xlabel('Number of Clusters');
+    ylabel('Proportion "Grid Cells"');
+    set(gca,'FontSize',fontSiz,'fontname','Arial')
+
+%             title('Circular box')
+    fname = [figsDir sprintf('/gridness_%s_propGridCells_permPrc%d_testSet_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,permPrc,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
+    
+    if savePlots
+        set(gcf,'Renderer','painters');
+        print(gcf,'-depsc2',fname)
+        saveas(gcf,fname,'png');
+        close all
+    end
+    
 end
-
-
-% % %prop grid cells, averaged across clusters
-% if ~strcmp(dat(1:4),'trap')
-% %     maxThresh=squeeze(max(max(gA_actNorm_permPrc(:,1,1,8:end))));
-%     maxThresh=squeeze(max(max(gA_actNorm_permPrc(:,1,1,:))));
-% %     maxThresh=squeeze(max(max(gW_actNorm_permPrc(:,1,1,8:end))));
-% %     maxThresh=squeeze(max(max(gW_actNorm_permPrc(:,1,1,:))));
-% %     maxThresh=0.4;
-%     propGrid=nan(1,size(dat1,2));
-% for i=1:size(dat1,2) %length(clus2run)
-% propGrid(i)=nnz(dat1(:,i)>maxThresh)/200;
-% end
-% mean(propGrid)
-% std(propGrid)/sqrt(length(propGrid))
-% end
 
 
 if strcmp(dat(1:4),'trap')
@@ -719,7 +742,7 @@ end
 %% Thresholds from perm stats
 figsDir = [wd '/grid_figs'];
 
-savePlots=0;
+savePlots=1;
 
 clusPosAct = 'actNorm'; %'act' or 'actNorm'
 
@@ -770,9 +793,11 @@ figure; hold on;
 %         sm      = std(dat1)./sqrt(size(dat1,1));
 %         ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
         plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-        scatter(barpos,mean(dat1),dSize,colors,'d'); %mean
+%         scatter(barpos,mean(dat1),dSize,colors,'d'); %mean
+        scatter(barpos,mean(dat1),50,colgrey,'filled','d');
+
 %         scatter(barpos,max(dat1),dSize,colors,'d');  %max
-        scatter(barpos,prctile(dat1,99),dSize,colors,'d');  %
+        scatter(barpos,prctile(dat1,100),dSize,colors,'x');  %
 
 %         prctile(dat1,[2.5, 97.5])
         xticklabels(xTickLabs);
