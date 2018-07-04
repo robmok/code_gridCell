@@ -1,21 +1,17 @@
 %% plot centres 
 
-nClus = size(muAvg,1);
+nClus = size(muAll,1);
 colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
 
 iterI=1; 
 
-for iSet=1:4 %size(muAvg,3) %plot - diff averaging over nTrials
+for iSet=1%:4 %size(muAvg,3) %plot - diff averaging over nTrials
     figure; hold on;
-    scatter(muAvg(:,1,iSet,iterI),muAvg(:,2,iSet,iterI),20e+2,colors,'.');
+%     scatter(muAvg(:,1,iSet,iterI),muAvg(:,2,iSet,iterI),20e+2,colors,'.');
+    scatter(muAll(:,1,end),muAll(:,2,end),20e+2,colors,'.');
     xlim(locRange); ylim(locRange);
 %     voronoi(muAvg(:,1,iSet,iterI),muAvg(:,2,iSet,iterI),'k');
 end
-% 
-figure; hold on;
-scatter(muAll(:,1,end),muAll(:,2,end),20e+2,colors,'.');
-xlim(locRange); ylim(locRange);
-% voronoi(muAll(:,1,end),muAll(:,2,end),'k');
 
 %% gridness, autocorrelogram
 
@@ -148,7 +144,7 @@ if ~exist('dat')
 end
 
 %if plotAgent, need trials as an output argument
-plotAgent = 0;
+plotAgent = 1;
 
 nClus = size(muAll,1);
 
@@ -169,7 +165,9 @@ for iBatch = 1:nBatches/4 % - for trapzKfrmSq
 end
 % end
 
-figure;
+figure; hold on;
+xlim([0, 50]);
+ylim([0,50]); 
 % figure('units','normalized','outerposition',[0 0 1 1]);
 clear h1
 for iTrl = 1000:nTrials

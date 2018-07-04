@@ -27,9 +27,14 @@ switch dat
         catCentres = nan(catsInfo.nCats,2);
         datPtsGauss = nan(nTrialsCat,2,catsInfo.nCats);
         for iCat = 1:catsInfo.nCats
-            catCentres(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % ±10 so category centres are not on the edge
+            if catsInfo.msExample %if generating example for ms - 2 gaussians at opposite sides of the square env
+                catCentres = [15, 35; 35, 15];
+            else
+                catCentres(iCat,:)=randsample(locRange(1)+10:locRange(2)-10,2,'true'); % ±10 so category centres are not on the edge
+            end
             datPtsGauss(:,:,iCat) = round(repmat(catCentres(iCat,:),nTrialsCat,1) + randn(nTrialsCat,2)*catsInfo.R); % key - these are the coordinates of the points
         end
+        
         trials = reshape(datPtsGauss,numel(datPtsGauss)/2,2);
         %if odd number of categories, create the remaining number of trials 
         trlsRem=nTrials-nTrialsCat*catsInfo.nCats;
@@ -210,7 +215,7 @@ end
 trialIndTest = randi(length(shapePts),nTrials,1);
 dataPtsTest  = shapePts(trialIndTest,:);
 end
-if nargout > 3
+if nargout > 3 && ~strcmp(dat(1:3),'cat')
     sq=linspace(locRange(1),locRange(2),nSteps);
     sqPts=[];
     for i=1:length(sq)
@@ -219,6 +224,8 @@ if nargout > 3
         end
     end
     ntInSq = setdiff(sqPts,shapePts,'rows');
+else
+    ntInSq =[];
 end
 end
 % %checking agent's visited locations

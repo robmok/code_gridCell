@@ -4,8 +4,8 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -18,22 +18,25 @@ dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning
 dat = 'square'; 
 % dat = 'trapzKrupic';
 
-% dat = 'catLearn';
+dat = 'catLearn';
 
 %compute activation and densityPlotActNorm over time? takes longer
 actOverTime = 0; 
 
 %annealed learning rate
-annEps = 1; %1 or 0
+annEps = 0; %1 or 0
 
 jointTrls = 1;
 boxSize = 1; % 1=normal, 2=double size, 3=triple size
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
-catsInfo.nCats=4; %2 categories
-% sigmaG = [5 0; 0 5];   % isotropic % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
-sigmaG = [3 0; 0 3];
+catsInfo.nCats=2; %2 categories
+% % variance - isotropic % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
+% sigmaG = [3 0; 0 3];
+% sigmaG = [5 0; 0 5];
+sigmaG = [7 0; 0 7];
 catsInfo.R=chol(sigmaG);
+catsInfo.msExample = 1; %2 gaussians in opposite sides of the square - example for ms
 
 %love06
 %200 sims - 27:30 - circ/sq; batchSiz=400, no annEps, w/ act over time
@@ -54,7 +57,7 @@ clus2run = [3, 15, 23,  26, 20, 18];
 % clus2run = [11, 21, 12, 14, 27, 25]; 
 % clus2run = [4, 24, 17, 28
 
-% clus2run = 25;
+clus2run = 20;
 
 %%%%%
 %STILL TO RUN on love01 - 
@@ -140,9 +143,9 @@ end
 warpBox = 0; %1 or 0
 warpType = 'sq2rect';
 %%
-saveDat=1; %save simulations
+saveDat=0; %save simulations
 
-nIter=1000; %200 for covering map, 20 for cat; 1k for covering map new
+nIter=1; %200 for covering map, 20 for cat; 1k for covering map new
 
 if useSameTrls
 %     switch dat
@@ -187,7 +190,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
             if strcmp(dat(1:3),'cat') %save muAll
                 [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll,trials] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls,actOverTime);
             else
-                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll,trials] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls,actOverTime);
+                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls,actOverTime);
             end
             
             timeTaken=toc;
