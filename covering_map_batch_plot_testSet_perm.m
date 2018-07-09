@@ -18,7 +18,7 @@ gaussSmooth = 1;
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-dat='square';
+% dat='square';
 compareCircSq = 0; %if compare circ-sq gridness, dat=circ, but load sq too
 
 % annEps=0;
@@ -38,15 +38,15 @@ nIter=200;
 nIter=1000;
 
 %load perm data when nIter=1000- this is with nIter=200. doPerm should=0
-loadPerm = 1;
+loadPerm = 0;
 
 % clus2run = [3:16, 18, 20:26];  %missed 17, 19?
 
-% % % dat='trapzKrupic';    
-% dat='trapzKfrmSq1';
-% %trapzKfrmSq1
-% nTrials=1000000/2;
-% epsMuTrapz10 = 25; 
+% % dat='trapzKrupic';    
+dat='trapzKfrmSq1';
+%trapzKfrmSq1
+nTrials=1000000/2;
+epsMuTrapz10 = 25; 
 
 
 % dat='trapzKfrmSq2';
@@ -326,9 +326,9 @@ clus2plot=(10:26)-2;
 % clus2plot=([6:24])-2;
 
 clus2plot=(3:30)-2;
-% clus2plot=(6:30)-2;
-% clus2plot=(10:30)-2;
-% clus2plot=(10:26)-2;
+clus2plot=(6:30)-2;
+clus2plot=(10:30)-2;
+clus2plot=(10:26)-2;
 
 % clus2plot=(3:26)-2;
 
@@ -395,10 +395,23 @@ permPrc = 100; %use top x prctile of the perm distributions - 97.5/99/99.5/100
 if ~strcmp(dat(1:4),'trap')
     propGrid = nan(size(dat1,2),1);
     propGridCI = nan(size(dat1,2),2);
+    propGridMaxThresh = nan(size(dat1,2),1);
+    propGridCIMaxThresh = nan(size(dat1,2),2);
     for i=1:size(dat1,2)
-        propGrid(i)     = nnz(dat1(:,i)>squeeze(prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot(i)),permPrc)))/nIter;
+        propGrid(i)     = nnz(dat1(:,i)>squeeze(prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot(i)),permPrc)))./nIter; %cond-wise thresh
         propGridCI(i,:) = bootrm(dat1(:,i),[2.5, 97.5],'percentGr',nIter,prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot(i)),permPrc));
+        
+        propGridMaxThresh(i)     = nnz(dat1(:,i)>max((prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot),permPrc))))./nIter; %max thresh
+        propGridCIMaxThresh(i,:) = bootrm(dat1(:,i),[2.5, 97.5],'percentGr',nIter,max((prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot),permPrc))));
     end
+    fprintf('%d to %d clusters: \nmean across cond means: %.3f\n', clus2plot(1)+2,clus2plot(end)+2, mean(propGrid))
+    fprintf('mean across cond means maxThresh: %.3f\n', mean(propGridMaxThresh))
+    
+%prop Grid over all conditions with max threshold
+propGridAll     = nnz(dat1>max((prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot),permPrc))))./nnz(dat1);
+propGridAllCI = bootrm(reshape(dat1,numel(dat1),1),[2.5, 97.5],'percentGr',nIter,max(prctile(squeeze(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot)),permPrc)));
+fprintf('mean and CI across cond all iters - max thresh: %.3f, CIs [%.3f,%.3f]\n', propGridAll, propGridAllCI)
+
     
     %plot mean + CI as errorbars
     figure; hold on;
@@ -834,13 +847,15 @@ end
 
 %% trapz vs orig sq gridness / circ vs sq
 
-savePlots=0;
+savePlots=1;
 
 clusPosAct = 'actNorm'; %'act' or 'actNorm'
 
 gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
 
 gridMeasure = 'grid';
+
+computeCIs=0; 
 
 switch clusPosAct
 %     case 'act'
@@ -881,17 +896,14 @@ switch gridMeasure
         datTmp=wav;
 end
 
-
-
 iEps=1;
-
 
 clus2plot=(3:30)-2;
 clus2plot=(6:30)-2;
 clus2plot=(10:30)-2;
 clus2plot=(10:26)-2;
 
-clus2plot=(3:26)-2;
+% clus2plot=(3:26)-2;
 
 iBatchVals=1;
 
@@ -922,7 +934,7 @@ figure; hold on;
         end
         xlabel('Number of Clusters');
         ylabel('Grid Score');
-        title('Square-Trapezoid box')
+        title('Square-Trapezoid')
 
         set(gca,'FontSize',fontSiz,'fontname','Arial')
     end
@@ -933,35 +945,36 @@ if savePlots
    saveas(gcf,fname,'png');
 end
 
-% mean & bootstrap 95 CIs
-nBoot = nIter;
-clear ciTest ciTmp ciClusSig
-cnter=0;
-for iClus=1:length(clus2plot)
-    cnter = cnter+1;
-    ciTmp = bootci(nBoot,@nanmean,dat1(:,iClus));
-    ciTest(:,cnter) = [nanmean(dat1(:,iClus),1); ciTmp]; % mean & CIs
+if computeCIs
+    % mean & bootstrap 95 CIs
+    nBoot = nIter;
+    clear ciTest ciTmp ciClusSig
+    cnter=0;
+    for iClus=1:length(clus2plot)
+        cnter = cnter+1;
+        ciTmp = bootci(nBoot,@nanmean,dat1(:,iClus));
+        ciTest(:,cnter) = [nanmean(dat1(:,iClus),1); ciTmp]; % mean & CIs
+        
+        %check CIs sig
+        posInd=ciTest(:,cnter)>0;
+        negInd=ciTest(:,cnter)<0;
+        if all(posInd)
+            ciClusSig(cnter)=1;
+        end
+        if all(negInd)
+            ciClusSig(cnter)=-1;
+        end
+        if ~all(posInd) && ~all(negInd)
+            ciClusSig(cnter)=0;
+        end
+    end
     
-    %check CIs sig
-    posInd=ciTest(:,cnter)>0;
-    negInd=ciTest(:,cnter)<0;
-    if all(posInd)
-       ciClusSig(cnter)=1;
-    end
-    if all(negInd)
-        ciClusSig(cnter)=-1;
-    end
-    if ~all(posInd) && ~all(negInd)
-        ciClusSig(cnter)=0;
+    ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs
+    if strcmp(dat(1:4),'trap')
+        fprintf('Square-Trapezoid box, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig Square-Trapezoid, %d sig Trapezoid-Square , %0.2f percent Sq>T\n',clus2plot(1)+2,clus2plot(end)+2,mean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig==-1),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
+    elseif strcmp(dat(1:4),'circ')
+        fprintf('Circ-Square box, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig Circ-Square, %d sig Square-Circ, %0.2f percent C>Sq\n',clus2plot(1)+2,clus2plot(end)+2,mean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig==-1),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
     end
 end
-
-ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs
-if strcmp(dat(1:4),'trap')
-    fprintf('Square-Trapezoid box, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig Square-Trapezoid, %d sig Trapezoid-Square , %0.2f percent Sq>T\n',clus2plot(1)+2,clus2plot(end)+2,mean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig==-1),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
-elseif strcmp(dat(1:4),'circ')
-    fprintf('Circ-Square box, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig Circ-Square, %d sig Square-Circ, %0.2f percent C>Sq\n',clus2plot(1)+2,clus2plot(end)+2,mean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig==-1),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
-end
-      
 
 

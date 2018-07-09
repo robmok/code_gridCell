@@ -4,8 +4,8 @@ clear all;
 % close all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -18,13 +18,13 @@ dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning
 dat = 'square'; 
 % dat = 'trapzKrupic';
 
-dat = 'catLearn';
+% dat = 'catLearn';
 
 %compute activation and densityPlotActNorm over time? takes longer
-actOverTime = 0; 
+actOverTime = 1; 
 
 %annealed learning rate
-annEps = 0; %1 or 0
+annEps = 1; %1 or 0
 
 jointTrls = 1;
 boxSize = 1; % 1=normal, 2=double size, 3=triple size
@@ -46,31 +46,33 @@ catsInfo.msExample = 1; %2 gaussians in opposite sides of the square - example f
 
 % annEps new - now correct
 %love06 - circ
-clus2run = [3, 15, 23, 26, 20, 18, 4, 16, 8, 5];
-clus2run = [13, 7,  10, 19, 29, 25, 11, 21, 12];
-clus2run = [14, 27, 28, 17, 22, 6, 9, 30, 24];
+% clus2run = [3, 15, 23, 26, 20, 18, 4, 16, 8, 5];
+% clus2run = [13, 7,  10, 19, 29, 25, 11, 21, 12];
+% clus2run = [14, 27, 28, 17, 22, 6, 9, 30, 24];
 
 %love01 - sq
-clus2run = [3, 15, 23,  26, 20, 18];
+% clus2run = [3, 15, 23,  26, 20, 18];
 % clus2run = [16, 8, 22, 6, 9, 30];
 % clus2run = [5,  13, 7, 10,19, 29];
 % clus2run = [11, 21, 12, 14, 27, 25]; 
-% clus2run = [4, 24, 17, 28
+% clus2run = [4, 24, 17, 28]
 
-clus2run = 20;
+% clus2run = 18;
 
-%%%%%
-%STILL TO RUN on love01 - 
-%NOTE edit to actOverTime=0 when run, AND batchSiz=200
-%%%%%
-%1k sims, batsiz=200 - STOPPED - run this when perms done
-%circ - love01 - no annEps, and annEps - was running 8 matlabs
-% clus2run = [6, 20, 24, 18]; %14, 15, 23; - waiting 23 noAnnEps (screen c2)
-% clus2run = [ 27, 26,  9, 28]; %done 16, 13, 22,
-% clus2run = [ 10, 19,  29, 8]; %done 5,  25, 7,
-% clus2run = [ 30, 3,  4, 17]; %done - 11, 21, 12; waiting 12 noAnnEps (screen c5)
-%next - sq
 
+
+%annEps 200iter, act over time (then later perms)
+%love01 - sq - screen sq[1,3,4,5,6,7]
+clus2run = [3, 15, 23,  26, 4];
+% clus2run = [16, 8, 22,  6,  9];
+% clus2run = [5,  13, 27, 10, 19];
+% clus2run = [11, 21, 12, 14, 7]; 
+% clus2run = [24, 17, 28, 18];
+% clus2run = [29, 25, 20, 30];
+
+%love06 - circ - TO RUN
+% clus2run = [3, 15, 23, 26, 20, 18, 4, 16, 8, 5, 14, 27, 28, 9, 6];
+% clus2run = [13, 7,  10, 19, 29, 25, 11, 21, 12, 22, 17, 30, 24];
 
 % nTrials
 if ~strcmp(dat(1:3),'cat')
@@ -143,9 +145,9 @@ end
 warpBox = 0; %1 or 0
 warpType = 'sq2rect';
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
-nIter=1; %200 for covering map, 20 for cat; 1k for covering map new
+nIter=200; %200 for covering map over time, 20 for cat; 1k for covering map new
 
 if useSameTrls
 %     switch dat
@@ -190,29 +192,32 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
             if strcmp(dat(1:3),'cat') %save muAll
                 [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll,trials] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls,actOverTime);
             else
-                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls,actOverTime);
+                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll,trials] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls,actOverTime);
             end
             
             timeTaken=toc;
             if saveDat
-                if useSameTrls
-                    fname = [fname '_useSameTrls'];
-                end
-                if warpBox
-                    fname = [fname '_warpBox'];
-                end
-                if jointTrls
-                    fname = [fname '_jointTrls_stepSiz'];
-                end
-                if ~actOverTime && ~strcmp(dat(1:3),'cat')
-                    fname = [fname '_noActOverTime'];
-                end
-                if annEps
-                    fname = [fname '_annEps'];
-                end
-                
-                if strcmp(dat(1:3),'cat')
+                if ~strcmp(dat(1:3),'cat')
+                    if useSameTrls
+                        fname = [fname '_useSameTrls'];
+                    end
+                    if warpBox
+                        fname = [fname '_warpBox'];
+                    end
+                    if jointTrls
+                        fname = [fname '_jointTrls_stepSiz'];
+                    end
+                    if ~actOverTime && ~strcmp(dat(1:3),'cat')
+                        fname = [fname '_noActOverTime'];
+                    end
+                    if annEps
+                        fname = [fname '_annEps'];
+                    end
+                else
                     fname = [fname sprintf('_%dcats_stoch%d_c%d',catsInfo.nCats,stoch,c1)];
+                    if catsInfo.msExample
+                       fname = [fname '_msExample']; 
+                    end
                 end
                 cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
                 if strcmp(dat(1:4),'trap')

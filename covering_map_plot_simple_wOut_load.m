@@ -198,7 +198,61 @@ for iTrl = 1000:nTrials
     end
 end
 
+%% plot navigation example - over 3 time points; save figs
 
+%ATM needs to be done once at a time - since muAll is not saved across
+%iters
+
+figDir = [wd '/data_gridCell/figs'];
+fntSiz = 15;
+gaussSmooth=1;
+
+savePlots=1;
+iterI = 1;
+
+prtTrls = [.0005, .05, .99];
+trls2plt = {1:prtTrls(1)*nTrials, prtTrls(2)*nTrials:(prtTrls(2)*nTrials)+2500, prtTrls(3)*nTrials+1:nTrials}; %1:500, 50000:52500 (2.5k trials; 5% to 5.25%), then 990000:nTrials (10k trials; 99%-100%)
+
+%if plotAgent, need trials as an output argument
+plotAgent = 1;
+nClus = size(muAll,1);
+colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
+colAgent = [.75, .75, .75];
+
+%if plotting agent over batches - need make cluster positions same over trials in a batch
+muTrls = nan(nClus,2,nTrials); %nTrials/2 - for trapzKfrmSq
+for iBatch = 1:nBatches
+    muTrls(:,1,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(muAll(:,1,iBatch),1,batchSize);
+    muTrls(:,2,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(muAll(:,2,iBatch),1,batchSize);
+end
+
+cTime=datestr(now,'HHMMSS'); %so each iter has the same ending
+
+for iPlot = 1:length(trls2plt)
+    figure; hold on;
+    plot(trials(trls2plt{iPlot},1),trials(trls2plt{iPlot},2),'Color',colAgent); hold on;
+    scatter(squeeze(muTrls(:,1,trls2plt{iPlot}(end))),squeeze(muTrls(:,2,trls2plt{iPlot}(end))),1000,colors,'.'); hold on;    
+    xlim([locRange(1) locRange(2)+1]);
+    ylim([locRange(1) locRange(2)+1]);
+    xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
+    
+    if iPlot==3
+        densityPlotCentresSm = imgaussfilt(densityPlotActNorm(:,:,end,iterI),gaussSmooth);
+        aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram
+        [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
+        title(sprintf('Grid Score %.2f',g));
+        set(gca,'FontSize',fntSiz,'fontname','Arial');
+    end
+%     fname = [figDir, sprintf('/navExamples_eps%d_batchSiz%d_nClus%d_iter%d_t%d',epsMuOrig1000,batchSizeVals(iBvals),clus2run(1),iterI,cTimeiPlot)];
+    fname = [figDir, sprintf('/navExamples_%s_eps%d_batchSiz%d_nClus%d_iter%d_%s_t%d',dat,epsMuOrig1000,batchSizeVals(iBvals),clus2run(1),iterI,cTime,iPlot)];
+    
+    if savePlots
+        set(gcf,'Renderer','painters');
+        print(gcf,'-depsc2',fname)
+        saveas(gcf,fname,'png');
+        close all
+    end
+end
 %% mu - plot each trial; could compute gridness on each trial?
 
 gaussSmooth=1;

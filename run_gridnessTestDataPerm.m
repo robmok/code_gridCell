@@ -18,10 +18,21 @@ dat = 'square';
 
 % dat = 'trapzKrupic';
 
-dat = 'trapzKfrmSq1'; % load covering map on sq, then run it on trapz; then assess gridness in trapz
+% dat = 'trapzKfrmSq1'; % load covering map on sq, then run it on trapz; then assess gridness in trapz
 % dat = 'trapzKfrmSq2'; % load covering map on sq, then assess gridness in trapz
 
 saveDat=1;
+
+nIter=200;
+epsMuVals=.025;
+nTrials=1000000;
+% batchSizeVals = [400, 100]; % 125?
+batchSizeVals=400;
+
+annEps=1;
+if annEps %new
+    epsMuVals=.1; %below multiplies this by 1k
+end
 
 %for loading
 % nTrials = 1000000;
@@ -30,53 +41,41 @@ saveDat=1;
 
 
 % 1k iters, sq/circ annEps, no perm - % rerun
-% clus2run = [18,  8, 16,  4, 22, 27, 26,  9, 13, 29,  5, 25, 7, 10, 19, 28, 17, 11, 21, 12,  30, 3]; %
-% clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 30, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3]; %all
 
-
+% circ - love06
+clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 30, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3]; %all
+%sq
+clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3, 30]; %30 at end
+%sq still to run - 30 - if fails above before i send it over
+% clus2run = [30];
 
 %%%%%%%
-% new fixed perm - 200iters
+% new fixed perm - 200iters - not run
 % annEps
-%running on love01, 4 matlabs- circ
-clus2run = [3, 15, 23,  26, 20, 18, 4];
+% circ
+% clus2run = [3, 15, 23,  26, 20, 18, 4];
 % clus2run = [16, 8, 22, 6, 9, 30, 24];
 % clus2run = [5,  13, 7, 10,19, 29, 25];
 % clus2run = [11, 21, 12, 14, 27, 28, 17]; 
 
-
-% sq love06 - not started yet - probably just run 2
+% sq
 % clus2run = [14, 15, 23,  30, 6, 20, 16, 22, 26];
 % clus2run = [5,  13, 7,  10, 19, 29, 11, 21, 12];
 % clus2run = [9, 18, 24,4, 25, 17, 27, 28, 3, 8];
 
 
-
-
-% % next: sq2trapz 1kiters
+% sq2trapz 1kiters - done  i think
 % clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 30, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3]; %all
 % clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26, 9]; %half
 % clus2run = [13, 30, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3]; %half
-clus2run = [13, 30, 29,  5, 25, 10,  7, ]; %quarter
-clus2run = [19, 28, 17, 11, 21, 12,  3]; %quarter
+% clus2run = [13, 30, 29,  5, 25, 10,  7, ]; %quarter
+% clus2run = [19, 28, 17, 11, 21, 12,  3]; %quarter
 
 % clus2run = 11;
 
 %sq 200 iters no annEps no perm
 % clus2run = 27:30;
 
-nIter=200;
-epsMuVals=.025;
-nTrials=1000000;
-% batchSizeVals = [400, 100]; % 125?
-batchSizeVals=400;
-% batchSizeVals=200;
-% batchSizeVals=100;
-
-annEps=0;
-if annEps
-    epsMuVals=1.5; %below multiplies this by 1k
-end
 jointTrls=1; %for test trials
 
 nIter=1000;
@@ -97,8 +96,8 @@ else
     doPerm=0;
 end
 
-%tmp - for getting sq density plots
-% doPerm=0;
+%
+doPerm=0;
 
 % run perm tests on how many iters? takes a bit of time (a couple mins) per
 % iter, so with 200 iters plus many conditions, maybe too much (if all the
@@ -126,7 +125,7 @@ for iClus2run = 1:length(clus2run)
             end
             
             %note, annEps slightly different file name
-            if ~annEps
+%             if ~annEps
                 if ~(length(dat)==12)
                     fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat);
                 else %trapzKfrmSq1 or 2 - i think only 1 now
@@ -136,18 +135,23 @@ for iClus2run = 1:length(clus2run)
                         fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,'square');
                     end
                 end
-            else
-                if ~(length(dat)==12)
-                    fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_annEps_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat);
-                else %trapzKfrmSq1
-                    fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_%d_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,epsMuTrapz10);
-                    
-                end
-            end
-            
+%             else
+%                 if ~(length(dat)==12)
+%                     fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_annEps_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat);
+%                 else %trapzKfrmSq1
+%                     fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_%d_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,epsMuTrapz10);
+%                     
+%                 end
+%             end
             
             %finish with directory and * for date/time
-            fname = [saveDir, fname '*']; %finish with directory and * for date/time
+            if ~annEps
+                fname = [saveDir, fname '*']; %finish with directory and * for date/time
+
+            else
+                fname = [saveDir, fname '*annEps*']; %new position of annEps - works now - above no need
+            end
+
             
             f = dir(fname); filesToLoad = cell(1,length(f));
             if isempty(f) %if no file, don't load/save - but print a warning
