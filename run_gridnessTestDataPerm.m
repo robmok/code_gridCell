@@ -46,6 +46,11 @@ end
 clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 30, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3]; %all
 %sq
 clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3, 30]; %30 at end
+%split into 2
+clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26, 9]; %30 at end
+clus2run = [13, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3, 30]; 
+clus2run=30;
+
 %sq still to run - 30 - if fails above before i send it over
 % clus2run = [30];
 
@@ -183,10 +188,14 @@ for iClus2run = 1:length(clus2run)
                 cTime=datestr(now,'HHMMSS');
                 if doPerm
                     %                     fname = [fname(1:end-1), sprintf('_perm_%dpermsOn%diters',nPerm,nIters2run)];
-                    fname = [fname(1:end-1), sprintf('_actNorm_perm_%dpermsOn%diters',nPerm,nIters2run)]; %now correct actNorm; add 'trlsTest'?
+%                     fname = [fname(1:end-1), sprintf('_actNorm_perm_%dpermsOn%diters',nPerm,nIters2run)]; %now correct actNorm; add 'trlsTest'?
+                    fname = [[f(1).folder '/' f(1).name(1:end-11)], sprintf('_actNorm_perm_%dpermsOn%diters',nPerm,nIters2run)]; %now correct actNorm; add 'trlsTest'?
+                    [f(1).folder '/' f(1).name(1:end-11)]
                 else
-                    fname = [fname(1:end-1), '_trlsTest_noPerm'];
+%                     fname = [fname(1:end-1), '_trlsTest_noPerm'];
+                    fname = [[f(1).folder '/' f(1).name(1:end-11)], '_trlsTest_noPerm'];
                 end
+                
                 if length(dat)==12
                     fname = [fname sprintf('_%s',dat)];
                 end
@@ -195,7 +204,6 @@ for iClus2run = 1:length(clus2run)
                 end
                 
                 fname = [fname sprintf('_%s',cTime)];
-                
                 
                 if saveDat
                     if length(dat)==12 && strcmp(dat(12),'2')
