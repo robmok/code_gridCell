@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -39,36 +39,29 @@ end
 % clus2run = [3:30];
 % clus2run=[3:10 12:2:26 11:2:25, 27:30]; % 27:30
 
-
-% 1k iters, sq/circ annEps, no perm - % rerun
-
-% circ - love06
-clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 30, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3]; %all
-%sq
-clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3, 30]; %30 at end
-%split into 2
-clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26, 9]; %30 at end
-clus2run = [13, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3, 30]; 
-clus2run=30;
-
-%sq still to run - 30 - if fails above before i send it over
-% clus2run = [30];
-
 %%%%%%%
-% new fixed perm - 200iters - not run
+% new fixed perm - 200iters - starting now
 % annEps
-% circ
-% clus2run = [3, 15, 23,  26, 20, 18, 4];
-% clus2run = [16, 8, 22, 6, 9, 30, 24];
-% clus2run = [5,  13, 7, 10,19, 29, 25];
-% clus2run = [11, 21, 12, 14, 27, 28, 17]; 
-
 % sq
-% clus2run = [14, 15, 23,  30, 6, 20, 16, 22, 26];
-% clus2run = [5,  13, 7,  10, 19, 29, 11, 21, 12];
-% clus2run = [9, 18, 24,4, 25, 17, 27, 28, 3, 8];
+%love06
+clus2run = [3, 15, 23,  26, 20, 9, 19, 27];
+
+%love01
+clus2run = [16, 8,  22, 6,  30];
+% clus2run = [5,  13, 7,  10, 29];
+% clus2run = [11, 21, 12, 14, 28]; 
+% clus2run = [24, 25, 17, 4,  18]; 
 
 
+%circ still to run above
+
+
+
+
+
+%%%%
+% 1k iters, sq/circ annEps, no perm - % done
+%%%%%
 % sq2trapz 1kiters - done  i think
 % clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 30, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3]; %all
 % clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26, 9]; %half
@@ -78,12 +71,9 @@ clus2run=30;
 
 % clus2run = 11;
 
-%sq 200 iters no annEps no perm
-% clus2run = 27:30;
-
 jointTrls=1; %for test trials
 
-nIter=1000;
+nIter=200;
 
 % if trapKfrmSq1
 if strcmp(dat,'trapzKfrmSq1')
@@ -102,7 +92,7 @@ else
 end
 
 %
-doPerm=0;
+% doPerm=0;
 
 % run perm tests on how many iters? takes a bit of time (a couple mins) per
 % iter, so with 200 iters plus many conditions, maybe too much (if all the
@@ -129,30 +119,19 @@ for iClus2run = 1:length(clus2run)
                 fprintf('Computing test trials gridness on %s, nClus=%d, epsMu=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000,batchSize)
             end
             
-            %note, annEps slightly different file name
-%             if ~annEps
-                if ~(length(dat)==12)
-                    fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat);
-                else %trapzKfrmSq1 or 2 - i think only 1 now
-                    if strcmp(dat(12),'1')
-                        fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_%d_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,epsMuTrapz10);
-                    elseif strcmp(dat(12),'2')
-                        fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,'square');
-                    end
+            if ~(length(dat)==12)
+                fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat);
+            else %trapzKfrmSq1 or 2 - i think only 1 now
+                if strcmp(dat(12),'1')
+                    fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_%d_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,epsMuTrapz10);
+                elseif strcmp(dat(12),'2')
+                    fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,'square');
                 end
-%             else
-%                 if ~(length(dat)==12)
-%                     fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_annEps_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat);
-%                 else %trapzKfrmSq1
-%                     fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_%d_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,epsMuTrapz10);
-%                     
-%                 end
-%             end
-            
+            end
+
             %finish with directory and * for date/time
             if ~annEps
                 fname = [saveDir, fname '*']; %finish with directory and * for date/time
-
             else
                 fname = [saveDir, fname '*annEps*']; %new position of annEps - works now - above no need
             end
@@ -190,7 +169,6 @@ for iClus2run = 1:length(clus2run)
                     %                     fname = [fname(1:end-1), sprintf('_perm_%dpermsOn%diters',nPerm,nIters2run)];
 %                     fname = [fname(1:end-1), sprintf('_actNorm_perm_%dpermsOn%diters',nPerm,nIters2run)]; %now correct actNorm; add 'trlsTest'?
                     fname = [[f(1).folder '/' f(1).name(1:end-11)], sprintf('_actNorm_perm_%dpermsOn%diters',nPerm,nIters2run)]; %now correct actNorm; add 'trlsTest'?
-                    [f(1).folder '/' f(1).name(1:end-11)]
                 else
 %                     fname = [fname(1:end-1), '_trlsTest_noPerm'];
                     fname = [[f(1).folder '/' f(1).name(1:end-11)], '_trlsTest_noPerm'];

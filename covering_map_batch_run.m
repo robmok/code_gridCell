@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -63,7 +63,7 @@ catsInfo.msExample = 1; %2 gaussians in opposite sides of the square - example f
 
 %annEps 200iter, act over time (then later perms)
 %love01 - circ
-clus2run = [3, 15, 23,  26, 4];
+% clus2run = [3, 15, 23,  26, 4];
 % clus2run = [11, 21, 12, 14, 7]; 
 % clus2run = [24, 17, 28, 18];
 % clus2run = [29, 25, 20, 30];
@@ -71,6 +71,9 @@ clus2run = [3, 15, 23,  26, 4];
 %love06 - circ
 % clus2run = [16, 8, 22,  6,  9];
 % clus2run = [5,  13, 27, 10, 19];
+%stopped on love01, run 06
+clus2run = [26];
+clus2run = [4];
 
 
 % nTrials
