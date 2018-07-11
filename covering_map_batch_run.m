@@ -72,8 +72,7 @@ catsInfo.msExample = 1; %2 gaussians in opposite sides of the square - example f
 % clus2run = [16, 8, 22,  6,  9];
 % clus2run = [5,  13, 27, 10, 19];
 %stopped on love01, run 06
-clus2run = [26];
-clus2run = [4];
+clus2run = [7];
 
 
 % nTrials
