@@ -197,12 +197,12 @@ for iterI = 1:nIter
             %learning rate
             if annEps %if use annealed learning rate
                 epsMu = epsMuOrig/(1+(annEpsDecay*iBatch)); %new
-%                 clear epsAll
-%                 epsMuOrig = 0.1;
-%                 annEpsDecay = 1.6e-07*(nBatches*39); % eps stays high till 1/annEpsDecay batches; here 64.1026
-%                 for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+(annEpsDecay*iBatch)); end
-%                 figure; plot(epsAll); hold on;
-%                 epsAll(nBatches.*[.05, .25, .5, .75, .95, 1]) % eps at 25%, 50%, 75% of trials: 
+                clear epsAll
+                epsMuOrig = 0.1;
+                annEpsDecay = 1.6e-07*(nBatches*39); % eps stays high till 1/annEpsDecay batches; here 64.1026
+                for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+(annEpsDecay*iBatch)); end
+                figure; plot(epsAll); hold on;
+                epsAll(nBatches.*[.05, .25, .5, .75, .95, 1]) % eps at 25%, 50%, 75% of trials: 
             else
                 epsMu = epsMuOrig;
             end

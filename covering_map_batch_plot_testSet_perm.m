@@ -18,10 +18,10 @@ gaussSmooth = 1;
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-% dat='square';
+dat='square';
 compareCircSq = 0; %if compare circ-sq gridness, dat=circ, but load sq too
 
-% annEps=0;
+annEps=0;
 boxSize=1;
 
 % joined trials
@@ -32,10 +32,10 @@ epsMuVals=.025;
 nTrials=1000000;
 % batchSizeVals = [1000, 400, 100]; 
 % batchSizeVals=400;
-annEps=0;
 nIter=200;
 
 nIter=1000;
+
 
 %load perm data when nIter=1000- this is with nIter=200. doPerm should=0
 loadPerm = 0;
@@ -43,23 +43,16 @@ loadPerm = 0;
 % clus2run = [3:16, 18, 20:26];  %missed 17, 19?
 
 % % dat='trapzKrupic';    
-dat='trapzKfrmSq1';
-%trapzKfrmSq1
-nTrials=1000000/2;
-epsMuTrapz10 = 25; 
+% dat='trapzKfrmSq1';
+% %trapzKfrmSq1
+% nTrials=1000000/2;
+% epsMuTrapz10 = 25; 
 
-
-% dat='trapzKfrmSq2';
-% nTrials=1000000;
 
 % clus2run = [3:26]; 
 clus2run = [3:30]; 
 % clus2run = [3:26]; 
 % clus2run = 20:23; 
-
-% clus2run=6:26;
-% % clus2run=26;
-% clus2run=4:2:26;
 
 batchSizeVals = 400; %100, 125, 200,400, 1000
 % batchSizeVals = 200;
@@ -68,6 +61,13 @@ batchSizeVals = 400; %100, 125, 200,400, 1000
 % epsMuVals=.015;
 % batchSizeVals = 100; %100, 125, 200, 400
 % clus2run = [12, 16, 24, 28]; %batchSize200 missed 20?
+
+
+
+%new annEps
+annEps=1;
+epsMuVals = 0.1;
+
 
 rHex=0; %if choose raw 60deg corr values, not gridness
 
@@ -90,54 +90,33 @@ for iClus2run = 1:length(clus2run)
         for iBvals = 1:length(batchSizeVals)
             batchSize = batchSizeVals(iBvals);
             fprintf('Loading %s, nClus=%d, epsMu=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000,batchSize)
+
             if doPerm
-%                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_perm_%dpermsOn%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,nPerm,nIters2run)];
-                fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_actNorm_perm_%dpermsOn%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,nPerm,nIters2run)];
+                if ~annEps
+                    fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_actNorm_perm_%dpermsOn%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,nPerm,nIters2run)];
+                else
+                    %check
+                    fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_*annEps_actNorm_perm_%dpermsOn%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,nPerm,nIters2run)];
+                end
             else
                 if ~(length(dat)==12)
-%                     fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_noPerm',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
-                    fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_trlsTest_noPerm',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
-                    % fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_jointTrls_stepSiz_noPerm_noJointTrlsTest',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+                    if ~annEps
+                        fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_trlsTest_noPerm',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+                    else
+                        fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_*annEps_trlsTest_noPerm',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+                    end
                 else
                     if strcmp(dat(12),'1')
-                    fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_%d_jointTrls_stepSiz_trlsTest_noPerm_%s',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,epsMuTrapz10,dat)];
+                        fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_%d_jointTrls_stepSiz_trlsTest_noPerm_%s',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,epsMuTrapz10,dat)];
                     else
-                    fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_trlsTest_noPerm_%s',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,'square',dat)];
+                        fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_trlsTest_noPerm_%s',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,'square',dat)];
                     end
-                    % covering_map_batch_dat_11clus_500ktrls_eps25_batchSiz400_200iters_trapzKfrmSq1_wActNorm_epsMuTrapz10_25_jointTrls_stepSiz_trlsTest_noPerm_trapzKfrmSq1_184644
                 end
             end
-                        
-%%% 
-%edit ABOVE
-%%%
-%             %note, annEps slightly different file name
-%             if ~annEps
-%                 if ~(length(dat)==12)
-%                     fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat);
-%                 else %trapzKfrmSq1 or 2 - i think only 1 now
-%                     if strcmp(dat(12),'1')
-%                         fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_%d_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,epsMuTrapz10);
-%                     elseif strcmp(dat(12),'2')
-%                         fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,'square');
-%                     end
-%                 end
-%             else
-%                 if ~(length(dat)==12)
-%                     fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_annEps_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat);
-%                 else %trapzKfrmSq1 
-%                     fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_%d_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,epsMuTrapz10);
-% 
-%                 end
-%             end
-            
 
+            %finish with directory and * for date/time
+            fname = [saveDir, fname '*']; %finish with directory and * for date/time
 
-
-
-
-%             finish with directory and * for date/time
-            fname = [saveDir, fname '*'];
             
             %edit if want to load more than one file per sim, merge
             f = dir(fname); filesToLoad = cell(1,length(f));
@@ -262,7 +241,7 @@ gridMeasure = 'grid';
 
 plotFewClus = 0; %plot 3:5 clusters separately
 
-computeCIs = 0; %takes a bit of time
+computeCIs = 1; %takes a bit of time
 
 switch clusPosAct
 % case 'clus'
@@ -392,26 +371,25 @@ figure; hold on;
 
 %prop grid cells
 permPrc = 100; %use top x prctile of the perm distributions - 97.5/99/99.5/100
-if ~strcmp(dat(1:4),'trap')
-    propGrid = nan(size(dat1,2),1);
-    propGridCI = nan(size(dat1,2),2);
-    propGridMaxThresh = nan(size(dat1,2),1);
-    propGridCIMaxThresh = nan(size(dat1,2),2);
-    for i=1:size(dat1,2)
-        propGrid(i)     = nnz(dat1(:,i)>squeeze(prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot(i)),permPrc)))./nIter; %cond-wise thresh
-        propGridCI(i,:) = bootrm(dat1(:,i),[2.5, 97.5],'percentGr',nIter,prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot(i)),permPrc));
+if ~strcmp(dat(1:4),'trap') && loadPerm
+        propGrid = nan(size(dat1,2),1);
+        propGridCI = nan(size(dat1,2),2);
+        propGridMaxThresh = nan(size(dat1,2),1);
+        propGridCIMaxThresh = nan(size(dat1,2),2);
+        for i=1:size(dat1,2)
+            propGrid(i)     = nnz(dat1(:,i)>squeeze(prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot(i)),permPrc)))./nIter; %cond-wise thresh
+            propGridCI(i,:) = bootrm(dat1(:,i),[2.5, 97.5],'percentGr',nIter,prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot(i)),permPrc));
+            
+            propGridMaxThresh(i)     = nnz(dat1(:,i)>max((prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot),permPrc))))./nIter; %max thresh
+            propGridCIMaxThresh(i,:) = bootrm(dat1(:,i),[2.5, 97.5],'percentGr',nIter,max((prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot),permPrc))));
+        end
+        fprintf('%d to %d clusters: \nmean across cond means: %.3f\n', clus2plot(1)+2,clus2plot(end)+2, mean(propGrid))
+        fprintf('mean across cond means maxThresh: %.3f\n', mean(propGridMaxThresh))
         
-        propGridMaxThresh(i)     = nnz(dat1(:,i)>max((prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot),permPrc))))./nIter; %max thresh
-        propGridCIMaxThresh(i,:) = bootrm(dat1(:,i),[2.5, 97.5],'percentGr',nIter,max((prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot),permPrc))));
-    end
-    fprintf('%d to %d clusters: \nmean across cond means: %.3f\n', clus2plot(1)+2,clus2plot(end)+2, mean(propGrid))
-    fprintf('mean across cond means maxThresh: %.3f\n', mean(propGridMaxThresh))
-    
-%prop Grid over all conditions with max threshold
-propGridAll     = nnz(dat1>max((prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot),permPrc))))./nnz(dat1);
-propGridAllCI = bootrm(reshape(dat1,numel(dat1),1),[2.5, 97.5],'percentGr',nIter,max(prctile(squeeze(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot)),permPrc)));
-fprintf('mean and CI across cond all iters - max thresh: %.3f, CIs [%.3f,%.3f]\n', propGridAll, propGridAllCI)
-
+        %prop Grid over all conditions with max threshold
+        propGridAll     = nnz(dat1>max((prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot),permPrc))))./nnz(dat1);
+        propGridAllCI = bootrm(reshape(dat1,numel(dat1),1),[2.5, 97.5],'percentGr',nIter,max(prctile(squeeze(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot)),permPrc)));
+        fprintf('mean and CI across cond all iters - max thresh: %.3f, CIs [%.3f,%.3f]\n', propGridAll, propGridAllCI)
     
     %plot mean + CI as errorbars
     figure; hold on;
@@ -438,7 +416,6 @@ fprintf('mean and CI across cond all iters - max thresh: %.3f, CIs [%.3f,%.3f]\n
         saveas(gcf,fname,'png');
         close all
     end
-    
 end
 
 

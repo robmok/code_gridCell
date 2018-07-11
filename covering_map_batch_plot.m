@@ -92,7 +92,7 @@ jointTrls=1;
 % clus2run = [3:26]; 
 % clus2run = [6:26]; 
 % clus2run = [10:26]; 
-clus2run = [3:26]; 
+% clus2run = [3:26]; 
 epsMuVals=.025;
 nTrials=1000000;
 % batchSizeVals = [1000, 400, 100]; 
@@ -132,14 +132,13 @@ clus2run = 3:30;
 
 
 
-%new - annealed learning rate
-% clus2run = [10:26]; 
-% epsMuVals=1500; %"starting" learning rate - actually these are just numbers, not actualy starting eps
-% nTrials=1000000;
-% batchSizeVals = 400;
-% annEps=1;
-% covering_map_batch_dat_9clus_1000ktrls_eps1500_batchSiz400_200iters_square_wActNorm_annEps_jointTrls_stepSiz_154025
 
+%new - annealed learning rate
+clus2run  = 3:30;
+epsMuVals = 0.1;
+nTrials=1000000;
+batchSizeVals = 400;
+annEps=1;
 
 rHex=0; %if choose raw 60deg corr values, not gridness
 
@@ -178,23 +177,17 @@ for iClus2run = 1:length(clus2run)
             if boxSize>1
                 fname = [fname sprintf('_boxSizex%d',boxSize)];
             end
-            if annEps %epsMu is different here
-%                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps*_batchSiz%d_%diters_%s_wAct_annEps_jointTrls_stepSiz',nClus,round(nTrials/1000),batchSize,nIter,dat)];
-                fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_annEps_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000/1000,batchSize,nIter,dat)];
-%                 fname = [fname '_annEps'];
-            end            
-            
-            %problem with loading in trapzK - and maybe others; loading in
-            %the test/perm file since it's the same but with another bit..
-
-            
             if ~actOverTime
                fname = [fname '_noActOverTime']; 
             end
             
             %finish with directory and * for date/time
-            fname = [saveDir, fname '*'];
-                                   
+            if ~annEps
+                fname = [saveDir, fname '*']; %finish with directory and * for date/time
+            else
+                fname = [saveDir, fname '*annEps*']; %new position of annEps - works now - above no need
+            end
+            
             %edit if want to load more than one file per sim, merge
             f = dir(fname); filesToLoad = cell(1,length(f));
 %             for iF = 1%:length(f)

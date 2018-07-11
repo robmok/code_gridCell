@@ -14,7 +14,7 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; % orig nTrials/10
 dat = 'circ';
-dat = 'square';
+% dat = 'square';
 
 % dat = 'trapzKrupic';
 
@@ -42,20 +42,14 @@ end
 %%%%%%%
 % new fixed perm - 200iters - starting now
 % annEps
-% sq
+% sq / circ
 %love06
-clus2run = [3, 15, 23,  26, 20, 9, 19, 27];
+clus2run = [3, 15, 23,  26, 20, 9, 19, 4, 7, 27];
 
 %love01
-clus2run = [16, 8,  22, 6,  30];
-% clus2run = [5,  13, 7,  10, 29];
-% clus2run = [11, 21, 12, 14, 28]; 
-% clus2run = [24, 25, 17, 4,  18]; 
-
-
-%circ still to run above
-
-
+clus2run = [16, 8,  22, 6,  24, 30];
+% clus2run = [11, 21, 12, 14, 25, 28]; 
+% clus2run = [5,  13, 10, 17, 18, 29];
 
 
 
@@ -170,7 +164,6 @@ for iClus2run = 1:length(clus2run)
 %                     fname = [fname(1:end-1), sprintf('_actNorm_perm_%dpermsOn%diters',nPerm,nIters2run)]; %now correct actNorm; add 'trlsTest'?
                     fname = [[f(1).folder '/' f(1).name(1:end-11)], sprintf('_actNorm_perm_%dpermsOn%diters',nPerm,nIters2run)]; %now correct actNorm; add 'trlsTest'?
                 else
-%                     fname = [fname(1:end-1), '_trlsTest_noPerm'];
                     fname = [[f(1).folder '/' f(1).name(1:end-11)], '_trlsTest_noPerm'];
                 end
                 
