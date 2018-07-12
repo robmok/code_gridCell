@@ -15,9 +15,12 @@ if annEps
     nBatches = nTrials./batchSize; %2500, 5000, 250000, 50000  
 %     epsMuOrig = 0.05;
 %     annEpsDecay = 1.6e-07*(nBatches*20); % eps stays high till 1/annEpsDecay batches; here 125
-    epsMuOrig = 0.1;
-    annEpsDecay = 1.6e-07*(nBatches*39); % eps stays high till 1/annEpsDecay batches; here 64.1026
-
+    if epsMuOrig == 0.1
+        annEpsDecay = 1.6e-07*(nBatches*39); % eps stays high till 1/annEpsDecay batches; here 64.1026
+    elseif epsMuOrig == 0.15
+        %make epsMuOrig higher to keep it high for longer
+        annEpsDecay = 1.6e-07*(nBatches*59); %  epsMuOrig =.15; here 42.3729; ends with .0025
+    end
 end
 
 %compute gridness over time %20 timepoints; - 21 sets now - last one is last quarter
@@ -199,10 +202,14 @@ for iterI = 1:nIter
                 epsMu = epsMuOrig/(1+(annEpsDecay*iBatch)); %new
                 %debug mode - plot learning rate over time
 %                 clear epsAll
-%                 epsMuOrig = 0.1;
-%                 annEpsDecay = 1.6e-07*(nBatches*39); % eps stays high till 1/annEpsDecay batches; here 64.1026
+%                 epsMuOrig = 0.15;
+%                 annEpsDecay = 1.6e-07*(nBatches*39); % epsMuOrig =.1; eps stays high till 1/annEpsDecay batches; here 64.1026; ends with .0025
+%                 annEpsDecay = 1.6e-07*(nBatches*19); %  epsMuOrig =.05; here 125; ends with .0025
+%                 annEpsDecay = 1.6e-07*(nBatches*9); %  epsMuOrig =.025; here 227.77; ends with .0025
+               % higher epsMuOrig - stays higher for longer
+%                 annEpsDecay = 1.6e-07*(nBatches*59); %  epsMuOrig =.15; here 42.3729; ends with .0025
 %                 for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+(annEpsDecay*iBatch)); end
-%                 figure; plot(epsAll); hold on;
+%                 figure; plot(epsAll); ylim([0, 0.1]);
 %                 epsAll(nBatches.*[.05, .25, .5, .75, .95, 1]) % eps at 25%, 50%, 75% of trials: 
             else
                 epsMu = epsMuOrig;

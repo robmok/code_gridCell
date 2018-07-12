@@ -120,13 +120,13 @@ batchSizeVals = 400; %100, 125, 200,400, 1000
 %200 iters orig
 nIter=200;
 actOverTime = 1;
-clus2run = 3:30;
+% clus2run = 3:30;
 
 % % %1000 iters
-nIter=1000;
-actOverTime = 0;
-nSet = 1;
-clus2run = 3:30;
+% nIter=1000;
+% actOverTime = 0;
+% nSet = 1;
+% clus2run = 3:30;
 % clus2run = [10, 12:26]; 
 
 
@@ -931,6 +931,9 @@ else
 end
 
 %% gridness over time stats
+
+nTimePts = 20;
+
 
 clus2plot = 1:length(clus2run);
 clus2plot = 4:length(clus2run); %skip 3:5

@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -51,6 +51,9 @@ clus2run = [16, 8,  22, 6,  24, 30];
 % clus2run = [11, 21, 12, 14, 25, 28]; 
 % clus2run = [5,  13, 10, 17, 18, 29];
 
+%love06 fast - take some from love01
+% sq / circ - take from perm2,3,5,6
+clus2run = [12, 14, 25, 28, 10, 17, 18, 29]; 
 
 
 %%%%
@@ -85,7 +88,6 @@ else
     doPerm=0;
 end
 
-%
 % doPerm=0;
 
 % run perm tests on how many iters? takes a bit of time (a couple mins) per

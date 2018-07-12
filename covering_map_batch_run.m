@@ -111,6 +111,7 @@ epsMuVals = 0.025;
 % epsMuVals = 0.015; 
 if annEps
     epsMuVals = 0.1; %new
+%     epsMuVals = 0.15; %new 2
 end
 
 % use the same training data (trials) across current sims or gen new data
