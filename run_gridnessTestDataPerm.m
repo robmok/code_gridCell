@@ -14,7 +14,7 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; % orig nTrials/10
 dat = 'circ';
-% dat = 'square';
+dat = 'square';
 
 % dat = 'trapzKrupic';
 
@@ -44,17 +44,18 @@ end
 % annEps
 % sq / circ
 %love06
-clus2run = [3, 15, 23,  26, 20, 9, 19, 4, 7, 27];
+% clus2run = [3, 15, 23,  26, 20, 9, 19, 4, 7, 27];
 
 %love01
-clus2run = [16, 8,  22, 6,  24, 30];
+% clus2run = [16, 8,  22, 6,  24, 30];
 % clus2run = [11, 21, 12, 14, 25, 28]; 
 % clus2run = [5,  13, 10, 17, 18, 29];
 
 %love06 fast - take some from love01
 % sq / circ - take from perm2,3,5,6
-clus2run = [12, 14, 25, 28, 10, 17, 18, 29]; 
-
+% clus2run = [12, 14, 25, 28, 10, 17, 18, 29]; 
+%sq died at 18 - TO RERUN when circ done
+clus2run = [18, 29]; 
 
 %%%%
 % 1k iters, sq/circ annEps, no perm - % done
@@ -68,9 +69,10 @@ clus2run = [12, 14, 25, 28, 10, 17, 18, 29];
 
 % clus2run = 11;
 
-jointTrls=1; %for test trials
-
 nIter=200;
+% nIter=1000;
+
+jointTrls=1; %for test trials
 
 % if trapKfrmSq1
 if strcmp(dat,'trapzKfrmSq1')
@@ -88,8 +90,9 @@ else
     doPerm=0;
 end
 
-% doPerm=0;
-
+if nIter==1000
+    doPerm=0; %if 1000 iters
+end
 % run perm tests on how many iters? takes a bit of time (a couple mins) per
 % iter, so with 200 iters plus many conditions, maybe too much (if all the
 % perm data are about the same, then just take max, or 95th percentile as

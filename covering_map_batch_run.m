@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -15,7 +15,7 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
-% dat = 'square'; 
+dat = 'square'; 
 % dat = 'trapzKrupic';
 
 % dat = 'catLearn';
@@ -38,42 +38,20 @@ sigmaG = [7 0; 0 7];
 catsInfo.R=chol(sigmaG);
 catsInfo.msExample = 1; %2 gaussians in opposite sides of the square - example for ms
 
-%love06
-%200 sims - 27:30 - circ/sq; batchSiz=400, no annEps, w/ act over time
-% clus2run = 27:30;
-% clus2run = 14;
-
-
-% annEps new - now correct
+% annEps new - v2 (epsMuOrig=0.15)- 200iter first wActOverTime
 %love06 - circ
-% clus2run = [3, 15, 23, 26, 20, 18, 4, 16, 8, 5];
-% clus2run = [13, 7,  10, 19, 29, 25, 11, 21, 12];
-% clus2run = [14, 27, 28, 17, 22, 6, 9, 30, 24];
+clus2run = [20, 4, 16, 8, 5, 12, 24]; %added 2 more since starting this first; 18, 3, 15, 23, 26, 
+% clus2run = [13, 7,  10, 19, 29, 25, 11, 21]; %12
+% clus2run = [14, 27, 28, 17, 22, 6,  9, 30];   %24
 
 %love01 - sq
-% clus2run = [3, 15, 23,  26, 20, 18];
-% clus2run = [16, 8, 22, 6, 9, 30];
-% clus2run = [5,  13, 7, 10,19, 29];
-% clus2run = [11, 21, 12, 14, 27, 25]; 
-% clus2run = [4, 24, 17, 28]
+clus2run = [18, 3,  15, 23, 26, 20]; 
+% clus2run = [16,  8, 22, 6,  9,  25];
+% clus2run = [5,  13, 7,  10, 19, 29];
+% clus2run = [27, 11,21, 12,  14]; 
+% clus2run = [4, 24, 17, 28,  30];
 
 % clus2run = 18;
-
-
-
-%annEps 200iter, act over time (then later perms)
-%love01 - circ
-% clus2run = [3, 15, 23,  26, 4];
-% clus2run = [11, 21, 12, 14, 7]; 
-% clus2run = [24, 17, 28, 18];
-% clus2run = [29, 25, 20, 30];
-
-%love06 - circ
-% clus2run = [16, 8, 22,  6,  9];
-% clus2run = [5,  13, 27, 10, 19];
-%stopped on love01, run 06
-clus2run = [7];
-
 
 % nTrials
 if ~strcmp(dat(1:3),'cat')
@@ -110,8 +88,8 @@ end
 epsMuVals = 0.025;
 % epsMuVals = 0.015; 
 if annEps
-    epsMuVals = 0.1; %new
-%     epsMuVals = 0.15; %new 2
+%     epsMuVals = 0.1; %new
+    epsMuVals = 0.15; %new 2
 end
 
 % use the same training data (trials) across current sims or gen new data
@@ -132,7 +110,6 @@ end
 
 %stochastic update
 stoch = 0; %1 or 0
-
 % c parameter: larger c = less stochastic over trials, smaller c = more stochastic over trials
 cVals = [1/nTrials, 2/nTrials, 5/nTrials, 20/nTrials];
 % cVals = [1/nTrials, 2/nTrials];
