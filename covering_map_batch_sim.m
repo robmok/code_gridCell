@@ -20,6 +20,11 @@ if annEps
     elseif epsMuOrig == 0.15
         %make epsMuOrig higher to keep it high for longer
         annEpsDecay = 1.6e-07*(nBatches*59); %  epsMuOrig =.15; here 42.3729; ends with .0025
+    elseif epsMuOrig == 0.25
+%         annEpsDecay = 1.6e-07*(nBatches*200); %  epsMuOrig =.25;ends with .0025
+        annEpsDecay = 1.6e-07*(nBatches*49); %  epsMuOrig =.25;ends with .005
+%     elseif epsMuOrig == 0.5
+%         annEpsDecay = 1.6e-07*(nBatches*100); %  epsMuOrig =.5;ends with .005
     end
 end
 
@@ -200,14 +205,21 @@ for iterI = 1:nIter
             %learning rate
             if annEps %if use annealed learning rate
                 epsMu = epsMuOrig/(1+(annEpsDecay*iBatch)); %new
-                %debug mode - plot learning rate over time
+%                 %debug mode - plot learning rate over time
 %                 clear epsAll
-%                 epsMuOrig = 0.15;
+%                 epsMuOrig = .25;
 %                 annEpsDecay = 1.6e-07*(nBatches*39); % epsMuOrig =.1; eps stays high till 1/annEpsDecay batches; here 64.1026; ends with .0025
 %                 annEpsDecay = 1.6e-07*(nBatches*19); %  epsMuOrig =.05; here 125; ends with .0025
 %                 annEpsDecay = 1.6e-07*(nBatches*9); %  epsMuOrig =.025; here 227.77; ends with .0025
-               % higher epsMuOrig - stays higher for longer
+% %                higher epsMuOrig - stays higher for longer
 %                 annEpsDecay = 1.6e-07*(nBatches*59); %  epsMuOrig =.15; here 42.3729; ends with .0025
+%                 annEpsDecay = 1.6e-07*(nBatches*200); %  epsMuOrig =.5;ends with .0025
+% 
+%                 % ending at 0.005
+%                 annEpsDecay = 1.6e-07*(nBatches*49); %  epsMuOrig =.25;ends with .005 
+% %                 annEpsDecay = 1.6e-07*(nBatches*100); %  epsMuOrig =.5;ends with .005 
+% 
+% 
 %                 for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+(annEpsDecay*iBatch)); end
 %                 figure; plot(epsAll); ylim([0, 0.1]);
 %                 epsAll(nBatches.*[.05, .25, .5, .75, .95, 1]) % eps at 25%, 50%, 75% of trials: 

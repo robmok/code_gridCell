@@ -38,20 +38,25 @@ sigmaG = [7 0; 0 7];
 catsInfo.R=chol(sigmaG);
 catsInfo.msExample = 1; %2 gaussians in opposite sides of the square - example for ms
 
-% annEps new - v2 (epsMuOrig=0.15)- 200iter first wActOverTime
+% annEps new - v3 (epsMuOrig=0.25)- 200iter first wActOverTime
+% do 10:26 first
 %love06 - circ
-clus2run = [20, 4, 16, 8, 5, 12, 24]; %added 2 more since starting this first; 18, 3, 15, 23, 26, 
-% clus2run = [13, 7,  10, 19, 29, 25, 11, 21]; %12
-% clus2run = [14, 27, 28, 17, 22, 6,  9, 30];   %24
+clus2run = [18, 15, 23, 17, 20, 16, 14, 25, 13];
+clus2run = [22, 11, 10, 19, 21, 12, 24, 26]; 
+% % love06 - sq
+clus2run = [11, 21, 12, 14, 20]; 
 
 %love01 - sq
-clus2run = [18, 3,  15, 23, 26, 20]; 
-% clus2run = [16,  8, 22, 6,  9,  25];
-% clus2run = [5,  13, 7,  10, 19, 29];
-% clus2run = [27, 11,21, 12,  14]; 
-% clus2run = [4, 24, 17, 28,  30];
+clus2run = [18, 15, 23, 26]; 
+% clus2run = [16, 22, 25, 24];
+% clus2run = [13, 10, 19, 17];
 
-% clus2run = 18;
+%%%%
+%if OK, do 3:9, 27:30 too too
+%%%
+
+
+% clus2run = 24;
 
 % nTrials
 if ~strcmp(dat(1:3),'cat')
@@ -90,6 +95,7 @@ epsMuVals = 0.025;
 if annEps
 %     epsMuVals = 0.1; %new
     epsMuVals = 0.15; %new 2
+    epsMuVals = 0.25; %new 3
 end
 
 % use the same training data (trials) across current sims or gen new data

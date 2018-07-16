@@ -144,7 +144,7 @@ if ~exist('dat')
 end
 
 %if plotAgent, need trials as an output argument
-plotAgent = 1;
+plotAgent = 0;
 
 nClus = size(muAll,1);
 

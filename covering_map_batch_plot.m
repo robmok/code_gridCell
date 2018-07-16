@@ -136,6 +136,7 @@ actOverTime = 1;
 %new - annealed learning rate
 clus2run  = 3:30;
 epsMuVals = 0.1;
+epsMuVals = 0.15;
 nTrials=1000000;
 batchSizeVals = 400;
 annEps=1;
