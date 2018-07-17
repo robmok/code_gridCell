@@ -16,7 +16,7 @@ gaussSmooth = 1;
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-dat='square';
+% dat='square';
 % annEps=0;
 boxSize=1;
 % nIter=200;
@@ -135,8 +135,10 @@ actOverTime = 1;
 
 %new - annealed learning rate
 clus2run  = 3:30;
+clus2run  = 10:26;
 epsMuVals = 0.1;
 epsMuVals = 0.15;
+epsMuVals = 0.25;
 nTrials=1000000;
 batchSizeVals = 400;
 annEps=1;
@@ -732,9 +734,9 @@ iEps=1;
 % clus2plot=(6:26)-2;
 
 clus2plot = 1:length(clus2run);
-clus2plot=(6:30)-2;
-clus2plot=(10:30)-2;
-clus2plot=(10:26)-2;
+% clus2plot=(6:30)-2;
+% clus2plot=(10:30)-2;
+% clus2plot=(10:26)-2;
 
 iBatchVals=1; %'medium' one
 
@@ -937,9 +939,9 @@ nTimePts = 20;
 
 
 clus2plot = 1:length(clus2run);
-clus2plot = 4:length(clus2run); %skip 3:5
-clus2plot = 8:length(clus2run); %skip 3:9
-clus2plot = 8:length(clus2run)-4; %skip 3:9, 27:30 % turns out last few are positive!
+% clus2plot = 4:length(clus2run); %skip 3:5
+% clus2plot = 8:length(clus2run); %skip 3:9
+% clus2plot = 8:length(clus2run)-4; %skip 3:9, 27:30 % turns out last few are positive!
 
 % clear gt_b gt_p
 % cnter=0;

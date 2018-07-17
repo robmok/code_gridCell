@@ -80,8 +80,10 @@ rSeedAll  = cell(length(clus2run),length(batchSizeVals),length(cVals));
     end
 end
     
-%%
-savePlots = 0;
+%% 
+
+%in the end used iter 13 and 14
+savePlots = 1;
 
 fontSiz=15;
 datPtSiz=130;
@@ -95,11 +97,15 @@ catCentres = [15, 35; 35, 15];
 colGreyClus = [.85, .85, .85];
 colGreyDat  = [.45 .45 .45];
 
+catAcol = [0, 0, 1];
+catBcol = [1, 0, 0];
+catAcol = [catAcol+((1-catAcol).*.5); catAcol];
+catBcol = [catBcol+((1-catBcol).*.5); catBcol];
 
-catAcol = [0.65 0.65 1; 0, 0, 1];
-catBcol = [1 0.65 0.65; 1, 0, 0];
+% colors(:,:,2) = distinguishable_colors(nClus)+(1-distinguishable_colors(nClus)).*.5; %lighter
 
-for iterI=1
+
+for iterI=1:20
     
     for iBvals= 1:length(batchSizeVals)
     for iC = 1:length(cVals)

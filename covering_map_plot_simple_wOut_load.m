@@ -200,7 +200,8 @@ end
 
 %% plot navigation example - over 3 time points; save figs
 
-%ATM needs to be done once at a time - since muAll is not saved across
+% needs muAll and trials 
+% needs to be done one (nIter=1) at a time - since muAll is not saved across
 %iters
 
 figDir = [wd '/data_gridCell/figs'];
@@ -216,8 +217,11 @@ trls2plt = {1:prtTrls(1)*nTrials, prtTrls(2)*nTrials:(prtTrls(2)*nTrials)+2500, 
 %if plotAgent, need trials as an output argument
 plotAgent = 1;
 nClus = size(muAll,1);
-colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
 colAgent = [.75, .75, .75];
+colGreyClus = [.85, .85, .85];
+colors(:,:,1) = repmat(colGreyClus,nClus,1);
+colors(:,:,2) = distinguishable_colors(nClus)+(1-distinguishable_colors(nClus)).*.5; %lighter
+colors(:,:,3) = distinguishable_colors(nClus);
 
 %if plotting agent over batches - need make cluster positions same over trials in a batch
 muTrls = nan(nClus,2,nTrials); %nTrials/2 - for trapzKfrmSq
@@ -231,11 +235,10 @@ cTime=datestr(now,'HHMMSS'); %so each iter has the same ending
 for iPlot = 1:length(trls2plt)
     figure; hold on;
     plot(trials(trls2plt{iPlot},1),trials(trls2plt{iPlot},2),'Color',colAgent); hold on;
-    scatter(squeeze(muTrls(:,1,trls2plt{iPlot}(end))),squeeze(muTrls(:,2,trls2plt{iPlot}(end))),1000,colors,'.'); hold on;    
+    scatter(squeeze(muTrls(:,1,trls2plt{iPlot}(end))),squeeze(muTrls(:,2,trls2plt{iPlot}(end))),1000,colors(:,:,iPlot),'.'); hold on;    
     xlim([locRange(1) locRange(2)+1]);
     ylim([locRange(1) locRange(2)+1]);
     xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
-    
     if iPlot==3
         densityPlotCentresSm = imgaussfilt(densityPlotActNorm(:,:,end,iterI),gaussSmooth);
         aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram

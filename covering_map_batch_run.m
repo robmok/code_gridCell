@@ -21,7 +21,7 @@ dat = 'square';
 % dat = 'catLearn';
 
 %compute activation and densityPlotActNorm over time? takes longer
-actOverTime = 1; 
+actOverTime = 0; 
 
 %annealed learning rate
 annEps = 1; %1 or 0
@@ -38,28 +38,28 @@ sigmaG = [7 0; 0 7];
 catsInfo.R=chol(sigmaG);
 catsInfo.msExample = 1; %2 gaussians in opposite sides of the square - example for ms
 
-% annEps new - v3 (epsMuOrig=0.25)- 200iter first wActOverTime
-% do 10:26 first
-%love06 - circ
-clus2run = [18, 15, 23, 17, 20, 16, 14, 25, 13];
-clus2run = [22, 11, 10, 19, 21, 12, 24, 26]; 
-% % love06 - sq
-clus2run = [11, 21, 12, 14, 20]; 
+% annEps new - v3 (epsMuOrig=0.25)- 1000iter, noActOverTime
+%love06 - circ - to run
+% clus2run = [18, 15, 23, 17, 20, 16, 28, 14, 25, 30, 13]; 
+% clus2run = [22, 11, 29, 10, 19, 27, 21, 12, 24, 26]; 
+% love06 - sq
+% clus2run = [11, 21, 12, 29, 14, 20]; % running 200iters 12, 14, 20
 
-%love01 - sq
-clus2run = [18, 15, 23, 26]; 
-% clus2run = [16, 22, 25, 24];
-% clus2run = [13, 10, 19, 17];
+%love01 - sq - running
+clus2run = [18, 15, 27, 23, 26]; 
+% clus2run = [16, 28, 22, 25, 24];
+% clus2run = [13, 10, 19, 17, 30];
 
 %%%%
-%if OK, do 3:9, 27:30 too too
+% 200 iters - 27:30 - circ/sq, love06; (later, 3:9?)
 %%%
+% clus2run = 27:30;
+% clus2run = fliplr(27:30);
 
 
 
 
-
-% clus2run = 24;
+% clus2run = 18;
 
 % nTrials
 if ~strcmp(dat(1:3),'cat')
@@ -135,7 +135,7 @@ warpType = 'sq2rect';
 %%
 saveDat=1; %save simulations
 
-nIter=200; %200 for covering map over time, 20 for cat; 1k for covering map new
+nIter=1000; %200 for covering map over time, 20 for cat; 1k for covering map new
 
 if useSameTrls
 %     switch dat
