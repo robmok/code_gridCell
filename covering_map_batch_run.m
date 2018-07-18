@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -51,6 +51,11 @@ clus2run = [11, 21, 12, 29, 14, 20];
 %  clus2run = [13, 10, 19, 17, 30];
 %love01 - circ - running
 %  clus2run = [13, 10, 19, 17];
+
+%love01 - above slow, so run 2 more matlabs - sq
+clus2run = [26,24]; 
+% clus2run = [30,25]; 
+
 
 %%%%
 % 200 iters - 27:30 - circ/sq, love06; (later, 3:9?)
