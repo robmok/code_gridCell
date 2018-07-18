@@ -1,21 +1,30 @@
-function [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,rSeed,muAll,trials] = covering_map_batch_sim_clusPosIn(clusPos,nClus,locRange,epsMuOrig,nTrials,batchSize,nIter,dat,annEps,jointTrls)
+function [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,rSeed,muAll,trials] = covering_map_batch_sim_clusPosIn(clusPos,nClus,locRange,epsMuOrig,epsMuTrapz,nTrialsOrig,nTrials,batchSize,nIter,dat,annEps,jointTrls)
 
-% clusPos is nClus x 2 x nIter(usually 200)
 
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
-stepSize=diff(spacing(1:2)); 
+% stepSize=diff(spacing(1:2)); 
 
 gaussSmooth=1; %smoothing for density map
 
 nBatch=round(nTrials/batchSize); %nBatch 7500 this better?
 batchSize = floor(batchSize); % when have decimal points, above needed
 
+nBatchOrig = nTrialsOrig/batchSize;
+
 %if decrease learning rate over time: 1/(1+decay+timestep); Decay - set a param
 if annEps
-    nBatches = nTrials./batchSize; %2500, 5000, 250000, 50000
-    epsMuOrig = nBatches/100;
-%     epsMuOrig = nBatches/150; %200
-    annEpsDecay = nBatches/40;
+    nBatches = nTrials./batchSize; %2500, 5000, 250000, 50000  
+%     epsMuOrig = 0.05;
+    if epsMuOrig == 0.1
+        annEpsDecay = 1.6e-07*(nBatchOrig*39); % eps stays high till 1/annEpsDecay batches; here 64.1026
+    elseif epsMuOrig == 0.15
+        %make epsMuOrig higher to keep it high for longer
+        annEpsDecay = 1.6e-07*(nBatchOrig*59); %  epsMuOrig =.15; here 42.3729; ends with .0025
+    elseif epsMuOrig == 0.25
+        annEpsDecay = 1.6e-07*(nBatchOrig*49); %  epsMuOrig =.25;ends with .005
+    end
+else %if not annEps, use fixed slower learning rate
+    epsMuOrig=epsMuTrapz;
 end
 
 %compute gridness over time %20 timepoints; - 21 sets now - last one is last quarter
@@ -108,19 +117,7 @@ for iterI = 1:nIter
             %update cluster positions
             closestC = nan(1,batchSize);
             for iTrlBatch = 1:batchSize
-%                 if stoch %stochastic update
-% %                     beta=c*(iBatch-1);  % by batch  % so this gets bigger, and more deterministic with more trials
-%                     beta=c*((iBatch-1)*nTrials/1000);  % by batch, no need to be so stochatic at start
-%                     dist2Clus2 = exp(-beta.*dist2Clus(iTrlBatch,:))./ sum(exp(-beta.*dist2Clus(iTrlBatch,:)));
-%                     distClusPr = cumsum(dist2Clus2);
-%                     closestTmp=find(rand(1)<distClusPr,1);
-%                     if isempty(closestTmp)  %if beta is too big, just do deterministic update (already will be near deterministic anyway)
-%                         closestTmp = find(min(dist2Clus(iTrlBatch,:))==dist2Clus(iTrlBatch,:));
-%                     end
-%                     betaAll((iBatch-1)*batchSize+iTrlBatch)     = beta;
-%                 else %deterministic update
-                    closestTmp = find(min(dist2Clus(iTrlBatch,:))==dist2Clus(iTrlBatch,:));
-%                 end
+                closestTmp = find(min(dist2Clus(iTrlBatch,:))==dist2Clus(iTrlBatch,:));
                 
                 if numel(closestTmp)>1
                     closestC(iTrlBatch) = randsample(closestTmp,1);
@@ -132,17 +129,7 @@ for iterI = 1:nIter
 %                     sigmaGauss = stepSize;%/3.5; %move up later - 1 seems to be fine
 %                     actTrl(closestC(iTrlBatch),iTrlBatch)=mvnpdf(trls2Upd(iTrlBatch,:),mu(closestC(iTrlBatch),:,iBatch),eye(2)*sigmaGauss); % save only the winner
 %                 end
-                            
-% %               %if stochastic, closestC might not be if more than 1 actual
-% %               %closest, have to check if stoch update chose one of them
-%                 actualClosestC = find(min(dist2Clus(iTrlBatch,:))==dist2Clus(iTrlBatch,:));
-%                 closestMatch = zeros(1,length(actualClosestC));
-%                 for iC = 1:length(actualClosestC)
-%                     closestMatch(iC) = actualClosestC(iC) == closestC(iTrlBatch);
-%                 end
-%                 closestChosen((iBatch-1)*batchSize+iTrlBatch) = any(closestMatch); %was (one of) the closest cluster selected? plot to check
-% %             log which cluster has been updated
-%                 updatedC((iBatch-1)*batchSize+iTrlBatch) = closestC(iTrlBatch);
+
             end
 %             if ~strcmp(dat(1:4),'trap') %not computing for trapz
 %                 actTrlAll(:,:,iBatch) = actTrl;
@@ -150,11 +137,17 @@ for iterI = 1:nIter
             
             %learning rate
             if annEps %if use annealed learning rate
-                epsMu = epsMuOrig./(1+annEpsDecay+iBatch); %need to check if it's actually epsMuOrig*(1/(1+annEpsDecay+iBatch);
-%                                     clear epsAll
-%                                     for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+annEpsDecay+iBatch); end
-%                                     figure; plot(epsAll);
-%                                     epsAll(nBatches.*[.25, .5, .75]) % eps at 25%, 50%, 75% of trials: 0.0396    0.0199    0.0133
+                epsMu = epsMuOrig/(1+(annEpsDecay*(iBatch+nBatchOrig))); %new
+                %debug mode - plot learning rate over time
+%                 clear epsAll
+%                 epsMuOrig = .25;
+%                 annEpsDecay = 1.6e-07*(nBatchOrig*49); %  epsMuOrig =.25;ends with .005 
+% %                 annEpsDecay = 1.6e-07*(nBatches*100); %  epsMuOrig =.5;ends with .005 
+%                 for iBatch=1:nBatchOrig+nBatch, epsAll(iBatch)=epsMuOrig/(1+(annEpsDecay*iBatch)); end
+%                 figure; plot(epsAll); ylim([0, 0.1]);
+%                 epsAll(round((nBatchOrig+nBatch).*[.05, .25, .5, .75, .95, 1]))
+%                 epsNew=epsAll(nBatchOrig+1:end);
+%                 epsNew(round(nBatch.*[.05, .25, .5, .75, .95, 1]))
             else
                 epsMu = epsMuOrig;
             end

@@ -21,20 +21,22 @@ dat2 = 'trapzKfrmSq1'; % run covering map on sq, then assess gridness in trapz
 saveDat=1;
 
 %for loading
-nIter=200;
 epsMuVals=.025;
 nTrials=1000000;
-% batchSizeVals = [400, 100]; % 125/200?
 batchSizeVals=400;
 
-annEps=0;
-jointTrls=1;
-
-%new running
+nIter=200;
 nIter=1000;
 
+annEps=1;
+if ~annEps
+   epsMuVals=.025;
+else
+    epsMuVals=.25;
+end
+jointTrls=1;
 
-% for current
+% trapz sims here
 nTrials2 = nTrials/2; %/4?
 nBatches = 2500;
 batchSizeVals = nTrials./nBatches;
@@ -42,18 +44,13 @@ nBvals = length(batchSizeVals);
 nIter2run = nIter;
 
 %new
-epsMuTrapz = 0.0025;
-% epsMuTrapz = 0.005;
-% epsMuTrapz = 0.0015; %to run - slower
-
-% clus2run = 3:26; 
+% epsMuTrapz = 0.0025;
+epsMuTrapz = 0.005; %new 
 
 %love06
-clus2run=[8:4:20, 23, 10:4:22, 27, 4];
-clus2run=[26, 24, 9:4:21,29, 3, 6]; 
-clus2run=[7:4:19, 25, 5, 28, 30]; 
-
-
+clus2run = [18, 15, 23, 20, 16, 28, 30]; 
+% clus2run = [22, 11, 29, 27, 21, 24, 26]; 
+% clus2run = [13, 10, 19, 17, 25, 12, 14];
 
 %testing
 % clus2run = 13;
@@ -70,7 +67,12 @@ for iClus2run = 1:length(clus2run)
             fprintf('Running %s, nClus=%d, epsMu=%d, batchSize=%d\n',dat2,nClus,epsMuOrig1000, batchSize)
             %load in sq
             fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat1);
-            fname = [saveDir, fname '*']; %finish with directory and * for date/time
+            %finish with directory and * for date/time
+            if ~annEps
+                fname = [saveDir, fname '*']; %finish with directory and * for date/time
+            else
+                fname = [saveDir, fname '*annEps*']; %new position of annEps - works now - above no need
+            end
             
             f = dir(fname); filesToLoad = cell(1,length(f));
             if isempty(f) %if no file, don't load/save - but print a warning
@@ -90,7 +92,7 @@ for iClus2run = 1:length(clus2run)
                 % run - allow starting clus positions (even
                 % outside the trapz box)
                 tic
-                [densityPlot,~,gA,gW,~,~,rSeed] = covering_map_batch_sim_clusPosIn(clusPos,nClus,locRange,epsMuTrapz,nTrials2,batchSize,nIter2run,dat2,annEps,jointTrls);
+                [densityPlot,~,gA,gW,~,~,rSeed] = covering_ map_batch_sim_clusPosIn(clusPos,nClus,locRange,epsMuOrig,epsMuTrapz,nTrials,nTrials2,batchSize,nIter2run,dat2,annEps,jointTrls);
                 
                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_%d',nClus,round(nTrials2/1000),epsMuOrig1000,round(batchSize),nIter,dat2,epsMuTrapz*10000)];
                 
