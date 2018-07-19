@@ -46,14 +46,14 @@ clus2run = [22, 11, 29, 27, 21, 12, 24, 26];
 clus2run = [11, 21, 12, 29, 14, 20]; 
 
 %love01 - sq - running
-% clus2run = [18, 15, 27, 23, 26]; 
-%  clus2run = [16, 28, 22, 25, 24];
-%  clus2run = [13, 10, 19, 17, 30];
+clus2run = [27, 23];% [18, 15, 27, 23, 26]; 
+%  clus2run = [22]; %[16, 28, 22, 25, 24];
+%  clus2run = [19, 17]; %[13, 10, 19, 17, 30];
 %love01 - circ - running
 %  clus2run = [13, 10, 19, 17];
 
 %love01 - above slow, so run 2 more matlabs - sq
-clus2run = [26,24]; 
+% clus2run = [26,24]; 
 % clus2run = [30,25]; 
 
 
