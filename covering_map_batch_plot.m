@@ -134,11 +134,11 @@ actOverTime = 1;
 
 
 %new - annealed learning rate
-clus2run  = 3:30;
-clus2run  = 10:26;
-epsMuVals = 0.1;
-epsMuVals = 0.15;
-epsMuVals = 0.25;
+% clus2run  = 3:30;
+clus2run  = 10:30;
+% epsMuVals = 0.1;
+% epsMuVals = 0.15;
+epsMuVals = 0.25; %use this one
 nTrials=1000000;
 batchSizeVals = 400;
 annEps=1;
@@ -612,7 +612,7 @@ nnz(peaksW~=6)
 %% density plots
 close all
 
-iSet=5;
+iSet=17;
 iEps=1;
 gaussSmooth=1;
 
@@ -624,10 +624,10 @@ else
 end
 
 %set
-iClus2run = 3;
+iClus2run = 30-9;
 iBvals    = 1;
 
-iters2plot = 1:5;
+iters2plot = 1;
 
 fprintf(sprintf('clus %d batchSizeVals %d\n',clus2run(iClus2run),batchSizeVals(iBvals)));
 for iterI = iters2plot
@@ -636,8 +636,8 @@ for iterI = iters2plot
 
     densityPlotCentresSm = imgaussfilt(densityPlotActNormAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
     densityPlotActNormTmp = densityPlotActNormAll(:,:,iSet,iterI,iEps,iBvals,iClus2run);
-    densityPlotActNormTmp(isnan(densityPlotActNormTmp))=0;
-%     densityPlotCentresSm = imgaussfilt(densityPlotActNormTmp,gaussSmooth);
+%     densityPlotActNormTmp(isnan(densityPlotActNormTmp))=0;
+    densityPlotCentresSm = imgaussfilt(densityPlotActNormTmp,gaussSmooth);
     
     figure; hold on;
     subplot(subPlt(1),subPlt(2),1)
@@ -871,9 +871,9 @@ if plotSubPlots
     for iClus = clus2plot
         %     subplot(2,ceil(length(clus2plot)/2),iClus); hold on;
 %         subplot(3,7,iClus-clus2plot(1)+1); hold on;
-        subplot(4,7,iClus-clus2plot(1)+1); hold on;
+        subplot(4,6,iClus-clus2plot(1)+1); hold on;
         %         subplot(ceil(length(clus2plot)/2),2,iClus); hold on;
-        dat1     = squeeze(datTmp(1:end-1,:,iEps,iBatchVals,:,iClus))';
+        dat1     = squeeze(datTmp(1:nTimePts,:,iEps,iBatchVals,:,iClus))';
         barpos  = .25:.5:.5*size(dat1,2);
         colgrey = [.5, .5, .5];
         mu      = nanmean(dat1,1);
@@ -887,10 +887,10 @@ if plotSubPlots
         ylim([-.5,1.25]);
         xticks([]); xticklabels({''});
         %         title(sprintf('nClus=%d, batchSize=%d',clus2plot(iClus),batchSizeVals(iBatchVals)))
-        title(sprintf('%d clusters',clus2plot(iClus-clus2plot(1)+1)+2));
-        
+%         title(sprintf('%d clusters',clus2plot(iClus-clus2plot(1)+1)+2));
+        title(sprintf('%d clusters',clus2run(clus2plot(iClus))));
     end
-    fname = [figsDir sprintf('/gridness_%s_univarScatters_overTime_nClus%d-%d_eps%d_batchSiz%d_%s',dat,(clus2plot(1)+2),(clus2plot(end)+2),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
+    fname = [figsDir sprintf('/gridness_%s_univarScatters_overTime_nClus%d-%d_eps%d_batchSiz%d_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
     if savePlots
         set(gcf,'Renderer','painters');
         print(gcf,'-depsc2',fname)
@@ -902,11 +902,12 @@ else
     %subset of nClus conds
 %     clus2plot = [7,10,12,18,25]-2;
     clus2plot = [10,12,18,25]-9;
+        clus2plot = [24:30]-9;
     
 %     clus2plot = 18-2;
     for iClus = clus2plot
         figure;
-        dat1     = squeeze(datTmp(1:end-2,:,iEps,iBatchVals,iClus,:))';
+        dat1     = squeeze(datTmp(1:nTimePts,:,:,iEps,iBatchVals,iClus,:))';
         barpos  = .25:.5:.5*size(dat1,2);
         colgrey = [.5, .5, .5];
         mu      = nanmean(dat1,1);
@@ -920,10 +921,10 @@ else
         ylim([-.5,1.3]);
         xticks([]); xticklabels({''});
         %         title(sprintf('nClus=%d, batchSize=%d',clus2plot(iClus),batchSizeVals(iBatchVals)))
-        title(sprintf('%d clusters',iClus+9));
+        title(sprintf('%d clusters',clus2run(iClus)));
         set(gca,'FontSize',fontSiz,'fontname','Arial')
 
-        fname = [figsDir sprintf('/gridness_%s_univarScatters_overTime_singlePlot_nClus%d_eps%d_batchSiz%d_%s',dat,iClus+9,epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
+        fname = [figsDir sprintf('/gridness_%s_univarScatters_overTime_singlePlot_nClus%d_eps%d_batchSiz%d_%s',dat,clus2run(iClus),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
         if savePlots
             set(gcf,'Renderer','painters');
             print(gcf,'-depsc2',fname)

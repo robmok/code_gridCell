@@ -14,7 +14,7 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; % orig nTrials/10
 dat = 'circ';
-dat = 'square';
+% dat = 'square';
 
 % dat = 'trapzKrupic';
 
@@ -40,27 +40,23 @@ end
 % clus2run=[3:10 12:2:26 11:2:25, 27:30]; % 27:30
 
 %%%%%%%
-% new fixed perm - 200iters - starting now
-% annEps
-% sq / circ
+% new fixed perm - 200iters
+% annEps - not started
+% sq / circ - 10:30
 %love06
-% clus2run = [3, 15, 23,  26, 20, 9, 19, 4, 7, 27];
+clus2run = [18, 15, 23,  26, 20, 25 ,28, 19,  27];%[3, 15, 23,  26, 20, 9, 19, 4, 7, 27];
 
 %love01
-% clus2run = [16, 8,  22, 6,  24, 30];
-% clus2run = [11, 21, 12, 14, 25, 28]; 
-% clus2run = [5,  13, 10, 17, 18, 29];
+% clus2run = [16, 22, 24, 30]; %[16, 8,  22, 6,  24, 30];
+% clus2run = [11, 21, 12, 14]; %[11, 21, 12, 14, 25, 28]; 
+% clus2run = [13, 10, 17, 29]; %[5,  13, 10, 17, 18, 29];
 
-%love06 fast - take some from love01
-% sq / circ - take from perm2,3,5,6
-% clus2run = [12, 14, 25, 28, 10, 17, 18, 29]; 
-%sq died at 18 - TO RERUN when circ done
-clus2run = [18, 29]; 
+
 
 %%%%
-% 1k iters, sq/circ annEps, no perm - % done
+% 1k iters, sq/circ annEps, no perm - not started
 %%%%%
-% sq2trapz 1kiters - done  i think
+% sq2trapz 1kiters - not started
 % clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 30, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3]; %all
 % clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26, 9]; %half
 % clus2run = [13, 30, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3]; %half
