@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -15,7 +15,7 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
-% dat = 'square';   
+dat = 'square';   
 % dat = 'trapzKrupic';
 
 % dat = 'catLearn';
@@ -62,12 +62,13 @@ clus2run = [27, 23];% [18, 15, 27, 23, 26];
 % 200 iters, learning over time needs smoothing - rerun; not started
 %circ/sq, 4 matlabs
 %love06
-clus2run = [18, 15, 23, 14, 25, 30, 17, 18]; 
+clus2run = [18, 15, 23, 14, 25, 30, 17, 19]; 
 clus2run = [22, 11, 29, 27, 21, 12, 24]; 
+clus2run= 19; %missed
 
 %love01 - circ/sq, 4 matlabs
-clus2run = [10, 28, 16]; 
-%  clus2run = [13, 20, 26];
+% clus2run = [10, 28, 16];  %c2,3
+%  clus2run = [13, 20, 26]; %c4,5
 
 
 

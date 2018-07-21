@@ -136,6 +136,7 @@ actOverTime = 1;
 %new - annealed learning rate
 % clus2run  = 3:30;
 clus2run  = 10:30;
+clus2run  = [10:18, 20:30];
 % epsMuVals = 0.1;
 % epsMuVals = 0.15;
 epsMuVals = 0.25; %use this one

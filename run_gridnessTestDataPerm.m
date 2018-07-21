@@ -31,7 +31,7 @@ batchSizeVals=400;
 
 annEps=1;
 if annEps %new
-    epsMuVals=.1; %below multiplies this by 1k
+    epsMuVals=.25; %below multiplies this by 1k
 end
 
 %for loading
@@ -46,8 +46,8 @@ end
 %love06
 clus2run = [18, 15, 23,  26, 20, 25 ,28, 19,  27];%[3, 15, 23,  26, 20, 9, 19, 4, 7, 27];
 
-%love01
-% clus2run = [16, 22, 24, 30]; %[16, 8,  22, 6,  24, 30];
+%love01 - circ/sq - started
+clus2run = [16, 22, 24, 30]; %[16, 8,  22, 6,  24, 30];
 % clus2run = [11, 21, 12, 14]; %[11, 21, 12, 14, 25, 28]; 
 % clus2run = [13, 10, 17, 29]; %[5,  13, 10, 17, 18, 29];
 
@@ -58,8 +58,8 @@ clus2run = [18, 15, 23,  26, 20, 25 ,28, 19,  27];%[3, 15, 23,  26, 20, 9, 19, 4
 %%%%%
 % sq2trapz 1kiters - not started
 % clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 30, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3]; %all
-% clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26, 9]; %half
-% clus2run = [13, 30, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3]; %half
+% clus2run = [14, 15, 23,  20, 24, 18, 16, 22, 27, 26, 19]; %half - running
+% clus2run = [13, 30, 29,  25, 10, 28, 17, 11, 21, 12]; %half - running
 % clus2run = [13, 30, 29,  5, 25, 10,  7, ]; %quarter
 % clus2run = [19, 28, 17, 11, 21, 12,  3]; %quarter
 

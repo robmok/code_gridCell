@@ -92,7 +92,7 @@ for iClus2run = 1:length(clus2run)
                 % run - allow starting clus positions (even
                 % outside the trapz box)
                 tic
-                [densityPlot,~,gA,gW,~,~,rSeed] = covering_ map_batch_sim_clusPosIn(clusPos,nClus,locRange,epsMuOrig,epsMuTrapz,nTrials,nTrials2,batchSize,nIter2run,dat2,annEps,jointTrls);
+                [densityPlot,~,gA,gW,~,~,rSeed] = covering_map_batch_sim_clusPosIn(clusPos,nClus,locRange,epsMuOrig,epsMuTrapz,nTrials,nTrials2,batchSize,nIter2run,dat2,annEps,jointTrls);
                 
                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_%d',nClus,round(nTrials2/1000),epsMuOrig1000,round(batchSize),nIter,dat2,epsMuTrapz*10000)];
                 
