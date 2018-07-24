@@ -16,7 +16,7 @@ gaussSmooth = 1;
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-% dat='square';
+dat='square';
 % annEps=0;
 boxSize=1;
 % nIter=200;
@@ -798,7 +798,7 @@ end
 
 %overall mean
 ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs
-fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2plot(1)+2,clus2plot(end)+2,nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2));
+fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2));
 
 %%
     
@@ -892,6 +892,9 @@ if plotSubPlots
         title(sprintf('%d clusters',clus2run(clus2plot(iClus))));
     end
     fname = [figsDir sprintf('/gridness_%s_univarScatters_overTime_nClus%d-%d_eps%d_batchSiz%d_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
+    if annEps
+        fname = [fname '_annEps'];
+    end
     if savePlots
         set(gcf,'Renderer','painters');
         print(gcf,'-depsc2',fname)
@@ -903,7 +906,7 @@ else
     %subset of nClus conds
 %     clus2plot = [7,10,12,18,25]-2;
     clus2plot = [10,12,18,25]-9;
-        clus2plot = [24:30]-9;
+    clus2plot = 1:length(clus2run);
     
 %     clus2plot = 18-2;
     for iClus = clus2plot
@@ -926,6 +929,9 @@ else
         set(gca,'FontSize',fontSiz,'fontname','Arial')
 
         fname = [figsDir sprintf('/gridness_%s_univarScatters_overTime_singlePlot_nClus%d_eps%d_batchSiz%d_%s',dat,clus2run(iClus),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
+        if annEps
+           fname = [fname '_annEps']; 
+        end
         if savePlots
             set(gcf,'Renderer','painters');
             print(gcf,'-depsc2',fname)
@@ -942,7 +948,7 @@ nTimePts = 20;
 
 clus2plot = 1:length(clus2run);
 % clus2plot = 4:length(clus2run); %skip 3:5
-% clus2plot = 8:length(clus2run); %skip 3:9
+% clus2plot = 8:length(clus2run); %skip 3:9 %
 % clus2plot = 8:length(clus2run)-4; %skip 3:9, 27:30 % turns out last few are positive!
 
 % clear gt_b gt_p
@@ -991,7 +997,7 @@ end
 % ci = bootci(length(gt_b),@mean,mean(gt_b,2));
 ci = bootci(numel(gt_b),@nanmean,reshape(gt_b,1,numel(gt_b))); %CI over ALL runs
 
-fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig betas > 0, out of %d sig betas. %0.2f percent\n',clus2plot(1)+2,clus2plot(end)+2,mean(reshape(gt_b,1,numel(gt_b))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
+fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig betas > 0, out of %d sig betas. %0.2f percent\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),mean(reshape(gt_b,1,numel(gt_b))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
 
 
 %TO DO:

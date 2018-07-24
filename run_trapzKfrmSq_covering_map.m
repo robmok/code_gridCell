@@ -48,9 +48,10 @@ nIter2run = nIter;
 epsMuTrapz = 0.005; %new 
 
 %love06
-clus2run = [18, 15, 23, 20, 16, 28, 30]; 
-% clus2run = [22, 11, 29, 27, 21, 24, 26]; 
-% clus2run = [13, 10, 19, 17, 25, 12, 14];
+% clus2run = [15, 23,  20, 24, 18, 16, 22, 27, 26, 19]; %half - ;14
+% clus2run = [30, 29,  25, 10, 28, 17, 11, 21, 12]; %half - ; 13
+
+clus2run = [15, 23,  20, 24, 18, 16, 22, 27, 26, 19, 30, 29,  25, 10, 28, 17, 11, 21, 12]; % full - 13, 14 - % running
 
 %testing
 % clus2run = 13;
@@ -94,7 +95,7 @@ for iClus2run = 1:length(clus2run)
                 tic
                 [densityPlot,~,gA,gW,~,~,rSeed] = covering_map_batch_sim_clusPosIn(clusPos,nClus,locRange,epsMuOrig,epsMuTrapz,nTrials,nTrials2,batchSize,nIter2run,dat2,annEps,jointTrls);
                 
-                fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_%d',nClus,round(nTrials2/1000),epsMuOrig1000,round(batchSize),nIter,dat2,epsMuTrapz*10000)];
+                fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz_%d',nClus,round(nTrials2/1000),epsMuOrig1000,round(batchSize),nIter,dat2,epsMuTrapz*10000)];
                 
                 timeTaken=toc;
                 if saveDat

@@ -18,7 +18,7 @@ gaussSmooth = 1;
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-% dat='square';
+dat='square';
 compareCircSq = 0; %if compare circ-sq gridness, dat=circ, but load sq too
 
 annEps=0;
@@ -52,7 +52,7 @@ loadPerm = 0;
 % clus2run = [3:26]; 
 clus2run = [3:30]; 
 % clus2run = [3:26]; 
-% clus2run = 20:23; 
+clus2run = 10:30;
 
 batchSizeVals = 400; %100, 125, 200,400, 1000
 % batchSizeVals = 200;
@@ -66,7 +66,8 @@ batchSizeVals = 400; %100, 125, 200,400, 1000
 
 %new annEps
 annEps=1;
-epsMuVals = 0.1;
+% epsMuVals = 0.1;
+epsMuVals = 0.25;
 
 
 rHex=0; %if choose raw 60deg corr values, not gridness
@@ -231,7 +232,7 @@ dat = datOrig;
 end
 %% Making figs - univar scatters 1 - test set
 
-savePlots=0;
+savePlots=1;
 
 clusPosAct = 'actNorm'; %'act' or 'actNorm'
 
@@ -299,20 +300,12 @@ end
 
 iEps=1;
 
-% clus2plot=(3:26)-2;
-clus2plot=(6:26)-2;
-clus2plot=(10:26)-2;
-% clus2plot=([6:24])-2;
+% clus2plot=(3:30)-2;
+% clus2plot=(6:30)-2;
+% clus2plot=(10:30)-2;
+% clus2plot=(10:26)-2;
 
-clus2plot=(3:30)-2;
-clus2plot=(6:30)-2;
-clus2plot=(10:30)-2;
-clus2plot=(10:26)-2;
-
-% clus2plot=(3:26)-2;
-
-
-% clus2plot=1:length(clus2run);
+clus2plot=1:length(clus2run);
 
 %trapz
 % clus2plot = 1:length(clus2run);
@@ -350,23 +343,25 @@ figure; hold on;
         
 %         title(sprintf('%s, %s - eps=%d, batchSize=%d',dat, gridMeasure,epsMuVals(iEps)*1000,batchSizeVals(iBatchVals)))
         if strcmp(dat(1:2),'ci')
-            title('Circular box')
+            title('Circular Environment')
         elseif strcmp(dat(1:2),'sq')
-            title('Square box')
+            title('Square Environment')
         elseif strcmp(dat(1:2),'tr')
-            title('Trapezoid box')
+            title('Trapezoid')
         end
         set(gca,'FontSize',fontSiz,'fontname','Arial')
     end
 
     fname = [figsDir sprintf('/gridness_%s_univarScatters_testSet_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
-
-% if savePlots
-%    set(gcf,'Renderer','painters');
-%    print(gcf,'-depsc2',fname)
-%    saveas(gcf,fname,'png');
-%    close all
-% end
+if annEps
+    fname = [fname '_annEps'];
+end
+if savePlots
+   set(gcf,'Renderer','painters');
+   print(gcf,'-depsc2',fname)
+   saveas(gcf,fname,'png');
+   close all
+end
 
 
 %prop grid cells
@@ -505,7 +500,7 @@ if ~strcmp(dat,'trapzKfrmSq1')
     end
 %     ci = bootci(length(clus2run),@nanmean,nanmean(dat1,1)); %CI over mean of nClus conds - prob not as gd
     ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs 
-    fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2plot(1)+2,clus2plot(end)+2,nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2))
+    fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2))
 else
     %trapz 
     dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,1));
@@ -563,7 +558,7 @@ else
         end
     end
     ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs 
-    fprintf('trapzL-R, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f];  %d sig > 0, out of %d sig conds. %0.2f percent\n',clus2plot(1)+2,clus2plot(end)+2,nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
+    fprintf('trapzL-R, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f];  %d sig > 0, out of %d sig conds. %0.2f percent\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
 end
 end
 %%
