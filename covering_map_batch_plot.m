@@ -16,7 +16,7 @@ gaussSmooth = 1;
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-dat='square';
+% dat='square';
 % annEps=0;
 boxSize=1;
 % nIter=200;
@@ -136,7 +136,7 @@ actOverTime = 1;
 %new - annealed learning rate
 % clus2run  = 3:30;
 clus2run  = 10:30;
-clus2run  = [10:18, 20:30];
+% clus2run  = [10:18, 20:30];
 % epsMuVals = 0.1;
 % epsMuVals = 0.15;
 epsMuVals = 0.25; %use this one
@@ -153,8 +153,8 @@ rHex=0; %if choose raw 60deg corr values, not gridness
 % dat='trapzKfrmSq1';
 % nTrials=500000;
 % batchSizeVals=400;
-% clus2run=6:26;
-
+% clus2run=10:30;
+% nIter=1000;
 
 
 %load loop
@@ -854,9 +854,9 @@ end
 
 %% Making figs: plot over sets
 
-savePlots = 0;
+savePlots = 1;
 
-plotSubPlots = 1;
+plotSubPlots = 0;
 
 fontSiz = 25;
 
@@ -905,8 +905,8 @@ else
     
     %subset of nClus conds
 %     clus2plot = [7,10,12,18,25]-2;
-    clus2plot = [10,12,18,25]-9;
-    clus2plot = 1:length(clus2run);
+%     clus2plot = [10,12,18,25]-9;
+    clus2plot = (19-9):length(clus2run);
     
 %     clus2plot = 18-2;
     for iClus = clus2plot

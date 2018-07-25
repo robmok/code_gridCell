@@ -52,6 +52,8 @@ epsMuTrapz = 0.005; %new
 % clus2run = [30, 29,  25, 10, 28, 17, 11, 21, 12]; %half - ; 13
 
 clus2run = [15, 23,  20, 24, 18, 16, 22, 27, 26, 19, 30, 29,  25, 10, 28, 17, 11, 21, 12]; % full - 13, 14 - % running
+clus2run = [27, 26, 19, 30, 29,  25];
+clus2run = [10, 28, 17, 11, 21, 12];
 
 %testing
 % clus2run = 13;
@@ -101,6 +103,9 @@ for iClus2run = 1:length(clus2run)
                 if saveDat
                     if jointTrls
                         fname = [fname '_jointTrls_stepSiz'];
+                    end
+                    if annEps
+                        fname = [fname '_annEps'];
                     end
                     cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
 %                     save(fname,'densityPlot','densityPlotActNorm','gA','gW','gA_actNorm','gW_actNorm','rSeed','timeTaken');
