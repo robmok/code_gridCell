@@ -45,32 +45,23 @@ catsInfo.msExample = 1; %2 gaussians in opposite sides of the square - example f
 % % love06 - sq
 % clus2run = [11, 21, 12, 29, 14, 20]; 
 
-%love01 - sq - running
-clus2run = [27, 23];% [18, 15, 27, 23, 26]; 
+%love01 - sq 
+% clus2run = [27, 23];% [18, 15, 27, 23, 26]; 
 %  clus2run = [22]; %[16, 28, 22, 25, 24];
 %  clus2run = [19, 17]; %[13, 10, 19, 17, 30];
-%love01 - circ - running
+%love01 - circ 
 %  clus2run = [13, 10, 19, 17];
 
-%love01 - above slow, so run 2 more matlabs - sq
-% clus2run = [26,24]; 
-% clus2run = [30,25]; 
 
-
-%%%% re-run 200 iters
-
-% 200 iters, learning over time needs smoothing - rerun; not started
-%circ/sq, 4 matlabs
+%%%% new run 200 iters - annEps from 0.25 to 0.033
+%sq, 4 matlabs
 %love06
-clus2run = [18, 15, 23, 14, 25, 30, 17, 19]; 
-clus2run = [22, 11, 29, 27, 21, 12, 24]; 
-clus2run= 19; %missed
+clus2run = [12, 15, 13]; 
+% clus2run = [14, 10, 11]; 
+% clus2run = [17, 16]; 
+% clus2run = [18, 19];
 
-%love01 - circ/sq, 4 matlabs
-% clus2run = [10, 28, 16];  %c2,3
-%  clus2run = [13, 20, 26]; %c4,5
-
-
+%love01 - circ/sq, 4 matlabs - not yet
 
 
 
