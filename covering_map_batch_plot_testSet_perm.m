@@ -38,19 +38,19 @@ nIter=1000;
 
 
 %load perm data when nIter=1000- this is with nIter=200. doPerm should=0
-loadPerm = 1;
+loadPerm = 0;
 
 % clus2run = [3:16, 18, 20:26];  %missed 17, 19?
 
 % % dat='trapzKrupic';    
-% dat='trapzKfrmSq1';
-% %trapzKfrmSq1
-% nTrials=1000000/2;
-% epsMuTrapz10 = 25; 
+dat='trapzKfrmSq1';
+%trapzKfrmSq1
+nTrials=1000000/2;
+epsMuTrapz10 = 50; 
 
 
 % clus2run = [3:26]; 
-clus2run = [3:30]; 
+% clus2run = [3:30]; 
 % clus2run = [3:26]; 
 clus2run = 10:30;
 
@@ -108,7 +108,11 @@ for iClus2run = 1:length(clus2run)
                     end
                 else
                     if strcmp(dat(12),'1')
-                        fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_%d_jointTrls_stepSiz_trlsTest_noPerm_%s',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,epsMuTrapz10,dat)];
+                        if ~annEps
+                            fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz10_%d_jointTrls_stepSiz_trlsTest_noPerm_%s',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,epsMuTrapz10,dat)];
+                        else
+                            fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz_%d_jointTrls_stepSiz_annEps_trlsTest_noPerm_%s',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,epsMuTrapz10,dat)];
+                        end
                     else
                         fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_trlsTest_noPerm_%s',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,'square',dat)];
                     end
@@ -201,11 +205,12 @@ for iClus2run = 1:length(clus2run)
             if doPerm
                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_actNorm_perm_%dpermsOn%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,nPerm,nIters2run)];
             else
+                if ~annEps
                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_trlsTest_noPerm',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+                else
+                fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_*annEps_trlsTest_noPerm',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+                end
             end
-%             %note, annEps slightly different file name
-
-
 
 
             %finish with directory and * for date/time
@@ -245,7 +250,7 @@ gridMeasure = 'grid';
 
 plotFewClus = 0; %plot 3:5 clusters separately
 
-computeCIs = 1; %takes a bit of time
+computeCIs = 0; %takes a bit of time
 
 switch clusPosAct
 % case 'clus'
