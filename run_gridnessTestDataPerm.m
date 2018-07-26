@@ -68,7 +68,7 @@ clus2run = [13, 30, 29,  25, 10, 28, 17, 11, 21, 12]; %half -
 % clus2run = 11;
 
 nIter=200;
-nIter=1000;
+% nIter=1000;
 
 jointTrls=1; %for test trials
 
@@ -77,6 +77,7 @@ if strcmp(dat,'trapzKfrmSq1')
     nTrials=1000000/2;
 %     epsMuTrapz10 = 25; %this is 10% of orig learning rate - using this
     epsMuTrapz10 = 50; % anEps - 20%
+    epsMuTrapz10 = 30; % anEps -
     % epsMuTrapz10 = 15;  %
 end
 

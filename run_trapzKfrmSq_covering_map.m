@@ -26,7 +26,7 @@ nTrials=1000000;
 batchSizeVals=400;
 
 nIter=200;
-nIter=1000;
+% nIter=1000;
 
 annEps=1;
 if ~annEps
@@ -46,14 +46,18 @@ nIter2run = nIter;
 %new
 % epsMuTrapz = 0.0025;
 epsMuTrapz = 0.005; %new 
+epsMuTrapz = 0.003; %new 
 
 %love06
 % clus2run = [15, 23,  20, 24, 18, 16, 22, 27, 26, 19]; %half - ;14
 % clus2run = [30, 29,  25, 10, 28, 17, 11, 21, 12]; %half - ; 13
 
-clus2run = [15, 23,  20, 24, 18, 16, 22, 27, 26, 19, 30, 29,  25, 10, 28, 17, 11, 21, 12]; % full - 13, 14 - % running
-clus2run = [27, 26, 19, 30, 29,  25];
-clus2run = [10, 28, 17, 11, 21, 12];
+% clus2run = [15, 23,  20, 24, 18, 16, 22, 27, 26, 19, 30, 29,  25, 10, 28, 17, 11, 21, 12]; % full - 13, 14 - % 
+
+%10:20 only
+clus2run = [15, 13, 18, 16, 19, 14];
+clus2run = [10, 17, 11, 12, 20];
+
 
 %testing
 % clus2run = 13;

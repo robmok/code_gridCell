@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -15,7 +15,7 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
-% dat = 'square';   
+dat = 'square';   
 % dat = 'trapzKrupic';
 
 % dat = 'catLearn';
@@ -56,11 +56,17 @@ catsInfo.msExample = 1; %2 gaussians in opposite sides of the square - example f
 %%%% new run 200 iters - annEps from 0.25 to 0.033
 %sq, 4 matlabs
 %love06
-clus2run = [12, 15, 16, 13, 17]; 
-clus2run = [14, 18, 10, 11, 19]; 
+clus2run = [12, 15, 16, 19]; 
+clus2run = [14, 18, 10, 20]; 
+clus2run = [13, 11, 17]; 
+
+%next:
+clus2run = 21:2:30;
+% clus2run = fliplr(22:2:30);
+
 
 %love01 - circ, 4 matlabs - not yet
-clus2run = [12, 15, 20, 27, 16, 19]; 
+% clus2run = [12, 15, 20, 27, 16, 19]; 
 % clus2run = [14, 26, 18, 10, 21]; 
 % clus2run = [22, 11, 23, 30, 28];
 % clus2run = [25, 17, 24, 26, 13];
