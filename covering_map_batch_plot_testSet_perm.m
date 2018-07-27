@@ -34,7 +34,7 @@ nTrials=1000000;
 % batchSizeVals=400;
 nIter=200;
 
-nIter=1000;
+% nIter=1000;
 
 
 %load perm data when nIter=1000- this is with nIter=200. doPerm should=0
@@ -46,13 +46,13 @@ loadPerm = 0;
 dat='trapzKfrmSq1';
 %trapzKfrmSq1
 nTrials=1000000/2;
-epsMuTrapz10 = 50; 
+epsMuTrapz10 = 30; 
 
 
 % clus2run = [3:26]; 
 % clus2run = [3:30]; 
 % clus2run = [3:26]; 
-clus2run = 10:30;
+clus2run = 10:20;
 
 batchSizeVals = 400; %100, 125, 200,400, 1000
 % batchSizeVals = 200;
@@ -185,7 +185,7 @@ for iClus2run = 1:length(clus2run)
 end
 
 
-if strcmp(dat,'trapzKfrmSq1') || compareCircSq %added compare circ vs sq - should work?
+if 0% strcmp(dat,'trapzKfrmSq1') || compareCircSq %added compare circ vs sq - should work?
     
     datOrig = dat;
     dat = 'square';

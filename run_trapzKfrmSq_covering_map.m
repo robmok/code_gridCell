@@ -38,15 +38,16 @@ jointTrls=1;
 
 % trapz sims here
 nTrials2 = nTrials/2; %/4?
-nBatches = 2500;
-batchSizeVals = nTrials./nBatches;
+% nBatches = 2500;
+nBatches = 5000;%new
+batchSizeVals = nTrials./nBatches; %match original batchsize values (nTrials being original nTrials)
 nBvals = length(batchSizeVals);
 nIter2run = nIter;
 
 %new
-% epsMuTrapz = 0.0025;
-epsMuTrapz = 0.005; %new 
-epsMuTrapz = 0.003; %new 
+epsMuTrapz = 0.0025;
+% epsMuTrapz = 0.005; %new 
+% epsMuTrapz = 0.003; %new 
 
 %love06
 % clus2run = [15, 23,  20, 24, 18, 16, 22, 27, 26, 19]; %half - ;14

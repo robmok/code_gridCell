@@ -12,20 +12,19 @@ batchSize = floor(batchSize); % when have decimal points, above needed
 
 %if decrease learning rate over time: 1/(1+decay+timestep); Decay - set a param
 if annEps
-    nBatches = nTrials./batchSize; %2500, 5000, 250000, 50000  
-%     epsMuOrig = 0.05;
-%     annEpsDecay = 1.6e-07*(nBatches*20); % eps stays high till 1/annEpsDecay batches; here 125
+%     eps stays high till 1/annEpsDecay batches - 
+    annC = (1/nBatch)/nBatch; % 1/annC*nBatch = nBatch: constant to calc 1/annEpsDecay
     if epsMuOrig == 0.1
-        annEpsDecay = 1.6e-07*(nBatches*39); % eps stays high till 1/annEpsDecay batches; here 64.1026
+        annEpsDecay = annC*(nBatch*39); % eps stays high till 1/annEpsDecay batches; here 64.1026
     elseif epsMuOrig == 0.15
         %make epsMuOrig higher to keep it high for longer
-        annEpsDecay = 1.6e-07*(nBatches*59); %  epsMuOrig =.15; here 42.3729; ends with .0025
+        annEpsDecay = annC*(nBatch*59); %  epsMuOrig =.15; here 42.3729; ends with .0025
     elseif epsMuOrig == 0.25
-%         annEpsDecay = 1.6e-07*(nBatches*200); %  epsMuOrig =.25;ends with .0025
-%         annEpsDecay = 1.6e-07*(nBatches*49); %  epsMuOrig =.25;ends with .005
-        annEpsDecay = 1.6e-07*(nBatches*75); %  epsMuOrig =.25;ends with .033
+        annEpsDecay = annC*(nBatch*100); %  epsMuOrig =.25;ends with .0025
+%         annEpsDecay = annC*(nBatch*49); %  epsMuOrig =.25;ends with .005
+%         annEpsDecay = annC*(nBatch*75); %  epsMuOrig =.25;ends with .033
 %     elseif epsMuOrig == 0.5
-%         annEpsDecay = 1.6e-07*(nBatches*100); %  epsMuOrig =.5;ends with .005
+%         annEpsDecay = annC*(nBatch*100); %  epsMuOrig =.5;ends with .005
     end
 end
 
@@ -205,26 +204,28 @@ for iterI = 1:nIter
             
             %learning rate
             if annEps %if use annealed learning rate
-                epsMu = epsMuOrig/(1+(annEpsDecay*iBatch)); %new
-                %debug mode - plot learning rate over time
+                epsMu = epsMuOrig/(1+(annEpsDecay*iBatch)); 
+%                 debug mode - plot learning rate over time
 %                 clear epsAll
-%                 epsMuOrig = .5;
-% %                 annEpsDecay = 1.6e-07*(nBatches*39); % epsMuOrig =.1; eps stays high till 1/annEpsDecay batches; here 64.1026; ends with .0025
-% %                 annEpsDecay = 1.6e-07*(nBatches*19); %  epsMuOrig =.05; here 125; ends with .0025
-%                 annEpsDecay = 1.6e-07*(nBatches*9); %  epsMuOrig =.025; here 227.77; ends with .0025
+%                 epsMuOrig = .25;
+% %                 annEpsDecay = annC*(nBatch*39); % epsMuOrig =.1; eps stays high till 1/annEpsDecay batches; here 64.1026; ends with .0025
+% %                 annEpsDecay = annC*(nBatch*19); %  epsMuOrig =.05; here 125; ends with .0025
+% %                 annEpsDecay = annC*(nBatch*9); %  epsMuOrig =.025; here 227.77; ends with .0025
 % %                higher epsMuOrig - stays higher for longer
-% %                 annEpsDecay = 1.6e-07*(nBatches*59); %  epsMuOrig =.15; here 42.3729; ends with .0025
-%                 annEpsDecay = 1.6e-07*(nBatches*200); %  epsMuOrig =.5;ends with .0025
+% %                 annEpsDecay = annC*(nBatch*59); %  epsMuOrig =.15; here 42.3729; ends with .0025
+% %                 annEpsDecay = annC*(nBatch*200); %  epsMuOrig =.5;ends with .0025
 % 
 %                 % ending at 0.005
-% %                 annEpsDecay = 1.6e-07*(nBatches*49); %  epsMuOrig =.25;ends with .005 
-%                 annEpsDecay = 1.6e-07*(nBatches*100); %  epsMuOrig =.5;ends with .005 
+% %                 annEpsDecay = annC*(nBatch*49); %  epsMuOrig =.25;ends with .005 
+% %                 annEpsDecay = annC*(nBatch*100); %  epsMuOrig =.5;ends with .005 
+% %                 annEpsDecay = annC*(nBatch*75); %  epsMuOrig =.25;ends with .033
 % 
-% %                 annEpsDecay = 1.6e-07*(nBatches*75); %  epsMuOrig =.25;ends with .033
-% 
-%                 for iBatch=1:nBatches, epsAll(iBatch)=epsMuOrig/(1+(annEpsDecay*iBatch)); end
+%                 annEpsDecay = annC*(nBatch*100); %  epsMuOrig =.25;ends with .025
+% % 
+%                 for iBatch=1:nBatch, epsAll(iBatch)=epsMuOrig/(1+(annEpsDecay*iBatch)); end
+% %                 for iBatch=1:nBatch, epsAll(iBatch)=epsMuOrig/(1+(annEpsDecay*(iBatch+100))); end %start from iBatch later
 %                 figure; plot(epsAll); ylim([0, 0.1]);
-%                 epsAll(nBatches.*[.05, .25, .5, .75, .95, 1]) % eps at 25%, 50%, 75% of trials: 
+%                 epsAll(nBatch.*[.05, .25, .5, .75, .95, 1]) % eps at 25%, 50%, 75% of trials: 
             else
                 epsMu = epsMuOrig;
             end

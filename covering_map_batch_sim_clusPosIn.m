@@ -13,15 +13,17 @@ nBatchOrig = nTrialsOrig/batchSize;
 
 %if decrease learning rate over time: 1/(1+decay+timestep); Decay - set a param
 if annEps
-    nBatches = nTrials./batchSize; %2500, 5000, 250000, 50000  
-%     epsMuOrig = 0.05;
+%     eps stays high till 1/annEpsDecay batches - 
+    annC = (1/nBatch)/nBatch; % 1/annC*nBatch = nBatch: constant to calc 1/annEpsDecay
     if epsMuOrig == 0.1
-        annEpsDecay = 1.6e-07*(nBatchOrig*39); % eps stays high till 1/annEpsDecay batches; here 64.1026
+        annEpsDecay = annC*(nBatch*39); % eps stays high till 1/annEpsDecay batches; here 64.1026
     elseif epsMuOrig == 0.15
         %make epsMuOrig higher to keep it high for longer
-        annEpsDecay = 1.6e-07*(nBatchOrig*59); %  epsMuOrig =.15; here 42.3729; ends with .0025
+        annEpsDecay = annC*(nBatch*59); %  epsMuOrig =.15; here 42.3729; ends with .0025
     elseif epsMuOrig == 0.25
-        annEpsDecay = 1.6e-07*(nBatchOrig*49); %  epsMuOrig =.25;ends with .005
+        annEpsDecay = annC*(nBatch*100); %  epsMuOrig =.25;ends with .0025
+%         annEpsDecay = annC*(nBatch*49); %  epsMuOrig =.25;ends with .005
+
     end
 else %if not annEps, use fixed slower learning rate
     epsMuOrig=epsMuTrapz;
@@ -141,8 +143,8 @@ for iterI = 1:nIter
                 %debug mode - plot learning rate over time
 %                 clear epsAll
 %                 epsMuOrig = .25;
-%                 annEpsDecay = 1.6e-07*(nBatchOrig*49); %  epsMuOrig =.25;ends with .005 
-% %                 annEpsDecay = 1.6e-07*(nBatches*100); %  epsMuOrig =.5;ends with .005 
+%                 annEpsDecay = annC*(nBatchOrig*49); %  epsMuOrig =.25;ends with .005 
+% %                 annEpsDecay = annC*(nBatches*100); %  epsMuOrig =.5;ends with .005 
 %                 for iBatch=1:nBatchOrig+nBatch, epsAll(iBatch)=epsMuOrig/(1+(annEpsDecay*iBatch)); end
 %                 figure; plot(epsAll); ylim([0, 0.1]);
 %                 epsAll(round((nBatchOrig+nBatch).*[.05, .25, .5, .75, .95, 1]))
