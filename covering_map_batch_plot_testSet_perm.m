@@ -46,7 +46,7 @@ loadPerm = 0;
 dat='trapzKfrmSq1';
 %trapzKfrmSq1
 nTrials=1000000/2;
-epsMuTrapz10 = 30; 
+epsMuTrapz10 = 25; 
 
 
 % clus2run = [3:26]; 
@@ -55,7 +55,7 @@ epsMuTrapz10 = 30;
 clus2run = 10:20;
 
 batchSizeVals = 400; %100, 125, 200,400, 1000
-% batchSizeVals = 200;
+batchSizeVals = 200;
 
 %new - slower learning rate
 % epsMuVals=.015;
@@ -635,14 +635,14 @@ clus2plot = [10,12,18,25]-9;
 clus2plot = ([10,12,18,20,23,25,28])-9;
 % clus2plot = (3:5)-2;
 
-clus2plot=20-9;
+clus2plot=(10:15)-9;
 
 myColorMap = parula;
 myColorMap(end,:) = 1;
 
 for iClus = clus2plot%:length(clus2run)
 for iBvals = 1:length(batchSizeVals)
-    for iterI = 1:10%nIter
+    for iterI = 1:2%nIter
         switch clusPosAct
             case 'act'
                 densityPlotCentresSm = densityPlotActAll(:,:,iterI,iEps,iBvals,iClus);

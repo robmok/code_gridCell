@@ -27,7 +27,8 @@ nIter=200;
 epsMuVals=.025;
 nTrials=1000000;
 % batchSizeVals = [400, 100]; % 125?
-batchSizeVals=400;
+% batchSizeVals=400;
+batchSizeVals=200; %new
 
 annEps=1;
 if annEps %new
@@ -44,9 +45,9 @@ end
 % annEps - not started
 % sq / circ - 10:30
 %love06
-% clus2run = [18, 15, 23,  26, 20, 25 ,28, 19,  27];%[3, 15, 23,  26, 20, 9, 19, 4, 7, 27];
+clus2run = [18, 15, 23,  26, 20, 25 ,28, 19,  27];%[3, 15, 23,  26, 20, 9, 19, 4, 7, 27];
 % clus2run = [18, 15, 23,  26, 20, 25 , 27]; %28, 19, 
-clus2run = 25; % stop then run 25, love01 running 27
+% clus2run = 25; % stop then run 25, love01 running 27
 
 %love01 - circ/sq - started
 % clus2run = [16, 22, 24, 30]; %[16, 8,  22, 6,  24, 30];
@@ -54,14 +55,18 @@ clus2run = 25; % stop then run 25, love01 running 27
 % clus2run = [13, 10, 17, 29]; %[5,  13, 10, 17, 18, 29];
 % clus2run = 27; % brought over from love06 - sq/circ - running
 
+
+%10:20 test - trapz 200 iters
+clus2run = [15, 17, 13, 16, 12, 18, 10, 11, 20 19, 14]; 
+
 %%%%
 % 1k iters, sq/circ annEps, no perm 
 % clus2run=[17,23]; %sq, missed
 %%%%%
 % sq2trapz 1kiters - not started
 % clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 30, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3]; %all
-clus2run = [14, 15, 23,  20, 24, 18, 16, 22, 27, 26, 19]; %half - running
-clus2run = [13, 30, 29,  25, 10, 28, 17, 11, 21, 12]; %half - 
+% clus2run = [14, 15, 23,  20, 24, 18, 16, 22, 27, 26, 19]; %half - running
+% clus2run = [13, 30, 29,  25, 10, 28, 17, 11, 21, 12]; %half - 
 % clus2run = [13, 30, 29,  5, 25, 10,  7, ]; %quarter
 % clus2run = [19, 28, 17, 11, 21, 12,  3]; %quarter
 
@@ -75,9 +80,9 @@ jointTrls=1; %for test trials
 % if trapKfrmSq1
 if strcmp(dat,'trapzKfrmSq1')
     nTrials=1000000/2;
-%     epsMuTrapz10 = 25; %this is 10% of orig learning rate - using this
-    epsMuTrapz10 = 50; % anEps - 20%
-    epsMuTrapz10 = 30; % anEps -
+    epsMuTrapz10 = 25; %this is 10% of orig learning rate - using this
+%     epsMuTrapz10 = 50; % anEps - 20%
+%     epsMuTrapz10 = 30; % anEps -
     % epsMuTrapz10 = 15;  %
 end
 

@@ -6,7 +6,7 @@ spacing=linspace(locRange(1),locRange(2),locRange(2)+1);
 
 gaussSmooth=1; %smoothing for density map
 
-nBatch=round(nTrials/batchSize); %nBatch 7500 this better?
+nBatch=round(nTrials/batchSize); 
 batchSize = floor(batchSize); % when have decimal points, above needed
 
 nBatchOrig = nTrialsOrig/batchSize;
@@ -14,15 +14,15 @@ nBatchOrig = nTrialsOrig/batchSize;
 %if decrease learning rate over time: 1/(1+decay+timestep); Decay - set a param
 if annEps
 %     eps stays high till 1/annEpsDecay batches - 
-    annC = (1/nBatch)/nBatch; % 1/annC*nBatch = nBatch: constant to calc 1/annEpsDecay
+    annC = (1/nBatchOrig)/nBatchOrig; % 1/annC*nBatch = nBatch: constant to calc 1/annEpsDecay
     if epsMuOrig == 0.1
-        annEpsDecay = annC*(nBatch*39); % eps stays high till 1/annEpsDecay batches; here 64.1026
+        annEpsDecay = annC*(nBatchOrig*39); % eps stays high till 1/annEpsDecay batches; here 64.1026
     elseif epsMuOrig == 0.15
         %make epsMuOrig higher to keep it high for longer
-        annEpsDecay = annC*(nBatch*59); %  epsMuOrig =.15; here 42.3729; ends with .0025
+        annEpsDecay = annC*(nBatchOrig*59); %  epsMuOrig =.15; here 42.3729; ends with .0025
     elseif epsMuOrig == 0.25
-        annEpsDecay = annC*(nBatch*100); %  epsMuOrig =.25;ends with .0025
-%         annEpsDecay = annC*(nBatch*49); %  epsMuOrig =.25;ends with .005
+        annEpsDecay = annC*(nBatchOrig*100); %  epsMuOrig =.25;ends with .0025
+%         annEpsDecay = annC*(nBatchOrig*49); %  epsMuOrig =.25;ends with .005
 
     end
 else %if not annEps, use fixed slower learning rate
@@ -143,8 +143,8 @@ for iterI = 1:nIter
                 %debug mode - plot learning rate over time
 %                 clear epsAll
 %                 epsMuOrig = .25;
-%                 annEpsDecay = annC*(nBatchOrig*49); %  epsMuOrig =.25;ends with .005 
-% %                 annEpsDecay = annC*(nBatches*100); %  epsMuOrig =.5;ends with .005 
+% %                 annEpsDecay = annC*(nBatchOrig*49); %  epsMuOrig =.25;ends with .005 
+%                 annEpsDecay = annC*(nBatchOrig*100); %  epsMuOrig =.5;ends with .005 
 %                 for iBatch=1:nBatchOrig+nBatch, epsAll(iBatch)=epsMuOrig/(1+(annEpsDecay*iBatch)); end
 %                 figure; plot(epsAll); ylim([0, 0.1]);
 %                 epsAll(round((nBatchOrig+nBatch).*[.05, .25, .5, .75, .95, 1]))

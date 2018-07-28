@@ -23,7 +23,8 @@ saveDat=1;
 %for loading
 epsMuVals=.025;
 nTrials=1000000;
-batchSizeVals=400;
+% batchSizeVals=400;
+batchSizeVals=200;
 
 nIter=200;
 % nIter=1000;
@@ -57,7 +58,7 @@ epsMuTrapz = 0.0025;
 
 %10:20 only
 clus2run = [15, 13, 18, 16, 19, 14];
-% clus2run = [10, 17, 11, 12, 20];
+clus2run = [10, 17, 11, 12, 20];
 
 
 %testing
