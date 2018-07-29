@@ -59,15 +59,17 @@ catsInfo.msExample = 1; %2 gaussians in opposite sides of the square - example f
 %sq, 4 matlabs - not started
 %love06
 clus2run = [12, 15, 20, 27, 16, 19]; 
-% clus2run = [14, 26, 18, 10, 21]; 
-% clus2run = [22, 11, 23, 30, 28];
-% clus2run = [25, 17, 24, 26, 13];
+clus2run = [14, 26, 18, 10, 21]; 
+clus2run = [22, 11, 23, 30, 28];
+clus2run = [25, 17, 24, 26, 13];
 
-%love01 - circ, 4 matlabs 
-% clus2run = [12, 15, 20, 27, 16, 19]; 
-% clus2run = [14, 26, 18, 10, 21]; 
-% clus2run = [22, 11, 23, 30, 28];
-% clus2run = [25, 17, 24, 26, 13];
+%love01 - circ, 6 matlabs
+clus2run = [12, 15, 20, 27]; 
+% clus2run = [14, 26, 18, 10]; 
+% clus2run = [22, 11, 23, 30];
+% clus2run = [25, 17, 24];
+% clus2run = [19, 21, 28];
+% clus2run = [16, 13, 26];
 
 % clus2run = 18;
 
