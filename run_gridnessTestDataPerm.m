@@ -27,8 +27,8 @@ nIter=200;
 epsMuVals=.025;
 nTrials=1000000;
 % batchSizeVals = [400, 100]; % 125?
-% batchSizeVals=400;
-batchSizeVals=200; %new
+batchSizeVals=400;
+% batchSizeVals=200; %new
 
 annEps=1;
 if annEps %new
@@ -45,7 +45,7 @@ end
 % annEps - not started
 % sq / circ - 10:30
 %love06
-clus2run = [18, 15, 23,  26, 20, 25 ,28, 19,  27];%[3, 15, 23,  26, 20, 9, 19, 4, 7, 27];
+% clus2run = [18, 15, 23,  26, 20, 25 ,28, 19,  27];%[3, 15, 23,  26, 20, 9, 19, 4, 7, 27];
 % clus2run = [18, 15, 23,  26, 20, 25 , 27]; %28, 19, 
 % clus2run = 25; % stop then run 25, love01 running 27
 
@@ -56,8 +56,12 @@ clus2run = [18, 15, 23,  26, 20, 25 ,28, 19,  27];%[3, 15, 23,  26, 20, 9, 19, 4
 % clus2run = 27; % brought over from love06 - sq/circ - running
 
 
-%10:20 test - trapz 200 iters
-clus2run = [15, 17, 13, 16, 12, 18, 10, 11, 20 19, 14]; 
+%10:20 test - trapz 200 iters - running both 200 and 400 batchSiz
+clus2run = [15, 17, 13, 16, 12, 18]; 
+clus2run = [10, 11, 20 19, 14]; 
+
+%next
+clus2run=21:30;
 
 %%%%
 % 1k iters, sq/circ annEps, no perm 
@@ -81,7 +85,7 @@ jointTrls=1; %for test trials
 if strcmp(dat,'trapzKfrmSq1')
     nTrials=1000000/2;
     epsMuTrapz10 = 25; %this is 10% of orig learning rate - using this
-%     epsMuTrapz10 = 50; % anEps - 20%
+    epsMuTrapz10 = 50; % anEps - 20%
 %     epsMuTrapz10 = 30; % anEps -
     % epsMuTrapz10 = 15;  %
 end

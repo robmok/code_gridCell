@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -21,7 +21,7 @@ dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning
 % dat = 'catLearn';
 
 %compute activation and densityPlotActNorm over time? takes longer
-actOverTime = 1; 
+actOverTime = 0; 
 
 %annealed learning rate
 annEps = 1; %1 or 0
@@ -53,21 +53,18 @@ catsInfo.msExample = 1; %2 gaussians in opposite sides of the square - example f
 %  clus2run = [13, 10, 19, 17];
 
 
-%%%% new run 200 iters - annEps from 0.25 to 0.025, batchSize=200 / 5k batches
-%sq, 4 matlabs
+%%%% new run 200 iters - annEps from 0.25 to 0.05, batchSize=200 / 5k
+%%%% batches 
+%now run 1000 iters
+%sq, 4 matlabs - not started
 %love06
-clus2run = [12, 15, 16]; 
-clus2run = [14, 18, 10]; 
-clus2run = [13, 11, 17]; 
-clus2run = [19, 20]; 
-
-%next:
-% clus2run = 21:2:30;
-% clus2run = fliplr(22:2:30);
-
+clus2run = [12, 15, 20, 27, 16, 19]; 
+% clus2run = [14, 26, 18, 10, 21]; 
+% clus2run = [22, 11, 23, 30, 28];
+% clus2run = [25, 17, 24, 26, 13];
 
 %love01 - circ, 4 matlabs 
-clus2run = [12, 15, 20, 27, 16, 19]; 
+% clus2run = [12, 15, 20, 27, 16, 19]; 
 % clus2run = [14, 26, 18, 10, 21]; 
 % clus2run = [22, 11, 23, 30, 28];
 % clus2run = [25, 17, 24, 26, 13];
@@ -90,7 +87,7 @@ if fixBatchSize
 %     nBatches = [8000 5000];
 %     nBatches = [1000 5000 2500];
 %     nBatches = 2500;
-    nBatches = 5000;
+    nBatches = 5000; % using this now
     if strcmp(dat(1:3),'cat')
         nBatches = nBatches.*2;
     end
@@ -111,7 +108,7 @@ epsMuVals = 0.025;
 if annEps
 %     epsMuVals = 0.1; %new
 %     epsMuVals = 0.15; %new 2
-    epsMuVals = 0.25; %new 3
+    epsMuVals = 0.25; %new 3 - using this now
 end
 
 % use the same training data (trials) across current sims or gen new data
@@ -148,7 +145,7 @@ warpType = 'sq2rect';
 %%
 saveDat=1; %save simulations
 
-nIter=200; %200 for covering map over time, 20 for cat; 1k for covering map new
+nIter=1000; %200 for covering map over time, 20 for cat; 1k for covering map new
 
 if useSameTrls
 %     switch dat

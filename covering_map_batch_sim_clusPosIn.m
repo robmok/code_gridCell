@@ -1,6 +1,5 @@
 function [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,rSeed,muAll,trials] = covering_map_batch_sim_clusPosIn(clusPos,nClus,locRange,epsMuOrig,epsMuTrapz,nTrialsOrig,nTrials,batchSize,nIter,dat,annEps,jointTrls)
 
-
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
 % stepSize=diff(spacing(1:2)); 
 
@@ -23,7 +22,6 @@ if annEps
     elseif epsMuOrig == 0.25
         annEpsDecay = annC*(nBatchOrig*100); %  epsMuOrig =.25;ends with .0025
 %         annEpsDecay = annC*(nBatchOrig*49); %  epsMuOrig =.25;ends with .005
-
     end
 else %if not annEps, use fixed slower learning rate
     epsMuOrig=epsMuTrapz;
