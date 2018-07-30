@@ -89,17 +89,12 @@ boxSize=1;
 
 % joined trials
 jointTrls=1;
-% clus2run = [3:26]; 
-% clus2run = [6:26]; 
-% clus2run = [10:26]; 
-% clus2run = [3:26]; 
-epsMuVals=.025;
-nTrials=1000000;
-% batchSizeVals = [1000, 400, 100]; 
-batchSizeVals=400;
-annEps=0;
+% epsMuVals=.025;
+% nTrials=1000000;
+% % batchSizeVals = [1000, 400, 100]; 
+% batchSizeVals=400;
+% annEps=0;
 
-% 
 % dat='trapzKrupic';
 % % clus2run = [8, 12, 16, 20, 24,28]; 
 % % 
@@ -131,9 +126,6 @@ actOverTime = 1;
 % clus2run = [10, 12:26]; 
 
 
-
-
-
 %new - annealed learning rate
 % clus2run  = 3:30;
 clus2run  = 10:30;
@@ -148,16 +140,12 @@ annEps=1;
 
 rHex=0; %if choose raw 60deg corr values, not gridness
 
-% dat='trapzScaled1';
-
- 
-% %trapzKfrmSq - fname below tmp, need edit
+% %trapzKfrmSq 
 % dat='trapzKfrmSq1';
 % nTrials=500000;
 % batchSizeVals=400;
 % clus2run=10:30;
 % nIter=1000;
-
 
 %load loop
 for iClus2run = 1:length(clus2run) 
@@ -908,7 +896,7 @@ else
     %subset of nClus conds
 %     clus2plot = [7,10,12,18,25]-2;
 %     clus2plot = [10,12,18,25]-9;
-    clus2plot = (19-9):length(clus2run);
+    clus2plot = 1:length(clus2run);
     
 %     clus2plot = 18-2;
     for iClus = clus2plot
@@ -1019,7 +1007,7 @@ fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig betas > 0, out 
 
 %% Making figs: density plot examples
 
-savePlots = 1;
+savePlots = 0;
 
 doPlot=0; %do plot when computing gridness
 
@@ -1029,18 +1017,17 @@ clusPosAct = 'actNorm'; %'clus' or 'actNorm'
 
 gridMsrType = 'a';
 
+% clus2plot = [5,8,13,18];%[7,10,12,25]
+clus2plot = ([10,11,12,18,20,23,25,28])-2;
 
-clus2plot = [5,8,13,18];%[7,10,12,25]
-clus2plot = ([7,9,10,11,12,18,20,23,25,28])-2;
-
-iSet=1;
+% iSet=1;
 % iSet=10;
-% iSet=size(densityPlotActNormAll,3);
+iSet=size(densityPlotActNormAll,3);
 
 
 for iClus = clus2plot%:length(clus2run)
 for iBvals = 1:length(batchSizeVals)
-    for iterI = 1:5%nIter
+    for iterI = 1%:5%nIter
 %         densityPlotCentresSm = imgaussfilt(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus),gaussSmooth);
         
         densityPlotCentresSm = densityPlotActNormAll(:,:,iSet,iterI,iEps,iBvals,iClus);
