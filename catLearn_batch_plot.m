@@ -105,7 +105,7 @@ catBcol = [catBcol+((1-catBcol).*.5); catBcol];
 % colors(:,:,2) = distinguishable_colors(nClus)+(1-distinguishable_colors(nClus)).*.5; %lighter
 
 
-for iterI=1:20
+for iterI=30:50
     
     for iBvals= 1:length(batchSizeVals)
     for iC = 1:length(cVals)
@@ -115,7 +115,7 @@ for iterI=1:20
     for iClus = 1:length(clus2run)       
 %         colors    = distinguishable_colors(clus2run(iClus));
         %     figure; hold on;
-        for iPlot = 2%1:length(trls2plt)
+        for iPlot = 3%1:length(trls2plt)
             ctr=ctr+1;
 %             subplot(length(clus2run),length(trls2plt),ctr); hold on;
 %             subplot(1,length(trls2Plt),iPlot);
@@ -126,16 +126,18 @@ for iterI=1:20
             scatter(trials(trls2plt{iPlot},1),trials(trls2plt{iPlot},2),datPtSiz,colGreyDat,'.');
                         
             colors = repmat(colGreyClus,clus2run(iClus),1);
-            if iPlot==2 % if moved and closer to one category than the other, assign intermediate category colour (blue-grey, red-grey)
-                moved = sqrt(sum([muAllClus{iClus}(:,1,iPlot,iterI,iBvals,iC)-muAllClus{iClus}(:,1,iPlot-1,iterI,iBvals,iC), muAllClus{iClus}(:,2,iPlot,iterI,iBvals,iC)-muAllClus{iClus}(:,2,iPlot-1,iterI,iBvals,iC)].^2,2));
-                dist2catA = sqrt(sum([muAllClus{iClus}(:,1,iPlot,iterI,iBvals,iC)-catCentres(1,1), muAllClus{iClus}(:,2,iPlot,iterI,iBvals,iC)-catCentres(1,2)].^2,2));
-                dist2catB = sqrt(sum([muAllClus{iClus}(:,1,iPlot,iterI,iBvals,iC)-catCentres(2,1), muAllClus{iClus}(:,2,iPlot,iterI,iBvals,iC)-catCentres(2,2)].^2,2));
-                indA = moved & (dist2catA < dist2catB);
-                indB = moved & (dist2catB < dist2catA);
-                colors(indA,:) = repmat(catAcol(iPlot-1,:),size(colors(indA,:),1),1);
-                colors(indB,:) = repmat(catBcol(iPlot-1,:),size(colors(indB,:),1),1);
+%             if iPlot==2 % if moved and closer to one category than the other, assign intermediate category colour (blue-grey, red-grey)
+%                 moved = sqrt(sum([muAllClus{iClus}(:,1,iPlot,iterI,iBvals,iC)-muAllClus{iClus}(:,1,iPlot-1,iterI,iBvals,iC), muAllClus{iClus}(:,2,iPlot,iterI,iBvals,iC)-muAllClus{iClus}(:,2,iPlot-1,iterI,iBvals,iC)].^2,2));
+%                 dist2catA = sqrt(sum([muAllClus{iClus}(:,1,iPlot,iterI,iBvals,iC)-catCentres(1,1), muAllClus{iClus}(:,2,iPlot,iterI,iBvals,iC)-catCentres(1,2)].^2,2));
+%                 dist2catB = sqrt(sum([muAllClus{iClus}(:,1,iPlot,iterI,iBvals,iC)-catCentres(2,1), muAllClus{iClus}(:,2,iPlot,iterI,iBvals,iC)-catCentres(2,2)].^2,2));
+%                 indA = moved & (dist2catA < dist2catB);
+%                 indB = moved & (dist2catB < dist2catA);
+%                 colors(indA,:) = repmat(catAcol(iPlot-1,:),size(colors(indA,:),1),1);
+%                 colors(indB,:) = repmat(catBcol(iPlot-1,:),size(colors(indB,:),1),1);
+%                 
+%             elseif iPlot==3 
                 
-            elseif iPlot==3 % if within the vicinity of data, assign category color (blue, red)
+            if iPlot==2 || iPlot==3 % if within the vicinity of data, assign category color (blue, red)
                 dist2catA = sqrt(sum([muAllClus{iClus}(:,1,iPlot,iterI,iBvals,iC)-catCentres(1,1), muAllClus{iClus}(:,2,iPlot,iterI,iBvals,iC)-catCentres(1,2)].^2,2));
                 dist2catB = sqrt(sum([muAllClus{iClus}(:,1,iPlot,iterI,iBvals,iC)-catCentres(2,1), muAllClus{iClus}(:,2,iPlot,iterI,iBvals,iC)-catCentres(2,2)].^2,2));
                 indA = dist2catA < 7;
