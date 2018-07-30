@@ -110,7 +110,8 @@ annEps=0;
 % clus2run = [10,15,20,25];
 % clus2run = [4:25];
 
-batchSizeVals = 400; %100, 125, 200,400, 1000
+% batchSizeVals = 400; %100, 125, 200,400, 1000
+% batchSizeVals = 200;
 
 %new - slower learning rate
 % epsMuVals=.015;
@@ -141,7 +142,8 @@ clus2run  = 10:30;
 % epsMuVals = 0.15;
 epsMuVals = 0.25; %use this one
 nTrials=1000000;
-batchSizeVals = 400;
+% batchSizeVals = 400;
+batchSizeVals = 200; %new
 annEps=1;
 
 rHex=0; %if choose raw 60deg corr values, not gridness

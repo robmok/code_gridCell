@@ -27,8 +27,8 @@ nIter=200;
 epsMuVals=.025;
 nTrials=1000000;
 % batchSizeVals = [400, 100]; % 125?
-batchSizeVals=400;
-% batchSizeVals=200; %new
+% batchSizeVals=400;
+batchSizeVals=200; %new
 
 annEps=1;
 if annEps %new
@@ -85,7 +85,7 @@ jointTrls=1; %for test trials
 if strcmp(dat,'trapzKfrmSq1')
     nTrials=1000000/2;
     epsMuTrapz10 = 25; %this is 10% of orig learning rate - using this
-    epsMuTrapz10 = 50; % anEps - 20%
+%     epsMuTrapz10 = 50; % anEps - 20%
 %     epsMuTrapz10 = 30; % anEps -
     % epsMuTrapz10 = 15;  %
 end

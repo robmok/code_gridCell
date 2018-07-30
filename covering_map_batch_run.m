@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -61,15 +61,18 @@ catsInfo.msExample = 1; %2 gaussians in opposite sides of the square - example f
 clus2run = [12, 15, 20, 27, 16, 19]; 
 clus2run = [14, 26, 18, 10, 21]; 
 clus2run = [22, 11, 23, 30, 28];
-clus2run = [25, 17, 24, 26, 13];
+clus2run = [25, 17, 24, 13]; % ***had 26 here before 13, doubled! can stop if want later; or just delete
+clus2run = [24, 13]; %ok - re running this without 26
 
 %love01 - circ, 6 matlabs
-clus2run = [12, 15, 20, 27]; 
+% clus2run = [12, 15, 20, 27]; 
 % clus2run = [14, 26, 18, 10]; 
 % clus2run = [22, 11, 23, 30];
 % clus2run = [25, 17, 24];
 % clus2run = [19, 21, 28];
-% clus2run = [16, 13, 26];
+% clus2run = [16, 13]; ***had 26 here at end, doubled! can stop if want later; or just delete
+clus2run = 13; % STOP c6 when clus16 done, then run this (skipping 26)
+
 
 % clus2run = 18;
 

@@ -58,7 +58,7 @@ end
 % clus2run = [3:26]; 
 % clus2run = [3:30]; 
 % clus2run = [3:26]; 
-clus2run = 10:20;
+clus2run = 10:30;
 
 % batchSizeVals = 400; %100, 125, 200,400, 1000
 % batchSizeVals = 200;
