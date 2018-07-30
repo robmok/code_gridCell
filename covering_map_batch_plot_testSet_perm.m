@@ -31,9 +31,11 @@ jointTrls=1;
 epsMuVals=.025;
 nTrials=1000000;
 % batchSizeVals = [1000, 400, 100]; 
-% batchSizeVals=400;
-nIter=200;
+batchSizeVals=400;
+batchSizeVals=200;
 
+
+nIter=200;
 % nIter=1000;
 
 
@@ -46,15 +48,19 @@ loadPerm = 0;
 dat='trapzKfrmSq1';
 %trapzKfrmSq1
 nTrials=1000000/2;
-epsMuTrapz10 = 30; 
+if batchSizeVals == 200
+    epsMuTrapz10 = 25;
+elseif batchSizeVals == 400
+    epsMuTrapz10 = 50; %could also run 25
+end
 
 
 % clus2run = [3:26]; 
 % clus2run = [3:30]; 
 % clus2run = [3:26]; 
-clus2run = 10:20;
+clus2run = 10:30;
 
-batchSizeVals = 400; %100, 125, 200,400, 1000
+% batchSizeVals = 400; %100, 125, 200,400, 1000
 % batchSizeVals = 200;
 
 %new - slower learning rate
@@ -250,7 +256,7 @@ gridMeasure = 'grid';
 
 plotFewClus = 0; %plot 3:5 clusters separately
 
-computeCIs = 0; %takes a bit of time
+computeCIs = 1; %takes a bit of time
 
 switch clusPosAct
 % case 'clus'
@@ -635,14 +641,14 @@ clus2plot = [10,12,18,25]-9;
 clus2plot = ([10,12,18,20,23,25,28])-9;
 % clus2plot = (3:5)-2;
 
-clus2plot=20-9;
+clus2plot=(10:15)-9;
 
 myColorMap = parula;
 myColorMap(end,:) = 1;
 
 for iClus = clus2plot%:length(clus2run)
 for iBvals = 1:length(batchSizeVals)
-    for iterI = 1:10%nIter
+    for iterI = 1:2%nIter
         switch clusPosAct
             case 'act'
                 densityPlotCentresSm = densityPlotActAll(:,:,iterI,iEps,iBvals,iClus);

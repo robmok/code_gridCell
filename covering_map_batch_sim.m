@@ -216,7 +216,7 @@ for iterI = 1:nIter
 % %                 annEpsDecay = annC*(nBatch*200); %  epsMuOrig =.5;ends with .0025
 % 
 %                 % ending at 0.005
-% %                 annEpsDecay = annC*(nBatch*49); %  epsMuOrig =.25;ends with .005 
+%                 annEpsDecay = annC*(nBatch*49); %  epsMuOrig =.25;ends with .005 
 % %                 annEpsDecay = annC*(nBatch*100); %  epsMuOrig =.5;ends with .005 
 % %                 annEpsDecay = annC*(nBatch*75); %  epsMuOrig =.25;ends with .033
 % 

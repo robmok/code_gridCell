@@ -83,7 +83,7 @@ end
 %% 
 
 %in the end used iter 13 and 14
-savePlots = 1;
+savePlots = 0;
 
 fontSiz=15;
 datPtSiz=130;
