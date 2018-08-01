@@ -83,7 +83,7 @@ end
 %% 
 
 %in the end used iter 13 and 14
-savePlots = 0;
+savePlots = 1;
 
 fontSiz=15;
 datPtSiz=130;
@@ -95,7 +95,7 @@ trls2plt = {1:25, 1:100, 1:2000};
 catCentres = [15, 35; 35, 15];
 
 colGreyClus = [.85, .85, .85];
-colGreyDat  = [.45 .45 .45];
+colGreyDat  = [.3 .3 .3];
 
 catAcol = [0, 0, 1];
 catBcol = [1, 0, 0];
@@ -115,7 +115,7 @@ for iterI=30:50
     for iClus = 1:length(clus2run)       
 %         colors    = distinguishable_colors(clus2run(iClus));
         %     figure; hold on;
-        for iPlot = 3%1:length(trls2plt)
+        for iPlot = 1:length(trls2plt)
             ctr=ctr+1;
 %             subplot(length(clus2run),length(trls2plt),ctr); hold on;
 %             subplot(1,length(trls2Plt),iPlot);

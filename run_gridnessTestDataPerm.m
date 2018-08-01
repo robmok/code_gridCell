@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -14,19 +14,14 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 locRange = [0 49];
 nTrialsTest = 100000; % orig nTrials/10
 dat = 'circ';
-dat = 'square';
-
-% dat = 'trapzKrupic';
-
-dat = 'trapzKfrmSq1'; % load covering map on sq, then run it on trapz; then assess gridness in trapz
-% dat = 'trapzKfrmSq2'; % load covering map on sq, then assess gridness in trapz
+% dat = 'square';
+% dat = 'trapzKfrmSq1'; % load covering map on sq, then run it on trapz; then assess gridness in trapz
 
 saveDat=1;
 
-nIter=200;
+% nIter=200;
 epsMuVals=.025;
 nTrials=1000000;
-% batchSizeVals = [400, 100]; % 125?
 % batchSizeVals=400;
 batchSizeVals=200; %new
 
@@ -35,49 +30,46 @@ if annEps %new
     epsMuVals=.25; %below multiplies this by 1k
 end
 
-%for loading
-% nTrials = 1000000;
-% clus2run = [3:30];
-% clus2run=[3:10 12:2:26 11:2:25, 27:30]; % 27:30
-
 %%%%%%%
 % new fixed perm - 200iters
 % annEps - not started
 % sq / circ - 10:30
-%love06
-% clus2run = [18, 15, 23,  26, 20, 25 ,28, 19,  27];%[3, 15, 23,  26, 20, 9, 19, 4, 7, 27];
-% clus2run = [18, 15, 23,  26, 20, 25 , 27]; %28, 19, 
-% clus2run = 25; % stop then run 25, love01 running 27
-
-%love01 - circ/sq - started
-% clus2run = [16, 22, 24, 30]; %[16, 8,  22, 6,  24, 30];
-% clus2run = [11, 21, 12, 14]; %[11, 21, 12, 14, 25, 28]; 
-% clus2run = [13, 10, 17, 29]; %[5,  13, 10, 17, 18, 29];
-% clus2run = 27; % brought over from love06 - sq/circ - running
+% clus2run = [16, 22, 24, 30, 15, 27, 19];
+% clus2run = [11, 21, 12, 14, 25, 28, 20]; 
+% clus2run = [13, 10, 17, 18, 29, 23, 26];
 
 
-%10:20 test - trapz 200 iters - running both 200 and 400 batchSiz
-clus2run = [15, 17, 13, 16, 12, 18]; 
-clus2run = [10, 11, 20 19, 14]; 
 
-%next
-clus2run=21:30;
 
 %%%%
-% 1k iters, sq/circ annEps, no perm 
-% clus2run=[17,23]; %sq, missed
+% 1k iters, sq/circ annEps, batchSiz=200, no perm 
+
+%sq
+% clus2run = [16, 22, 24, 14, 15, 27, 19];
+% clus2run = [11, 21, 12, 30, 25, 28, 20]; 
+% clus2run = [13, 10, 17, 18, 29, 23, 26];
+
+%circ - love01
+clus2run = [16, 22, 24, 14, 15, 27];
+% clus2run = [11, 21, 12, 30, 25]; 
+% clus2run = [13, 10, 17, 18, 29];
+% clus2run = [19, 20, 26, 28, 23];
+
+
+
+
+
 %%%%%
 % sq2trapz 1kiters - not started
 % clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 30, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3]; %all
-% clus2run = [14, 15, 23,  20, 24, 18, 16, 22, 27, 26, 19]; %half - running
+% clus2run = [14, 15, 23,  20, 24, 18, 16, 22, 27, 26, 19]; %half - 
 % clus2run = [13, 30, 29,  25, 10, 28, 17, 11, 21, 12]; %half - 
-% clus2run = [13, 30, 29,  5, 25, 10,  7, ]; %quarter
-% clus2run = [19, 28, 17, 11, 21, 12,  3]; %quarter
+
 
 % clus2run = 11;
 
-nIter=200;
-% nIter=1000;
+% nIter=200;
+nIter=1000;
 
 jointTrls=1; %for test trials
 
