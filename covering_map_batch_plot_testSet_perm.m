@@ -21,6 +21,8 @@ dat='circ';
 % dat='square';
 compareCircSq = 0; %if compare circ-sq gridness, dat=circ, but load sq too
 
+dat='trapzKfrmSq1';
+
 annEps=0;
 boxSize=1;
 
@@ -31,34 +33,30 @@ jointTrls=1;
 epsMuVals=.025;
 nTrials=1000000;
 % batchSizeVals = [1000, 400, 100]; 
-batchSizeVals=400;
+% batchSizeVals=400;
 batchSizeVals=200;
 
-
-nIter=200;
+% nIter=200;
 nIter=1000;
 
 
-%load perm data when nIter=1000- this is with nIter=200. doPerm should=0
-loadPerm = 0;
-
-% clus2run = [3:16, 18, 20:26];  %missed 17, 19?
-
-% % dat='trapzKrupic';    
-dat='trapzKfrmSq1';
-%trapzKfrmSq1
-nTrials=1000000/2;
-if batchSizeVals == 200
-    epsMuTrapz10 = 25;
-elseif batchSizeVals == 400
-    epsMuTrapz10 = 50; %could also run 25
+if strcmp(dat(1:4),'trap')
+    nTrials=1000000/2;
+    if batchSizeVals == 200
+        epsMuTrapz10 = 25;
+    elseif batchSizeVals == 400
+        epsMuTrapz10 = 50; %could also run 25
+    end
 end
 
+%load perm data when nIter=1000- this is with nIter=200. doPerm should=0
+loadPerm = 0;
 
 % clus2run = [3:26]; 
 % clus2run = [3:30]; 
 % clus2run = [3:26]; 
 clus2run = 10:30;
+% clus2run = [11:17, 19:29]; %CIRC waiting to finish
 
 % batchSizeVals = 400; %100, 125, 200,400, 1000
 % batchSizeVals = 200;
@@ -256,7 +254,7 @@ gridMeasure = 'grid';
 
 plotFewClus = 0; %plot 3:5 clusters separately
 
-computeCIs = 1; %takes a bit of time
+computeCIs = 0; %takes a bit of time
 
 switch clusPosAct
 % case 'clus'
@@ -311,7 +309,6 @@ switch gridMeasure
         datTmp=wav;
 end
 
-
 iEps=1;
 
 % clus2plot=(3:30)-2;
@@ -320,9 +317,6 @@ iEps=1;
 % clus2plot=(10:26)-2;
 
 clus2plot=1:length(clus2run);
-
-%trapz
-% clus2plot = 1:length(clus2run);
 
 iBatchVals=1;
 
@@ -342,20 +336,20 @@ figure; hold on;
 %         ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
         plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
 %         errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-%         scatter(barpos,mu,50,colors,'filled','d');
         scatter(barpos,mu,50,colgrey,'filled','d');
         xticklabels(xTickLabs);
         xlim([barpos(1)-.5, barpos(end)+.5]);
-        %         ylim([0,1]);
         if strcmp(gridMsrType,'a')
-%             ylim([-.45,1.4]);
+            if ~strcmp(dat(1:4),'trap')
+                ylim([-.4,1.4]);
+            else
+                ylim([-.6,1.4]);
+            end
         elseif strcmp(gridMsrType,'w')
             ylim([-1.25,1.4]);
         end
         xlabel('Number of Clusters');
         ylabel('Grid Score');
-        
-%         title(sprintf('%s, %s - eps=%d, batchSize=%d',dat, gridMeasure,epsMuVals(iEps)*1000,batchSizeVals(iBatchVals)))
         if strcmp(dat(1:2),'ci')
             title('Circular Environment')
         elseif strcmp(dat(1:2),'sq')
@@ -438,7 +432,7 @@ if strcmp(dat(1:4),'trap')
     scatter(barpos,mu,50,colgrey,'filled','d');
     xticklabels(xTickLabs);
     xlim([barpos(1)-.5, barpos(end)+.5]);
-    ylim([-.5,1.5]);
+    ylim([-.6,1.5]);
     title('Left half of Trapezoid box')
     xlabel('Number of Clusters');
     ylabel('Grid Score');
@@ -462,7 +456,7 @@ if strcmp(dat(1:4),'trap')
     scatter(barpos,mu,50,colgrey,'filled','d');
     xticklabels(xTickLabs);
     xlim([barpos(1)-.5, barpos(end)+.5]);
-    ylim([-.5,1.5]);
+    ylim([-.6,1.5]);
     title('Right half of Trapezoid box')
     xlabel('Number of Clusters');
     ylabel('Grid Score');
@@ -485,7 +479,7 @@ if strcmp(dat(1:4),'trap')
     scatter(barpos,mu,50,colgrey,'filled','d');
     xticklabels(xTickLabs);
     xlim([barpos(1)-.5, barpos(end)+.5]);
-    ylim([-1.5,2]);
+    ylim([-1.75,2]);
     xlabel('Number of Clusters');
     ylabel('Grid Score');
     set(gca,'FontSize',fontSiz,'fontname','Arial')
@@ -637,18 +631,28 @@ gridMsrType = 'a';
 % clus2plot = 10-2;
 %
 clus2plot = [10,12,18,25]-9;
-% clus2plot = [7,10,12,18,25]-9;
-clus2plot = ([10,12,18,20,23,25,28])-9;
+% clus2plot = ([10,12,18,20,23,25,28])-9;
+
+clus2plot = [10, 12, 18, 20, 23, 25, 28]-9; 
+
+%circ 10,18 - to make figs for at least iters-1:20
+clus2plot = [10, 18]-9; % STILL TO MAKE AND SELECT
+
+
+%trapz
+% clus2plot = [12, 20, 23, 25, 28]-9;
+
+
 % clus2plot = (3:5)-2;
 
-clus2plot=(10:15)-9;
+% clus2plot=(10:15)-9;
 
 myColorMap = parula;
 myColorMap(end,:) = 1;
 
 for iClus = clus2plot%:length(clus2run)
 for iBvals = 1:length(batchSizeVals)
-    for iterI = 1:2%nIter
+    for iterI = 1%:20%nIter
         switch clusPosAct
             case 'act'
                 densityPlotCentresSm = densityPlotActAll(:,:,iterI,iEps,iBvals,iClus);
@@ -713,7 +717,7 @@ for iBvals = 1:length(batchSizeVals)
             [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
             %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
             
-            aCorrMap(isnan(aCorrMap))=.5;
+            aCorrMap(isnan(aCorrMap))=1.1;
             figure; imagesc(aCorrMap,[-1.01 1.01]); colormap(myColorMap);
             title(sprintf('Grid Score %.2f',g));
             set(gca,'FontSize',fontSiz,'fontname','Arial')

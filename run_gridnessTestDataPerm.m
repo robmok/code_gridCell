@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -31,32 +31,30 @@ if annEps %new
 end
 
 nIter=200;
-% nIter=1000;
+nIter=1000;
 
 %%%%%%%
 % new fixed perm - 200iters
 % annEps 
 
 % sq - not started
-% clus2run = [16, 22, 24, 14, 15, 27];
+clus2run = [16, 22, 24, 14, 15, 27];
 % clus2run = [25, 11, 21, 12, 30, 26]; 
 % clus2run = [13, 10, 17, 18, 29];
-
-% sq - love01 - perm5
-% clus2run = [19, 20, 28, 23];
-
-
-%circ - love01 - perm1-5
-clus2run = [16, 22, 24];
-% clus2run = [14, 15, 11];
-% clus2run = [27, 21, 12]; 
-% clus2run = [13, 10, 17];
-% clus2run = [18, 29, 30];
 
 %circ - love06 - not started
 % clus2run = [19, 20, 26, 28, 23, 25];
 
 
+%circ - love01 - perm1-5 - running
+% clus2run = [16, 22, 24];
+% clus2run = [14, 15, 11];
+% clus2run = [27, 21, 12]; 
+% clus2run = [13, 10, 17];
+% clus2run = [18, 29, 30];
+
+% sq - love01 - perm6 - running
+% clus2run = [19, 20, 28, 23];
 
 %%%%
 % 1k iters, sq/circ annEps, batchSiz=200, no perm 
@@ -72,9 +70,11 @@ clus2run = [16, 22, 24];
 % clus2run = [19, 20, 26, 28, 23];
 
 %circ - still running - 30, 10
-% done now and can run - 23, 27
+clus2run = 18; % missed
 % clus2run = [23, 27]; %then 30, 10
 
+clus2run = [10]; % TO RUN
+clus2run = [30]; % TO RUN
 
 
 %%%%%

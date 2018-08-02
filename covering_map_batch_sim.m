@@ -67,24 +67,24 @@ trapzSpacing{1} = spacing(10:41);
 trapzSpacing{2} = spacing(7:44); 
 trapzSpacing{3} = spacing(4:47);
 if strcmp(dat(1:4),'trap') && length(dat)>10
-    if strcmp(dat(1:11),'trapzScaled')
-        spacingTrapz = trapzSpacing{str2double(dat(12))}; %trapzScaled1,2,3
-        a=length(spacingTrapz); %trapz length1
-        b=locRange(2)+1; %50 - trapz length2 - +1 to let density plot go from 1:50 (rather than 0:49)
-        h=round(((locRange(2)+1)^2)/((a+b)/2))+1; %trapz height (area = 50^2; like square)
-    elseif strcmp(dat(1:11),'trapzKrupic')
-        spacingTrapz = spacing(14:37);
-        if boxSize==1.5
-            spacingTrapz = spacing(14:37+length(14:37)*.5);
-        elseif boxSize==2
-            spacingTrapz = spacing(14:37+length(14:37));
-        end
-        if length(dat)==11 % 'trapzKrupic'
-            a = length(spacingTrapz);
-            b = length(spacing);
-            h = length(spacing);
-        end
-    end
+%     if strcmp(dat(1:11),'trapzScaled')
+%         spacingTrapz = trapzSpacing{str2double(dat(12))}; %trapzScaled1,2,3
+%         a=length(spacingTrapz); %trapz length1
+%         b=locRange(2)+1; %50 - trapz length2 - +1 to let density plot go from 1:50 (rather than 0:49)
+%         h=round(((locRange(2)+1)^2)/((a+b)/2))+1; %trapz height (area = 50^2; like square)
+%     elseif strcmp(dat(1:11),'trapzKrupic')
+%         spacingTrapz = spacing(14:37);
+%         if boxSize==1.5
+%             spacingTrapz = spacing(14:37+length(14:37)*.5);
+%         elseif boxSize==2
+%             spacingTrapz = spacing(14:37+length(14:37));
+%         end
+%         if length(dat)==11 % 'trapzKrupic'
+%             a = length(spacingTrapz);
+%             b = length(spacing);
+%             h = length(spacing);
+%         end
+%     end
     
     %split left and right half the trapz with equal areas
     % c is the length of the line when split the trapz in half

@@ -79,8 +79,12 @@ if strcmp(dat(1:4),'trap') && length(dat)>10
 %     hRight = ceil(halfArea/((a+c)/2))+1; %smaller side
     
     %equal number of points in trapz (301 each; nPoints in trap 877/2=438.5)
-    hLeft = 14;
-    hRight = 20;
+%     hLeft = 14;
+%     hRight = 20;
+    %new - actually half, L=328, R=329 pixels
+    hLeft = 20;
+    hRight = 30;
+    
 else
     b=length(spacing);
     h=length(spacing);
@@ -258,7 +262,7 @@ for iterI = 1:nIter
                 gW(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
                 
                 %right half of box
-                aCorrMap = ndautoCORR(densityPlotSm(:,h-hRight:end));
+                aCorrMap = ndautoCORR(densityPlotSm(:,h-hRight+1:end));
                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
                 gA(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
                 [g,gdataA] = gridSCORE(aCorrMap,'wills',0);
