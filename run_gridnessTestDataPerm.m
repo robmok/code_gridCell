@@ -30,14 +30,31 @@ if annEps %new
     epsMuVals=.25; %below multiplies this by 1k
 end
 
+nIter=200;
+% nIter=1000;
+
 %%%%%%%
 % new fixed perm - 200iters
-% annEps - not started
-% sq / circ - 10:30
-% clus2run = [16, 22, 24, 30, 15, 27, 19];
-% clus2run = [11, 21, 12, 14, 25, 28, 20]; 
-% clus2run = [13, 10, 17, 18, 29, 23, 26];
+% annEps 
 
+% sq - not started
+% clus2run = [16, 22, 24, 14, 15, 27];
+% clus2run = [25, 11, 21, 12, 30, 26]; 
+% clus2run = [13, 10, 17, 18, 29];
+
+% sq - love01 - perm5
+% clus2run = [19, 20, 28, 23];
+
+
+%circ - love01 - perm1-5
+clus2run = [16, 22, 24];
+% clus2run = [14, 15, 11];
+% clus2run = [27, 21, 12]; 
+% clus2run = [13, 10, 17];
+% clus2run = [18, 29, 30];
+
+%circ - love06 - not started
+% clus2run = [19, 20, 26, 28, 23, 25];
 
 
 
@@ -45,31 +62,28 @@ end
 % 1k iters, sq/circ annEps, batchSiz=200, no perm 
 
 %sq
-% clus2run = [16, 22, 24, 14, 15, 27, 19];
-% clus2run = [11, 21, 12, 30, 25, 28, 20]; 
-% clus2run = [13, 10, 17, 18, 29, 23, 26];
+% clus2run = [16, 22, 24, 14, 15, 27, 19, 13, 10, 17, 18];
+% clus2run = [11, 21, 12, 30, 25, 28, 20, 29, 23, 26]; 
 
 %circ - love01
-clus2run = [16, 22, 24, 14, 15, 27];
+% clus2run = [16, 22, 24, 14, 15, 27];
 % clus2run = [11, 21, 12, 30, 25]; 
 % clus2run = [13, 10, 17, 18, 29];
 % clus2run = [19, 20, 26, 28, 23];
 
-
+%circ - still running - 30, 10
+% done now and can run - 23, 27
+% clus2run = [23, 27]; %then 30, 10
 
 
 
 %%%%%
 % sq2trapz 1kiters - not started
-% clus2run = [14, 15, 23,  6, 20, 24, 18,  8, 16,  4, 22, 27, 26,  9, 13, 30, 29,  5, 25, 10,  7, 19, 28, 17, 11, 21, 12,  3]; %all
+% clus2run = [14, 15, 23,  20, 24, 16,  22, 27, 26,  13, 30, 29,  25, 17, 21, 12, 19, 28, 11, 10, 18]; %all
 % clus2run = [14, 15, 23,  20, 24, 18, 16, 22, 27, 26, 19]; %half - 
 % clus2run = [13, 30, 29,  25, 10, 28, 17, 11, 21, 12]; %half - 
 
-
 % clus2run = 11;
-
-% nIter=200;
-nIter=1000;
 
 jointTrls=1; %for test trials
 

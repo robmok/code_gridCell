@@ -36,7 +36,7 @@ batchSizeVals=200;
 
 
 nIter=200;
-% nIter=1000;
+nIter=1000;
 
 
 %load perm data when nIter=1000- this is with nIter=200. doPerm should=0
