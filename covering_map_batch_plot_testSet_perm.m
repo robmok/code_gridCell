@@ -21,9 +21,9 @@ dat='circ';
 % dat='square';
 compareCircSq = 0; %if compare circ-sq gridness, dat=circ, but load sq too
 
-dat='trapzKfrmSq1';
+% dat='trapzKfrmSq1';
 
-annEps=0;
+% annEps=0;
 boxSize=1;
 
 % joined trials
@@ -254,7 +254,7 @@ gridMeasure = 'grid';
 
 plotFewClus = 0; %plot 3:5 clusters separately
 
-computeCIs = 0; %takes a bit of time
+computeCIs = 1; %takes a bit of time
 
 switch clusPosAct
 % case 'clus'
@@ -617,7 +617,7 @@ end
 end
 %% Making figs: density plot examples
 
-savePlots = 0;
+savePlots = 1;
 
 doPlot=0; %do plot when computing gridness
 
@@ -652,7 +652,7 @@ myColorMap(end,:) = 1;
 
 for iClus = clus2plot%:length(clus2run)
 for iBvals = 1:length(batchSizeVals)
-    for iterI = 1%:20%nIter
+    for iterI = 1:20%:20%nIter
         switch clusPosAct
             case 'act'
                 densityPlotCentresSm = densityPlotActAll(:,:,iterI,iEps,iBvals,iClus);

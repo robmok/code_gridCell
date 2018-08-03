@@ -31,7 +31,7 @@ if annEps %new
 end
 
 nIter=200;
-nIter=1000;
+% nIter=1000;
 
 %%%%%%%
 % new fixed perm - 200iters
@@ -47,34 +47,26 @@ clus2run = [16, 22, 24, 14, 15, 27];
 
 
 %circ - love01 - perm1-5 - running
-% clus2run = [16, 22, 24];
-% clus2run = [14, 15, 11];
-% clus2run = [27, 21, 12]; 
-% clus2run = [13, 10, 17];
-% clus2run = [18, 29, 30];
+clus2run = [22, 24]; %16
+% clus2run = [15, 11]; %14
+% clus2run = [21, 12]; %27
+% clus2run = [10, 17]; %13
+% clus2run = [29, 30]; %18
 
 % sq - love01 - perm6 - running
-% clus2run = [19, 20, 28, 23];
+% clus2run = [20, 28, 23]; %19
 
 %%%%
 % 1k iters, sq/circ annEps, batchSiz=200, no perm 
-
-%sq
+%sq - done
 % clus2run = [16, 22, 24, 14, 15, 27, 19, 13, 10, 17, 18];
 % clus2run = [11, 21, 12, 30, 25, 28, 20, 29, 23, 26]; 
 
-%circ - love01
+%circ - love01 - done
 % clus2run = [16, 22, 24, 14, 15, 27];
 % clus2run = [11, 21, 12, 30, 25]; 
 % clus2run = [13, 10, 17, 18, 29];
 % clus2run = [19, 20, 26, 28, 23];
-
-%circ - still running - 30, 10
-clus2run = 18; % missed
-% clus2run = [23, 27]; %then 30, 10
-
-clus2run = [10]; % TO RUN
-clus2run = [30]; % TO RUN
 
 
 %%%%%
