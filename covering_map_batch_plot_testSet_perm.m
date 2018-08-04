@@ -21,7 +21,7 @@ dat='circ';
 % dat='square';
 compareCircSq = 0; %if compare circ-sq gridness, dat=circ, but load sq too
 
-% dat='trapzKfrmSq1';
+dat='trapzKfrmSq1';
 
 % annEps=0;
 boxSize=1;
@@ -33,19 +33,20 @@ jointTrls=1;
 epsMuVals=.025;
 nTrials=1000000;
 % batchSizeVals = [1000, 400, 100]; 
-% batchSizeVals=400;
+batchSizeVals=400;
 batchSizeVals=200;
 
-% nIter=200;
+nIter=200;
 nIter=1000;
 
 
 if strcmp(dat(1:4),'trap')
     nTrials=1000000/2;
+    nTrials=1000000/4;
     if batchSizeVals == 200
         epsMuTrapz10 = 25;
     elseif batchSizeVals == 400
-        epsMuTrapz10 = 50; %could also run 25
+        epsMuTrapz10 = 50; %could also run 25 - no, 25 reduced too quick
     end
 end
 
@@ -215,7 +216,6 @@ for iClus2run = 1:length(clus2run)
                 fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_*annEps_trlsTest_noPerm',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
                 end
             end
-
 
             %finish with directory and * for date/time
             fname = [saveDir, fname '*'];

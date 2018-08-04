@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -22,7 +22,7 @@ saveDat=1;
 % nIter=200;
 epsMuVals=.025;
 nTrials=1000000;
-% batchSizeVals=400;
+batchSizeVals=400;
 batchSizeVals=200; %new
 
 annEps=1;
@@ -38,16 +38,21 @@ nIter=200;
 % annEps 
 
 % sq - not started
-clus2run = [16, 22, 24, 14, 15, 27];
-% clus2run = [25, 11, 21, 12, 30, 26]; 
-% clus2run = [13, 10, 17, 18, 29];
+clus2run = [16, 22, 24, 14, 13];
+clus2run = [25, 11, 21, 12]; 
+clus2run = [27, 10, 17, 29];
 
-%circ - love06 - not started
-% clus2run = [19, 20, 26, 28, 23, 25];
+%circ - love01 - not started
+clus2run = [19, 20];
+% clus2run = [26, 28];
+% clus2run = [23, 25];
+%sq
+% clus2run = [18, 26];
+% clus2run = [30, 15];
 
 
-%circ - love01 - perm1-5 - running
-clus2run = [22, 24]; %16
+%circ - love01 - perm1-5 - done
+% clus2run = [22, 24]; %16
 % clus2run = [15, 11]; %14
 % clus2run = [21, 12]; %27
 % clus2run = [10, 17]; %13
@@ -55,6 +60,8 @@ clus2run = [22, 24]; %16
 
 % sq - love01 - perm6 - running
 % clus2run = [20, 28, 23]; %19
+
+
 
 %%%%
 % 1k iters, sq/circ annEps, batchSiz=200, no perm 
@@ -70,10 +77,14 @@ clus2run = [22, 24]; %16
 
 
 %%%%%
-% sq2trapz 1kiters - not started
+% sq2trapz 1kiters - done
 % clus2run = [14, 15, 23,  20, 24, 16,  22, 27, 26,  13, 30, 29,  25, 17, 21, 12, 19, 28, 11, 10, 18]; %all
 % clus2run = [14, 15, 23,  20, 24, 18, 16, 22, 27, 26, 19]; %half - 
 % clus2run = [13, 30, 29,  25, 10, 28, 17, 11, 21, 12]; %half - 
+% clus2run = [14, 15, 23, 20, 24, 18]; %quarter
+% clus2run = [16, 22, 27, 26, 19]; 
+% clus2run = [13, 30, 29, 25, 10]; 
+% clus2run = [28, 17, 11, 21, 12]; 
 
 % clus2run = 11;
 
@@ -81,8 +92,8 @@ jointTrls=1; %for test trials
 
 % if trapKfrmSq1
 if strcmp(dat,'trapzKfrmSq1')
-    nTrials=1000000/2;
-    epsMuTrapz10 = 25; %this is 10% of orig learning rate - using this
+    nTrials=1000000/4; %/2 or /4
+    epsMuTrapz10 = 25; % using this
 %     epsMuTrapz10 = 50; % anEps - 20%
 %     epsMuTrapz10 = 30; % anEps -
     % epsMuTrapz10 = 15;  %
