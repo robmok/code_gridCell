@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -37,19 +37,21 @@ nIter=200;
 % new fixed perm - 200iters
 % annEps 
 
-% sq - not started
+% sq - done
 clus2run = [16, 22, 24, 14, 13];
 clus2run = [25, 11, 21, 12]; 
 clus2run = [27, 10, 17, 29];
 
-%circ - love01 - not started
-clus2run = [19, 20];
+%circ - love01 - done
+% clus2run = [19, 20];
 % clus2run = [26, 28];
 % clus2run = [23, 25];
 %sq
 % clus2run = [18, 26];
 % clus2run = [30, 15];
 
+%circ missed 29 - running on love06
+clus2run=29;
 
 %circ - love01 - perm1-5 - done
 % clus2run = [22, 24]; %16

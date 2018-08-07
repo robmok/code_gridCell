@@ -96,8 +96,8 @@ if strcmp(dat(1:4),'trap') && length(dat)>10
 
     % new to equalize area - Krupic
     %equal number of points in trapz (301 each; nPoints in trap 877/2=438.5)
-    hLeft = 14;
-    hRight = 20;    
+%     hLeft = 14;
+%     hRight = 20;    
 else
     b=length(spacing);
     h=length(spacing);

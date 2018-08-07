@@ -21,7 +21,7 @@ dat='circ';
 % dat='square';
 compareCircSq = 0; %if compare circ-sq gridness, dat=circ, but load sq too
 
-dat='trapzKfrmSq1';
+% dat='trapzKfrmSq1';
 
 % annEps=0;
 boxSize=1;
@@ -33,7 +33,7 @@ jointTrls=1;
 epsMuVals=.025;
 nTrials=1000000;
 % batchSizeVals = [1000, 400, 100]; 
-batchSizeVals=400;
+% batchSizeVals=400;
 batchSizeVals=200;
 
 nIter=200;
@@ -41,8 +41,8 @@ nIter=1000;
 
 
 if strcmp(dat(1:4),'trap')
-    nTrials=1000000/2;
-    nTrials=1000000/4;
+%     nTrials=1000000/2;
+    nTrials=1000000/4; %using this now
     if batchSizeVals == 200
         epsMuTrapz10 = 25;
     elseif batchSizeVals == 400
@@ -51,7 +51,7 @@ if strcmp(dat(1:4),'trap')
 end
 
 %load perm data when nIter=1000- this is with nIter=200. doPerm should=0
-loadPerm = 0;
+loadPerm = 1;
 
 % clus2run = [3:26]; 
 % clus2run = [3:30]; 
@@ -190,7 +190,7 @@ for iClus2run = 1:length(clus2run)
 end
 
 
-if 0% strcmp(dat,'trapzKfrmSq1') || compareCircSq %added compare circ vs sq - should work?
+if strcmp(dat,'trapzKfrmSq1') || compareCircSq %added compare circ vs sq - should work?
     
     datOrig = dat;
     dat = 'square';
@@ -617,7 +617,7 @@ end
 end
 %% Making figs: density plot examples
 
-savePlots = 1;
+savePlots = 0;
 
 doPlot=0; %do plot when computing gridness
 
@@ -635,12 +635,10 @@ clus2plot = [10,12,18,25]-9;
 
 clus2plot = [10, 12, 18, 20, 23, 25, 28]-9; 
 
-%circ 10,18 - to make figs for at least iters-1:20
-clus2plot = [10, 18]-9; % STILL TO MAKE AND SELECT
-
 
 %trapz
 % clus2plot = [12, 20, 23, 25, 28]-9;
+% clus2plot = [18, 19, 20, 23]-9;
 
 
 % clus2plot = (3:5)-2;
@@ -652,7 +650,7 @@ myColorMap(end,:) = 1;
 
 for iClus = clus2plot%:length(clus2run)
 for iBvals = 1:length(batchSizeVals)
-    for iterI = 1:20%:20%nIter
+    for iterI = 11:20%:20%nIter
         switch clusPosAct
             case 'act'
                 densityPlotCentresSm = densityPlotActAll(:,:,iterI,iEps,iBvals,iClus);
@@ -712,13 +710,13 @@ for iBvals = 1:length(batchSizeVals)
         end
         
         if strcmp(dat(1:4),'trap')
-            h=50; hLeft = 14; hRight = 20;
+            h=50; hLeft = 20; hRight = 30;
             aCorrMap = ndautoCORR(densityPlotCentresSm(:,1:hLeft));
             [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
             %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
             
             aCorrMap(isnan(aCorrMap))=1.1;
-            figure; imagesc(aCorrMap,[-1.01 1.01]); colormap(myColorMap);
+            figure; imagesc(aCorrMap,[-1.1 1.1]); colormap(myColorMap);
             title(sprintf('Grid Score %.2f',g));
             set(gca,'FontSize',fontSiz,'fontname','Arial')
             xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
@@ -736,8 +734,8 @@ for iBvals = 1:length(batchSizeVals)
             aCorrMap = ndautoCORR(densityPlotCentresSm(:,h-hRight+1:end));
             [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
             %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
-            aCorrMap(isnan(aCorrMap))=.5;
-            figure; imagesc(aCorrMap,[-1.01 1.01]);
+            aCorrMap(isnan(aCorrMap))=1.1;
+            figure; imagesc(aCorrMap,[-1.1 1.1]);colormap(myColorMap);
             title(sprintf('Grid Score %.2f',g));
             set(gca,'FontSize',fontSiz,'fontname','Arial')
             xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
@@ -759,7 +757,7 @@ end
 %% Thresholds from perm stats
 figsDir = [wd '/grid_figs'];
 
-savePlots=0;
+savePlots=1;
 
 clusPosAct = 'actNorm'; %'act' or 'actNorm'
 
@@ -855,7 +853,7 @@ end
 
 %% trapz vs orig sq gridness / circ vs sq
 
-savePlots=1;
+savePlots=0;
 
 clusPosAct = 'actNorm'; %'act' or 'actNorm'
 
@@ -863,7 +861,7 @@ gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
 
 gridMeasure = 'grid';
 
-computeCIs=0; 
+computeCIs=1; 
 
 switch clusPosAct
 %     case 'act'
@@ -906,12 +904,14 @@ end
 
 iEps=1;
 
-clus2plot=(3:30)-2;
-clus2plot=(6:30)-2;
-clus2plot=(10:30)-2;
-clus2plot=(10:26)-2;
+% clus2plot=(3:30)-2;
+% clus2plot=(6:30)-2;
+% clus2plot=(10:30)-2;
+% clus2plot=(10:26)-2;
 
 % clus2plot=(3:26)-2;
+
+clus2plot = 1:length(clus2run);
 
 iBatchVals=1;
 
