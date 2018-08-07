@@ -15,7 +15,7 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
-dat = 'square';   
+% dat = 'square';   
 % dat = 'trapzKrupic';
 
 % dat = 'catLearn';
@@ -57,17 +57,12 @@ catsInfo.msExample = 1; %2 gaussians in opposite sides of the square - example f
 %%%% new run 200 iters - annEps from 0.25 to 0.05, batchSize=200 / 5k
 %%%% batches 
 %now run 1000 iters
-%sq, 4 matlabs - not started
+%sq, 4 matlabs - running
 %love06
-clus2run = [12, 15, 20, 27, 16, 19]; 
-clus2run = [14, 26, 18, 10, 21]; 
-clus2run = [22, 11, 23, 30, 28];
-clus2run = [25, 17, 24, 13]; 
-clus2run = [24, 13]; % re running this without 26, added 13 - actually add 29 when ok
-% *****
-% add 29 - still to run
-clus2run = [13, 29]; %e.g. could run this after 24 is done
-% *****
+clus2run = [20, 27, 16, 19]; %12, 15,
+clus2run = [18, 10, 21]; %14, 26, 
+clus2run = [23, 30, 28]; %22, 11,
+clus2run = [24, 13, 29];  %25, 17
 
 %love01 - circ, 6 matlabs
 % clus2run = [12, 15, 20, 27]; 
@@ -77,6 +72,10 @@ clus2run = [13, 29]; %e.g. could run this after 24 is done
 % clus2run = [19, 21, 28];
 % clus2run = [16, 13];
 % clus2run = [13, 29]; % running now on c6 (replacing immediately above one)
+
+%circ now run on love06
+clus2run = 30;
+clus2run = 10;
 
 
 % clus2run = 18;

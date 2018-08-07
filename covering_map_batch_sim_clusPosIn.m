@@ -28,8 +28,13 @@ else %if not annEps, use fixed slower learning rate
 end
 
 %compute gridness over time %20 timepoints; - 21 sets now - last one is last quarter
-fromTrlI  = round([1,               nTrials.*.05+1,  nTrials.*.1+1,  nTrials.*.15+1,  nTrials.*.2+1,  nTrials.*.25+1,   nTrials.*.3+1,  nTrials.*.35+1,  nTrials.*.4+1,  nTrials.*.45+1,  nTrials.*.5+1,  nTrials.*.55+1, nTrials.*.6+1,  nTrials.*.65+1, nTrials.*.7+1, nTrials.*.75+1, nTrials.*.8+1,  nTrials.*.85+1,  nTrials.*.9+1,  nTrials.*.95+1, nTrials.*.75]);
-toTrlN    = round([nTrials.*.05,    nTrials.*.1,     nTrials.*.15,   nTrials.*.2,     nTrials.*.25,   nTrials.*.3,      nTrials.*.35,   nTrials.*.4,     nTrials.*.45,   nTrials.*.5,     nTrials.*.55,   nTrials.*.6,    nTrials.*.65,   nTrials.*.7,    nTrials.*.75,  nTrials.*.8,    nTrials.*.85,   nTrials.*.9,     nTrials.*.95,   nTrials,        nTrials]);
+% if actOverTime
+%     fromTrlI  = round([1,               nTrials.*.05+1,  nTrials.*.1+1,  nTrials.*.15+1,  nTrials.*.2+1,  nTrials.*.25+1,   nTrials.*.3+1,  nTrials.*.35+1,  nTrials.*.4+1,  nTrials.*.45+1,  nTrials.*.5+1,  nTrials.*.55+1, nTrials.*.6+1,  nTrials.*.65+1, nTrials.*.7+1, nTrials.*.75+1, nTrials.*.8+1,  nTrials.*.85+1,  nTrials.*.9+1,  nTrials.*.95+1, nTrials.*.75]);
+%     toTrlN    = round([nTrials.*.05,    nTrials.*.1,     nTrials.*.15,   nTrials.*.2,     nTrials.*.25,   nTrials.*.3,      nTrials.*.35,   nTrials.*.4,     nTrials.*.45,   nTrials.*.5,     nTrials.*.55,   nTrials.*.6,    nTrials.*.65,   nTrials.*.7,    nTrials.*.75,  nTrials.*.8,    nTrials.*.85,   nTrials.*.9,     nTrials.*.95,   nTrials,        nTrials]);
+% else %just compute last one
+fromTrlI  = round(nTrials.*.75);
+toTrlN    = nTrials;
+% end
 
 if nargout > 7
     muAll            = nan(nClus,2,nBatch+1,nIter);
@@ -74,8 +79,12 @@ if strcmp(dat(1:4),'trap') && length(dat)>10
 %     hRight = ceil(halfArea/((a+c)/2))+1; %smaller side
     
     %equal number of points in trapz (301 each; nPoints in trap 877/2=438.5)
-    hLeft = 14;
-    hRight = 20;
+%     hLeft = 14;
+%     hRight = 20;
+    %new - actually half, L=328, R=329 pixels
+    hLeft = 20;
+    hRight = 30;
+    
 else
     b=length(spacing);
     h=length(spacing);
@@ -253,7 +262,7 @@ for iterI = 1:nIter
                 gW(iSet,iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
                 
                 %right half of box
-                aCorrMap = ndautoCORR(densityPlotSm(:,h-hRight:end));
+                aCorrMap = ndautoCORR(densityPlotSm(:,h-hRight+1:end));
                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
                 gA(iSet,iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
                 [g,gdataA] = gridSCORE(aCorrMap,'wills',0);

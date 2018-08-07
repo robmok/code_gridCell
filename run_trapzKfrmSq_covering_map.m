@@ -27,7 +27,7 @@ nTrials=1000000;
 % batchSizeVals=200;
 
 nIter=200;
-% nIter=1000;
+nIter=1000;
 
 annEps=1;
 if ~annEps
@@ -38,8 +38,8 @@ end
 jointTrls=1;
 
 % trapz sims here
-nTrials2 = nTrials/2; %/4?
-nBatches = 2500;
+nTrials2 = nTrials/4; %/2, /4?
+% nBatches = 2500;
 nBatches = 5000;%new
 batchSizeVals = nTrials./nBatches; %match original batchsize values (nTrials being original nTrials)
 nBvals = length(batchSizeVals);
@@ -51,27 +51,17 @@ epsMuTrapz = 0.0025;
 % epsMuTrapz = 0.003; %new 
 
 %love06
-% clus2run = [15, 23,  20, 24, 18, 16, 22, 27, 26, 19]; %half - ;14
-% clus2run = [30, 29,  25, 10, 28, 17, 11, 21, 12]; %half - ; 13
+%  batchSiz200 0.25 to 00025, batchSiz=200; to run, 1000 iters
 
-% clus2run = [15, 23,  20, 24, 18, 16, 22, 27, 26, 19, 30, 29,  25, 10, 28, 17, 11, 21, 12]; % full - 13, 14 - % 
+% clus2run = [13, 15, 23,  20, 24, 18, 16, 22, 27, 26, 19]; %half -
+% clus2run = [14, 30, 29,  25, 10, 28, 17, 11, 21, 12]; %half -
 
-%10:20 only
-% clus2run = [15, 13, 18, 16, 19, 14];
-% clus2run = [10, 17, 11, 12, 20];
+% clus2run = [13, 14, 15, 23,  20, 24, 18, 16, 22, 27, 26, 30, 25, 10, 17, 11, 12, 19, 21,28, 29]; % full - 
 
 
-% rerunning batch400, 0.25 to 0.005, now with correct reduction over time
-%rerunning 10:20, but also 21:30
-% batchSiz=400, eps250-50 - OK
-
-clus2run = [15, 13, 18, 16, 19, 14,21:2:30];
-clus2run = [10, 17, 11, 12, 20, 22:2:30];
-
-% running batchSiz200 0.25 to 00025
-% now 0.25 to 0.005
-clus2run = [21:2:30 ];
-clus2run = 22:2:30;
+clus2run = [13, 15, 12, 20, 11, 18, 16]; % 1/3 
+clus2run = [22, 27, 26, 19, 14, 30, 29]; 
+clus2run = [25, 10, 17,24, 21, 23, 28]; 
 
 %testing
 % clus2run = 13;
