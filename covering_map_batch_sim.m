@@ -25,7 +25,7 @@ if annEps
 %         annEpsDecay = annC*(nBatch*75); %  epsMuOrig =.25;ends with .033
 
 % trying with batch400, trapKrupic
-    annEpsDecay = annC*(nBatch*49); %  epsMuOrig =.25;ends with .005
+%     annEpsDecay = annC*(nBatch*49); %  epsMuOrig =.25;ends with .005
 
 
 %     elseif epsMuOrig == 0.5

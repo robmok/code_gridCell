@@ -16,15 +16,15 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
 % dat = 'square';   
-dat = 'trapzKrupic';
+% dat = 'trapzKrupic';
 
 % dat = 'catLearn';
 
 %compute activation and densityPlotActNorm over time? takes longer
-actOverTime = 1; 
+actOverTime = 0; 
 
 %annealed learning rate
-annEps = 0; %1 or 0
+annEps = 1; %1 or 0
 
 jointTrls = 1;
 boxSize = 1; % 1=normal, 2=double size, 3=triple size
@@ -39,43 +39,18 @@ catsInfo.R=chol(sigmaG);
 catsInfo.msExample = 1; %2 gaussians in opposite sides of the square - example for ms
 
 % annEps new - v3 (epsMuOrig=0.25)- 1000iter, noActOverTime
-%love06 - circ -running
-% clus2run = [18, 15, 23, 20, 16, 28, 14, 25, 30]; 
-% clus2run = [22, 11, 29, 27, 21, 12, 24, 26]; 
-% % love06 - sq
-% clus2run = [11, 21, 12, 29, 14, 20]; 
-
-%love01 - sq 
-% clus2run = [27, 23];% [18, 15, 27, 23, 26]; 
-%  clus2run = [22]; %[16, 28, 22, 25, 24];
-%  clus2run = [19, 17]; %[13, 10, 19, 17, 30]; %missed 29
-%love01 - circ 
-%  clus2run = [13, 10, 19, 17];
-% clus2run=29; %missed circ - runnning on love06 now
-
-
-%%%% new run 200 iters - annEps from 0.25 to 0.05, batchSize=200 / 5k
-%%%% batches 
-%now run 1000 iters
-%sq, 4 matlabs - running
-%love06
-clus2run = [20, 27, 16, 19]; %12, 15,
-clus2run = [18, 10, 21]; %14, 26, 
+%re-running (circ first, sq need?) without smoothing in nans
+%love06 -circ
+clus2run = [10, 13, 16, 19]; %12, 15,
+clus2run = [18, 20, 27]; %14, 26, 
 clus2run = [23, 30, 28]; %22, 11,
-clus2run = [24, 13, 29];  %25, 17
-
-%love01 - circ, 6 matlabs
-% clus2run = [12, 15, 20, 27]; 
-% clus2run = [14, 26, 18, 10]; 
-% clus2run = [22, 11, 23, 30];
-% clus2run = [25, 17, 24];
-% clus2run = [19, 21, 28];
-% clus2run = [16, 13];
-% clus2run = [13, 29]; % running now on c6 (replacing immediately above one)
-
-% %circ now run on love06
-% clus2run = 30;
-% clus2run = 10;
+clus2run = [24, 21, 29];  %25, 17
+% 
+% %love01 - circ, 6 matlabs
+clus2run = [12, 15];
+% clus2run = [14, 26];
+% clus2run = [22, 11];
+% clus2run = [25, 17];
 
 
 
@@ -83,7 +58,7 @@ clus2run = [24, 13, 29];  %25, 17
 %expected
 %love06 - annEps - NB - 0.25 to 0.005 (edited the annEps delay param
 %love01 - try no annEps
-clus2run = [12 16];
+% clus2run = [12 16];
 % clus2run = [18, 25];
 % clus2run = [20, 10];
 % clus2run = [23, 14];
@@ -106,7 +81,7 @@ if fixBatchSize
 %     nBatches = [8000 5000];
 %     nBatches = [1000 5000 2500];
     nBatches = 2500;
-%     nBatches = 5000; % using this now
+    nBatches = 5000; % using this now
     if strcmp(dat(1:3),'cat')
         nBatches = nBatches.*2;
     end
@@ -164,7 +139,7 @@ warpType = 'sq2rect';
 %%
 saveDat=1; %save simulations
 
-nIter=200; %200 for covering map over time, 20 for cat; 1k for covering map new
+nIter=1000; %200 for covering map over time, 20 for cat; 1k for covering map new
 
 if useSameTrls
 %     switch dat

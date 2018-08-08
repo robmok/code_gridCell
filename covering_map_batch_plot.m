@@ -149,13 +149,14 @@ rHex=0; %if choose raw 60deg corr values, not gridness
 
 
 %new trapzKrupic dimensions
+dat='trapzKrupic';
 nTrials=1000000;
 epsMuVals = 0.25; %use this one
 batchSizeVals = 400;
 annEps=1;
 nIter=200;
 
-clus2run  = [12, 18, 20, 23]; %[10, 12, 14, 16, 18, 20, 23, 25]; 
+clus2run  = [10, 12, 14, 16, 18, 20, 23, 25]; 
 
 
 %load loop
@@ -271,7 +272,7 @@ for iClus2run = 1:length(clus2run)
 end
 %% plot univar scatters
 
-clusPosAct = 'actNorm'; %'clus' or 'actNorm'
+clusPosAct = 'clus'; %'clus' or 'actNorm'
 
 gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
 
@@ -614,7 +615,7 @@ nnz(peaksW~=6)
 %% density plots
 close all
 
-iSet=17;
+iSet=21;
 iEps=1;
 gaussSmooth=1;
 
@@ -626,7 +627,8 @@ else
 end
 
 %set
-iClus2run = 30-9;
+iClus2run = 20-9;
+iClus2run = 6;
 iBvals    = 1;
 
 iters2plot = 1;
@@ -636,10 +638,13 @@ for iterI = iters2plot
 %     densityPlotCentresSm = imgaussfilt(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
 %     densityPlotCentresSm = imgaussfilt(densityPlotActAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
 
-    densityPlotCentresSm = imgaussfilt(densityPlotActNormAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
-    densityPlotActNormTmp = densityPlotActNormAll(:,:,iSet,iterI,iEps,iBvals,iClus2run);
+%     densityPlotCentresSm = imgaussfilt(densityPlotActNormAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
+%     densityPlotActNormTmp = densityPlotActNormAll(:,:,iSet,iterI,iEps,iBvals,iClus2run);
 %     densityPlotActNormTmp(isnan(densityPlotActNormTmp))=0;
-    densityPlotCentresSm = imgaussfilt(densityPlotActNormTmp,gaussSmooth);
+%     densityPlotCentresSm = imgaussfilt(densityPlotActNormTmp,gaussSmooth);
+    
+    densityPlotCentresSm = (densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run));
+    
     
     figure; hold on;
     subplot(subPlt(1),subPlt(2),1)
