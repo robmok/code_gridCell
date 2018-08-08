@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -16,12 +16,12 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
 % dat = 'square';   
-% dat = 'trapzKrupic';
+dat = 'trapzKrupic';
 
 % dat = 'catLearn';
 
 %compute activation and densityPlotActNorm over time? takes longer
-actOverTime = 0; 
+actOverTime = 1; 
 
 %annealed learning rate
 annEps = 0; %1 or 0
@@ -84,9 +84,11 @@ clus2run = [24, 13, 29];  %25, 17
 %love06 - annEps
 %love01 - try no annEps
 clus2run = [12 16];
-clus2run = [18, 25];
-clus2run = [20, 10];
-clus2run = [23, 14];
+% clus2run = [18, 25];
+% clus2run = [20, 10];
+% clus2run = [23, 14];
+
+
 
 % nTrials
 if ~strcmp(dat(1:3),'cat')
