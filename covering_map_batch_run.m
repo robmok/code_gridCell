@@ -24,7 +24,7 @@ dat = 'trapzKrupic';
 actOverTime = 0; 
 
 %annealed learning rate
-annEps = 1; %1 or 0
+annEps = 0; %1 or 0
 
 jointTrls = 1;
 boxSize = 1; % 1=normal, 2=double size, 3=triple size
@@ -79,21 +79,14 @@ clus2run = [24, 13, 29];  %25, 17
 
 
 
-%try new trapzKrupic
-%love06
+%try new trapzKrupic - 200 iters, no actOverTime - check if get results as
+%expected
+%love06 - annEps
+%love01 - try no annEps
 clus2run = [12 16];
 clus2run = [18, 25];
 clus2run = [20, 10];
 clus2run = [23, 14];
-
-%love01
-clus2run = [11, 22];
-% clus2run = [24, 13];
-% clus2run = [15, 21];
-% clus2run = [17, 26];
-% clus2run = [27, 19];
-
-
 
 % nTrials
 if ~strcmp(dat(1:3),'cat')
