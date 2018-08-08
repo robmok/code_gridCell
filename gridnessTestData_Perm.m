@@ -147,10 +147,14 @@ for iterI=1:nIters2run
 %         densityPlotAct(:,:,iterI)               =  densityPlotActTmp;
 %         densityPlotActNorm(:,:,iterI)           =  densityPlotActNormTmp;
 
-        %smooth - not nec but to compare with perm (which need smoothing)
-        densityPlotAct(:,:,iterI)               =  imgaussfilt(densityPlotActTmp,gaussSmooth);
-        densityPlotActNorm(:,:,iterI)           =  imgaussfilt(densityPlotActNormTmp,gaussSmooth);
+%         %smooth - not nec but to compare with perm (which need smoothing)
+%         densityPlotAct(:,:,iterI)               =  imgaussfilt(densityPlotActTmp,gaussSmooth);
+%         densityPlotActNorm(:,:,iterI)           =  imgaussfilt(densityPlotActNormTmp,gaussSmooth);
         
+        %new smoothing, ignores nans
+        imageFilter=fspecial('gaussian',5,gaussSmooth); %this is default for imgaussfilt
+        densityPlotAct(:,:,iterI)               =  nanconv(densityPlotActTmp,imageFilter, 'nanout');
+        densityPlotActNorm(:,:,iterI)           =  nanconv(densityPlotActNormTmp,imageFilter, 'nanout');        
         
         aCorrMap = ndautoCORR(densityPlotActTmp);
         [g,gdataA] = gridSCORE(aCorrMap,'allen',0);

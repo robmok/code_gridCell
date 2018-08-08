@@ -286,11 +286,18 @@ for iterI = 1:nIter
         end
         densityPlot(:,:,iSet,iterI) = densityPlotTmp;
 %         densityPlotTmp(densityPlotTmp==0) = nan; %for circ, and prob trapz, to ignore points not in the shape - do this above now; for actNorm already does it by dividing by 0
-        densityPlotSm               = imgaussfilt(densityPlotTmp,gaussSmooth); %smooth
+
+        % smoothing that deals with nans 8/8/18
+        imageFilter           = fspecial('gaussian',5,gaussSmooth); %this is default for imgaussfilt
+        densityPlotSm         = nanconv(densityPlotTmp,imageFilter, 'nanout');
         densityPlotActNormTmp = densityPlotAct./densityPlotActUpd; %divide by number of times that location was visited
-        if actOverTime %maybe add this?
-        densityPlotActNormTmp = imgaussfilt(densityPlotActNormTmp,gaussSmooth); %smooth - new 20/8/18 rob after annEps learning over time doesnt work so well..
-        end
+        
+%         if actOverTime %maybe add this?
+%             densityPlotActNormTmp = imgaussfilt(densityPlotActNormTmp,gaussSmooth); %smooth - new 20/7/18 rob after annEps learning over time doesnt work so well..
+            % deals with nans    
+            imageFilter=fspecial('gaussian',5,gaussSmooth); %this is default for imgaussfilt
+            densityPlotActNormTmp = nanconv(densityPlotActNormTmp,imageFilter, 'nanout');
+%         end
 %%%%%%%%%%%%%%%
          % IF COMPUTING GRIDNESS FOR ACT ITSELF
 %         densityPlotAct(densityPlotAct==0) =  nan; %for circ, and prob trapz, to ignore points not in the shape - if computing this at all (atm not)
