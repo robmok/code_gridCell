@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -79,9 +79,9 @@ clus2run = [24, 13, 29];  %25, 17
 
 
 
-%try new trapzKrupic - 200 iters, no actOverTime - check if get results as
+%try new trapzKrupic - 200 iters, - check if get results as
 %expected
-%love06 - annEps
+%love06 - annEps - NB - 0.25 to 0.005 (edited the annEps delay param
 %love01 - try no annEps
 clus2run = [12 16];
 % clus2run = [18, 25];
