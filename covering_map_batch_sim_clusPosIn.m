@@ -148,15 +148,15 @@ for iterI = 1:nIter
             if annEps %if use annealed learning rate
                 epsMu = epsMuOrig/(1+(annEpsDecay*(iBatch+nBatchOrig))); %new
                 %debug mode - plot learning rate over time
-%                 clear epsAll
-%                 epsMuOrig = .25;
-% %                 annEpsDecay = annC*(nBatchOrig*49); %  epsMuOrig =.25;ends with .005 
-%                 annEpsDecay = annC*(nBatchOrig*100); %  epsMuOrig =.5;ends with .005 
-%                 for iBatch=1:nBatchOrig+nBatch, epsAll(iBatch)=epsMuOrig/(1+(annEpsDecay*iBatch)); end
-%                 figure; plot(epsAll); ylim([0, 0.1]);
-%                 epsAll(round((nBatchOrig+nBatch).*[.05, .25, .5, .75, .95, 1]))
-%                 epsNew=epsAll(nBatchOrig+1:end);
-%                 epsNew(round(nBatch.*[.05, .25, .5, .75, .95, 1]))
+                clear epsAll
+                epsMuOrig = .25;
+%                 annEpsDecay = annC*(nBatchOrig*49); %  epsMuOrig =.25;ends with .005 
+                annEpsDecay = annC*(nBatchOrig*100); %  epsMuOrig =.5;ends with .005 
+                for iBatch=1:nBatchOrig+nBatch, epsAll(iBatch)=epsMuOrig/(1+(annEpsDecay*iBatch)); end
+                figure; plot(epsAll); ylim([0, 0.1]);
+                epsAll(round((nBatchOrig+nBatch).*[.05, .25, .5, .75, .95, 1]))
+                epsNew=epsAll(nBatchOrig+1:end);
+                epsNew(round(nBatch.*[.05, .25, .5, .75, .95, 1]))
             else
                 epsMu = epsMuOrig;
             end

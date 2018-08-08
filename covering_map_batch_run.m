@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];
@@ -16,7 +16,7 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
 % dat = 'square';   
-% dat = 'trapzKrupic';
+dat = 'trapzKrupic';
 
 % dat = 'catLearn';
 
@@ -73,12 +73,27 @@ clus2run = [24, 13, 29];  %25, 17
 % clus2run = [16, 13];
 % clus2run = [13, 29]; % running now on c6 (replacing immediately above one)
 
-%circ now run on love06
-clus2run = 30;
-clus2run = 10;
+% %circ now run on love06
+% clus2run = 30;
+% clus2run = 10;
 
 
-% clus2run = 18;
+
+%try new trapzKrupic
+%love06
+clus2run = [12 16];
+clus2run = [18, 25];
+clus2run = [20, 10];
+clus2run = [23, 14];
+
+%love01
+clus2run = [11, 22];
+% clus2run = [24, 13];
+% clus2run = [15, 21];
+% clus2run = [17, 26];
+% clus2run = [27, 19];
+
+
 
 % nTrials
 if ~strcmp(dat(1:3),'cat')
@@ -95,8 +110,8 @@ if fixBatchSize
 %     nBatches = [5000, 2500, 10000]; 
 %     nBatches = [8000 5000];
 %     nBatches = [1000 5000 2500];
-%     nBatches = 2500;
-    nBatches = 5000; % using this now
+    nBatches = 2500;
+%     nBatches = 5000; % using this now
     if strcmp(dat(1:3),'cat')
         nBatches = nBatches.*2;
     end
@@ -154,7 +169,7 @@ warpType = 'sq2rect';
 %%
 saveDat=1; %save simulations
 
-nIter=1000; %200 for covering map over time, 20 for cat; 1k for covering map new
+nIter=200; %200 for covering map over time, 20 for cat; 1k for covering map new
 
 if useSameTrls
 %     switch dat

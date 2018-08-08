@@ -18,10 +18,10 @@ gaussSmooth = 1;
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-% dat='square';
+dat='square';
 compareCircSq = 0; %if compare circ-sq gridness, dat=circ, but load sq too
 
-% dat='trapzKfrmSq1';
+dat='trapzKfrmSq1';
 
 % annEps=0;
 boxSize=1;
@@ -36,9 +36,11 @@ nTrials=1000000;
 % batchSizeVals=400;
 batchSizeVals=200;
 
-nIter=200;
+% nIter=200;
 nIter=1000;
 
+%load perm data when nIter=1000- this is with nIter=200. doPerm should=0
+loadPerm = 1;
 
 if strcmp(dat(1:4),'trap')
 %     nTrials=1000000/2;
@@ -48,10 +50,10 @@ if strcmp(dat(1:4),'trap')
     elseif batchSizeVals == 400
         epsMuTrapz10 = 50; %could also run 25 - no, 25 reduced too quick
     end
+    loadPerm=0;
 end
 
-%load perm data when nIter=1000- this is with nIter=200. doPerm should=0
-loadPerm = 1;
+
 
 % clus2run = [3:26]; 
 % clus2run = [3:30]; 
@@ -509,6 +511,31 @@ if ~strcmp(dat,'trapzKfrmSq1')
 %     ci = bootci(length(clus2run),@nanmean,nanmean(dat1,1)); %CI over mean of nClus conds - prob not as gd
     ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs 
     fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2))
+    
+    % individual nClus cond CIs, whole trapz
+    nBoot = nIter;
+    clear ciTest ciTmp ciClusSig
+    cnter=0;
+    for iClus=1:length(clus2plot)
+        cnter = cnter+1;
+        ciTmp = bootci(nBoot,@nanmean,dat1(:,iClus));
+        ciTest(:,cnter) = [nanmean(dat1(:,iClus),1); ciTmp]; % mean & CIs for all nClus conds - use for tables
+        
+        %check CIs sig - pos/neg
+        posInd=ciTest(:,cnter)>0;
+        negInd=ciTest(:,cnter)<0;
+        if all(posInd)
+            ciClusSig(cnter)=1;
+        end
+        if all(negInd)
+            ciClusSig(cnter)=-1;
+        end
+        if ~all(posInd) && ~all(negInd)
+            ciClusSig(cnter)=0;
+        end
+    end
+    fprintf('%s, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f];  %d sig > 0, out of %d sig conds. %0.2f percent\n',dat,clus2plot(1)+2,clus2plot(end)+2,nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
+    
 else
     %trapz 
     dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,1));
@@ -522,7 +549,7 @@ else
         ciTmp = bootci(nBoot,@nanmean,dat1(:,iClus));
         ciTest(:,cnter) = [nanmean(dat1(:,iClus),1); ciTmp]; % mean & CIs
         
-        %check CIs sig
+        %check CIs sig - pos/neg
         posInd=ciTest(:,cnter)>0;
         negInd=ciTest(:,cnter)<0;
         if all(posInd)
@@ -545,16 +572,16 @@ else
     % individual nClus cond CIs, L-R
     dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,2))-squeeze(datTmp(:,iEps,iBatchVals,clus2plot,3));
     nBoot = nIter;
-    clear ciTest ciTmp ciClusSig
+    clear ciTest2 ciTmp ciClusSig
     cnter=0;
     for iClus=1:length(clus2plot)
         cnter = cnter+1;
         ciTmp = bootci(nBoot,@nanmean,dat1(:,iClus));
-        ciTest(:,cnter) = [nanmean(dat1(:,iClus),1); ciTmp]; % mean & CIs
+        ciTest2(:,cnter) = [nanmean(dat1(:,iClus),1); ciTmp]; % mean & CIs
         
         %check CIs sig
-        posInd=ciTest(:,cnter)>0;
-        negInd=ciTest(:,cnter)<0;
+        posInd=ciTest2(:,cnter)>0;
+        negInd=ciTest2(:,cnter)<0;
         if all(posInd)
             ciClusSig(cnter)=1;
         end

@@ -4,7 +4,7 @@
 clear all;
 
 wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
+wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
@@ -64,7 +64,7 @@ clus2run = [22, 27, 26, 19, 14, 30, 29];
 clus2run = [25, 10, 17,24, 21, 23, 28]; 
 
 %testing
-% clus2run = 13;
+clus2run = 13;
 % nIter2run = 1;
 %%
 

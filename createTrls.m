@@ -1,6 +1,7 @@
 function [trials,dataPtsTest, rSeed,ntInSq] = createTrls(dat,nTrials,locRange,useSameTrls,jointTrls,boxSize,catsInfo,rSeed)
 
 spacing =linspace(locRange(1),locRange(2),locRange(2)+1); 
+spacingOrig=spacing;
 stepSize=diff(spacing(1:2)); nSteps = length(spacing);
 
 
@@ -61,14 +62,9 @@ switch dat
 %         dataPtsTest = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)/1.5,nTrials,'true'); randsample(spacing,nTrials,'true')]';
     case 'trapzKrupic'
         %if scale to Krupic:
-        if boxSize==1
-            spacing = spacing(14:37);
-        elseif boxSize==1.5
-            spacingTrapz = spacing(14:37+length(14:37)*.5);
-        elseif boxSize==2
-            spacingTrapz = spacing(14:37+length(14:37));
-        end
-        trapY=locRange(2).*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
+        spacing = spacing(14:37);
+%         trapY=locRange(2).*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]); %old, a=18
+        trapY=locRange(2).*trapmf(spacing,[spacing(1), spacingOrig(round(length(spacingOrig)*.46)), spacingOrig(round(length(spacingOrig)*.54)),spacing(end)]);% new, a=5; 23:27
         trapX=spacing;
         trapPts=[];
         for i=1:length(trapY)

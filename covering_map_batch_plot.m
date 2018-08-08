@@ -16,7 +16,7 @@ gaussSmooth = 1;
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-% dat='square';
+dat='square';
 % annEps=0;
 boxSize=1;
 % nIter=200;
@@ -146,6 +146,17 @@ rHex=0; %if choose raw 60deg corr values, not gridness
 % batchSizeVals=400;
 % clus2run=10:30;
 % nIter=1000;
+
+
+%new trapzKrupic dimensions
+nTrials=1000000;
+epsMuVals = 0.25; %use this one
+batchSizeVals = 400;
+annEps=1;
+nIter=200;
+
+clus2run  = [12, 18, 20, 23]; %[10, 12, 14, 16, 18, 20, 23, 25]; 
+
 
 %load loop
 for iClus2run = 1:length(clus2run) 
@@ -969,7 +980,8 @@ for iClus = clus2plot
         [b,d,s]=glmfit(1:nTimePts,dat1(iterI,:)');
         gt_b(cnter,iterI) = b(2);
     end
-    ciClus(:,cnter) = bootci(nIter,@mean,gt_b(cnter,:));
+    ciTmp = bootci(nIter,@mean,gt_b(cnter,:));
+    ciClus(:,cnter) = [nanmean(gt_b(cnter,:)); ciTmp]; % mean & CIs    
     
     %check CIs sig
     posInd=ciClus(:,cnter)>0;
@@ -1003,7 +1015,6 @@ fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig betas > 0, out 
 %     ciTrain(iClus,:) = [mean(dat1(:,iClus),1); ciTmp]; % mean & CIs
 % end
 % ciTrain
-
 
 %% Making figs: density plot examples
 
