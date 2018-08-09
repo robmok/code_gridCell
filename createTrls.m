@@ -73,7 +73,9 @@ switch dat
         shapePts = trapPts';
     case 'trapzKfrmSq1'
         spacing = spacing(14:37);
-        trapY=locRange(2).*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
+%         trapY=locRange(2).*trapmf(spacing,[spacing(1), spacing(round(length(spacing)*.25)), spacing(round(length(spacing)*.75)),spacing(end)]);
+trapY=locRange(2).*trapmf(spacing,[spacing(1), spacingOrig(round(length(spacingOrig)*.46)), spacingOrig(round(length(spacingOrig)*.54)),spacing(end)]);% new, a=5; 23:27
+
         trapX=spacing;
         trapPts=[];
         for i=1:length(trapY)

@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -50,21 +50,17 @@ epsMuTrapz = 0.0025;
 % epsMuTrapz = 0.005; %new 
 % epsMuTrapz = 0.003; %new 
 
-%love06
-%  batchSiz200 0.25 to 00025, batchSiz=200; to run, 1000 iters
+%love01 - correct trapzKrupic scale now 
 
-% clus2run = [13, 15, 23,  20, 24, 18, 16, 22, 27, 26, 19]; %half -
-% clus2run = [14, 30, 29,  25, 10, 28, 17, 11, 21, 12]; %half -
+%*** NEXT could also try nTrials/2?
 
-% clus2run = [13, 14, 15, 23,  20, 24, 18, 16, 22, 27, 26, 30, 25, 10, 17, 11, 12, 19, 21,28, 29]; % full - 
-
-
-clus2run = [13, 15, 12, 20, 11, 18, 16]; % 1/3 
-clus2run = [22, 27, 26, 19, 14, 30, 29]; 
-clus2run = [25, 10, 17,24, 21, 23, 28]; 
+clus2run = [13, 15, 12, 20, 11, 18];  
+% clus2run = [22, 27, 26, 19, 14]; 
+% clus2run = [25, 10, 17, 24, 21]; 
+% clus2run = [16, 29, 28, 30, 23]; 
 
 %testing
-clus2run = 13;
+% clus2run = 13;
 % nIter2run = 1;
 %%
 
