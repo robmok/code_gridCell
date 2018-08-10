@@ -10,9 +10,12 @@ figsDir = [wd '/grid_figs'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed']));
 
+%smoothing
+gaussSmooth = 1; 
+imageFilter = fspecial('gaussian',5,gaussSmooth); %this is default for imgaussfilt
+
 % load
 nSet        = 21; %was 22 now 21
-gaussSmooth = 1; 
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
@@ -156,6 +159,9 @@ batchSizeVals = 400;
 annEps=1;
 nIter=200;
 
+% annEps=0;
+% epsMuVals = 0.025;
+
 clus2run  = [10, 12, 14, 16, 18, 20, 23, 25]; 
 
 
@@ -214,7 +220,8 @@ for iClus2run = 1:length(clus2run)
             
             for iterI = 1:nIter
                 for iSet=1:nSet
-                    densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
+%                     densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlot(:,:,iSet,iterI),gaussSmooth);
+                    densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run) = nanconv(densityPlot(:,:,iSet,iterI),imageFilter, 'nanout'); %new smooths ignoring nans
                 end
             end
             
@@ -238,7 +245,7 @@ for iClus2run = 1:length(clus2run)
                 for iterI = 1:nIter
                     for iSet=1:nSet
 %                         densityPlotActAll(:,:,iSet,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlotAct(:,:,iSet,iterI),gaussSmooth);
-                        densityPlotActNormAll(:,:,iSet,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlotActNorm(:,:,iSet,iterI),gaussSmooth);
+                        densityPlotActNormAll(:,:,iSet,iterI,iEps,iBvals,iClus2run) = nanconv(densityPlotActNorm(:,:,iSet,iterI),imageFilter, 'nanout'); %new smooths ignoring nans
                     end
                 end
                 
@@ -568,7 +575,9 @@ for iClus2run = 1:length(clus2run)
 for iBvals = 1:length(batchSizeVals)
     fprintf(sprintf('Running clus %d batchSizeVals %d\n',clus2run(iClus2run),batchSizeVals(iBvals)));
     for iterI = 1:nIter
-        densityPlotCentresSm = imgaussfilt(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
+%         densityPlotCentresSm = imgaussfilt(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),gaussSmooth);
+        densityPlotCentresSm = nanconv(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run),imageFilter, 'nanout');
+
         
         if doPlot
             figure; hold on;
@@ -642,9 +651,13 @@ for iterI = iters2plot
 %     densityPlotActNormTmp = densityPlotActNormAll(:,:,iSet,iterI,iEps,iBvals,iClus2run);
 %     densityPlotActNormTmp(isnan(densityPlotActNormTmp))=0;
 %     densityPlotCentresSm = imgaussfilt(densityPlotActNormTmp,gaussSmooth);
-    
-    densityPlotCentresSm = (densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run));
-    
+
+% if smooth, use:
+% imSmoothed = nanconv(im,imageFilter, 'nanout'); %new smooths ignoring nans
+
+
+    densityPlotCentresSm = densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus2run);
+
     
     figure; hold on;
     subplot(subPlt(1),subPlt(2),1)

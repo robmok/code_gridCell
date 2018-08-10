@@ -4,6 +4,7 @@ spacing=linspace(locRange(1),locRange(2),locRange(2)+1);
 % stepSize=diff(spacing(1:2)); 
 
 gaussSmooth=1; %smoothing for density map
+imageFilter = fspecial('gaussian',5,gaussSmooth); %this is default for imgaussfilt
 
 nBatch=round(nTrials/batchSize); 
 batchSize = floor(batchSize); % when have decimal points, above needed
@@ -220,10 +221,9 @@ for iterI = 1:nIter
         end
         densityPlot(:,:,iSet,iterI) = densityPlotTmp;
 %         densityPlotTmp(densityPlotTmp==0) = nan; %for circ, and prob trapz, to ignore points not in the shape - do this above now; for actNorm already does it by dividing by 0
-        densityPlotSm               = imgaussfilt(densityPlotTmp,gaussSmooth); %smooth
-%         densityPlotActNormTmp = densityPlotAct./densityPlotActUpd; %divide by number of times that location was visited
-%         %added smooth
-%         densityPlotActNormTmp =  imgaussfilt(densityPlotActNormTmp,gaussSmooth); %smooth - here only, before i don't since here less trials
+%         densityPlotSm               = imgaussfilt(densityPlotTmp,gaussSmooth); %smooth
+        densityPlotSm = nanconv(densityPlotTmp,imageFilter, 'nanout'); %new smooths ignoring nans
+
 %%%%%%%%%%%%%%%
          % IF COMPUTING GRIDNESS FOR ACT ITSELF
 %         densityPlotAct(densityPlotAct==0) =  nan; %for circ, and prob trapz, to ignore points not in the shape - if computing this at all (atm not)

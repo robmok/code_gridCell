@@ -10,12 +10,6 @@ function [permPrc_gA_act, permPrc_gW_act,permPrc_gA_actNorm, permPrc_gW_actNorm,
 % output
 % densityPlotAct,densityPlotActNorm,gA_act,gA_actNorm,gW_act,gW_actNorm, rSeedTest
 
-%tmp - inputs
-% locRange = [0 49];
-% nTrialsTest = 100000; %?
-% dat = 'trapzKrupic';
-% nClus=20;
-
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1);
 boxSize     = 1;
 useSameTrls = 0;
@@ -24,6 +18,8 @@ stepSize = 1;
 sigmaGauss = stepSize;
 
 gaussSmooth = 1;
+imageFilter=fspecial('gaussian',5,gaussSmooth); %this is default for imgaussfilt
+
 % nSets = size(densityPlot,3);
 % nIters2run = size(densityPlot,4);
 
@@ -33,40 +29,24 @@ b = 50;
 h = 50; %for trapz - height
 
 if strcmp(dat(1:4),'trap') && length(dat)>10
-    if strcmp(dat(1:6),'trapzS')
-        spacingTrapz = trapzSpacing{str2double(dat(12))}; %trapzScaled1,2,3
-        a=length(spacingTrapz); %trapz length1
-        b=locRange(2)+1; %50 - trapz length2 - +1 to let density plot go from 1:50 (rather than 0:49)
-        h=round(((locRange(2)+1)^2)/((a+b)/2))+1; %trapz height (area = 50^2; like square)
-    elseif strcmp(dat(1:6),'trapzK')
-        spacingTrapz = spacing(14:37);
-        if boxSize==1.5
-            spacingTrapz = spacing(14:37+length(14:37)*.5);
-        elseif boxSize==2
-            spacingTrapz = spacing(14:37+length(14:37));
-        end
-        a = length(spacingTrapz);
-        b = length(spacing);
-        h = length(spacing);
-    end
+    spacingTrapz = spacing(14:37);
+%     a = length(spacingTrapz);
+    b = length(spacing);
+    h = length(spacing);
 %     halfArea = (((a+b)/2)*h)/2;
 %     c = sqrt(((a^2)+(b^2))/2);
 %     hLeft  = floor(halfArea/((b+c)/2)); %bigger side
 %     hRight = ceil(halfArea/((a+c)/2))+1; %smaller side
 
-    % new to equalize area - Krupic
-    %equal number of points in trapz (301 each; nPoints in trap 877/2=438.5)
-%     hLeft = 14;
-%     hRight = 20;
-    %new - actually half, L=328, R=329 pixels
-    hLeft = 20;
-    hRight = 30;
-    
-    
+%     %new - actually half, L=328, R=329 pixels
+%     hLeft = 20;
+%     hRight = 30;
+    %new correct trapzKrupic scale
+    hLeft=12;
+    hRight=27;
 else
     b=length(spacing);
     h=length(spacing);
-    spacingTrapz = spacing;
 end
 
 
@@ -147,12 +127,8 @@ for iterI=1:nIters2run
 %         densityPlotAct(:,:,iterI)               =  densityPlotActTmp;
 %         densityPlotActNorm(:,:,iterI)           =  densityPlotActNormTmp;
 
-%         %smooth - not nec but to compare with perm (which need smoothing)
-%         densityPlotAct(:,:,iterI)               =  imgaussfilt(densityPlotActTmp,gaussSmooth);
-%         densityPlotActNorm(:,:,iterI)           =  imgaussfilt(densityPlotActNormTmp,gaussSmooth);
-        
+        %smooth - not nec but to compare with perm (which need smoothing)
         %new smoothing, ignores nans
-        imageFilter=fspecial('gaussian',5,gaussSmooth); %this is default for imgaussfilt
         densityPlotAct(:,:,iterI)               =  nanconv(densityPlotActTmp,imageFilter, 'nanout');
         densityPlotActNorm(:,:,iterI)           =  nanconv(densityPlotActNormTmp,imageFilter, 'nanout');        
         
@@ -253,9 +229,9 @@ for iterI=1:nIters2run
                 end
                 densityPlotActNormPerm   = densityPlotActPerm./densityPlotActUpdPerm; %divide by number of times that location was visited
                 %smooth
-                densityPlotActPerm = imgaussfilt(densityPlotActPerm,gaussSmooth);
-                densityPlotActNormPerm = imgaussfilt(densityPlotActNormPerm,gaussSmooth);
-                
+                densityPlotActPerm = nanconv(densityPlotActPerm,imageFilter, 'nanout'); %new smooths ignoring nans
+                densityPlotActNormPerm = nanconv(densityPlotActNormPerm,imageFilter, 'nanout'); %new smooths ignoring nans
+
                 %compute gridness
                 aCorrMap = ndautoCORR(densityPlotActPerm);
                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
@@ -263,7 +239,6 @@ for iterI=1:nIters2run
                 
                 [g,gdataW] = gridSCORE(aCorrMap,'wills',0);
                 gW_actPerm(iPerm,iterI) = gdataW.g_score;
-                
                 
                 aCorrMap = ndautoCORR(densityPlotActNormPerm);
                 [g,gdataA] = gridSCORE(aCorrMap,'allen',0);

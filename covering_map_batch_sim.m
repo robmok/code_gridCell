@@ -1,11 +1,12 @@
-function [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll, trials] = covering_map_batch_sim(nClus,locRange,catsInfo,warpType,epsMuOrig,nTrials,batchSize,nIter,warpBox,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls,actOverTime)
+function [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll, trials] = covering_map_batch_sim(nClus,locRange,catsInfo,epsMuOrig,nTrials,batchSize,nIter,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls,actOverTime)
 
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
 stepSize=diff(spacing(1:2)); 
-% nSteps = length(spacing);
-% nTrialsTest = nTrials;
 
 gaussSmooth=1; %smoothing for density map
+imageFilter           = fspecial('gaussian',5,gaussSmooth); %this is default for imgaussfilt
+
+sigmaGauss = stepSize; %computing cluster activation
 
 nBatch=round(nTrials/batchSize); %nBatch 7500 this better?
 batchSize = floor(batchSize); % when have decimal points, above needed
@@ -22,11 +23,9 @@ if annEps
     elseif epsMuOrig == 0.25
         annEpsDecay = annC*(nBatch*100); %  epsMuOrig =.25;ends with .0025
 %         annEpsDecay = annC*(nBatch*49); %  epsMuOrig =.25;ends with .005
-%         annEpsDecay = annC*(nBatch*75); %  epsMuOrig =.25;ends with .033
 
 % trying with batch400, trapKrupic
 %     annEpsDecay = annC*(nBatch*49); %  epsMuOrig =.25;ends with .005
-
 
 %     elseif epsMuOrig == 0.5
 %         annEpsDecay = annC*(nBatch*100); %  epsMuOrig =.5;ends with .005
@@ -107,10 +106,7 @@ else
     spacingTrapz = spacing;
 end
 
-% %now setting/refreshing some of these over sets below
-% densityPlotClus    = zeros(b,h,nClus,nSets,nIter); 
 densityPlot        = zeros(b,h,nSets,nIter);
-% densityPlotAct     = zeros(b,h,nSets,nIter);
 densityPlotActNorm = zeros(b,h,nSets,nIter);
 closestChosen = nan(1,nTrials);
 updatedC      = nan(1,nTrials);
@@ -121,14 +117,6 @@ for iterI = 1:nIter
     fprintf('iter %d \n',iterI);
 
     [trials,dataPtsTest, rSeed(iterI),ntInSq] = createTrls(dat,nTrials,locRange,useSameTrls,jointTrls,boxSize,catsInfo);
-        
-    % if expand box
-    switch warpType
-        case 'sq2rect'
-            trialsExpand = [randsample(locRange(1):diff(spacing(1:2)):locRange(2)*2,nTrials*.75,'true'); randsample(spacing,nTrials*.75,'true')]';
-        case 'rect2sq'
-            trialsExpand = [randsample(spacing,nTrials*.75,'true'); randsample(spacing,nTrials*.75,'true')]'; %this doesn't work - actually, maybe this isn't a thing?
-    end
     
     %initialise each cluster location  
     mu = nan(nClus,2,nBatch+1); 
@@ -146,18 +134,11 @@ for iterI = 1:nIter
     
 %     updatedC = nan(nTrials,1);
     deltaMu  = zeros(nClus,2,nBatch);
-%     clusUpdates = zeros(nClus,2); %acutally starting at 0 is OK, since there was no momentum from last trial
-    
     actTrlAll = nan(nClus,batchSize,nBatch); %check
 
     for iBatch=1:nBatch
         batchInd=batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize; %trials to average over
         trls2Upd = trials(batchInd,:); %trials to use this batch
-
-%             %if change size of box half way
-%             if iTrl == nTrials*.75 && warpBox
-%                 trials(nTrials*.75+1:end,:) = trialsExpand;
-%             end
 
             %compute distances - vectorise both clusters and trials (in batch)
             dist2Clus = sqrt(sum(reshape([mu(:,1,iBatch)'-trls2Upd(:,1), mu(:,2,iBatch)'-trls2Upd(:,2)].^2,batchSize,nClus,2),3));% reshapes it into batchSize x nClus x 2 (x and y locs)
@@ -186,7 +167,6 @@ for iterI = 1:nIter
                 end
                 %compute activation
 %                 if ~strcmp(dat(1:4),'trap') %not computing for trapz
-                    sigmaGauss = stepSize;%/3.5; %move up later - 1 seems to be fine
                     actTrl(closestC(iTrlBatch),iTrlBatch)=mvnpdf(trls2Upd(iTrlBatch,:),mu(closestC(iTrlBatch),:,iBatch),eye(2)*sigmaGauss); % save only the winner
 %                 end
                 
@@ -208,7 +188,8 @@ for iterI = 1:nIter
             %learning rate
             if annEps %if use annealed learning rate
                 epsMu = epsMuOrig/(1+(annEpsDecay*iBatch)); 
-%                 debug mode - plot learning rate over time
+
+                %Checking in debug mode - plot learning rate over time
 %                 clear epsAll
 %                 epsMuOrig = .25;
 % %                 annEpsDecay = annC*(nBatch*39); % epsMuOrig =.1; eps stays high till 1/annEpsDecay batches; here 64.1026; ends with .0025
@@ -293,16 +274,11 @@ for iterI = 1:nIter
 %         densityPlotTmp(densityPlotTmp==0) = nan; %for circ, and prob trapz, to ignore points not in the shape - do this above now; for actNorm already does it by dividing by 0
 
         % smoothing that deals with nans 8/8/18
-        imageFilter           = fspecial('gaussian',5,gaussSmooth); %this is default for imgaussfilt
         densityPlotSm         = nanconv(densityPlotTmp,imageFilter, 'nanout');
         densityPlotActNormTmp = densityPlotAct./densityPlotActUpd; %divide by number of times that location was visited
         
-%         if actOverTime %maybe add this?
-%             densityPlotActNormTmp = imgaussfilt(densityPlotActNormTmp,gaussSmooth); %smooth - new 20/7/18 rob after annEps learning over time doesnt work so well..
-            % deals with nans    
-            imageFilter=fspecial('gaussian',5,gaussSmooth); %this is default for imgaussfilt
-            densityPlotActNormTmp = nanconv(densityPlotActNormTmp,imageFilter, 'nanout');
-%         end
+%         densityPlotActNormTmp = imgaussfilt(densityPlotActNormTmp,gaussSmooth);
+         densityPlotActNormTmp = nanconv(densityPlotActNormTmp,imageFilter, 'nanout');
 %%%%%%%%%%%%%%%
          % IF COMPUTING GRIDNESS FOR ACT ITSELF
 %         densityPlotAct(densityPlotAct==0) =  nan; %for circ, and prob trapz, to ignore points not in the shape - if computing this at all (atm not)

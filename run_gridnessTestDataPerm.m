@@ -44,8 +44,6 @@ nIter=1000;
 
 
 
-
-
 %circ - love01 - circ perm - perm1-5 - not yet
 % clus2run = [22, 24]; %16
 % clus2run = [15, 11]; %14
@@ -74,11 +72,11 @@ clus2run = [12, 14, 22, 25, 16, 27, 28, 29, 19]; %running; %19 - might not be do
 
 %new correct trapKrupic scaled right
 %love06
-clus2run = [14, 15, 23, 20, 24, 18, 25];
-clus2run = [16, 22, 27, 26, 29, 30]; 
+clus2run = [14, 15, 23, 20, 24, 18, 25, 11, 21];
+clus2run = [16, 22, 27, 26, 29, 30, 19, 28]; 
 %love01
-clus2run = [13, 21, 19, 10]; 
-% clus2run = [28, 17, 11, 12]; 
+clus2run = [13, 10]; 
+% clus2run = [17, 12]; 
 
 
 % clus2run = 11;
