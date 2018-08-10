@@ -105,21 +105,9 @@ if ~useSameTrls && ~jointTrls
     trials=shapePts(trialInd,:);
 elseif ~useSameTrls && jointTrls  %joined trials
     %move step sizes - possible step sizes; if larger, e.g. double, then need bigger steps?
-%     selStepSiz = [-stepSize*5,-stepSize*3,-stepSize,0,stepSize,stepSize*3,stepSize*5].*boxSize;
-%     selStepSiz = [-stepSize*3,-stepSize*2,-stepSize,0,stepSize,stepSize*2,stepSize*3].*boxSize;
-%     selStepSiz = [-stepSize*2,-stepSize,0,stepSize,stepSize*2].*boxSize; % too slow to explore
-%     selStepSiz = [-stepSize*3,-stepSize*2,-stepSize,-stepSize,-stepSize,0,stepSize,stepSize,stepSize,stepSize*2,stepSize*3].*boxSize;
-%     selStepSiz = [-stepSize*3,-stepSize*2,-stepSize*2,-stepSize,-stepSize,-stepSize,0,stepSize,stepSize,stepSize,stepSize*2,stepSize*2,stepSize*3].*boxSize;
-%     selStepSiz = [-stepSize*2,-stepSize*2,-stepSize,-stepSize,-stepSize,0,stepSize,stepSize,stepSize,stepSize*2,stepSize*2].*boxSize;
-%     selStepSiz = [-stepSize*3,-stepSize,-stepSize,0,stepSize,stepSize,stepSize*3].*boxSize;
-%     selStepSiz = [-stepSize*3,-stepSize*2,-stepSize,-stepSize,0,stepSize,stepSize,stepSize*2,stepSize*3].*boxSize;
-
-
-%     selStepSiz = [-stepSize*4,-stepSize*3,-stepSize*2,-stepSize,-stepSize,0,stepSize,stepSize,stepSize*2,stepSize*3,stepSize*4].*boxSize;
     
     selStepSiz = [-stepSize*4,-stepSize*2,-stepSize,-stepSize,0,stepSize,stepSize,stepSize*2,stepSize*4]; %stepSiz
 %     selStepSiz = [-stepSize*4,-stepSize*3,-stepSize*2,-stepSize,0,stepSize,stepSize*2,stepSize*3,stepSize*4].*boxSize;% stepSiz1
-
 %     selStepSiz = [-stepSize*4,-stepSize*2,-stepSize,-stepSize,0,0,0,stepSize,stepSize,stepSize*2,stepSize*4].*boxSize; %new; stay more - maybe stepSizLR2 if try
     
     % select points trial by trial, if not in shape go back into the shape
@@ -161,11 +149,8 @@ elseif ~useSameTrls && jointTrls  %joined trials
         
         %trapz - left right don't make too big steps - since height is more than
         %double the width
-        if strcmp(dat(1:6),'trapzK')
+        if strcmp(dat(1:6),'trapzK') %trapzKfrmSq as well
             selStepSizLR = [-stepSize,-stepSize,0,0,0,stepSize,stepSize]; %stepSizLR - combined with stepSiz
-%         elseif strcmp(dat(1:6),'trapzS') %for now, trapzScaled1
-%             %trapzScaled1 - larger LR dim
-%             selStepSizLR = [-stepSize*2,-stepSize,-stepSize,0,0,0,stepSize,stepSize*2]; %stepSizLR - combined with stepSiz
         end
         
         locRangeX = [min(trapX), max(trapX)];

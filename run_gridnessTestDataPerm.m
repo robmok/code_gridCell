@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -15,7 +15,7 @@ locRange = [0 49];
 nTrialsTest = 100000; % orig nTrials/10
 dat = 'circ';
 % dat = 'square';
-% dat = 'trapzKfrmSq1'; % load covering map on sq, then run it on trapz; then assess gridness in trapz
+dat = 'trapzKfrmSq1'; % load covering map on sq, then run it on trapz; then assess gridness in trapz
 
 saveDat=1;
 
@@ -31,62 +31,55 @@ if annEps %new
 end
 
 nIter=200;
-% nIter=1000;
+nIter=1000;
 
 %%%%%%%
 % new fixed perm - 200iters
 % annEps 
 
-% sq - done
-clus2run = [16, 22, 24, 14, 13];
-clus2run = [25, 11, 21, 12]; 
-clus2run = [27, 10, 17, 29];
 
-%circ - love01 - done
-% clus2run = [19, 20];
-% clus2run = [26, 28];
-% clus2run = [23, 25];
-%sq
-% clus2run = [18, 26];
-% clus2run = [30, 15];
+%circ - to run
 
-%circ missed 29 - running on love06
-clus2run=29;
 
-%circ - love01 - perm1-5 - done
+
+
+
+
+
+%circ - love01 - circ perm - perm1-5 - not yet
 % clus2run = [22, 24]; %16
 % clus2run = [15, 11]; %14
 % clus2run = [21, 12]; %27
 % clus2run = [10, 17]; %13
 % clus2run = [29, 30]; %18
 
-% sq - love01 - perm6 - running
-% clus2run = [20, 28, 23]; %19
-
-
 
 %%%%
 % 1k iters, sq/circ annEps, batchSiz=200, no perm 
-%sq - done
-% clus2run = [16, 22, 24, 14, 15, 27, 19, 13, 10, 17, 18];
-% clus2run = [11, 21, 12, 30, 25, 28, 20, 29, 23, 26]; 
+%circ - love01 - new re-running
+%run these first (since done)
+% clus2run = [10, 13, 18, 20, 23, 30, 24, 21]; %done
+clus2run = [12, 14, 22, 25, 16, 27, 28, 29, 19]; %running; %19 - might not be done yet
 
-%circ - love01 - done
-% clus2run = [16, 22, 24, 14, 15, 27];
-% clus2run = [11, 21, 12, 30, 25]; 
-% clus2run = [13, 10, 17, 18, 29];
-% clus2run = [19, 20, 26, 28, 23];
+% still to run circ:
+% clus2run = [15,26,11,17]; %still running on love01
+
 
 
 %%%%%
-% sq2trapz 1kiters - done
+% sq2trapz 1kiters 
 % clus2run = [14, 15, 23,  20, 24, 16,  22, 27, 26,  13, 30, 29,  25, 17, 21, 12, 19, 28, 11, 10, 18]; %all
 % clus2run = [14, 15, 23,  20, 24, 18, 16, 22, 27, 26, 19]; %half - 
 % clus2run = [13, 30, 29,  25, 10, 28, 17, 11, 21, 12]; %half - 
-% clus2run = [14, 15, 23, 20, 24, 18]; %quarter
-% clus2run = [16, 22, 27, 26, 19]; 
-% clus2run = [13, 30, 29, 25, 10]; 
-% clus2run = [28, 17, 11, 21, 12]; 
+
+%new correct trapKrupic scaled right
+%love06
+clus2run = [14, 15, 23, 20, 24, 18, 25];
+clus2run = [16, 22, 27, 26, 29, 30]; 
+%love01
+clus2run = [13, 21, 19, 10]; 
+% clus2run = [28, 17, 11, 12]; 
+
 
 % clus2run = 11;
 

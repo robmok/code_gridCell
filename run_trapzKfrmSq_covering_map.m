@@ -5,7 +5,7 @@ clear all;
 
 wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -50,7 +50,7 @@ epsMuTrapz = 0.0025;
 % epsMuTrapz = 0.005; %new 
 % epsMuTrapz = 0.003; %new 
 
-%love01 - correct trapzKrupic scale now 
+%love01 - correct trapzKrupic scale now - done
 
 %*** NEXT could also try nTrials/2?
 
