@@ -16,11 +16,11 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
 % dat = 'square';   
-dat = 'trapzKrupic';
+% dat = 'trapzKrupic';
 % dat = 'catLearn';
 
 %compute activation and densityPlotActNorm over time? takes longer
-actOverTime = 0; 
+actOverTime = 1; 
 
 %annealed learning rate
 annEps = 1; %1 or 0
@@ -51,9 +51,21 @@ clus2run = [12, 15];
 % clus2run = [25, 17];
 
 
+%circ 200 iters, with actOverTime
+
+%love06
+clus2run = [10, 13, 16, 19, 28, 29, 18, 27, 30];
+% clus2run = []; % add to this if other things finish before above finished  
+
+%love01 - c5-8
+clus2run = [15, 23, 12];
+% clus2run = [14, 26, 21];
+% clus2run = [22, 11, 24];
+% clus2run = [25, 17, 20];
+
 
 %try new trapzKrupic - 200 iters, - check if get results as
-%expected
+%expected - no
 %love06 - annEps - NB - 0.25 to 0.005 (edited the annEps delay param
 %love01 - try no annEps
 % clus2run = [12 16];
@@ -62,7 +74,7 @@ clus2run = [12, 15];
 % clus2run = [23, 14];
 
 %test
-clus2run=18;
+% clus2run=18;
 
 % nTrials
 if ~strcmp(dat(1:3),'cat')
@@ -126,9 +138,9 @@ else
 end
 
 %%
-saveDat=0; %save simulations
+saveDat=1; %save simulations
 
-nIter=1000;%1000; %200 for covering map over time, 20 for cat; 1k for covering map new
+nIter=200;%1000; %200 for covering map over time, 20 for cat; 1k for covering map new
 
 if useSameTrls
     trials=[]; trialsUnique=[];

@@ -112,7 +112,6 @@ for iClus2run = 1:length(clus2run)
                         fname = [fname '_annEps'];
                     end
                     cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
-%                     save(fname,'densityPlot','densityPlotActNorm','gA','gW','gA_actNorm','gW_actNorm','rSeed','timeTaken');
                     save(fname,'densityPlot','gA','gW','rSeed','timeTaken');
                     clear densityPlot gA gW
                 end
