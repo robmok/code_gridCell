@@ -68,10 +68,10 @@ clus2run = [15, 23];
 %circ - love01 - new re-running
 %run these first (since done)
 % clus2run = [10, 13, 18, 20, 23, 30, 24, 21]; %done
-clus2run = [12, 14, 22, 25, 16, 27, 28, 29]; %done
+%clus2run = [12, 14, 22, 25, 16, 27, 28, 29]; %done
 
 % still to run circ:
-clus2run = [19, 15,26,11,17]; %love06
+%clus2run = [19, 15,26,11,17]; %love06
 
 %%%%%
 % sq2trapz 1kiters 
