@@ -53,12 +53,12 @@ clus2run = [12, 15];
 
 %circ 200 iters, with actOverTime
 
-%love06
-clus2run = [10, 13, 16, 19, 28, 29, 18, 27, 30];
-% clus2run = []; % add to this if other things finish before above finished  
+%love06 - runing
+clus2run = [10, 13, 16, 19, 27];
+clus2run = [28, 29, 18, 30];
 
-%love01 - c5-8
-clus2run = [15, 23, 12];
+%love01 - c5-8; running
+% clus2run = [15, 23, 12];
 % clus2run = [14, 26, 21];
 % clus2run = [22, 11, 24];
 % clus2run = [25, 17, 20];

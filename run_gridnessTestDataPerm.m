@@ -15,7 +15,7 @@ locRange = [0 49];
 nTrialsTest = 100000; % orig nTrials/10
 dat = 'circ';
 % dat = 'square';
-dat = 'trapzKfrmSq1'; % load covering map on sq, then run it on trapz; then assess gridness in trapz
+% dat = 'trapzKfrmSq1'; % load covering map on sq, then run it on trapz; then assess gridness in trapz
 
 saveDat=1;
 
@@ -31,7 +31,7 @@ if annEps %new
 end
 
 nIter=200;
-nIter=1000;
+% nIter=1000;
 
 %%%%%%%
 % new fixed perm - 200iters
@@ -39,6 +39,17 @@ nIter=1000;
 
 
 %circ - to run
+%love06
+
+clus2run = [10, 13, 16, 19, 27, 21];
+clus2run = [28, 29, 18, 30, 12, 24, 20];
+
+%love01 - perm1-4
+clus2run = [15, 23];
+% clus2run = [14, 26];
+% clus2run = [22, 11];
+% clus2run = [25, 17];
+
 
 
 
@@ -57,12 +68,10 @@ nIter=1000;
 %circ - love01 - new re-running
 %run these first (since done)
 % clus2run = [10, 13, 18, 20, 23, 30, 24, 21]; %done
-clus2run = [12, 14, 22, 25, 16, 27, 28, 29, 19]; %running; %19 - might not be done yet
+clus2run = [12, 14, 22, 25, 16, 27, 28, 29]; %done
 
 % still to run circ:
-% clus2run = [15,26,11,17]; %still running on love01
-
-
+clus2run = [19, 15,26,11,17]; %love06
 
 %%%%%
 % sq2trapz 1kiters 
@@ -72,10 +81,10 @@ clus2run = [12, 14, 22, 25, 16, 27, 28, 29, 19]; %running; %19 - might not be do
 
 %new correct trapKrupic scaled right
 %love06
-clus2run = [14, 15, 23, 20, 24, 18, 25, 11, 21];
-clus2run = [16, 22, 27, 26, 29, 30, 19, 28]; 
-%love01
-clus2run = [13, 10]; 
+% clus2run = [14, 15, 23, 20, 24, 18, 25, 11, 21];
+% clus2run = [16, 22, 27, 26, 29, 30, 19, 28]; 
+% %love01
+% clus2run = [13, 10]; 
 % clus2run = [17, 12]; 
 
 
