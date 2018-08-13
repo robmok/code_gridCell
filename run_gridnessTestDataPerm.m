@@ -40,27 +40,21 @@ nIter=200;
 
 %circ - to run
 %love06
+clus2run = [10, 13, 24, 19, 27];
+clus2run = [28, 29, 30, 12];
 
-clus2run = [10, 13, 16, 19, 27, 21];
-clus2run = [28, 29, 18, 30, 12, 24, 20];
-
-%love01 - perm1-4
-clus2run = [15, 23];
+%love01 - perm1-4 - done
+% clus2run = [15, 23];
 % clus2run = [14, 26];
 % clus2run = [22, 11];
 % clus2run = [25, 17];
 
+%love01 - perm1-4 - new
+clus2run = 16;
+% clus2run = 21;
+% clus2run = 18;
+% clus2run = 20;
 
-
-
-
-
-%circ - love01 - circ perm - perm1-5 - not yet
-% clus2run = [22, 24]; %16
-% clus2run = [15, 11]; %14
-% clus2run = [21, 12]; %27
-% clus2run = [10, 17]; %13
-% clus2run = [29, 30]; %18
 
 
 %%%%
@@ -74,18 +68,10 @@ clus2run = [15, 23];
 %clus2run = [19, 15,26,11,17]; %love06
 
 %%%%%
-% sq2trapz 1kiters 
+% sq2trapz 1kiters - now running /2 trials
 % clus2run = [14, 15, 23,  20, 24, 16,  22, 27, 26,  13, 30, 29,  25, 17, 21, 12, 19, 28, 11, 10, 18]; %all
 % clus2run = [14, 15, 23,  20, 24, 18, 16, 22, 27, 26, 19]; %half - 
 % clus2run = [13, 30, 29,  25, 10, 28, 17, 11, 21, 12]; %half - 
-
-%new correct trapKrupic scaled right
-%love06
-% clus2run = [14, 15, 23, 20, 24, 18, 25, 11, 21];
-% clus2run = [16, 22, 27, 26, 29, 30, 19, 28]; 
-% %love01
-% clus2run = [13, 10]; 
-% clus2run = [17, 12]; 
 
 
 % clus2run = 11;
@@ -95,6 +81,7 @@ jointTrls=1; %for test trials
 % if trapKfrmSq1
 if strcmp(dat,'trapzKfrmSq1')
     nTrials=1000000/4; %/2 or /4
+    nTrials=1000000/2;
     epsMuTrapz10 = 25; % using this
 %     epsMuTrapz10 = 50; % anEps - 20%
 %     epsMuTrapz10 = 30; % anEps -

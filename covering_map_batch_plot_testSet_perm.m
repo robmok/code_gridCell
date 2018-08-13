@@ -18,10 +18,10 @@ gaussSmooth = 1;
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-dat='square';
+% dat='square';
 compareCircSq = 0; %if compare circ-sq gridness, dat=circ, but load sq too
 
-dat='trapzKfrmSq1';
+% dat='trapzKfrmSq1';
 
 % annEps=0;
 boxSize=1;

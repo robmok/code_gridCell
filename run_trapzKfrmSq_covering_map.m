@@ -39,6 +39,10 @@ jointTrls=1;
 
 % trapz sims here
 nTrials2 = nTrials/4; %/2, /4?
+
+nTrials2 = nTrials/2; %trying this 
+
+
 % nBatches = 2500;
 nBatches = 5000;%new
 batchSizeVals = nTrials./nBatches; %match original batchsize values (nTrials being original nTrials)
@@ -55,9 +59,9 @@ epsMuTrapz = 0.0025;
 %*** NEXT could also try nTrials/2?
 
 clus2run = [13, 15, 12, 20, 11, 18];  
-% clus2run = [22, 27, 26, 19, 14]; 
-% clus2run = [25, 10, 17, 24, 21]; 
-% clus2run = [16, 29, 28, 30, 23]; 
+clus2run = [22, 27, 26, 19, 14]; 
+clus2run = [25, 10, 17, 24, 21]; 
+clus2run = [16, 29, 28, 30, 23]; 
 
 %testing
 % clus2run = 13;
