@@ -2,7 +2,7 @@ clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-wd='/home/robmok/Documents/Grid_cell_model'; %on love01
+% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 
@@ -39,53 +39,37 @@ nIter=200;
 
 
 %circ - to run
-%love06
-clus2run = [10, 13, 24, 19, 27];
-clus2run = [28, 29, 30, 12];
-
-%love01 - perm1-4 - done
-% clus2run = [15, 23];
-% clus2run = [14, 26];
-% clus2run = [22, 11];
-% clus2run = [25, 17];
-
-%love01 - perm1-4 - new
-clus2run = 16;
-% clus2run = 21;
-% clus2run = 18;
-% clus2run = 20;
-
-
+%love06 - running
+% clus2run = [12,24]; %10, 13,
+% clus2run = [ 30]; % 28, 29,
+clus2run = 20; % missed
 
 %%%%
 % 1k iters, sq/circ annEps, batchSiz=200, no perm 
-%circ - love01 - new re-running
-%run these first (since done)
+%circ - love01 - 
 % clus2run = [10, 13, 18, 20, 23, 30, 24, 21]; %done
 %clus2run = [12, 14, 22, 25, 16, 27, 28, 29]; %done
 
-% still to run circ:
-%clus2run = [19, 15,26,11,17]; %love06
 
 %%%%%
-% sq2trapz 1kiters - now running /2 trials
+% sq2trapz 1kiters - re running /4
 % clus2run = [14, 15, 23,  20, 24, 16,  22, 27, 26,  13, 30, 29,  25, 17, 21, 12, 19, 28, 11, 10, 18]; %all
 % clus2run = [14, 15, 23,  20, 24, 18, 16, 22, 27, 26, 19]; %half - 
 % clus2run = [13, 30, 29,  25, 10, 28, 17, 11, 21, 12]; %half - 
 
-
-% clus2run = 11;
+% clus2run = [14, 15, 23, 20, 24, 18]; quarter
+% clus2run = [16, 22, 27, 26, 19]; 
+% clus2run = [13, 30, 21, 25, 10]; 
+% clus2run = [17, 11, 29, 28, 12]; 
 
 jointTrls=1; %for test trials
 
 % if trapKfrmSq1
 if strcmp(dat,'trapzKfrmSq1')
     nTrials=1000000/4; %/2 or /4
-    nTrials=1000000/2;
+%     nTrials=1000000/2;
     epsMuTrapz10 = 25; % using this
 %     epsMuTrapz10 = 50; % anEps - 20%
-%     epsMuTrapz10 = 30; % anEps -
-    % epsMuTrapz10 = 15;  %
 end
 
 

@@ -87,8 +87,8 @@ if strcmp(dat(1:4),'trap') && length(dat)>10
 %     hRight = 30;
 
 %new correct trapzKrupic scale
-    hLeft=12;
-    hRight=27;
+    hLeft=17;% 12;
+    hRight=33;% - 33 = start from 18 from left % 27;
     
 else
     b=length(spacing);

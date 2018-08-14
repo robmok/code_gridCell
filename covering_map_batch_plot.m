@@ -19,7 +19,7 @@ nSet        = 21; %was 22 now 21
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
-dat='square';
+% dat='square';
 % annEps=0;
 boxSize=1;
 % nIter=200;
@@ -152,17 +152,17 @@ rHex=0; %if choose raw 60deg corr values, not gridness
 
 
 %new trapzKrupic dimensions
-dat='trapzKrupic';
-nTrials=1000000;
-epsMuVals = 0.25; %use this one
-batchSizeVals = 400;
-annEps=1;
-nIter=200;
+% dat='trapzKrupic';
+% nTrials=1000000;
+% epsMuVals = 0.25; %use this one
+% batchSizeVals = 400;
+% annEps=1;
+% nIter=200;
 
 % annEps=0;
 % epsMuVals = 0.025;
 
-clus2run  = [10, 12, 14, 16, 18, 20, 23, 25]; 
+% clus2run  = [10, 12, 14, 16, 18, 20, 23, 25]; 
 
 
 %load loop

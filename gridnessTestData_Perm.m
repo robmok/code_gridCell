@@ -42,8 +42,8 @@ if strcmp(dat(1:4),'trap') && length(dat)>10
 %     hLeft = 20;
 %     hRight = 30;
     %new correct trapzKrupic scale
-    hLeft=12;
-    hRight=27;
+    hLeft=17;% 12;
+    hRight=33;% - 33 = start from 18 from left % 27;
 else
     b=length(spacing);
     h=length(spacing);
@@ -156,7 +156,7 @@ for iterI=1:nIters2run
             gW_act(iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
             
             %right half of box
-            aCorrMap = ndautoCORR(densityPlotActTmp(:,h-hRight:end));
+            aCorrMap = ndautoCORR(densityPlotActTmp(:,h-hRight+1:end));
             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
             gA_act(iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
             [g,gdataA] = gridSCORE(aCorrMap,'wills',0);
@@ -170,7 +170,7 @@ for iterI=1:nIters2run
             gW_actNorm(iterI,:,2) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
             
             %right half of box
-            aCorrMap = ndautoCORR(densityPlotActNormTmp(:,h-hRight:end));
+            aCorrMap = ndautoCORR(densityPlotActNormTmp(:,h-hRight+1:end));
             [g,gdataA] = gridSCORE(aCorrMap,'allen',0);
             gA_actNorm(iterI,:,3) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
             [g,gdataA] = gridSCORE(aCorrMap,'wills',0);

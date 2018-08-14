@@ -53,13 +53,11 @@ if strcmp(dat(1:4),'trap')
     loadPerm=0;
 end
 
-
-
 % clus2run = [3:26]; 
 % clus2run = [3:30]; 
 % clus2run = [3:26]; 
+% clus2run = [10:19 21:30];
 clus2run = 10:30;
-% clus2run = [11:17, 19:29]; %CIRC waiting to finish
 
 % batchSizeVals = 400; %100, 125, 200,400, 1000
 % batchSizeVals = 200;
@@ -534,7 +532,7 @@ if ~strcmp(dat,'trapzKfrmSq1')
             ciClusSig(cnter)=0;
         end
     end
-    fprintf('%s, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f];  %d sig > 0, out of %d sig conds. %0.2f percent\n',dat,clus2plot(1)+2,clus2plot(end)+2,nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
+    fprintf('%s, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f];  %d sig > 0, out of %d sig conds. %0.2f percent\n',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
     
 else
     %trapz 
@@ -562,7 +560,7 @@ else
             ciClusSig(cnter)=0;
         end
     end
-    fprintf('trapz, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f];  %d sig > 0, out of %d sig conds. %0.2f percent\n',clus2plot(1)+2,clus2plot(end)+2,nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
+    fprintf('trapz, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f];  %d sig > 0, out of %d sig conds. %0.2f percent\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
     dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,2));
     ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs 
     fprintf('trapzL %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2plot(1)+2,clus2plot(end)+2,nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2));
@@ -664,8 +662,10 @@ clus2plot = [10, 12, 18, 20, 23, 25, 28]-9;
 
 
 %trapz
-% clus2plot = [12, 20, 23, 25, 28]-9;
+% clus2plot = [12, 18, 20, 25, 28]-9; %23
 % clus2plot = [18, 19, 20, 23]-9;
+
+clus2plot = [25]-9; %testing
 
 
 % clus2plot = (3:5)-2;
@@ -677,7 +677,7 @@ myColorMap(end,:) = 1;
 
 for iClus = clus2plot%:length(clus2run)
 for iBvals = 1:length(batchSizeVals)
-    for iterI = 11:20%:20%nIter
+    for iterI = 15%nIter
         switch clusPosAct
             case 'act'
                 densityPlotCentresSm = densityPlotActAll(:,:,iterI,iEps,iBvals,iClus);
@@ -693,6 +693,7 @@ for iBvals = 1:length(batchSizeVals)
                 zlims=[0,.085];
                 if strcmp(dat(1:2),'ci') || strcmp(dat(1:2),'tr') 
                 zlims=[0,.085];
+%                 zlims=[0,.0885];
                 elseif strcmp(dat(1:2),'sq')
                 zlims=[0,.085];
                 end
@@ -737,7 +738,8 @@ for iBvals = 1:length(batchSizeVals)
         end
         
         if strcmp(dat(1:4),'trap')
-            h=50; hLeft = 20; hRight = 30;
+%             h=50; hLeft = 20; hRight = 30;
+            hLeft=17; hRight=33;% - 33 = start from 18 from left
             aCorrMap = ndautoCORR(densityPlotCentresSm(:,1:hLeft));
             [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
             %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
@@ -880,7 +882,7 @@ end
 
 %% trapz vs orig sq gridness / circ vs sq
 
-savePlots=0;
+savePlots=1;
 
 clusPosAct = 'actNorm'; %'act' or 'actNorm'
 
@@ -1006,9 +1008,9 @@ if computeCIs
     
     ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs
     if strcmp(dat(1:4),'trap')
-        fprintf('Square-Trapezoid box, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig Square-Trapezoid, %d sig Trapezoid-Square , %0.2f percent Sq>T\n',clus2plot(1)+2,clus2plot(end)+2,mean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig==-1),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
+        fprintf('Square-Trapezoid box, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig Square-Trapezoid, %d sig Trapezoid-Square , %0.2f percent Sq>T\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),mean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig==-1),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
     elseif strcmp(dat(1:4),'circ')
-        fprintf('Circ-Square box, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig Circ-Square, %d sig Square-Circ, %0.2f percent C>Sq\n',clus2plot(1)+2,clus2plot(end)+2,mean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig==-1),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
+        fprintf('Circ-Square box, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig Circ-Square, %d sig Square-Circ, %0.2f percent C>Sq\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),mean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig==-1),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
     end
 end
 
