@@ -15,7 +15,6 @@ gaussSmooth = 1;
 imageFilter = fspecial('gaussian',5,gaussSmooth); %this is default for imgaussfilt
 
 % load
-nSet        = 21; %was 22 now 21
 fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
@@ -119,15 +118,20 @@ jointTrls=1;
 %200 iters orig
 nIter=200;
 actOverTime = 1;
+nSet        = 21; %was 22 now 21
+
 % clus2run = 3:30;
 
 % % %1000 iters
-% nIter=1000;
-% actOverTime = 0;
+nIter=1000;
 % nSet = 1;
 % clus2run = 3:30;
 % clus2run = [10, 12:26]; 
 
+if nIter == 1000
+   actOverTime = 0;
+   nSet        = 1;
+end
 
 %new - annealed learning rate
 % clus2run  = 3:30;
@@ -750,15 +754,12 @@ end
 iSet=size(datTmp,1); %last or second last (add -1)
 iEps=1;
 
-% clus2plot=(3:26)-2;
-% clus2plot=(6:26)-2;
-
 clus2plot = 1:length(clus2run);
 % clus2plot=(6:30)-2;
 % clus2plot=(10:30)-2;
 % clus2plot=(10:26)-2;
 
-iBatchVals=1; %'medium' one
+iBatchVals=1; 
 
 %fig specs
 xTickLabs = num2cell(clus2run(clus2plot));
@@ -796,7 +797,6 @@ figure; hold on;
         end        
         set(gca,'FontSize',fontSiz,'fontname','Arial')
     end
-    
     fname = [figsDir sprintf('/gridness_%s_univarScatters_trainSetEnd_nClus%d-%d_eps%d_nIter%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,nIter,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
 if savePlots
    set(gcf,'Renderer','painters');
@@ -873,7 +873,7 @@ end
 
 %% Making figs: plot over sets
 
-savePlots = 1;
+savePlots = 0;
 
 plotSubPlots = 0;
 
@@ -1047,45 +1047,56 @@ clusPosAct = 'actNorm'; %'clus' or 'actNorm'
 gridMsrType = 'a';
 
 % clus2plot = [5,8,13,18];%[7,10,12,25]
-clus2plot = ([10,11,12,18,20,23,25,28])-2;
+% clus2plot = ([10,11,12,18,20,23,25,28])-2;
+clus2plot = ([10,11,12,18,20,23,25,28])-9;
+clus2plot = (18)-9;
 
 % iSet=1;
 % iSet=10;
 iSet=size(densityPlotActNormAll,3);
 
+myColorMap = parula;
+myColorMap(end,:) = 1;
+
+%add zlims, aCorr lims
+% zlims = [];
+
+
 
 for iClus = clus2plot%:length(clus2run)
 for iBvals = 1:length(batchSizeVals)
     for iterI = 1%:5%nIter
-%         densityPlotCentresSm = imgaussfilt(densityPlotAll(:,:,iSet,iterI,iEps,iBvals,iClus),gaussSmooth);
         
         densityPlotCentresSm = densityPlotActNormAll(:,:,iSet,iterI,iEps,iBvals,iClus);
 %         densityPlotCentresSm(isnan(densityPlotCentresSm))=0;
-                
         aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram        
+        
+        densityPlotCentresSm(isnan(densityPlotCentresSm))=1.1;
+        aCorrMap(isnan(aCorrMap))=1.1;
+        
         
         [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
 %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
-        
-        if strcmp(dat,'trapz')
-            aCorrMap = ndautoCORR(densityPlotCentresSm(:,1:size(densityPlotAll,1)/2));
-            [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
-            %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
-            aCorrMap = ndautoCORR(densityPlotCentresSm(:,size(densityPlotAll,1)/2+1:end));
-            [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
-            %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
-        end
-        
-        figure; imagesc(densityPlotCentresSm);
+
+% if strcmp(dat,'trapz')
+%             aCorrMap = ndautoCORR(densityPlotCentresSm(:,1:size(densityPlotAll,1)/2));
+%             [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
+%             %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
+%             aCorrMap = ndautoCORR(densityPlotCentresSm(:,size(densityPlotAll,1)/2+1:end));
+%             [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
+%             %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
+%         end
+%         
+        figure; imagesc(densityPlotCentresSm); colormap(myColorMap);
         xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
         fname = [figsDir sprintf('/densityPlot_%s_nClus%d_eps%d_batchSiz%d_%s_%s_iter%d_set%d_clusters',dat,iClus+2,epsMuVals(iEps)*1000,batchSizeVals(iBvals),clusPosAct,gridMsrType,iterI,iSet)];
         if savePlots
-        %     set(gcf,'Renderer','painters');
-        %     print(gcf,'-depsc2',fname)
+            set(gcf,'Renderer','painters');
+            print(gcf,'-depsc2',fname)
             saveas(gcf,fname,'png');
            close all
         end
-        figure; imagesc(aCorrMap,[-.7,.7]);
+        figure; imagesc(aCorrMap,[-.7,.7]); colormap(myColorMap);
         title(sprintf('Grid Score %.2f',g));
         set(gca,'FontSize',fontSiz,'fontname','Arial')
         xticks([]); xticklabels({''}); yticks([]); yticklabels({''});

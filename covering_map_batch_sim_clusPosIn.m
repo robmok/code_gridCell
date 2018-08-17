@@ -109,7 +109,7 @@ for iterI = 1:nIter
     
     fprintf('iter %d \n',iterI);
     catsInfo =[];
-    [trials,~, rSeed(iterI),ntInSq] = createTrls(dat,nTrials,locRange,0,jointTrls,1,catsInfo);
+    [trials,~, rSeed(iterI),ntInSq] = createTrls(dat,nTrials,locRange,0,jointTrls,catsInfo);
 
     %initialise each cluster location - at learned positions
     mu = nan(nClus,2,nBatch+1);

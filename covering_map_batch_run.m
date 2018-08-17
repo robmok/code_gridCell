@@ -31,13 +31,12 @@ boxSize = 1; % 1=normal, 2=double size, 3=triple size
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
 catsInfo.nCats=2; %2 categories
 % % variance - isotropic % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
-% sigmaG = [3 0; 0 3];% sigmaG = [5 0; 0 5];
-sigmaG = [7 0; 0 7];
+sigmaG = [7 0; 0 7]; %3, 5
 catsInfo.R=chol(sigmaG);
-catsInfo.msExample = 1; %2 gaussians in opposite sides of the square - example used for ms
+catsInfo.msExample = 1; % set 2 gaussians in opposite sides of the square - example for ms
 
 % annEps new - v3 (epsMuOrig=0.25)- 1000iter, noActOverTime
-%re-running (circ first, sq need?) without smoothing in nans
+%re-running (circ first, sq need?) without smoothing in nans - done
 %love06 -circ
 clus2run = [10, 13, 16, 19]; %12, 15,
 clus2run = [18, 20, 27]; %14, 26, 
@@ -50,31 +49,17 @@ clus2run = [12, 15];
 % clus2run = [22, 11];
 % clus2run = [25, 17];
 
-
 %circ 200 iters, with actOverTime
-
-%love06 - runing
-clus2run = [10, 13, 16, 19, 27];
-clus2run = [28, 29, 18, 30];
-
-%love01 - c5-8; running
-% clus2run = [15, 23, 12];
-% clus2run = [14, 26, 21];
-% clus2run = [22, 11, 24];
-% clus2run = [25, 17, 20];
 
 
 %try new trapzKrupic - 200 iters, - check if get results as
-%expected - no
-%love06 - annEps - NB - 0.25 to 0.005 (edited the annEps delay param
+%expected - no; try again? correct size here?
+%love06 - annEps -
 %love01 - try no annEps
 % clus2run = [12 16];
 % clus2run = [18, 25];
 % clus2run = [20, 10];
 % clus2run = [23, 14];
-
-%test
-% clus2run=18;
 
 % nTrials
 if ~strcmp(dat(1:3),'cat')
@@ -84,30 +69,21 @@ else
 end
 
 %batch size
-fixBatchSize = 1; %fixed
-
-if fixBatchSize
 %     nBatches = [1000, 5000, 8000, 2500, 10000]; %tried in the past
-    nBatches = 2500; % batchSiz=400
-    nBatches = 5000; % using this now batchSiz=200
-    if strcmp(dat(1:3),'cat')
-        nBatches = nBatches.*2;
-    end
-    batchSizeVals = nTrials./nBatches;
-    nBvals = length(batchSizeVals);
-else % define batch size based on average number of updates per cluster
-    avgBatchUpdate = [1, 2, 5]; % avgBatchUpdate = 25;
-    nBvals = length(avgBatchUpdate);
+nBatches = 2500; % batchSiz=400
+nBatches = 5000; % using this now batchSiz=200
+if strcmp(dat(1:3),'cat')
+    nBatches = nBatches.*2;
 end
+batchSizeVals = nTrials./nBatches;
+nBvals = length(batchSizeVals);
 
 % parameters
 % epsMuVals=[.01, .05, .075, .1, .2, .3];% %learning rate / starting learning rate 
 epsMuVals = 0.025; %using this
 % epsMuVals = 0.015; 
 if annEps
-%     epsMuVals = 0.1; %new
-%     epsMuVals = 0.15; %new 2
-    epsMuVals = 0.25; %new 3 - using this now
+    epsMuVals = 0.25; % using this now
 end
 
 % use the same training data (trials) across current sims or gen new data
@@ -117,14 +93,6 @@ useSameTrls=0;
 nSteps = 50; %to define spacing beween each loc in box
 locRange = [0, nSteps-1]; %[-1, 1]; % from locRange(1) to locRange(2)
 stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %smallest diff between locs
-
-if boxSize==1.5
-    locRange(2)= ceil(locRange(2)*1.5);
-elseif boxSize==2 %double
-    locRange(2)= locRange(2)*2;
-elseif boxSize==3 %triple
-    locRange(2)= locRange(2)*3;
-end
 
 %stochastic update - not used now
 stoch = 0; %1 or 0
@@ -162,22 +130,16 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
             end
             c1=round(c.*100000); % for saving file name
         for iBvals = 1:nBvals
-            if fixBatchSize
-                batchSize = batchSizeVals(iBvals); %fixed batch size
-                fprintf('Running %s, nClus=%d, epsMu=%d, c=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000,c1, batchSize)
-                fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm',nClus,round(nTrials/1000),epsMuOrig1000,round(batchSize),nIter,dat)];
-            else % define batch size based on average number of updates per cluster 
-%                 batchSize = clus2run(iClus2run).*avgBatchUpdate(iBvals); % batch size depends on average updates per cluster (depends on nClus cond)
-%                 fprintf('Running %s, nClus=%d, epsMu=%d, avgBatchUpd=%d; batchSize=%d\n',dat,nClus,epsMuOrig1000,avgBatchUpdate(iBvals),batchSize)
-%                 fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_avgBatch%d_batchSiz%d_%diters',nClus,round(nTrials/1000),epsMuOrig1000,round(avgBatchUpdate(iBvals)),round(batchSize),nIter)];
-            end
+            batchSize = batchSizeVals(iBvals); %fixed batch size
+            fprintf('Running %s, nClus=%d, epsMu=%d, c=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000,c1, batchSize)
+            fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm',nClus,round(nTrials/1000),epsMuOrig1000,round(batchSize),nIter,dat)];
             
             %run
             tic
             if strcmp(dat(1:3),'cat') %save muAll
-                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll,trials] = covering_map_batch_sim(nClus,locRange,catsInfo,epsMuOrig,nTrials,batchSize,nIter,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls,actOverTime);
+                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll,trials] = covering_map_batch_sim(nClus,locRange,catsInfo,epsMuOrig,nTrials,batchSize,nIter,trials,useSameTrls,stoch,c,dat,annEps,jointTrls,actOverTime);
             else
-                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB] = covering_map_batch_sim(nClus,locRange,catsInfo,epsMuOrig,nTrials,batchSize,nIter,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls,actOverTime);
+                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB] = covering_map_batch_sim(nClus,locRange,catsInfo,epsMuOrig,nTrials,batchSize,nIter,trials,useSameTrls,stoch,c,dat,annEps,jointTrls,actOverTime);
             end
             timeTaken=toc;
             

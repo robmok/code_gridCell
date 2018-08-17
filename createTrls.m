@@ -1,4 +1,4 @@
-function [trials,dataPtsTest, rSeed,ntInSq] = createTrls(dat,nTrials,locRange,useSameTrls,jointTrls,boxSize,catsInfo,rSeed)
+function [trials,dataPtsTest, rSeed,ntInSq] = createTrls(dat,nTrials,locRange,useSameTrls,jointTrls,catsInfo,rSeed)
 
 spacing =linspace(locRange(1),locRange(2),locRange(2)+1); 
 spacingOrig=spacing;
@@ -107,9 +107,7 @@ elseif ~useSameTrls && jointTrls  %joined trials
     %move step sizes - possible step sizes; if larger, e.g. double, then need bigger steps?
     
     selStepSiz = [-stepSize*4,-stepSize*2,-stepSize,-stepSize,0,stepSize,stepSize,stepSize*2,stepSize*4]; %stepSiz
-%     selStepSiz = [-stepSize*4,-stepSize*3,-stepSize*2,-stepSize,0,stepSize,stepSize*2,stepSize*3,stepSize*4].*boxSize;% stepSiz1
-%     selStepSiz = [-stepSize*4,-stepSize*2,-stepSize,-stepSize,0,0,0,stepSize,stepSize,stepSize*2,stepSize*4].*boxSize; %new; stay more - maybe stepSizLR2 if try
-    
+
     % select points trial by trial, if not in shape go back into the shape
     trials       =  nan(nTrials,2);
     trials(1,:)  =  shapePts(randi(length(shapePts),1,1),:);

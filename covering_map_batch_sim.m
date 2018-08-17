@@ -1,4 +1,4 @@
-function [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll, trials] = covering_map_batch_sim(nClus,locRange,catsInfo,epsMuOrig,nTrials,batchSize,nIter,trials,useSameTrls,stoch,c,dat,boxSize,annEps,jointTrls,actOverTime)
+function [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll, trials] = covering_map_batch_sim(nClus,locRange,catsInfo,epsMuOrig,nTrials,batchSize,nIter,trials,useSameTrls,stoch,c,dat,annEps,jointTrls,actOverTime)
 
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
 stepSize=diff(spacing(1:2)); 
@@ -23,12 +23,8 @@ if annEps
     elseif epsMuOrig == 0.25
         annEpsDecay = annC*(nBatch*100); %  epsMuOrig =.25;ends with .0025
 %         annEpsDecay = annC*(nBatch*49); %  epsMuOrig =.25;ends with .005
-
 % trying with batch400, trapKrupic
 %     annEpsDecay = annC*(nBatch*49); %  epsMuOrig =.25;ends with .005
-
-%     elseif epsMuOrig == 0.5
-%         annEpsDecay = annC*(nBatch*100); %  epsMuOrig =.5;ends with .005
     end
 end
 
@@ -66,17 +62,9 @@ end
 %compute distance of each cluster to itself over time (batches)
 clusDistB = nan(nSets-1,nIter);
 
-%set densityPlot array size
-trapzSpacing{1} = spacing(10:41);
-trapzSpacing{2} = spacing(7:44); 
-trapzSpacing{3} = spacing(4:47);
+
 if strcmp(dat(1:4),'trap') && length(dat)>10
-    if strcmp(dat(1:11),'trapzScaled')
-        spacingTrapz = trapzSpacing{str2double(dat(12))}; %trapzScaled1,2,3
-        a=length(spacingTrapz); %trapz length1
-        b=locRange(2)+1; %50 - trapz length2 - +1 to let density plot go from 1:50 (rather than 0:49)
-        h=round(((locRange(2)+1)^2)/((a+b)/2))+1; %trapz height (area = 50^2; like square)
-    elseif strcmp(dat(1:11),'trapzKrupic')
+    if strcmp(dat(1:11),'trapzKrupic')
         spacingTrapz = spacing(14:37);
         if length(dat)==11 % 'trapzKrupic'
             a = length(spacingTrapz);
@@ -86,20 +74,7 @@ if strcmp(dat(1:4),'trap') && length(dat)>10
         %correct split now
         hLeft=17;% 12;
         hRight=33;% - 33 = start from 18 from left % 27;
-    end
-    
-    %split left and right half the trapz with equal areas
-    % c is the length of the line when split the trapz in half
-%     halfArea = (((a+b)/2)*h)/2;
-%     c = sqrt(((a^2)+(b^2))/2);
-%     %(b+c)/2)*h=c
-%     hLeft  = floor(halfArea/((b+c)/2)); %bigger side
-%     hRight = ceil(halfArea/((a+c)/2))+1; %smaller side
-
-    % new to equalize area - Krupic
-    %equal number of points in trapz (301 each; nPoints in trap 877/2=438.5)
-%     hLeft = 14;
-%     hRight = 20;    
+    end 
 else
     b=length(spacing);
     h=length(spacing);
@@ -116,7 +91,7 @@ for iterI = 1:nIter
     
     fprintf('iter %d \n',iterI);
 
-    [trials,dataPtsTest, rSeed(iterI),ntInSq] = createTrls(dat,nTrials,locRange,useSameTrls,jointTrls,boxSize,catsInfo);
+    [trials,dataPtsTest, rSeed(iterI),ntInSq] = createTrls(dat,nTrials,locRange,useSameTrls,jointTrls,catsInfo);
     
     %initialise each cluster location  
     mu = nan(nClus,2,nBatch+1); 

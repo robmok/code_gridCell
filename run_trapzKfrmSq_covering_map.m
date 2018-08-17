@@ -23,8 +23,6 @@ saveDat=1;
 %for loading
 epsMuVals=.025;
 nTrials=1000000;
-% batchSizeVals=400;
-% batchSizeVals=200;
 
 nIter=200;
 nIter=1000;
@@ -49,15 +47,10 @@ batchSizeVals = nTrials./nBatches; %match original batchsize values (nTrials bei
 nBvals = length(batchSizeVals);
 nIter2run = nIter;
 
-%new
+%fixed
 epsMuTrapz = 0.0025;
-% epsMuTrapz = 0.005; %new 
-% epsMuTrapz = 0.003; %new 
 
 %love01 - correct trapzKrupic scale now - done
-
-%*** NEXT could also try nTrials/2?
-
 clus2run = [13, 15, 12, 20, 11, 18];  
 clus2run = [22, 27, 26, 19, 14]; 
 clus2run = [25, 10, 17, 24, 21]; 
@@ -100,14 +93,11 @@ for iClus2run = 1:length(clus2run)
                     [clusPos(:,1,iterI), clusPos(:,2,iterI)] = find(densityPlot(:,:,end,iterI)>0); %find cluster positions - added >0 since counts nans as well
                 end
                 
-                % run - allow starting clus positions (even
-                % outside the trapz box)
+                % run
                 tic
                 [densityPlot,~,gA,gW,~,~,rSeed] = covering_map_batch_sim_clusPosIn(clusPos,nClus,locRange,epsMuOrig,epsMuTrapz,nTrials,nTrials2,batchSize,nIter2run,dat2,annEps,jointTrls);
-                
-                fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz_%d',nClus,round(nTrials2/1000),epsMuOrig1000,round(batchSize),nIter,dat2,epsMuTrapz*10000)];
-                
                 timeTaken=toc;
+                fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_epsMuTrapz_%d',nClus,round(nTrials2/1000),epsMuOrig1000,round(batchSize),nIter,dat2,epsMuTrapz*10000)];
                 if saveDat
                     if jointTrls
                         fname = [fname '_jointTrls_stepSiz'];

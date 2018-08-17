@@ -21,7 +21,7 @@ dat='circ';
 % dat='square';
 compareCircSq = 0; %if compare circ-sq gridness, dat=circ, but load sq too
 
-% dat='trapzKfrmSq1';
+dat='trapzKfrmSq1';
 
 % annEps=0;
 boxSize=1;
@@ -53,21 +53,10 @@ if strcmp(dat(1:4),'trap')
     loadPerm=0;
 end
 
-% clus2run = [3:26]; 
-% clus2run = [3:30]; 
-% clus2run = [3:26]; 
-% clus2run = [10:19 21:30];
 clus2run = 10:30;
 
-% batchSizeVals = 400; %100, 125, 200,400, 1000
+% batchSizeVals = 400; %200,400 (100, 125, 1000)
 % batchSizeVals = 200;
-
-%new - slower learning rate
-% epsMuVals=.015;
-% batchSizeVals = 100; %100, 125, 200, 400
-% clus2run = [12, 16, 24, 28]; %batchSize200 missed 20?
-
-
 
 %new annEps
 annEps=1;
@@ -563,10 +552,10 @@ else
     fprintf('trapz, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f];  %d sig > 0, out of %d sig conds. %0.2f percent\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
     dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,2));
     ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs 
-    fprintf('trapzL %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2plot(1)+2,clus2plot(end)+2,nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2));
+    fprintf('trapzL %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2));
     dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,3));
     ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs 
-    fprintf('trapzR %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2plot(1)+2,clus2plot(end)+2,nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2));
+    fprintf('trapzR %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2));
     % individual nClus cond CIs, L-R
     dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,2))-squeeze(datTmp(:,iEps,iBatchVals,clus2plot,3));
     nBoot = nIter;
@@ -642,11 +631,11 @@ end
 end
 %% Making figs: density plot examples
 
-savePlots = 0;
+savePlots = 1;
 
 doPlot=0; %do plot when computing gridness
 
-fontSiz=15;
+fontSiz=25;
 
 clusPosAct = 'actNorm'; %'clus' or 'actNorm'
 
@@ -658,14 +647,15 @@ gridMsrType = 'a';
 clus2plot = [10,12,18,25]-9;
 % clus2plot = ([10,12,18,20,23,25,28])-9;
 
-clus2plot = [10, 12, 18, 20, 23, 25, 28]-9; 
+clus2plot = [12, 18, 20, 23, 25, 28]-9; %10
 
 
 %trapz
 % clus2plot = [12, 18, 20, 25, 28]-9; %23
 % clus2plot = [18, 19, 20, 23]-9;
+% clus2plot = [12, 14, 18, 20, 23]-9;
 
-clus2plot = [25]-9; %testing
+clus2plot = [25]-9; %
 
 
 % clus2plot = (3:5)-2;
@@ -677,7 +667,7 @@ myColorMap(end,:) = 1;
 
 for iClus = clus2plot%:length(clus2run)
 for iBvals = 1:length(batchSizeVals)
-    for iterI = 15%nIter
+    for iterI = [2,5,9,13,15]%:15%nIter
         switch clusPosAct
             case 'act'
                 densityPlotCentresSm = densityPlotActAll(:,:,iterI,iEps,iBvals,iClus);
@@ -691,11 +681,10 @@ for iBvals = 1:length(batchSizeVals)
             case 'actNorm'
                 densityPlotCentresSm = densityPlotActNormAll(:,:,iterI,iEps,iBvals,iClus);
                 zlims=[0,.085];
-                if strcmp(dat(1:2),'ci') || strcmp(dat(1:2),'tr') 
+                if strcmp(dat(1:2),'ci') || strcmp(dat(1:2),'sq') 
                 zlims=[0,.085];
-%                 zlims=[0,.0885];
-                elseif strcmp(dat(1:2),'sq')
-                zlims=[0,.085];
+                elseif strcmp(dat(1:2),'tr')
+                zlims=[0,.091];
                 end
         end
 
@@ -705,8 +694,16 @@ for iBvals = 1:length(batchSizeVals)
                 
 %       %make nans into white
         densityPlotTmp = densityPlotCentresSm;
-        densityPlotTmp(isnan(densityPlotCentresSm))=1.1;
-        aCorrMap(isnan(aCorrMap))=1.1;
+        
+        %TMP - edit
+        if strcmp(dat(1:2),'sq') % tmp - sq smooth means one square is white, turn to 0
+            densityPlotTmp(isnan(densityPlotCentresSm))=0;
+            aCorrMap(isnan(aCorrMap))=0;
+        else
+            densityPlotTmp(isnan(densityPlotCentresSm))=1.1;
+            aCorrMap(isnan(aCorrMap))=1.1;
+        end
+        
         
         figure; imagesc(densityPlotTmp,zlims); colormap(gcf,myColorMap);
 %         figure; imagesc(densityPlotTmp); colorbar;
@@ -723,7 +720,7 @@ for iBvals = 1:length(batchSizeVals)
         end
         figure; h=imagesc(aCorrMap,[-1.1 1.1]); colormap(gcf,myColorMap);
 %         figure; imagesc(aCorrMap); colorbar
-        title(sprintf('Grid Score %.2f',g));
+        title(sprintf('g = %.2f',g));
         set(gca,'FontSize',fontSiz,'fontname','Arial')
         xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
         fname = [figsDir sprintf('/densityPlot_testSet_%s_nClus%d_eps%d_batchSiz%d_%s_%s_iter%d_autoCorr',dat,iClus+9,epsMuVals(iEps)*1000,batchSizeVals(iBvals),clusPosAct,gridMsrType,iterI)];
@@ -739,14 +736,14 @@ for iBvals = 1:length(batchSizeVals)
         
         if strcmp(dat(1:4),'trap')
 %             h=50; hLeft = 20; hRight = 30;
-            hLeft=17; hRight=33;% - 33 = start from 18 from left
+            h=50; hLeft=17; hRight=33;% - 33 = start from 18 from left
             aCorrMap = ndautoCORR(densityPlotCentresSm(:,1:hLeft));
             [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
             %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
             
             aCorrMap(isnan(aCorrMap))=1.1;
             figure; imagesc(aCorrMap,[-1.1 1.1]); colormap(myColorMap);
-            title(sprintf('Grid Score %.2f',g));
+            title(sprintf('g = %.2f',g));
             set(gca,'FontSize',fontSiz,'fontname','Arial')
             xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
             fname = [figsDir sprintf('/densityPlot_testSet_%s_L_nClus%d_eps%d_batchSiz%d_%s_%s_iter%d_autoCorr',dat,iClus+9,epsMuVals(iEps)*1000,batchSizeVals(iBvals),clusPosAct,gridMsrType,iterI)];
@@ -765,7 +762,7 @@ for iBvals = 1:length(batchSizeVals)
             %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
             aCorrMap(isnan(aCorrMap))=1.1;
             figure; imagesc(aCorrMap,[-1.1 1.1]);colormap(myColorMap);
-            title(sprintf('Grid Score %.2f',g));
+            title(sprintf('g = %.2f',g));
             set(gca,'FontSize',fontSiz,'fontname','Arial')
             xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
             fname = [figsDir sprintf('/densityPlot_testSet_%s_R_nClus%d_eps%d_batchSiz%d_%s_%s_iter%d_autoCorr',dat,iClus+9,epsMuVals(iEps)*1000,batchSizeVals(iBvals),clusPosAct,gridMsrType,iterI)];
@@ -882,7 +879,7 @@ end
 
 %% trapz vs orig sq gridness / circ vs sq
 
-savePlots=1;
+savePlots=0;
 
 clusPosAct = 'actNorm'; %'act' or 'actNorm'
 

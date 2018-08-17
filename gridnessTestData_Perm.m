@@ -11,7 +11,6 @@ function [permPrc_gA_act, permPrc_gW_act,permPrc_gA_actNorm, permPrc_gW_actNorm,
 % densityPlotAct,densityPlotActNorm,gA_act,gA_actNorm,gW_act,gW_actNorm, rSeedTest
 
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1);
-boxSize     = 1;
 useSameTrls = 0;
 jointTrls   = 1;
 stepSize = 1;
@@ -23,31 +22,11 @@ imageFilter=fspecial('gaussian',5,gaussSmooth); %this is default for imgaussfilt
 % nSets = size(densityPlot,3);
 % nIters2run = size(densityPlot,4);
 
-% nSetsTest = 1; %last 1/2 only for now
-
-b = 50;
-h = 50; %for trapz - height
-
-if strcmp(dat(1:4),'trap') && length(dat)>10
-    spacingTrapz = spacing(14:37);
-%     a = length(spacingTrapz);
-    b = length(spacing);
-    h = length(spacing);
-%     halfArea = (((a+b)/2)*h)/2;
-%     c = sqrt(((a^2)+(b^2))/2);
-%     hLeft  = floor(halfArea/((b+c)/2)); %bigger side
-%     hRight = ceil(halfArea/((a+c)/2))+1; %smaller side
-
-%     %new - actually half, L=328, R=329 pixels
-%     hLeft = 20;
-%     hRight = 30;
-    %new correct trapzKrupic scale
-    hLeft=17;% 12;
-    hRight=33;% - 33 = start from 18 from left % 27;
-else
-    b=length(spacing);
-    h=length(spacing);
-end
+b = length(spacing);
+h = length(spacing);%for trapz
+%new correct trapzKrupic scale
+hLeft=17;% 12;
+hRight=33;% - 33 = start from 18 from left % 27;
 
 
 %perm testing
@@ -58,7 +37,7 @@ permPrc_gA_actNorm = nan(nIters2run,4);
 permPrc_gW_actNorm = nan(nIters2run,4);
 
 %% compute actNorm maps after 'training' (on a new test set of locations)
-[trialsTest,~, rSeedTest,ntInSq] = createTrls(dat,nTrialsTest,locRange,useSameTrls,jointTrls,boxSize,h);
+[trialsTest,~, rSeedTest,ntInSq] = createTrls(dat,nTrialsTest,locRange,useSameTrls,jointTrls,h);
 
 densityPlotAct     = zeros(b,h,nIters2run);
 densityPlotActNorm = zeros(b,h,nIters2run);
