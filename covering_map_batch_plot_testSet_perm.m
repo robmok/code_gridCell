@@ -6,7 +6,6 @@ cd(wd);
 
 codeDir = [wd '/code_gridCell'];
 saveDir = [wd '/data_gridCell'];
-% saveDir = [wd '/data_gridCell/toRmv'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed']));
 
@@ -28,18 +27,15 @@ boxSize=1;
 
 % joined trials
 jointTrls=1;
-% clus2run = [8, 12, 16, 20,24, 28]; 
-% clus2run = [8:2:28]; 
 epsMuVals=.025;
 nTrials=1000000;
-% batchSizeVals = [1000, 400, 100]; 
 % batchSizeVals=400;
 batchSizeVals=200;
 
 % nIter=200;
 nIter=1000;
 
-%load perm data when nIter=1000- this is with nIter=200. doPerm should=0
+%load perm data when nIter=1000 - this is with nIter=200. doPerm should=0
 loadPerm = 1;
 
 if strcmp(dat(1:4),'trap')
@@ -90,7 +86,6 @@ for iClus2run = 1:length(clus2run)
                 if ~annEps
                     fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_actNorm_perm_%dpermsOn%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,nPerm,nIters2run)];
                 else
-                    %check
                     fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_*annEps_actNorm_perm_%dpermsOn%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,nPerm,nIters2run)];
                 end
             else
@@ -116,14 +111,12 @@ for iClus2run = 1:length(clus2run)
             %finish with directory and * for date/time
             fname = [saveDir, fname '*']; %finish with directory and * for date/time
 
-            
             %edit if want to load more than one file per sim, merge
             f = dir(fname); filesToLoad = cell(1,length(f));
             for iF = 1%:length(f)
                 filesToLoad{iF} = f(iF).name;
                 load(f(iF).name);
             end
-            
             
             %organise gridness values (allen vs willis method)
             gA_gAll_act(:,iEps,iBvals,iClus2run,:)   = gA_act(:,1,:);
@@ -146,8 +139,6 @@ for iClus2run = 1:length(clus2run)
             
             
             for iterI = 1:nIter
-%                 densityPlotActAll(:,:,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlotAct(:,:,iterI),gaussSmooth);
-%                 densityPlotActNormAll(:,:,iterI,iEps,iBvals,iClus2run) = imgaussfilt(densityPlotActNorm(:,:,iterI),gaussSmooth);
                 densityPlotActAll(:,:,iterI,iEps,iBvals,iClus2run) = densityPlotAct(:,:,iterI);
                 densityPlotActNormAll(:,:,iterI,iEps,iBvals,iClus2run) = densityPlotActNorm(:,:,iterI);
             end
@@ -168,8 +159,6 @@ for iClus2run = 1:length(clus2run)
             end
             
             if doPerm || loadPerm
-%                 gA_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gA_act(:,3,:);
-%                 gW_act_permPrc(:,iEps,iBvals,iClus2run,:)   = permPrc_gW_act(:,3,:);
                 gA_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = perm.permPrc_gA_actNorm(:,3,:);
                 gW_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = perm.permPrc_gW_actNorm(:,3,:);
             end
@@ -180,56 +169,53 @@ end
 
 
 if strcmp(dat,'trapzKfrmSq1') || compareCircSq %added compare circ vs sq - should work?
-    
     datOrig = dat;
     dat = 'square';
     doPerm=0; % sq 200iter noPerm not run yet
     nTrials=1000000;
-
-%load sq gridness to compare with trapz
-for iClus2run = 1:length(clus2run) 
-    nClus = clus2run(iClus2run);
-    for iEps = 1:length(epsMuVals) 
-        epsMuOrig=epsMuVals(iEps);
-        epsMuOrig1000=epsMuOrig*1000;
-        for iBvals = 1:length(batchSizeVals)
-            batchSize = batchSizeVals(iBvals);
-            fprintf('Loading %s, nClus=%d, epsMu=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000,batchSize)
-
-            if doPerm
-                fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_actNorm_perm_%dpermsOn%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,nPerm,nIters2run)];
-            else
-                if ~annEps
-                fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_trlsTest_noPerm',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+    %load sq gridness to compare with trapz
+    for iClus2run = 1:length(clus2run)
+        nClus = clus2run(iClus2run);
+        for iEps = 1:length(epsMuVals)
+            epsMuOrig=epsMuVals(iEps);
+            epsMuOrig1000=epsMuOrig*1000;
+            for iBvals = 1:length(batchSizeVals)
+                batchSize = batchSizeVals(iBvals);
+                fprintf('Loading %s, nClus=%d, epsMu=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000,batchSize)
+                
+                if doPerm
+                    fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_actNorm_perm_%dpermsOn%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,nPerm,nIters2run)];
                 else
-                fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_*annEps_trlsTest_noPerm',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+                    if ~annEps
+                        fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_trlsTest_noPerm',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+                    else
+                        fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_*annEps_trlsTest_noPerm',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat)];
+                    end
                 end
+                %finish with directory and * for date/time
+                fname = [saveDir, fname '*'];
+                
+                %edit if want to load more than one file per sim, merge
+                f = dir(fname); filesToLoad = cell(1,length(f));
+                for iF = 1%:length(f)
+                    filesToLoad{iF} = f(iF).name;
+                    load(f(iF).name);
+                end
+                
+                %organise gridness values (allen vs willis method)
+                gA_gAll_actNormSq(:,iEps,iBvals,iClus2run,:)   = gA_actNorm(:,1,:);
+                gA_oAll_actNormSq(:,iEps,iBvals,iClus2run,:)   = gA_actNorm(:,2,:);
+                gA_radAll_actNormSq(:,iEps,iBvals,iClus2run,:) = gA_actNorm(:,3,:);
+                gA_wavAll_actNormSq(:,iEps,iBvals,iClus2run,:) = gA_actNorm(:,4,:);
+                gW_gAll_actNormSq(:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,1,:);
+                gW_oAll_actNormSq(:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,2,:);
+                gW_radAll_actNormSq(:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,3,:);
+                gW_wavAll_actNormSq(:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,4,:);
+                
             end
-
-            %finish with directory and * for date/time
-            fname = [saveDir, fname '*'];
-            
-            %edit if want to load more than one file per sim, merge
-            f = dir(fname); filesToLoad = cell(1,length(f));
-            for iF = 1%:length(f)
-                filesToLoad{iF} = f(iF).name;
-                load(f(iF).name);
-            end
-            
-            %organise gridness values (allen vs willis method)
-            gA_gAll_actNormSq(:,iEps,iBvals,iClus2run,:)   = gA_actNorm(:,1,:);
-            gA_oAll_actNormSq(:,iEps,iBvals,iClus2run,:)   = gA_actNorm(:,2,:);
-            gA_radAll_actNormSq(:,iEps,iBvals,iClus2run,:) = gA_actNorm(:,3,:);
-            gA_wavAll_actNormSq(:,iEps,iBvals,iClus2run,:) = gA_actNorm(:,4,:);
-            gW_gAll_actNormSq(:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,1,:);
-            gW_oAll_actNormSq(:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,2,:);
-            gW_radAll_actNormSq(:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,3,:);
-            gW_wavAll_actNormSq(:,iEps,iBvals,iClus2run,:) = gW_actNorm(:,4,:);  
-            
-        end 
+        end
     end
-end
-dat = datOrig;
+    dat = datOrig;
 end
 %% Making figs - univar scatters 1 - test set
 

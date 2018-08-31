@@ -30,38 +30,15 @@ boxSize = 1; % 1=normal, 2=double size, 3=triple size
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
 catsInfo.nCats=2; %2 categories
-% % variance - isotropic % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
-sigmaG = [7 0; 0 7]; %3, 5
+sigmaG = [7 0; 0 7]; % variance - isotropic % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
 catsInfo.R=chol(sigmaG);
 catsInfo.msExample = 1; % set 2 gaussians in opposite sides of the square - example for ms
 
-% annEps new - v3 (epsMuOrig=0.25)- 1000iter, noActOverTime
-%re-running (circ first, sq need?) without smoothing in nans - done
-%love06 -circ
-clus2run = [10, 13, 16, 19]; %12, 15,
-clus2run = [18, 20, 27]; %14, 26, 
-clus2run = [23, 30, 28]; %22, 11,
-clus2run = [24, 21, 29];  %25, 17
-% 
-% %love01 - circ, 6 matlabs
-clus2run = [12, 15];
-% clus2run = [14, 26];
-% clus2run = [22, 11];
-% clus2run = [25, 17];
-
-%circ 200 iters, with actOverTime
+% set number of clusters to run
+clus2run = 10:30;
 
 
-%try new trapzKrupic - 200 iters, - check if get results as
-%expected - no; try again? correct size here?
-%love06 - annEps -
-%love01 - try no annEps
-% clus2run = [12 16];
-% clus2run = [18, 25];
-% clus2run = [20, 10];
-% clus2run = [23, 14];
-
-% nTrials
+% number of learning/training trials
 if ~strcmp(dat(1:3),'cat')
     nTrials = 1000000;
 else
@@ -108,7 +85,7 @@ end
 %%
 saveDat=1; %save simulations
 
-nIter=200;%1000; %200 for covering map over time, 20 for cat; 1k for covering map new
+nIter=200;%1000; %200 for doing activations over time, 1000 for full simulations without activations over time (variable size gets large), 20-50 for catLearn demo
 
 if useSameTrls
     trials=[]; trialsUnique=[];
