@@ -16,6 +16,8 @@ function [acorr,nBins] = ndautoCORR(mat1,mat2,bcut)
 %%%%%%%% Comments
 %   12/08/17 adapted from xPearson, changed to be multidimensional, i.e. swap filter2 for imfilter 
 %   © Roddy Grieves: rmgrieves@gmail.com
+%   Written by Roddy Grieves
+%   Edited by Robert Mok, 2018
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Initial variables
@@ -67,7 +69,7 @@ xCoef = covar./(mat1_std.*mat2_std);
 acorr = real(xCoef);
 acorr(nBins < bcut) = NaN;
 
-if 0
+if 0 %RM edited
     figure
     subplot(1,2,1)
     mat1(mat1 < 0.1*nanmax(mat1(:))) = NaN;
@@ -104,15 +106,3 @@ if 0
     title('Autocorr')
 
 end
-
-
-
-
-
-
-
-
-
-
-
-

@@ -16,12 +16,9 @@ function [g,gdata] = gridSCORE(im,method,doPlot) %RM edited 171127 added doPlot
 %         gdata.orientation = the angle/orientation of the grid
 %         gdata.g_score = grid score
 %
-%%%%%%%% Comments
-%   21/08/17 created 
-%   12/09/17 added Allen and Wills methods
-%   13/09/17 added peak method
-%   15/10/17 removed buddy peak method and corrected Allen method, added orientation
 %   © Roddy Grieves: rmgrieves@gmail.com
+%   Written by Roddy Grieves
+%   Edited by Robert Mok, 2018
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Initial variables
