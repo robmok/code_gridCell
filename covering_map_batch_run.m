@@ -16,7 +16,6 @@ addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in cod
 %define box / environment - random points in a box
 dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
 % dat = 'square';   
-% dat = 'trapzKrupic';
 % dat = 'catLearn';
 
 %compute activation and densityPlotActNorm over time? takes longer
@@ -30,25 +29,23 @@ boxSize = 1; % 1=normal, 2=double size, 3=triple size
 
 % if cat learning specify number of categories (cluster centres) and sigma of the gaussan
 catsInfo.nCats=2; %2 categories
-sigmaG = [7 0; 0 7]; % variance - isotropic % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
+sigmaG = [7 0; 0 7]; % variance - isotropic
 catsInfo.R=chol(sigmaG);
 catsInfo.msExample = 1; % set 2 gaussians in opposite sides of the square - example for ms
 
 % set number of clusters to run
 clus2run = 10:30;
 
-
 % number of learning/training trials
 if ~strcmp(dat(1:3),'cat')
     nTrials = 1000000;
+%     nTrials = 200000;
 else
-    nTrials = 50000; %cat learning - need less trials
+    nTrials = 50000; %cat learning - less trials
 end
 
 %batch size
-%     nBatches = [1000, 5000, 8000, 2500, 10000]; %tried in the past
-nBatches = 2500; % batchSiz=400
-nBatches = 5000; % using this now batchSiz=200
+nBatches = 5000; % batchSiz=200; % nBatches = 2500; % batchSiz=400
 if strcmp(dat(1:3),'cat')
     nBatches = nBatches.*2;
 end
@@ -56,11 +53,9 @@ batchSizeVals = nTrials./nBatches;
 nBvals = length(batchSizeVals);
 
 % parameters
-% epsMuVals=[.01, .05, .075, .1, .2, .3];% %learning rate / starting learning rate 
-epsMuVals = 0.025; %using this
-% epsMuVals = 0.015; 
+epsMuVals = 0.025;
 if annEps
-    epsMuVals = 0.25; % using this now
+    epsMuVals = 0.25;
 end
 
 % use the same training data (trials) across current sims or gen new data
@@ -71,21 +66,10 @@ nSteps = 50; %to define spacing beween each loc in box
 locRange = [0, nSteps-1]; %[-1, 1]; % from locRange(1) to locRange(2)
 stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %smallest diff between locs
 
-%stochastic update - not used now
-stoch = 0; %1 or 0
-% c parameter: larger c = less stochastic over trials, smaller c = more stochastic over trials
-cVals = [1/nTrials, 2/nTrials, 5/nTrials, 20/nTrials];
-nC = length(cVals);
-if ~stoch
-    nC = 1;
-else
-    nC = length(cVals);
-end
-
 %%
 saveDat=1; %save simulations
 
-nIter=200;%1000; %200 for doing activations over time, 1000 for full simulations without activations over time (variable size gets large), 20-50 for catLearn demo
+nIter=1;%1000; %200 for doing activations over time, 1000 for full simulations without activations over time (variable size gets large), 20-50 for catLearn demo
 
 if useSameTrls
     trials=[]; trialsUnique=[];
@@ -100,23 +84,17 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
         epsMuOrig=epsMuVals(iEps);
         epsMuOrig1000=epsMuOrig*1000; %for saving
         
-        for iStoch = 1:nC %
-            c = cVals(iStoch);
-            if ~stoch
-                c=0;
-            end
-            c1=round(c.*100000); % for saving file name
         for iBvals = 1:nBvals
-            batchSize = batchSizeVals(iBvals); %fixed batch size
-            fprintf('Running %s, nClus=%d, epsMu=%d, c=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000,c1, batchSize)
+            batchSize = batchSizeVals(iBvals);
+            fprintf('Running %s, nClus=%d, epsMu=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000, batchSize)
             fname = [saveDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm',nClus,round(nTrials/1000),epsMuOrig1000,round(batchSize),nIter,dat)];
             
             %run
             tic
             if strcmp(dat(1:3),'cat') %save muAll
-                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll,trials] = covering_map_batch_sim(nClus,locRange,catsInfo,epsMuOrig,nTrials,batchSize,nIter,trials,useSameTrls,stoch,c,dat,annEps,jointTrls,actOverTime);
+                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll,trials] = covering_map_batch_sim(nClus,locRange,catsInfo,epsMuOrig,nTrials,batchSize,nIter,trials,useSameTrls,dat,annEps,jointTrls,actOverTime);
             else
-                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB] = covering_map_batch_sim(nClus,locRange,catsInfo,epsMuOrig,nTrials,batchSize,nIter,trials,useSameTrls,stoch,c,dat,annEps,jointTrls,actOverTime);
+                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB] = covering_map_batch_sim(nClus,locRange,catsInfo,epsMuOrig,nTrials,batchSize,nIter,trials,useSameTrls,dat,annEps,jointTrls,actOverTime);
             end
             timeTaken=toc;
             
@@ -135,7 +113,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                         fname = [fname '_annEps'];
                     end
                 else
-                    fname = [fname sprintf('_%dcats_stoch%d_c%d',catsInfo.nCats,stoch,c1)];
+                    fname = [fname sprintf('_%dcats',catsInfo.nCats)];
                     if catsInfo.msExample
                        fname = [fname '_msExample']; 
                     end
@@ -149,7 +127,6 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                     save(fname,'densityPlot','densityPlotActNorm','gA','gW','gA_actNorm','gW_actNorm','rSeed','muInit','clusDistB','timeTaken'); 
                 end
             end
-        end
         end
     end
 end
