@@ -19,12 +19,9 @@ sigmaGauss = stepSize;
 gaussSmooth = 1;
 imageFilter=fspecial('gaussian',5,gaussSmooth); %this is default for imgaussfilt
 
-% nSets = size(densityPlot,3);
-% nIters2run = size(densityPlot,4);
-
 b = length(spacing);
 h = length(spacing);%for trapz
-%new correct trapzKrupic scale
+%trapzKrupic
 hLeft=17;% 12;
 hRight=33;% - 33 = start from 18 from left % 27;
 
@@ -161,9 +158,7 @@ for iterI=1:nIters2run
         minTime = 20; % shuffle setting - each activation at least 20 time points away from orig
         
         if doPerm
-            for iPerm = 1:nPerm
-                %             fprintf('Perm %d\n',iPerm);
-                
+            for iPerm = 1:nPerm                
                 %shuffle trials, and log trials < 20 timepoints to orig
                 ind2short = zeros(1,nTrialsTest);
                 start=0; %get the while loop running

@@ -15,11 +15,10 @@ locRange = [0 49];
 nTrialsTest = 100000; % orig nTrials/10
 dat = 'circ';
 % dat = 'square';
-dat = 'trapzKfrmSq1'; % load covering map on sq, then run it on trapz; then assess gridness in trapz
+dat = 'trapzKfrmSq1'; % load covering map on sq, then run it on trapz
 
 saveDat=1;
 
-% nIter=200;
 epsMuVals=.025;
 nTrials=1000000;
 batchSizeVals=400;
@@ -33,43 +32,15 @@ end
 nIter=200;
 nIter=1000;
 
-%%%%%%%
-% new fixed perm - 200iters
 % annEps 
-
-
-%circ - to run
-%love06 - running
-% clus2run = [12,24]; %10, 13,
-% clus2run = [ 30]; % 28, 29,
-% clus2run = 20; % missed
-
-%%%%
-% 1k iters, sq/circ annEps, batchSiz=200, no perm 
-%circ - love01 - 
-% clus2run = [10, 13, 18, 20, 23, 30, 24, 21]; %done
-%clus2run = [12, 14, 22, 25, 16, 27, 28, 29]; %done
-
-
-%%%%%
-% sq2trapz 1kiters - re running /2 now
-% clus2run = [14, 15, 23,  20, 24, 16,  22, 27, 26,  13, 30, 29,  25, 17, 21, 12, 19, 28, 11, 10, 18]; %all
-% clus2run = [14, 15, 23,  20, 24, 18, 16, 22, 27, 26, 19]; %half - 
-% clus2run = [13, 30, 29,  25, 10, 28, 17, 11, 21, 12]; %half - 
-
-clus2run = [14, 15, 23, 20, 24, 18]; %quarter
-clus2run = [16, 22, 27, 26, 19]; 
-clus2run = [13, 30, 21, 25, 10]; 
-clus2run = [17, 11, 29, 28, 12]; 
+clus2run = 1:30
 
 jointTrls=1; %for test trials
 
 % if trapKfrmSq1
 if strcmp(dat,'trapzKfrmSq1')
-    nTrials=1000000/4; %/2 or /4
-    nTrials=1000000/2;
-    epsMuTrapz10 = 25; % using this
-%     epsMuTrapz10 = 50; % anEps - 20%
+    nTrials=1000000/4;
+    epsMuTrapz10 = 25;
 end
 
 
@@ -89,10 +60,6 @@ end
 % the threshold value)
 nIters2run = nIter; %200
 nPerm = 500;
-
-% %testing
-% nIters2run = 3;
-% nPerm=250;
 
 for iClus2run = 1:length(clus2run)
     nClus = clus2run(iClus2run);
