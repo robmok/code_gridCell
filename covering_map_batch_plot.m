@@ -23,72 +23,6 @@ dat='circ';
 boxSize=1;
 % nIter=200;
 
-% clus2run = [7,8,10,12]; 
-% nTrials = 100000; 
-% nIter=250;
-% batchSizeVals = [1, 50, 100, 200, 500];
-% epsMuVals=[.01, .05, .075, .1, .2, .3];% learning rate / starting learning rate 
-
-% sims 1 - one single LARGE batchSize, large nTrials, all nClus conds
-% clus2run = 3:30;%[7,8,10,12]; 
-% nTrials=10000000;
-% batchSizeVals=1000;
-% nIter=200;
-% epsMuVals=.075;
-
-% sims 2 - a smaller val of trials; testing batch sizes (works fine) - also
-% have some sims with ntrials = 5000000 (less batchSizeVals)
-% clus2run = [10:2:28]; % also have 11 but left out plot
-% clus2run = 28; % plotting one nClus cond over sets
-% nTrials=2500000;
-% nIter=200;
-% % batchSizeVals=[13, 25, 83, 125, 167, 250, 333, 500, 1000, 2000];
-% %wAct
-% clus2run = [10:2:30];
-% clus2run = [10, 12 16:2:28]; %no 14 and 30 for sq, no 12, 30 for circ; epsmu=00.75
-% % batchSizeVals=[1000, 2000];
-% batchSizeVals = [1000, 500, 125, 50];
-% epsMuVals=.075;
-
- %new
-%  clus2run = [10, 12, 16:2:26]; %no 14? 28? - errored, running (0.15, circ)
-% epsMuVals=.015;
-% nTrials=2000000; %new
-% batchSizeVals = [800, 400, 100, 40];
-
-
-% new 3 - fixed batch sizes across clusters
-% nTrials=2500000;
-% clus2run = [18:2:30]; 
-% batchSizeVals=[333, 500, 1000];
-
-% new 4 - batchSizes based on mean updates per clus per batch (avgBatch)
-% fixBatchSize = 0;
-% clus2run = [18:2:30]; 
-% % clus2run = [18 22 28]; % running these on love01
-% batchSizeVals=[1, 2, 5, 10, 25, 35, 50]; %avgBatchVals - 1,2,5 new
-
-%new 5 - circ
-% fixBatchSize = 1;
-% clus2run = [10:2:20, 22:26, 28, 30];
-% % clus2run = 14; % plotting one nClus cond over sets
-% nTrials=2500000;
-% % batchSizeVals=[125, 167, 250, 333, 500, 1000, 2000];
-% batchSizeVals=[167, 250, 333, 500, 1000, 2000];
-% %wAct
-% clus2run = [16 18 20 24];
-% batchSizeVals=[1000, 2000];
-% dat='circ';
-
-%new 5 - trapz
-% fixBatchSize = 1;
-% clus2run = [12:2:18 22, 26]; % trapz1-3, krupic
-% clus2run = [16, 18, 20, 22, 24, 26, 28, 30]; %new - more clusters (trapzScaled1-3, krupic2,3)
-% clus2run = [16, 18, 20, 24, 26, 30]; %krupic3 done
-% nTrials=2500000;
-% batchSizeVals=1000;
-% dat='trapzKrupic3'; %trapz1, trapz2, trapz3, trapzKrupic, trapzNorm (or rename to trapz)
-
 % joined trials
 jointTrls=1;
 % epsMuVals=.025;
@@ -97,36 +31,13 @@ jointTrls=1;
 % batchSizeVals=400;
 % annEps=0;
 
-% dat='trapzKrupic';
-% % clus2run = [8, 12, 16, 20, 24,28]; 
-% % 
-% % % 6, 10, 14, 18, 22, 26 - 
-% % clus2run = [8:2:28]; 
-
-% clus2run = [3:2:26]; 
-% clus2run = [10,15,20,25];
-% clus2run = [4:25];
-
-% batchSizeVals = 400; %100, 125, 200,400, 1000
-% batchSizeVals = 200;
-
-%new - slower learning rate
-% epsMuVals=.015;
-% batchSizeVals = 100; %100, 125, 200, 400
-% clus2run = [12, 16, 24, 28]; %batchSize200 missed 20?
-
 %200 iters orig
 nIter=200;
 actOverTime = 1;
-nSet        = 21; %was 22 now 21
+nSet        = 21;
 
-% clus2run = 3:30;
-
-% % %1000 iters
+%1000 iters
 nIter=1000;
-% nSet = 1;
-% clus2run = 3:30;
-% clus2run = [10, 12:26]; 
 
 if nIter == 1000
    actOverTime = 0;
@@ -134,15 +45,10 @@ if nIter == 1000
 end
 
 %new - annealed learning rate
-% clus2run  = 3:30;
 clus2run  = 10:30;
-% clus2run  = [10:18, 20:30];
-% epsMuVals = 0.1;
-% epsMuVals = 0.15;
-epsMuVals = 0.25; %use this one
+epsMuVals = 0.25;
 nTrials=1000000;
-% batchSizeVals = 400;
-batchSizeVals = 200; %new
+batchSizeVals = 200;
 annEps=1;
 
 rHex=0; %if choose raw 60deg corr values, not gridness
@@ -154,20 +60,8 @@ rHex=0; %if choose raw 60deg corr values, not gridness
 % clus2run=10:30;
 % nIter=1000;
 
-
-%new trapzKrupic dimensions
-% dat='trapzKrupic';
-% nTrials=1000000;
-% epsMuVals = 0.25; %use this one
-% batchSizeVals = 400;
-% annEps=1;
-% nIter=200;
-
 % annEps=0;
 % epsMuVals = 0.025;
-
-% clus2run  = [10, 12, 14, 16, 18, 20, 23, 25]; 
-
 
 %load loop
 for iClus2run = 1:length(clus2run) 

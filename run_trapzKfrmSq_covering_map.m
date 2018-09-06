@@ -1,5 +1,5 @@
-% load in sq map already run, then run covering map on trapz (smaller)
-% shape
+% Learning in trapezoid after learning in square
+% Load in clustering learnt in square map (already run), then run covering map on trapz (smaller) shape
 
 clear all;
 
@@ -21,10 +21,8 @@ dat2 = 'trapzKfrmSq1'; % run covering map on sq, then assess gridness in trapz
 saveDat=1;
 
 %for loading
-epsMuVals=.025;
 nTrials=1000000;
-
-nIter=200;
+% nIter=200;
 nIter=1000;
 
 annEps=1;
@@ -35,30 +33,16 @@ else
 end
 jointTrls=1;
 
-% trapz sims here
-nTrials2 = nTrials/4; %/2, /4?
-
-nTrials2 = nTrials/2; %trying this 
-
-
-% nBatches = 2500;
-nBatches = 5000;%new
+% trapz learning
+nTrials2 = nTrials/4;
+nBatches = 5000;
 batchSizeVals = nTrials./nBatches; %match original batchsize values (nTrials being original nTrials)
 nBvals = length(batchSizeVals);
 nIter2run = nIter;
+epsMuTrapz = 0.0025; %not used
 
-%fixed
-epsMuTrapz = 0.0025;
+clus2run = 10:30;
 
-%love01 - correct trapzKrupic scale now - done
-clus2run = [13, 15, 12, 20, 11, 18];  
-clus2run = [22, 27, 26, 19, 14]; 
-clus2run = [25, 10, 17, 24, 21]; 
-clus2run = [16, 29, 28, 30, 23]; 
-
-%testing
-% clus2run = 13;
-% nIter2run = 1;
 %%
 
 for iClus2run = 1:length(clus2run)

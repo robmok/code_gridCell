@@ -29,7 +29,6 @@ boxSize=1;
 jointTrls=1;
 epsMuVals=.025;
 nTrials=1000000;
-% batchSizeVals=400;
 batchSizeVals=200;
 
 % nIter=200;
@@ -39,26 +38,21 @@ nIter=1000;
 loadPerm = 1;
 
 if strcmp(dat(1:4),'trap')
-%     nTrials=1000000/2;
-    nTrials=1000000/4; %using this now
-    if batchSizeVals == 200
-        epsMuTrapz10 = 25;
-    elseif batchSizeVals == 400
-        epsMuTrapz10 = 50; %could also run 25 - no, 25 reduced too quick
-    end
+    nTrials=1000000/4;
+%     if batchSizeVals == 200
+%         epsMuTrapz10 = 25;
+%     elseif batchSizeVals == 400
+%         epsMuTrapz10 = 50; %could also run 25 - no, 25 reduced too quick
+%     end
+    epsMuTrapz10 = 25;
     loadPerm=0;
 end
 
 clus2run = 10:30;
 
-% batchSizeVals = 400; %200,400 (100, 125, 1000)
-% batchSizeVals = 200;
-
 %new annEps
 annEps=1;
-% epsMuVals = 0.1;
 epsMuVals = 0.25;
-
 
 rHex=0; %if choose raw 60deg corr values, not gridness
 
@@ -157,12 +151,10 @@ for iClus2run = 1:length(clus2run)
                 perm=load(f(1).name);
                 nIter = nIterOrig; nIters2run = nIter;
             end
-            
             if doPerm || loadPerm
                 gA_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = perm.permPrc_gA_actNorm(:,3,:);
                 gW_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = perm.permPrc_gW_actNorm(:,3,:);
             end
-            
         end 
     end
 end
@@ -286,11 +278,6 @@ end
 
 iEps=1;
 
-% clus2plot=(3:30)-2;
-% clus2plot=(6:30)-2;
-% clus2plot=(10:30)-2;
-% clus2plot=(10:26)-2;
-
 clus2plot=1:length(clus2run);
 
 iBatchVals=1;
@@ -308,9 +295,7 @@ figure; hold on;
         colgrey = [.6, .6, .6];
         mu      = mean(dat1,1);
         sm      = std(dat1)./sqrt(size(dat1,1));
-%         ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
         plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-%         errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
         scatter(barpos,mu,50,colgrey,'filled','d');
         xticklabels(xTickLabs);
         xlim([barpos(1)-.5, barpos(end)+.5]);
@@ -384,10 +369,7 @@ if ~strcmp(dat(1:4),'trap') && loadPerm
     xlabel('Number of Clusters');
     ylabel('Proportion "Grid Cells"');
     set(gca,'FontSize',fontSiz,'fontname','Arial')
-
-%             title('Circular box')
     fname = [figsDir sprintf('/gridness_%s_propGridCells_permPrc%d_testSet_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,permPrc,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
-    
     if savePlots
         set(gcf,'Renderer','painters');
         print(gcf,'-depsc2',fname)
@@ -396,13 +378,11 @@ if ~strcmp(dat(1:4),'trap') && loadPerm
     end
 end
 
-
 if strcmp(dat(1:4),'trap')
     figure; hold on;
     dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,2));
     mu      = nanmean(dat1,1);
     sm      = nanstd(dat1)./sqrt(size(dat1,1));
-    ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
     plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
     scatter(barpos,mu,50,colgrey,'filled','d');
     xticklabels(xTickLabs);
@@ -414,13 +394,11 @@ if strcmp(dat(1:4),'trap')
     set(gca,'FontSize',fontSiz,'fontname','Arial')
     
     fname = [figsDir sprintf('/gridness_%s_L_univarScatters_testSet_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
-    
     if savePlots
         set(gcf,'Renderer','painters');
         print(gcf,'-depsc2',fname)
         saveas(gcf,fname,'png');
     end
-    
     
     figure; hold on;
     dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,3));
@@ -438,7 +416,6 @@ if strcmp(dat(1:4),'trap')
     set(gca,'FontSize',fontSiz,'fontname','Arial')
     
     fname = [figsDir sprintf('/gridness_%s_R_univarScatters_testSet_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
-    
     if savePlots
         set(gcf,'Renderer','painters');
         print(gcf,'-depsc2',fname)
@@ -458,11 +435,9 @@ if strcmp(dat(1:4),'trap')
     xlabel('Number of Clusters');
     ylabel('Grid Score');
     set(gca,'FontSize',fontSiz,'fontname','Arial')
-    
     title('Left-right half of Trapezoid box')
     
     fname = [figsDir sprintf('/gridness_%s_L-R_univarScatters_testSet_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
-    
     if savePlots
         set(gcf,'Renderer','painters');
         print(gcf,'-depsc2',fname)
@@ -536,11 +511,11 @@ else
         end
     end
     fprintf('trapz, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f];  %d sig > 0, out of %d sig conds. %0.2f percent\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
-    dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,2));
-    ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs 
+    dat1  = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,2));
+    ci    = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs 
     fprintf('trapzL %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2));
-    dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,3));
-    ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs 
+    dat1  = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,3));
+    ci    = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs 
     fprintf('trapzR %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2));
     % individual nClus cond CIs, L-R
     dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,2))-squeeze(datTmp(:,iEps,iBatchVals,clus2plot,3));
@@ -552,7 +527,6 @@ else
         ciTmp = bootci(nBoot,@nanmean,dat1(:,iClus));
         ciTest2(:,cnter) = [nanmean(dat1(:,iClus),1); ciTmp]; % mean & CIs
         
-        %check CIs sig
         posInd=ciTest2(:,cnter)>0;
         negInd=ciTest2(:,cnter)<0;
         if all(posInd)
@@ -569,52 +543,6 @@ else
     fprintf('trapzL-R, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f];  %d sig > 0, out of %d sig conds. %0.2f percent\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
 end
 end
-%%
-
-if plotFewClus
-%plot 3:5
-clus2plot=(3:5)-2;
-clus2plot=(3:9)-2;
-%fig specs
-xTickLabs = num2cell(clus2run(clus2plot));
-fontSiz=15;
-figure; hold on;
-    for iEps = 1:length(epsMuVals)
-        %     subplot(2,3,iEps);
-        dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,1));
-        barpos  = .25:.5:.5*size(dat1,2);
-        colors  = distinguishable_colors(size(dat1,2));
-        colgrey = [.5, .5, .5];
-        mu      = mean(dat1,1);
-        sm      = std(dat1)./sqrt(size(dat1,1));
-        ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
-        plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-        errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-        scatter(barpos,mu,50,colors,'filled','d');
-        xticklabels(xTickLabs);
-        xlim([barpos(1)-.5, barpos(end)+.5]);
-        %         ylim([0,1]);
-        
-        if strcmp(gridMsrType,'a')
-            ylim([-.45,1.4]);
-        elseif strcmp(gridMsrType,'w')
-            ylim([-1.25,1.4]);
-        end
-        xlabel('Number of Clusters');
-        ylabel('Grid Score');
-        
-        title(sprintf('%s, %s - eps=%d, batchSize=%d',dat, gridMeasure,epsMuVals(iEps)*1000,batchSizeVals(iBatchVals)))
-        set(gca,'FontSize',fontSiz,'fontname','Arial')
-    end
-
-    fname = [figsDir sprintf('/gridness_%s_univarScatters_nClus%d-%d_eps%d_batchSiz%d_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
-if savePlots
-   set(gcf,'Renderer','painters');
-   print(gcf,'-depsc2',fname)
-   saveas(gcf,fname,'png');
-    close all
-end
-end
 %% Making figs: density plot examples
 
 savePlots = 1;
@@ -627,12 +555,8 @@ clusPosAct = 'actNorm'; %'clus' or 'actNorm'
 
 gridMsrType = 'a';
 
-% clus2plot = [7,10,12,25]-2;%[5,8,13,18];
-% clus2plot = 10-2;
-%
 clus2plot = [10,12,18,25]-9;
 % clus2plot = ([10,12,18,20,23,25,28])-9;
-
 clus2plot = [12, 18, 20, 23, 25, 28]-9; %10
 
 
@@ -642,11 +566,6 @@ clus2plot = [12, 18, 20, 23, 25, 28]-9; %10
 % clus2plot = [12, 14, 18, 20, 23]-9;
 
 clus2plot = [25]-9; %
-
-
-% clus2plot = (3:5)-2;
-
-% clus2plot=(10:15)-9;
 
 myColorMap = parula;
 myColorMap(end,:) = 1;
@@ -690,9 +609,7 @@ for iBvals = 1:length(batchSizeVals)
             aCorrMap(isnan(aCorrMap))=1.1;
         end
         
-        
         figure; imagesc(densityPlotTmp,zlims); colormap(gcf,myColorMap);
-%         figure; imagesc(densityPlotTmp); colorbar;
         xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
         fname = [figsDir sprintf('/densityPlot_testSet_%s_nClus%d_eps%d_batchSiz%d_%s_%s_iter%d_clusters',dat,iClus+9,epsMuVals(iEps)*1000,batchSizeVals(iBvals),clusPosAct,gridMsrType,iterI)];
         if annEps
@@ -705,7 +622,6 @@ for iBvals = 1:length(batchSizeVals)
            close all
         end
         figure; h=imagesc(aCorrMap,[-1.1 1.1]); colormap(gcf,myColorMap);
-%         figure; imagesc(aCorrMap); colorbar
         title(sprintf('g = %.2f',g));
         set(gca,'FontSize',fontSiz,'fontname','Arial')
         xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
@@ -721,7 +637,6 @@ for iBvals = 1:length(batchSizeVals)
         end
         
         if strcmp(dat(1:4),'trap')
-%             h=50; hLeft = 20; hRight = 30;
             h=50; hLeft=17; hRight=33;% - 33 = start from 18 from left
             aCorrMap = ndautoCORR(densityPlotCentresSm(:,1:hLeft));
             [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
@@ -794,10 +709,6 @@ switch clusPosAct
         end
 end
 
-% clus2plot=([3:30])-2;
-% clus2plot=([6:26])-2;
-% clus2plot=([10:26])-2;
-% clus2plot=([10:30])-2;
 clus2plot=1:length(clus2run);
 
 iBatchVals=1; %'medium' one
@@ -806,44 +717,24 @@ iBatchVals=1; %'medium' one
 xTickLabs = num2cell(clus2run(clus2plot));
 fontSiz=15;
 
-% gA_act_permPrc(:,1,1,:)
-
 dSize=400;
 
 figure; hold on;
     for iEps = 1:length(epsMuVals)
-        %     subplot(2,3,iEps);
         dat1     = squeeze(permThresh(:,iEps,iBatchVals,clus2plot,1));
         barpos  = .25:.5:.5*size(dat1,2);
         colors  = distinguishable_colors(size(dat1,2));
         colgrey = [.5, .5, .5];
         mu      = mean(dat1,1);
-%         sm      = std(dat1)./sqrt(size(dat1,1));
-%         ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
         plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-%         scatter(barpos,mean(dat1),dSize,colors,'d'); %mean
         scatter(barpos,mean(dat1),50,colgrey,'filled','d');
-
-%         scatter(barpos,max(dat1),dSize,colors,'d');  %max
-        scatter(barpos,prctile(dat1,100),dSize,colors,'x');  %
-
-%         prctile(dat1,[2.5, 97.5])
+        scatter(barpos,prctile(dat1,100),dSize,colors,'x');  
         xticklabels(xTickLabs);
         xlim([barpos(1)-.5, barpos(end)+.5]);
-%         if strcmp(gridMsrType,'a')
-%             ylim([-.45,1.4]);
-%         elseif strcmp(gridMsrType,'w')
-%             ylim([-1.25,1.4]);
-%         end
         xlabel('Number of Clusters');
-        ylabel('Grid Score Threshold (95% of permuted distribution)');
-        
-        
-%         title(sprintf('%s, %s - eps=%d, batchSize=%d',dat, gridMeasure,epsMuVals(iEps)*1000,batchSizeVals(iBatchVals)))
-        
+        ylabel('Grid Score Threshold (95% of permuted distribution)');        
         set(gca,'FontSize',fontSiz,'fontname','Arial')
     end
-
     fname = [figsDir sprintf('/gridness_%s_univarScatters_permThresh_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
     if annEps
        fname = [fname '_annEps']; 
@@ -853,16 +744,6 @@ if savePlots
    print(gcf,'-depsc2',fname)
    saveas(gcf,fname,'png');
 end
-
-   
-
-
-% squeeze(min(min(permThresh(:,1,1,:))))
-% squeeze(mean(mean(permThresh(:,1,1,:))))
-% squeeze(max(max(permThresh(:,1,1,:))))
-    
-
-
 %% trapz vs orig sq gridness / circ vs sq
 
 savePlots=0;
@@ -876,19 +757,6 @@ gridMeasure = 'grid';
 computeCIs=1; 
 
 switch clusPosAct
-%     case 'act'
-%         switch gridMsrType
-%             case 'a'
-%                 gridness    = gA_gAll_act;
-%                 orientation = gA_oAll_act;
-%                 rad         = gA_radAll_act;
-%                 wav         = gA_wavAll_act;
-%             case 'w'
-%                 gridness    = gW_gAll_act;
-%                 orientation = gW_oAll_act;
-%                 rad         = gW_radAll_act;
-%                 wav         = gW_wavAll_act;
-%         end
     case 'actNorm'
         switch gridMsrType
             case 'a'
@@ -916,13 +784,6 @@ end
 
 iEps=1;
 
-% clus2plot=(3:30)-2;
-% clus2plot=(6:30)-2;
-% clus2plot=(10:30)-2;
-% clus2plot=(10:26)-2;
-
-% clus2plot=(3:26)-2;
-
 clus2plot = 1:length(clus2run);
 
 iBatchVals=1;
@@ -938,15 +799,10 @@ figure; hold on;
         colors  = distinguishable_colors(size(dat1,2));
         colgrey = [.6, .6, .6];
         mu      = mean(dat1,1);
-%         sm      = std(dat1)./sqrt(size(dat1,1));
-%         ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
         plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-%         errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-%         scatter(barpos,mu,50,colors,'filled','d');
         scatter(barpos,mu,50,colgrey,'filled','d');
         xticklabels(xTickLabs);
         xlim([barpos(1)-.5, barpos(end)+.5]);
-        %         ylim([0,1]);
         if strcmp(gridMsrType,'a')
             ylim([-1.5,2]);
         elseif strcmp(gridMsrType,'w')
@@ -955,7 +811,6 @@ figure; hold on;
         xlabel('Number of Clusters');
         ylabel('Grid Score');
         title('Square-Trapezoid')
-
         set(gca,'FontSize',fontSiz,'fontname','Arial')
     end
     fname = [figsDir sprintf('/gridness_%s_univarScatters_testSet_nClus%d-%d_eps%d_batchSiz%d_%s_%s','trapzKfrmSq1_Sq-Trapz',clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
@@ -996,5 +851,3 @@ if computeCIs
         fprintf('Circ-Square box, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig Circ-Square, %d sig Square-Circ, %0.2f percent C>Sq\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),mean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig==-1),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
     end
 end
-
-
