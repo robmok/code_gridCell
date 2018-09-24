@@ -1,9 +1,7 @@
 function muInit = kmplusInit(dataPts,nK)
+%kmeans++ initiatialization
 
-%k means ++ initiatialization
-
-for i=1:nK
-    
+for i=1:nK    
     if i==1% random datapoint as 1st cluster
         muInit(i,:,1) = dataPts(randi(length(dataPts)),:);
     end
