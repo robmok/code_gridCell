@@ -1,3 +1,5 @@
+%% Plotting script 3: category learning demo
+
 clear all;
 
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
@@ -16,14 +18,8 @@ boxSize=1;
 nIter=50; %20, 50
 locRange = [0, 49];
 
-% clus2run = 2:26; 
 % clus2run = [2,3,4,5,8]; 
 % clus2run = [10, 15,20,25,30]; 
-
-% clus2run = [2,3,4]; 
-% clus2run = [5,8,10]; 
-% clus2run = [15, 25, 30]; 
-
 clus2run = 18;
 
 jointTrls=0;
@@ -38,18 +34,16 @@ stoch=0;
 cVals = 0;
 
 catsInfo.nCats=2; %2 categories
-% sigmaG = [5 0; 0 5];   % isotropic % sigmaG = [1 .5; .5 2]; R = chol(sigmaG);  % non-isotropic
-sigmaG = [3 0; 0 3];
+sigmaG = [3 0; 0 3];  % isotropic
 catsInfo.R=chol(sigmaG);
 
 catsInfo.msExample = 1;
-
 
 %load loop
 muAllClus = cell(1,length(clus2run));
 rSeedAll  = cell(length(clus2run),length(batchSizeVals),length(cVals));
 
- for iClus = 1:length(clus2run)
+for iClus = 1:length(clus2run)
     nClus = clus2run(iClus);
     for iEps = 1:length(epsMuVals)
         epsMuOrig=epsMuVals(iEps);
@@ -57,29 +51,22 @@ rSeedAll  = cell(length(clus2run),length(batchSizeVals),length(cVals));
         for iBvals = 1:length(batchSizeVals)
             for iC = 1:length(cVals)
                 fprintf('Loading %s, nClus=%d, epsMu=%d, c=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000,cVals(iC),batchSizeVals(iBvals))
-
-%                 fname = [savDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wAct_%dcats_stoch%d_c%d_*',nClus,round(nTrials/1000),epsMuOrig1000,batchSizeVals(iBvals),nIter,dat,nCats,stoch,cVals(iC))];
                 fname = [savDir, sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_%dcats_stoch%d_c%d_*',nClus,round(nTrials/1000),epsMuOrig1000,batchSizeVals(iBvals),nIter,dat,nCats,stoch,cVals(iC))];
-
                 f=dir(fname);
                 load(f.name);
                 
                 %just load in those to plot
                 nBatches = size(muAll,3)-1;
-%                 trls2Plt = [1, nBatches*.25, nBatches*.5, nBatches*.75, nBatches+1];
                 trls2plt = [1, nBatches*.5, nBatches+1];
                 muAllClus{iClus}(:,:,:,:,iBvals,iC)=muAll(:,:,trls2plt,:);
                 rSeedAll{iClus,iBvals,iC} = rSeed;
-
+                
 %                 muAllClus{iClus}(:,:,:,:,iBvals,iC)=muAll;
-%                 muAllClus{iClus}(:,:,:,:,iEps,iBvals,iC)=muAll;                
-                
-                
+%                 muAllClus{iClus}(:,:,:,:,iEps,iBvals,iC)=muAll;
             end
         end
     end
 end
-    
 %% 
 
 %in the end used iter 13 and 14
@@ -103,7 +90,6 @@ catAcol = [catAcol+((1-catAcol).*.5); catAcol];
 catBcol = [catBcol+((1-catBcol).*.5); catBcol];
 
 % colors(:,:,2) = distinguishable_colors(nClus)+(1-distinguishable_colors(nClus)).*.5; %lighter
-
 
 for iterI=30:50
     

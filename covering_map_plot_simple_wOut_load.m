@@ -1,16 +1,14 @@
+%% Plotting script 4 - quickPlot: run a quick sim (e.g. nIter=1) and plot results
+
 %% plot centres 
 
 nClus = size(muAll,1);
 colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
 
-iterI=1; 
-
 for iSet=1%:4 %size(muAvg,3) %plot - diff averaging over nTrials
     figure; hold on;
-%     scatter(muAvg(:,1,iSet,iterI),muAvg(:,2,iSet,iterI),20e+2,colors,'.');
     scatter(muAll(:,1,end),muAll(:,2,end),20e+2,colors,'.');
     xlim(locRange); ylim(locRange);
-%     voronoi(muAvg(:,1,iSet,iterI),muAvg(:,2,iSet,iterI),'k');
 end
 
 %% gridness, autocorrelogram
@@ -47,24 +45,8 @@ spacing=linspace(locRange(1),locRange(2),locRange(2)+1)+1;
 %spacing split into 2 equal areas - trapzKrupic only for now]
 
 %krupic
-spacingTrapz = spacing(14:37);
-%boxSize=2
-% spacingTrapz = spacing(14:37+length(14:37));
-
-%trapzScaled1
-% spacingTrapz = spacing(10:41);
-
-a = length(spacingTrapz);
-b = length(spacing);
-h = length(spacing);
-halfArea = (((a+b)/2)*h)/2;
-c = sqrt(((a^2)+(b^2))/2);
-% hLeft  = round(halfArea/((b+c)/2)); %bigger side
-% hLeft  = floor(halfArea/((b+c)/2)); %bigger side
-% hRight = ceil(halfArea/((b+c)/2))+1; %smaller size - to equalize area more
-%equal number of points in trapz (301 each; nPoints in trap 877/2=438.5)
-hLeft = 14;
-hRight = 20;
+hLeft  = 17;
+hRight = 33;% - 33 = start from 18 from left % 27;
     
 gaussSmooth=1;
 for iSet=1:21%:22
@@ -112,10 +94,8 @@ figure('units','normalized','outerposition',[0 0 1 1]);
 iPlot = 1; subplot(3,4,iPlot); hold on;%subplot
 for iTrl = 1:nTrials
     if mod(iTrl,4000)==0
-%         voronoi(muAll(:,1,iTrl,toPlot),muAll(:,2,iTrl,toPlot),'k'); %plot at the END before starting new subplot
         iPlot=iPlot+1;
         subplot(3,4,iPlot); hold on;
-%         voronoi(muAll(:,1,iTrl,iterI),muAll(:,2,iTrl,iterI),'k'); %plot at the START showing the previous final positions
     end
     xlim(locRange); ylim(locRange);
 
@@ -126,8 +106,6 @@ for iTrl = 1:nTrials
         drawnow;
     end
 end
-% voronoi(muAll(:,1,iTrl,iterI),muAll(:,2,iTrl,iterI),'k'); %final one - if plotting at END above
-% xlim([min(trials(:,1))-.1,max(trials(:,1))+.1]); ylim([min(trials(:,2))-.1,max(trials(:,2))+.1]);
 
 if savePlots
     fname=[saveDir, sprintf('/covering_map_%d_clus_locs_plotOverTime_top_%d_trls_eps%d_alpha%d_%diters',nClus,nTrials,epsMuOrig100,alpha10,nIter)];
@@ -152,7 +130,7 @@ iterI = 1;
 colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
 colAgent = [.75, .75, .75];
 
-% colAgent gets darker over time? also clear the lines?
+% colAgent gets darker over time? 
 colAgentCh = fliplr(linspace(0,.9,nTrials));
 
 %if plotting agent over batches - need make cluster positions same over
@@ -256,35 +234,3 @@ for iPlot = 1:length(trls2plt)
         close all
     end
 end
-%% mu - plot each trial; could compute gridness on each trial?
-
-gaussSmooth=1;
-% 
-% spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
-% densityPlotClus      = zeros(length(spacing),length(spacing),nClus,nSets);
-% 
-% 
-% i = 30000; % could compute the gridness over trials..
-% 
-% for iClus=1:nClus
-%     clusTmp  = squeeze(round(muAll(iClus,:,i)))';
-%     for iTrlUpd=1:size(clusTmp,2)
-%         densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet) = densityPlotClus(clusTmp(1,iTrlUpd),clusTmp(2,iTrlUpd),iClus,iSet)+1;
-%     end
-% end
-% 
-% %make combined (grid cell) plot, smooth
-% densityPlotCentres(:,:,iSet) = sum(densityPlotClus(:,:,:,iSet),3);
-% densityPlotCentresSm = imgaussfilt(densityPlotCentres(:,:,iSet),gaussSmooth);
-% 
-% figure;
-% imagesc(densityPlotCentresSm);
-% 
-% aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram
-% figure;
-% imagesc(aCorrMap,[-.45 .45]);
-% 
-% figure;
-% [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
-% % [g,gdataW] = gridSCORE(aCorrMap,'wills',1);
-    

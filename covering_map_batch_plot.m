@@ -1,5 +1,8 @@
+%% Plotting script 1: train set
+
 clear all;
 
+% Set working directory
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 cd(wd);
