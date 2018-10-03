@@ -17,28 +17,31 @@ dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning
 % dat = 'square';   
 % dat = 'catLearn';
 
-%compute activation and densityPlotActNorm over time? takes longer
+% set number of clusters to run
+clus2run = 10:30;
+
+%compute activation and densityPlotActNorm over time - takes longer
 actOverTime = 1; 
 
 %annealed learning rate
 annEps = 1; %1 or 0
 
-jointTrls = 1;
-boxSize = 1; % 1=normal, 2=double size, 3=triple size
+% learning rate
+if annEps
+    epsMuVals = 0.25;
+else
+    epsMuVals = 0.025;
+end
 
-% if cat learning specify number of categories (cluster centres) and sigma of the gaussan
-catsInfo.nCats=2; %2 categories
+% if cat learning, specify number of categories (cluster centres) and sigma of the gaussan
+catsInfo.nCats = 2; %2 categories
 sigmaG = [7 0; 0 7]; % variance - isotropic
-catsInfo.R=chol(sigmaG);
+catsInfo.R = chol(sigmaG);
 catsInfo.msExample = 1; % set 2 gaussians in opposite sides of the square - example for ms
-
-% set number of clusters to run
-clus2run = 10:30;
 
 % number of learning/training trials
 if ~strcmp(dat(1:3),'cat')
     nTrials = 1000000;
-%     nTrials = 200000;
 else
     nTrials = 50000; %cat learning - less trials
 end
@@ -51,20 +54,14 @@ end
 batchSizeVals = nTrials./nBatches;
 nBvals = length(batchSizeVals);
 
-% parameters
-epsMuVals = 0.025;
-if annEps
-    epsMuVals = 0.25;
-end
-
-% use the same training data (trials) across current sims or gen new data
-useSameTrls=0;
-
-%box
+% environment
 nSteps = 50; %to define spacing beween each loc in box
 locRange = [0, nSteps-1]; %[-1, 1]; % from locRange(1) to locRange(2)
-stepSize=diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %smallest diff between locs
+stepSize = diff(linspace(locRange(1),locRange(2),nSteps)); stepSize=stepSize(1); %smallest diff between locs
+jointTrls = 1; % simulating agent moving around environment
 
+% use the same training data (trials) across current sims or gen new data
+useSameTrls=0; %set to 0
 %%
 saveDat=1; %save simulations
 
@@ -73,7 +70,7 @@ nIter=1;%1000; %200 for doing activations over time, 1000 for full simulations w
 if useSameTrls
     trials=[]; trialsUnique=[];
 else
-    trials=[]; %trialsUnique=[];
+    trials=[]; 
 end
 
 tic
