@@ -14,7 +14,6 @@ covering_map_batch_run.m
 covering_map_batch_sim.m
 - called by main run script, covering_map_batch_run.m, - simulation script
 
-
 run_gridnessTestDataPerm.m
 - run script for ‘test’ set - plotting cluster activations after learning, with option to perform shuffling/permutation tests for stats on grid score
 
@@ -42,25 +41,24 @@ covering_map_plot_simple_wOut_load.m
 #FUNCTIONS#
 ###########
 
-createTrls.m - creates trials (x-y coordinates) for different spatial environments
-
 bootrm.m - bootstrap confidence intervals for mean and percent/proportion
+createTrls.m - creates trials (x-y coordinates) for different spatial environments
+nanconv.m - convolution in 1D or 2D ignoring NaNs; used for smoothing
 
 
-plotSpread.m
+#Functions for univariate scatterplots
 isEven.m
-myErrorbar.m
+myErrorbar.m 
+plotSpread.m
 repeatEntries.m
-nanconv.m
 
+#Computing grid scores - within directory: gridSCORE_packed
+ndautoCORR.m - computes an autocorrelation or crosscorrelation across two arrays
+gridSCORE.m - takes autocorrelation plot and computes grid score - can compute two grid scores, the one used in this project is the ’allen’ method
 
-Computing grid scores - within directory: gridSCORE_packed
-gridSCORE.m
-ndautoCORR.m
 
 Within gridSCORE_packed/gridSCORE_dependencies
 - from the geom2d toolbox: https://uk.mathworks.com/matlabcentral/fileexchange/7844-geom2d
-
 
 
 Unused but could be used
