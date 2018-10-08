@@ -9,7 +9,6 @@ wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
-
 codeDir = [wd '/code_gridCell'];
 saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
@@ -23,8 +22,8 @@ saveDat=1;
 
 %for loading
 nTrials=1000000;
-% nIter=200;
 nIter=1000;
+% nIter=200;
 
 annEps=1;
 if ~annEps
@@ -33,16 +32,14 @@ else
     epsMuVals=.25;
 end
 jointTrls=1;
-
-% trapz learning
+% set trapz learning trials
 nTrials2 = nTrials/4;
 nBatches = 5000;
 batchSizeVals = nTrials./nBatches; %match original batchsize values (nTrials being original nTrials)
 nBvals = length(batchSizeVals);
 nIter2run = nIter;
-epsMuTrapz = 0.0025; %not used
+epsMuTrapz = 0.0025; % used if fixed learning rate
 clus2run = 10:30;
-
 %%
 
 for iClus2run = 1:length(clus2run)
@@ -54,7 +51,7 @@ for iClus2run = 1:length(clus2run)
             batchSize = batchSizeVals(iBvals);
             fprintf('Running %s, nClus=%d, epsMu=%d, batchSize=%d\n',dat2,nClus,epsMuOrig1000, batchSize)
             
-            %load in sq
+            %load in cluster positions from square
             fname = sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat1);
             %finish with directory and * for date/time
             if ~annEps
@@ -62,7 +59,6 @@ for iClus2run = 1:length(clus2run)
             else
                 fname = [saveDir, fname '*annEps*']; %new position of annEps - works now - above no need
             end
-            
             f = dir(fname); filesToLoad = cell(1,length(f));
             if isempty(f) %if no file, don't load/save - but print a warning
                 warning('No file for: %s\n',fname);
@@ -75,7 +71,6 @@ for iClus2run = 1:length(clus2run)
                 for iterI = 1:nIter
                     [clusPos(:,1,iterI), clusPos(:,2,iterI)] = find(densityPlot(:,:,end,iterI)>0); %find cluster positions - added >0 since counts nans as well
                 end
-                
                 % run
                 tic
                 [densityPlot,~,gA,gW,~,~,rSeed] = covering_map_batch_sim_clusPosIn(clusPos,nClus,locRange,epsMuOrig,epsMuTrapz,nTrials,nTrials2,batchSize,nIter2run,dat2,annEps,jointTrls);

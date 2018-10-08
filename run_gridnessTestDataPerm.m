@@ -7,11 +7,10 @@ wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
-
-codeDir = [wd '/code_gridCell'];
-saveDir = [wd '/data_gridCell'];
+codeDir = [wd '/code_gridCell'];  %where the code lives
+saveDir = [wd '/data_gridCell'];  %where to save the output of the simulations
 addpath(codeDir); addpath(saveDir);
-addpath(genpath([codeDir '/gridSCORE_packed']));
+addpath(genpath([codeDir '/gridSCORE_packed'])); % add path to code for computing grid measures
 
 locRange = [0 49];
 nTrialsTest = 100000; % orig nTrials/10
@@ -23,16 +22,15 @@ dat = 'trapzKfrmSq1'; % trapz from square
 
 %set
 saveDat=1;
-nIter = 200;  %for do perm (500 perms on each iter: 500*200)
-nIter = 1000; %noPerm - if just to plot activation maps
+nIter = 200;  %for doPerm (500 perms on each iter: 500*200)
+nIter = 1000; %noPerm - if just to make activation maps
 
 clus2run = 10:30;
 epsMuVals=.025;
 nTrials=1000000;
-% batchSizeVals=400;
-batchSizeVals=200; %new
+batchSizeVals=200;
 annEps=1;
-if annEps %new
+if annEps 
     epsMuVals=.25; %below multiplies this by 1k for file name
 end
 
@@ -86,8 +84,8 @@ for iClus2run = 1:length(clus2run)
             if isempty(f) %if no file, don't load/save - but print a warning
                 warning('No file for: %s\n',fname);
             elseif ~isempty(f)
-                %might have problem with overlapping file names
-                for iF = 1%:length(f)
+                %might have problem with overlapping file names if done more than once
+                for iF = 1
                     load(f(iF).name);
                 end
                                 

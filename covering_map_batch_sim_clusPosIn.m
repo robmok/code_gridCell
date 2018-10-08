@@ -1,5 +1,7 @@
 function [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,rSeed,muAll,trials] = covering_map_batch_sim_clusPosIn(clusPos,nClus,locRange,epsMuOrig,epsMuTrapz,nTrialsOrig,nTrials,batchSize,nIter,dat,annEps,jointTrls)
+% loads in a set of cluster positions, runs clustering on a new env (trapz)
 
+%some settings
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
 gaussSmooth=1; %smoothing for density map
 imageFilter = fspecial('gaussian',5,gaussSmooth); %this is default for imgaussfilt
@@ -30,14 +32,13 @@ gW = nan(nSets,nIter,9);
 gA_actNorm = nan(nSets,nIter,9);
 gW_actNorm = nan(nSets,nIter,9);
 
-%if trapz - compute gridness of left/right half of boxes too
+%if trapz - compute gridness of left/right half
 if strcmp(dat(1:4),'trap')
     gA = nan(nSets,nIter,9,3);
     gW = nan(nSets,nIter,9,3);
     gA_actNorm = nan(nSets,nIter,9,3);
     gW_actNorm = nan(nSets,nIter,9,3);
 end
-
 %set densityPlot array size
 b = length(spacing);
 h = length(spacing);
@@ -48,9 +49,7 @@ hRight = 33;% - 33 = start from 18 from left % 27;
 % now setting/refreshing some of these over sets below
 densityPlot        = zeros(b,h,nSets,nIter);
 densityPlotActNorm = zeros(b,h,nSets,nIter);
-
 for iterI = 1:nIter
-    
     fprintf('iter %d \n',iterI);
     catsInfo =[];
     [trials,~, rSeed(iterI),ntInSq] = createTrls(dat,nTrials,locRange,0,jointTrls,catsInfo);
@@ -66,22 +65,19 @@ for iterI = 1:nIter
 
             %compute distances - vectorise both clusters and trials (in batch)
             dist2Clus = sqrt(sum(reshape([mu(:,1,iBatch)'-trls2Upd(:,1), mu(:,2,iBatch)'-trls2Upd(:,2)].^2,batchSize,nClus,2),3));% reshapes it into batchSize x nClus x 2 (x and y locs)
-            
             %update cluster positions
             closestC = nan(1,batchSize);
             for iTrlBatch = 1:batchSize
                 closestTmp = find(min(dist2Clus(iTrlBatch,:))==dist2Clus(iTrlBatch,:));
-                
                 if numel(closestTmp)>1
                     closestC(iTrlBatch) = randsample(closestTmp,1);
                 else
                     closestC(iTrlBatch) = closestTmp;
                 end
             end
-            
             %learning rate
             if annEps %if use annealed learning rate
-                epsMu = epsMuOrig/(1+(annEpsDecay*(iBatch+nBatchOrig))); %new
+                epsMu = epsMuOrig/(1+(annEpsDecay*(iBatch+nBatchOrig)));
             else
                 epsMu = epsMuOrig;
             end
@@ -94,13 +90,12 @@ for iterI = 1:nIter
                     deltaMu(iClus,2,iBatch) = nanmean(epsMu*(trls2Upd(updInd,2)-mu(iClus,2,iBatch)));
                 end
             end
-
             % update
             mu(:,1,iBatch+1) = mu(:,1,iBatch) + deltaMu(:,1,iBatch);
             mu(:,2,iBatch+1) = mu(:,2,iBatch) + deltaMu(:,2,iBatch);
     end
     if nargout > 7
-        muAll(:,:,:,iterI)      = mu;
+        muAll(:,:,:,iterI) = mu;
     end
 
     % densityplot
@@ -135,7 +130,6 @@ for iterI = 1:nIter
             gA(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
             [g,gdataA] = gridSCORE(aCorrMap,'wills',0);
             gW(iSet,iterI,:,1) = [gdataA.g_score, gdataA.orientation, gdataA.wavelength, gdataA.radius, gdataA.r'];
-            
             %trapz left and right of box
             if  strcmp(dat(1:4),'trap')
                 %left half of box

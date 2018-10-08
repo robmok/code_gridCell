@@ -7,7 +7,7 @@ wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
-codeDir = [wd '/code_gridCell']; %where the code live
+codeDir = [wd '/code_gridCell']; %where the code lives
 saveDir = [wd '/data_gridCell']; %where to save the output of the simulations
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed'])); % add path to code for computing grid measures
@@ -21,7 +21,7 @@ dat = 'circ';
 % dat = 'catLearn';
 
 % set number of clusters to run (set to one value during testing, e.g. 10)
-clus2run = 10%:30;
+clus2run = 10:30;
 
 %compute activation (densityPlotActNorm) over training time - takes longer
 %(only required for inspecting gridness over time)
@@ -95,7 +95,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
             else
                 [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed] = covering_map_batch_sim(nClus,locRange,catsInfo,epsMuOrig,nTrials,batchSize,nIter,trials,useSameTrls,dat,annEps,jointTrls,actOverTime);
                 %if testing a single sim, could run replace line above with line below to include 'muAll' and 'trials' - so can plot a single sim using: covering_map_plot_simple_wOut_load.m
-                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed, muAll,trials] = covering_map_batch_sim(nClus,locRange,catsInfo,epsMuOrig,nTrials,batchSize,nIter,trials,useSameTrls,dat,annEps,jointTrls,actOverTime);
+%                 [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed, muAll,trials] = covering_map_batch_sim(nClus,locRange,catsInfo,epsMuOrig,nTrials,batchSize,nIter,trials,useSameTrls,dat,annEps,jointTrls,actOverTime);
             end
             timeTaken=toc;
             
