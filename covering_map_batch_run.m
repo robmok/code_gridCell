@@ -7,20 +7,24 @@ wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
-codeDir = [wd '/code_gridCell'];
-saveDir = [wd '/data_gridCell'];
+codeDir = [wd '/code_gridCell']; %where the code live
+saveDir = [wd '/data_gridCell']; %where to save the output of the simulations
 addpath(codeDir); addpath(saveDir);
-addpath(genpath([codeDir '/gridSCORE_packed'])); % ****note edited this - in codeDir now not wd
+addpath(genpath([codeDir '/gridSCORE_packed'])); % add path to code for computing grid measures
 
-%define box / environment - random points in a box
-dat = 'circ'; % square, circ, rect, or cat (cat learning)cat = category learning in a 2D feature space
+%%%%%%%%
+%SET UP%
+%%%%%%%%
+%define box / environment -  circ, square, or cat (cat learning; cat = category learning in a 2D feature space)
+dat = 'circ';
 % dat = 'square';   
 % dat = 'catLearn';
 
-% set number of clusters to run
-clus2run = 10:30;
+% set number of clusters to run (set to one value during testing, e.g. 10)
+clus2run = 10%:30;
 
-%compute activation and densityPlotActNorm over time - takes longer
+%compute activation (densityPlotActNorm) over training time - takes longer
+%(only required for inspecting gridness over time)
 actOverTime = 1; 
 
 %annealed learning rate
@@ -28,15 +32,14 @@ annEps = 1; %1 or 0
 
 % learning rate
 if annEps
-    epsMuVals = 0.25;
+    epsMuVals = 0.25; %start from a high learning rate, reduce over time
 else
-    epsMuVals = 0.025;
+    epsMuVals = 0.025; %fixed learning rate
 end
 
 % if cat learning, specify number of categories (cluster centres) and sigma of the gaussan
-catsInfo.nCats = 2; %2 categories
-sigmaG = [7 0; 0 7]; % variance - isotropic
-catsInfo.R = chol(sigmaG);
+catsInfo.nCats = 2;  % 2 categories
+sigmaG = [7 0; 0 7]; catsInfo.R = chol(sigmaG); % variance - isotropic
 catsInfo.msExample = 1; % set 2 gaussians in opposite sides of the square - example for ms
 
 % number of learning/training trials
@@ -63,7 +66,7 @@ jointTrls = 1; % simulating agent moving around environment
 % use the same training data (trials) across current sims or gen new data
 useSameTrls=0; %set to 0
 %%
-saveDat=1; %save simulations
+saveDat=0; %save simulations
 
 nIter=1;%1000; %200 for doing activations over time, 1000 for full simulations without activations over time (variable size gets large), 20-50 for catLearn demo
 
@@ -88,9 +91,11 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
             %run
             tic
             if strcmp(dat(1:3),'cat') %save muAll
-                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll,trials] = covering_map_batch_sim(nClus,locRange,catsInfo,epsMuOrig,nTrials,batchSize,nIter,trials,useSameTrls,dat,annEps,jointTrls,actOverTime);
+                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,muAll,trials] = covering_map_batch_sim(nClus,locRange,catsInfo,epsMuOrig,nTrials,batchSize,nIter,trials,useSameTrls,dat,annEps,jointTrls,actOverTime);
             else
-                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB] = covering_map_batch_sim(nClus,locRange,catsInfo,epsMuOrig,nTrials,batchSize,nIter,trials,useSameTrls,dat,annEps,jointTrls,actOverTime);
+                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed] = covering_map_batch_sim(nClus,locRange,catsInfo,epsMuOrig,nTrials,batchSize,nIter,trials,useSameTrls,dat,annEps,jointTrls,actOverTime);
+                %if testing a single sim, could run replace line above with line below to include 'muAll' and 'trials' - so can plot a single sim using: covering_map_plot_simple_wOut_load.m
+                [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed, muAll,trials] = covering_map_batch_sim(nClus,locRange,catsInfo,epsMuOrig,nTrials,batchSize,nIter,trials,useSameTrls,dat,annEps,jointTrls,actOverTime);
             end
             timeTaken=toc;
             
@@ -116,7 +121,7 @@ for iClus2run = 1:length(clus2run) %nClus conditions to run
                 end
                 cTime=datestr(now,'HHMMSS'); fname = sprintf([fname '_%s'],cTime);
                 if strcmp(dat(1:4),'trap')
-                    save(fname,'densityPlot','gA','gW','rSeed','muInit','clusDistB','timeTaken'); 
+                    save(fname,'densityPlot','gA','gW','rSeed','muInit','timeTaken'); 
                 elseif strcmp(dat(1:3),'cat')
                     save(fname,'muAll','densityPlot','densityPlotActNorm','rSeed','muInit','timeTaken');
                 else 

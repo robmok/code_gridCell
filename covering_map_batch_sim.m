@@ -1,4 +1,4 @@
-function [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,clusDistB,muAll, trials] = covering_map_batch_sim(nClus,locRange,catsInfo,epsMuOrig,nTrials,batchSize,nIter,trials,useSameTrls,dat,annEps,jointTrls,actOverTime)
+function [densityPlot,densityPlotActNorm,gA,gW,gA_actNorm,gW_actNorm,muInit,rSeed,muAll, trials] = covering_map_batch_sim(nClus,locRange,catsInfo,epsMuOrig,nTrials,batchSize,nIter,trials,useSameTrls,dat,annEps,jointTrls,actOverTime)
 % run clustering algorithm with a batch update
 
 spacing=linspace(locRange(1),locRange(2),locRange(2)+1); 
@@ -18,7 +18,7 @@ if annEps
     end
 end
 
-%compute gridness over time 20 timepoints; - 21 sets now - last one is last quarter
+%compute gridness over time timepoints; - 21 sets, where last one include last quarter trials
 if actOverTime
     fromTrlI  = round([1,               nTrials.*.05+1,  nTrials.*.1+1,  nTrials.*.15+1,  nTrials.*.2+1,  nTrials.*.25+1,   nTrials.*.3+1,  nTrials.*.35+1,  nTrials.*.4+1,  nTrials.*.45+1,  nTrials.*.5+1,  nTrials.*.55+1, nTrials.*.6+1,  nTrials.*.65+1, nTrials.*.7+1, nTrials.*.75+1, nTrials.*.8+1,  nTrials.*.85+1,  nTrials.*.9+1,  nTrials.*.95+1, nTrials.*.75]);
     toTrlN    = round([nTrials.*.05,    nTrials.*.1,     nTrials.*.15,   nTrials.*.2,     nTrials.*.25,   nTrials.*.3,      nTrials.*.35,   nTrials.*.4,     nTrials.*.45,   nTrials.*.5,     nTrials.*.55,   nTrials.*.6,    nTrials.*.65,   nTrials.*.7,    nTrials.*.75,  nTrials.*.8,    nTrials.*.85,   nTrials.*.9,     nTrials.*.95,   nTrials,        nTrials]);
@@ -46,9 +46,6 @@ if strcmp(dat(1:4),'trap')
     gW_actNorm = nan(nSets,nIter,9,3);
 end
 
-%compute distance of each cluster to itself over time (batches)
-clusDistB = nan(nSets-1,nIter);
-
 if strcmp(dat(1:4),'trap') && length(dat)>10
     if strcmp(dat(1:11),'trapzKrupic')
         spacingTrapz = spacing(14:37);
@@ -58,8 +55,8 @@ if strcmp(dat(1:4),'trap') && length(dat)>10
             h = length(spacing);
         end
         % split trapz
-        hLeft=17;% 1:17
-        hRight=33;% - 33 means start from 18 from left, 18:50
+        hLeft  = 17;% 1:17
+        hRight = 33;% - 33 means start from 18 from left, 18:50
     end 
 else
     b=length(spacing);
@@ -82,7 +79,6 @@ for iterI = 1:nIter
     else
         mu(:,:,1) = reshape(randsample(locRange(1):diff(spacing(1:2)):locRange(2),nClus*2,'true'),nClus,2); %random
     end
-    % mu(:,:,1) = kmplusInit(dataPtsTest,nClus); %kmeans++ initialisation
     
     muInit(:,:,iterI) = mu(:,:,1);
     actTrl = zeros(nClus,batchSize);
@@ -110,13 +106,10 @@ for iterI = 1:nIter
                 end
                 %compute activation
                 actTrl(closestC(iTrlBatch),iTrlBatch)=mvnpdf(trls2Upd(iTrlBatch,:),mu(closestC(iTrlBatch),:,iBatch),eye(2)*sigmaGauss); % save only the winner
-                
                 %log which cluster has been updated
                 updatedC((iBatch-1)*batchSize+iTrlBatch) = closestC(iTrlBatch);
             end
-%             if ~strcmp(dat(1:4),'trap') %not computing for trapz
-                actTrlAll(:,:,iBatch) = actTrl;
-%             end
+            actTrlAll(:,:,iBatch) = actTrl;
             
             %learning rate
             if annEps %if use annealed learning rate
@@ -181,11 +174,6 @@ for iterI = 1:nIter
         densityPlotActNormTmp = densityPlotAct./densityPlotActUpd; %divide by number of times that location was visited
         densityPlotActNormTmp = nanconv(densityPlotActNormTmp,imageFilter, 'nanout');
         densityPlotActNorm(:,:,iSet,iterI) = densityPlotActNormTmp;
-        
-        %compute the sum of the distances between each cluster and itself over batches 
-        if iSet>1 
-           clusDistB(iSet-1,iterI)=sum(sqrt(sum([(mu(:,1,round(toTrlN(iSet)./batchSize)))-(mu(:,1,round(toTrlN(iSet-1)./batchSize))),(mu(:,2,round(toTrlN(iSet)./batchSize)))-(mu(:,2,round(toTrlN(iSet-1)./batchSize)))].^2,2)));
-        end
         
         if ~strcmp(dat(1:3),'cat') %if finding cats, won't be gridlike
             %compute autocorrmap
