@@ -18,17 +18,14 @@ boxSize=1;
 nIter=50; %20, 50
 locRange = [0, 49];
 
-% clus2run = [2,3,4,5,8]; 
-% clus2run = [10, 15,20,25,30]; 
 clus2run = 18;
 
-jointTrls=0;
-epsMuVals=.025;
-nTrials=50000;
-% batchSizeVals= [5, 10, 25]; %5, 10, 25?
-batchSizeVals= 10; 
+jointTrls = 0;
+epsMuVals =.025;
+nTrials   = 50000;
+batchSizeVals = 10; 
 
-nCats=2; %2,3,4
+nCats=2;
 stoch=0;
 % cVals = [2, 4, 10, 40];
 cVals = 0;
@@ -36,7 +33,6 @@ cVals = 0;
 catsInfo.nCats=2; %2 categories
 sigmaG = [3 0; 0 3];  % isotropic
 catsInfo.R=chol(sigmaG);
-
 catsInfo.msExample = 1;
 
 %load loop
@@ -60,15 +56,11 @@ for iClus = 1:length(clus2run)
                 trls2plt = [1, nBatches*.5, nBatches+1];
                 muAllClus{iClus}(:,:,:,:,iBvals,iC)=muAll(:,:,trls2plt,:);
                 rSeedAll{iClus,iBvals,iC} = rSeed;
-                
-%                 muAllClus{iClus}(:,:,:,:,iBvals,iC)=muAll;
-%                 muAllClus{iClus}(:,:,:,:,iEps,iBvals,iC)=muAll;
             end
         end
     end
 end
 %% 
-
 %in the end used iter 13 and 14
 savePlots = 1;
 
@@ -78,18 +70,13 @@ datPtSiz=130;
 % iterI=1;
 
 trls2plt = {1:25, 1:100, 1:2000};
-
 catCentres = [15, 35; 35, 15];
-
 colGreyClus = [.85, .85, .85];
 colGreyDat  = [.3 .3 .3];
-
 catAcol = [0, 0, 1];
 catBcol = [1, 0, 0];
 catAcol = [catAcol+((1-catAcol).*.5); catAcol];
 catBcol = [catBcol+((1-catBcol).*.5); catBcol];
-
-% colors(:,:,2) = distinguishable_colors(nClus)+(1-distinguishable_colors(nClus)).*.5; %lighter
 
 for iterI=30:50
     

@@ -10,7 +10,6 @@ codeDir = [wd '/code_gridCell'];
 saveDir = [wd '/data_gridCell'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed']));
-
 figsDir = [wd '/grid_figs'];
 
 % load
@@ -20,54 +19,38 @@ fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
 % dat='square';
-compareCircSq = 0; %if compare circ-sq gridness, dat=circ, but load sq too
-
 dat='trapzKfrmSq1';
 
-% annEps=0;
-boxSize=1;
-
-% joined trials
-jointTrls=1;
-epsMuVals=.025;
-nTrials=1000000;
-batchSizeVals=200;
-
-% nIter=200;
-nIter=1000;
+compareCircSq = 0; %if compare circ-sq gridness, dat=circ, but load sq too
 
 %load perm data when nIter=1000 - this is with nIter=200. doPerm should=0
 loadPerm = 1;
 
+clus2run = 10:30;
+jointTrls=1;
+nTrials=1000000;
+batchSizeVals=200;
+% nIter=200;
+nIter=1000;
+
 if strcmp(dat(1:4),'trap')
     nTrials=1000000/4;
-%     if batchSizeVals == 200
-%         epsMuTrapz10 = 25;
-%     elseif batchSizeVals == 400
-%         epsMuTrapz10 = 50; %could also run 25 - no, 25 reduced too quick
-%     end
     epsMuTrapz10 = 25;
     loadPerm=0;
 end
 
-clus2run = 10:30;
-
-%new annEps
+% annEps
 annEps=1;
 epsMuVals = 0.25;
 
-rHex=0; %if choose raw 60deg corr values, not gridness
-
 %perm
+doPerm = 1; %load up with perm or no perm 
 nPerm=500;
 nIters2run=nIter;
-
-doPerm = 0; 
-
-if strcmp(dat(1:4),'trap')
+rHex=0; %if choose raw 60deg corr values, not gridness
+if strcmp(dat(1:4),'trap') %no perms for trapz
     doPerm=0;
 end
-
 %load loop
 for iClus2run = 1:length(clus2run) 
     nClus = clus2run(iClus2run);
@@ -216,29 +199,11 @@ end
 savePlots=0;
 
 clusPosAct = 'actNorm'; %'act' or 'actNorm'
-
 gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
-
 gridMeasure = 'grid';
-
-plotFewClus = 0; %plot 3:5 clusters separately
-
 computeCIs = 1; %takes a bit of time
 
 switch clusPosAct
-% case 'clus'
-%     switch gridMsrType
-%         case 'a'
-%             gridness    = gA_gAll;
-%             orientation = gA_oAll;
-%             rad         = gA_radAll;
-%             wav         = gA_wavAll;
-%         case 'w'
-%             gridness    = gW_gAll;
-%             orientation = gW_oAll;
-%             rad         = gW_radAll;
-%             wav         = gW_wavAll;
-%     end
     case 'act'
         switch gridMsrType
             case 'a'
@@ -279,15 +244,11 @@ switch gridMeasure
 end
 
 iEps=1;
-
 clus2plot=1:length(clus2run);
-
 iBatchVals=1;
-
 %fig specs
 xTickLabs = num2cell(clus2run(clus2plot));
 fontSiz=15;
-
 figure; hold on;
     for iEps = 1:length(epsMuVals)
         %     subplot(2,3,iEps);
@@ -332,7 +293,6 @@ if savePlots
    saveas(gcf,fname,'png');
    close all
 end
-
 
 %prop grid cells
 permPrc = 100; %use top x prctile of the perm distributions - 97.5/99/99.5/100
@@ -384,7 +344,6 @@ if strcmp(dat(1:4),'trap')
     figure; hold on;
     dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,2));
     mu      = nanmean(dat1,1);
-    sm      = nanstd(dat1)./sqrt(size(dat1,1));
     plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
     scatter(barpos,mu,50,colgrey,'filled','d');
     xticklabels(xTickLabs);
@@ -405,8 +364,6 @@ if strcmp(dat(1:4),'trap')
     figure; hold on;
     dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,3));
     mu      = nanmean(dat1,1);
-    sm      = nanstd(dat1)./sqrt(size(dat1,1));
-    ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
     plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
     scatter(barpos,mu,50,colgrey,'filled','d');
     xticklabels(xTickLabs);
@@ -427,8 +384,6 @@ if strcmp(dat(1:4),'trap')
     figure; hold on;
     dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,2)-datTmp(:,iEps,iBatchVals,clus2plot,3));
     mu      = nanmean(dat1,1);
-    sm      = nanstd(dat1)./sqrt(size(dat1,1));
-    ci      = sm.*tinv(.025,size(dat1,1)-1); %compute conf intervals
     plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
     scatter(barpos,mu,50,colgrey,'filled','d');
     xticklabels(xTickLabs);
@@ -470,7 +425,6 @@ if ~strcmp(dat,'trapzKfrmSq1')
         cnter = cnter+1;
         ciTmp = bootci(nBoot,@nanmean,dat1(:,iClus));
         ciTest(:,cnter) = [nanmean(dat1(:,iClus),1); ciTmp]; % mean & CIs for all nClus conds - use for tables
-        
         %check CIs sig - pos/neg
         posInd=ciTest(:,cnter)>0;
         negInd=ciTest(:,cnter)<0;
@@ -485,7 +439,6 @@ if ~strcmp(dat,'trapzKfrmSq1')
         end
     end
     fprintf('%s, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f];  %d sig > 0, out of %d sig conds. %0.2f percent\n',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
-    
 else
     %trapz 
     dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,1));
@@ -498,7 +451,6 @@ else
         cnter = cnter+1;
         ciTmp = bootci(nBoot,@nanmean,dat1(:,iClus));
         ciTest(:,cnter) = [nanmean(dat1(:,iClus),1); ciTmp]; % mean & CIs
-        
         %check CIs sig - pos/neg
         posInd=ciTest(:,cnter)>0;
         negInd=ciTest(:,cnter)<0;
@@ -547,140 +499,125 @@ end
 end
 %% Making figs: density plot examples
 
-savePlots = 1;
+savePlots = 0;
 
 doPlot=0; %do plot when computing gridness
-
+clusPosAct = 'actNorm'; %'clus' or 'actNorm'
+gridMsrType = 'a';
 fontSiz=25;
 
-clusPosAct = 'actNorm'; %'clus' or 'actNorm'
-
-gridMsrType = 'a';
-
-clus2plot = [10,12,18,25]-9;
-% clus2plot = ([10,12,18,20,23,25,28])-9;
-clus2plot = [12, 18, 20, 23, 25, 28]-9; %10
-
-
-%trapz
-% clus2plot = [12, 18, 20, 25, 28]-9; %23
-% clus2plot = [18, 19, 20, 23]-9;
-% clus2plot = [12, 14, 18, 20, 23]-9;
-
-clus2plot = [25]-9; %
+clus2plot = [12, 18, 20, 23, 25, 28]-9; % minus 9 because starts with clus=10
+% clus2plot = [12, 14, 18, 20, 23]-9; %trapz
 
 myColorMap = parula;
 myColorMap(end,:) = 1;
-
 for iClus = clus2plot%:length(clus2run)
-for iBvals = 1:length(batchSizeVals)
-    for iterI = [2,5,9,13,15]%:15%nIter
-        switch clusPosAct
-            case 'act'
-                densityPlotCentresSm = densityPlotActAll(:,:,iterI,iEps,iBvals,iClus);
-                if strcmp(dat(1:2),'ci')
-                    zlims=[0,6];
-                elseif strcmp(dat(1:2),'sq')
-                    zlims=[0,3.5];
-                elseif strcmp(dat(1:2),'tr')
-                    zlims=[0,11.5];
-                end
-            case 'actNorm'
-                densityPlotCentresSm = densityPlotActNormAll(:,:,iterI,iEps,iBvals,iClus);
-                zlims=[0,.085];
-                if strcmp(dat(1:2),'ci') || strcmp(dat(1:2),'sq') 
-                zlims=[0,.085];
-                elseif strcmp(dat(1:2),'tr')
-                zlims=[0,.091];
-                end
-        end
-
-        aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram        
-        [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
-%         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
+    for iBvals = 1:length(batchSizeVals)
+        for iterI = [2,5,9,13,15]%:15%nIter
+            switch clusPosAct
+                case 'act'
+                    densityPlotCentresSm = densityPlotActAll(:,:,iterI,iEps,iBvals,iClus);
+                    if strcmp(dat(1:2),'ci')
+                        zlims=[0,6];
+                    elseif strcmp(dat(1:2),'sq')
+                        zlims=[0,3.5];
+                    elseif strcmp(dat(1:2),'tr')
+                        zlims=[0,11.5];
+                    end
+                case 'actNorm'
+                    densityPlotCentresSm = densityPlotActNormAll(:,:,iterI,iEps,iBvals,iClus);
+                    zlims=[0,.085];
+                    if strcmp(dat(1:2),'ci') || strcmp(dat(1:2),'sq')
+                        zlims=[0,.085];
+                    elseif strcmp(dat(1:2),'tr')
+                        zlims=[0,.091];
+                    end
+            end
+            
+            aCorrMap=ndautoCORR(densityPlotCentresSm); %autocorrelogram
+            [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
+            %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
+            
+            %make nans into white
+            densityPlotTmp = densityPlotCentresSm;
+            if strcmp(dat(1:2),'sq') % tmp - sq smooth means one square is white, turn to 0
+                densityPlotTmp(isnan(densityPlotCentresSm))=0;
+                aCorrMap(isnan(aCorrMap))=0;
+            else
+                densityPlotTmp(isnan(densityPlotCentresSm))=1.1;
+                aCorrMap(isnan(aCorrMap))=1.1;
+            end
+            
+            figure; imagesc(densityPlotTmp,zlims); colormap(gcf,myColorMap);
+            xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
+            fname = [figsDir sprintf('/densityPlot_testSet_%s_nClus%d_eps%d_batchSiz%d_%s_%s_iter%d_clusters',dat,iClus+9,epsMuVals(iEps)*1000,batchSizeVals(iBvals),clusPosAct,gridMsrType,iterI)];
+            if annEps
+                fname = [fname '_annEps'];
+            end
+            if savePlots
+                set(gcf,'Renderer','painters');
+                print(gcf,'-depsc2',fname)
+                saveas(gcf,fname,'png');
+                close all
+            end
+            figure; h=imagesc(aCorrMap,[-1.1 1.1]); colormap(gcf,myColorMap);
+            title(sprintf('g = %.2f',g));
+            set(gca,'FontSize',fontSiz,'fontname','Arial')
+            xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
+            fname = [figsDir sprintf('/densityPlot_testSet_%s_nClus%d_eps%d_batchSiz%d_%s_%s_iter%d_autoCorr',dat,iClus+9,epsMuVals(iEps)*1000,batchSizeVals(iBvals),clusPosAct,gridMsrType,iterI)];
+            if annEps
+                fname = [fname '_annEps'];
+            end
+            if savePlots
+                set(gcf,'Renderer','painters');
+                print(gcf,'-depsc2',fname)
+                saveas(gcf,fname,'png');
+                close all
+            end
+            
+            if strcmp(dat(1:4),'trap')
+                h=50; hLeft=17; hRight=33;% - 33 = start from 18 from left
+                aCorrMap = ndautoCORR(densityPlotCentresSm(:,1:hLeft));
+                [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
+                %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
                 
-%       %make nans into white
-        densityPlotTmp = densityPlotCentresSm;
-        
-        %TMP - edit
-        if strcmp(dat(1:2),'sq') % tmp - sq smooth means one square is white, turn to 0
-            densityPlotTmp(isnan(densityPlotCentresSm))=0;
-            aCorrMap(isnan(aCorrMap))=0;
-        else
-            densityPlotTmp(isnan(densityPlotCentresSm))=1.1;
-            aCorrMap(isnan(aCorrMap))=1.1;
-        end
-        
-        figure; imagesc(densityPlotTmp,zlims); colormap(gcf,myColorMap);
-        xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
-        fname = [figsDir sprintf('/densityPlot_testSet_%s_nClus%d_eps%d_batchSiz%d_%s_%s_iter%d_clusters',dat,iClus+9,epsMuVals(iEps)*1000,batchSizeVals(iBvals),clusPosAct,gridMsrType,iterI)];
-        if annEps
-            fname = [fname '_annEps'];
-        end
-        if savePlots
-            set(gcf,'Renderer','painters');
-            print(gcf,'-depsc2',fname)
-            saveas(gcf,fname,'png');
-           close all
-        end
-        figure; h=imagesc(aCorrMap,[-1.1 1.1]); colormap(gcf,myColorMap);
-        title(sprintf('g = %.2f',g));
-        set(gca,'FontSize',fontSiz,'fontname','Arial')
-        xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
-        fname = [figsDir sprintf('/densityPlot_testSet_%s_nClus%d_eps%d_batchSiz%d_%s_%s_iter%d_autoCorr',dat,iClus+9,epsMuVals(iEps)*1000,batchSizeVals(iBvals),clusPosAct,gridMsrType,iterI)];
-        if annEps
-            fname = [fname '_annEps'];
-        end
-        if savePlots
-            set(gcf,'Renderer','painters');
-            print(gcf,'-depsc2',fname)
-            saveas(gcf,fname,'png');
-           close all
-        end
-        
-        if strcmp(dat(1:4),'trap')
-            h=50; hLeft=17; hRight=33;% - 33 = start from 18 from left
-            aCorrMap = ndautoCORR(densityPlotCentresSm(:,1:hLeft));
-            [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
-            %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
-            
-            aCorrMap(isnan(aCorrMap))=1.1;
-            figure; imagesc(aCorrMap,[-1.1 1.1]); colormap(myColorMap);
-            title(sprintf('g = %.2f',g));
-            set(gca,'FontSize',fontSiz,'fontname','Arial')
-            xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
-            fname = [figsDir sprintf('/densityPlot_testSet_%s_L_nClus%d_eps%d_batchSiz%d_%s_%s_iter%d_autoCorr',dat,iClus+9,epsMuVals(iEps)*1000,batchSizeVals(iBvals),clusPosAct,gridMsrType,iterI)];
-            if annEps
-               fname = [fname '_annEps']; 
-            end
-            if savePlots
-                set(gcf,'Renderer','painters');
-                print(gcf,'-depsc2',fname)
-                saveas(gcf,fname,'png');
-                close all
-            end
-            
-            aCorrMap = ndautoCORR(densityPlotCentresSm(:,h-hRight+1:end));
-            [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
-            %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
-            aCorrMap(isnan(aCorrMap))=1.1;
-            figure; imagesc(aCorrMap,[-1.1 1.1]);colormap(myColorMap);
-            title(sprintf('g = %.2f',g));
-            set(gca,'FontSize',fontSiz,'fontname','Arial')
-            xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
-            fname = [figsDir sprintf('/densityPlot_testSet_%s_R_nClus%d_eps%d_batchSiz%d_%s_%s_iter%d_autoCorr',dat,iClus+9,epsMuVals(iEps)*1000,batchSizeVals(iBvals),clusPosAct,gridMsrType,iterI)];
-            if annEps
-               fname = [fname '_annEps']; 
-            end
-            if savePlots
-                set(gcf,'Renderer','painters');
-                print(gcf,'-depsc2',fname)
-                saveas(gcf,fname,'png');
-                close all
+                aCorrMap(isnan(aCorrMap))=1.1;
+                figure; imagesc(aCorrMap,[-1.1 1.1]); colormap(myColorMap);
+                title(sprintf('g = %.2f',g));
+                set(gca,'FontSize',fontSiz,'fontname','Arial')
+                xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
+                fname = [figsDir sprintf('/densityPlot_testSet_%s_L_nClus%d_eps%d_batchSiz%d_%s_%s_iter%d_autoCorr',dat,iClus+9,epsMuVals(iEps)*1000,batchSizeVals(iBvals),clusPosAct,gridMsrType,iterI)];
+                if annEps
+                    fname = [fname '_annEps'];
+                end
+                if savePlots
+                    set(gcf,'Renderer','painters');
+                    print(gcf,'-depsc2',fname)
+                    saveas(gcf,fname,'png');
+                    close all
+                end
+                
+                aCorrMap = ndautoCORR(densityPlotCentresSm(:,h-hRight+1:end));
+                [g,gdataA] = gridSCORE(aCorrMap,'allen',doPlot);
+                %         [g,gdataW] = gridSCORE(aCorrMap,'wills',doPlot);
+                aCorrMap(isnan(aCorrMap))=1.1;
+                figure; imagesc(aCorrMap,[-1.1 1.1]);colormap(myColorMap);
+                title(sprintf('g = %.2f',g));
+                set(gca,'FontSize',fontSiz,'fontname','Arial')
+                xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
+                fname = [figsDir sprintf('/densityPlot_testSet_%s_R_nClus%d_eps%d_batchSiz%d_%s_%s_iter%d_autoCorr',dat,iClus+9,epsMuVals(iEps)*1000,batchSizeVals(iBvals),clusPosAct,gridMsrType,iterI)];
+                if annEps
+                    fname = [fname '_annEps'];
+                end
+                if savePlots
+                    set(gcf,'Renderer','painters');
+                    print(gcf,'-depsc2',fname)
+                    saveas(gcf,fname,'png');
+                    close all
+                end
             end
         end
     end
-end
 end
 
 %% Thresholds from perm stats
@@ -718,44 +655,40 @@ iBatchVals=1; %'medium' one
 %fig specs
 xTickLabs = num2cell(clus2run(clus2plot));
 fontSiz=15;
-
 dSize=400;
 
 figure; hold on;
-    for iEps = 1:length(epsMuVals)
-        dat1     = squeeze(permThresh(:,iEps,iBatchVals,clus2plot,1));
-        barpos  = .25:.5:.5*size(dat1,2);
-        colors  = distinguishable_colors(size(dat1,2));
-        colgrey = [.5, .5, .5];
-        mu      = mean(dat1,1);
-        plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
-        scatter(barpos,mean(dat1),50,colgrey,'filled','d');
-        scatter(barpos,prctile(dat1,100),dSize,colors,'x');  
-        xticklabels(xTickLabs);
-        xlim([barpos(1)-.5, barpos(end)+.5]);
-        xlabel('Number of Clusters');
-        ylabel('Grid Score Threshold (95% of permuted distribution)');        
-        set(gca,'FontSize',fontSiz,'fontname','Arial')
-    end
-    fname = [figsDir sprintf('/gridness_%s_univarScatters_permThresh_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
-    if annEps
-       fname = [fname '_annEps']; 
-    end
+for iEps = 1:length(epsMuVals)
+    dat1     = squeeze(permThresh(:,iEps,iBatchVals,clus2plot,1));
+    barpos  = .25:.5:.5*size(dat1,2);
+    colors  = distinguishable_colors(size(dat1,2));
+    colgrey = [.5, .5, .5];
+    mu      = mean(dat1,1);
+    plotSpread(dat1,'xValues',barpos,'distributionColors',colors);
+    scatter(barpos,mean(dat1),50,colgrey,'filled','d');
+    scatter(barpos,prctile(dat1,100),dSize,colors,'x');
+    xticklabels(xTickLabs);
+    xlim([barpos(1)-.5, barpos(end)+.5]);
+    xlabel('Number of Clusters');
+    ylabel('Grid Score Threshold (95% of permuted distribution)');
+    set(gca,'FontSize',fontSiz,'fontname','Arial')
+end
+fname = [figsDir sprintf('/gridness_%s_univarScatters_permThresh_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
+if annEps
+    fname = [fname '_annEps'];
+end
 if savePlots
-   set(gcf,'Renderer','painters');
-   print(gcf,'-depsc2',fname)
-   saveas(gcf,fname,'png');
+    set(gcf,'Renderer','painters');
+    print(gcf,'-depsc2',fname)
+    saveas(gcf,fname,'png');
 end
 %% trapz vs orig sq gridness / circ vs sq
 
 savePlots=0;
 
 clusPosAct = 'actNorm'; %'act' or 'actNorm'
-
 gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
-
 gridMeasure = 'grid';
-
 computeCIs=1; 
 
 switch clusPosAct
@@ -767,7 +700,6 @@ switch clusPosAct
                 gridness    = gW_gAll_actNormSq-gW_gAll_actNorm;
         end
 end
-
 %flip sign for circ, so plotting circ>sq gridness
 if strcmp(dat(1:4),'circ')
     gridness = -gridness;
@@ -785,15 +717,11 @@ switch gridMeasure
 end
 
 iEps=1;
-
 clus2plot = 1:length(clus2run);
-
 iBatchVals=1;
-
 %fig specs
 xTickLabs = num2cell(clus2run(clus2plot));
 fontSiz=15;
-
 figure; hold on;
     for iEps = 1:length(epsMuVals)
         dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,1));
@@ -831,7 +759,6 @@ if computeCIs
         cnter = cnter+1;
         ciTmp = bootci(nBoot,@nanmean,dat1(:,iClus));
         ciTest(:,cnter) = [nanmean(dat1(:,iClus),1); ciTmp]; % mean & CIs
-        
         %check CIs sig
         posInd=ciTest(:,cnter)>0;
         negInd=ciTest(:,cnter)<0;
