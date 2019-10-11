@@ -1,12 +1,22 @@
-# gridCell_code
-# Code for grid / place cells simulation project
+# Clustering Spaces
 
-Matlab toolbox requirements
-- Statistics? Signal processing toolbox?
+Code for grid / place cells modelling project
 
-#########
-#SCRIPTS#
-#########
+
+## Software and toolboxes
+
+Matlab (2017b used)
+
+Matalb Toolboxes:
+- Statistics and Machine Learning Toolbox (bootci) 
+- Signal processing toolbox?
+- Image processing toolbox (gaussian filter)
+
+Additional tools/functions:
+Tools to compute grid scores: gridSCORE_packed (from Roddy Grieves, based on geom2D toolbox: https://uk.mathworks.com/matlabcentral/fileexchange/7844-geom2d)
+Plotting - unvariate scatterplots: https://uk.mathworks.com/matlabcentral/fileexchange/37105-plot-spread-points-beeswarm-plot
+
+## Scripts for simulations
 
 covering_map_batch_run.m
 - main run script for running clustering algorithm and simulation
@@ -28,25 +38,19 @@ covering_map_batch_sim_clusPosIn.m
 - called by run_trapzKfrmSq_covering_map.m - loads in an existing set of cluster positions and runs the clustering algorithm 
 
 
-##################
-#PLOTTING SCRIPTS#
-##################
-
+## Scripts for plotting
 covering_map_batch_plot.m
 covering_map_batch_plot_testSet_perm.m
 catLearn_batch_plot.m
 covering_map_plot_simple_wOut_load.m
 
-###########
-#FUNCTIONS#
-###########
+## FUNCTIONS
 
 bootrm.m - bootstrap confidence intervals for mean and percent/proportion
 createTrls.m - creates trials (x-y coordinates) for different spatial environments
-nanconv.m - convolution in 1D or 2D ignoring NaNs; used for smoothing
+nanconv.m - convolution in 1D or 2D ignoring NaNs; used for smoothing - https://uk.mathworks.com/matlabcentral/fileexchange/41961-nanconv
 
-
-#Functions for univariate scatterplots
+# Functions for univariate scatterplots  - https://uk.mathworks.com/matlabcentral/fileexchange/37105-plot-spread-points-beeswarm-plot
 isEven.m
 myErrorbar.m 
 plotSpread.m
