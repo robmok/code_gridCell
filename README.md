@@ -1,8 +1,23 @@
-# gridCell_code
-# Code for grid / place cells simulation project
+# Code for grid / place cells clustering project
+# Directory: gridCell_code
 
 Matlab toolbox requirements
 - Statistics? Signal processing toolbox?
+
+#######
+#INTRO#
+#######
+
+Scripts
+* Run scripts - scripts with ‘run’ in the title are the main scripts for running the simulations (calls the simulation scripts)
+* Simulation scripts - these run the simulations, called by the run scripts
+* Plotting scripts - for visualising results after simulations are run
+
+Structure
+* Run simulation in circle/square - learning / training phase (covering_map_batch_run.m)
+* Run script to make activation maps (taking cluster positions from learning phase), and for permutation tests for stats - test phase (run_gridnessTestDataPerm.m)
+* To run trapezoid simulation, take cluster positions from learning phase results from square, and run script in trapezoid (run_trapzKfrmSq_covering_map.m)
+*Plot to view results
 
 #########
 #SCRIPTS#
