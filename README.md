@@ -1,27 +1,22 @@
-# Code for grid / place cells clustering project
-# Directory: gridCell_code
+# Clustering Spaces
 
-Matlab toolbox requirements
-- Statistics? Signal processing toolbox?
+Code for grid / place cells modelling project
 
-#######
-#INTRO#
-#######
 
-Scripts
-* Run scripts - scripts with ‘run’ in the title are the main scripts for running the simulations (calls the simulation scripts)
-* Simulation scripts - these run the simulations, called by the run scripts
-* Plotting scripts - for visualising results after simulations are run
+## Software and toolboxes
 
-Structure
-* Run simulation in circle/square - learning / training phase (covering_map_batch_run.m)
-* Run script to make activation maps (taking cluster positions from learning phase), and for permutation tests for stats - test phase (run_gridnessTestDataPerm.m)
-* To run trapezoid simulation, take cluster positions from learning phase results from square, and run script in trapezoid (run_trapzKfrmSq_covering_map.m)
-*Plot to view results
+Matlab (2017b used)
 
-#########
-#SCRIPTS#
-#########
+Matalb Toolboxes:
+- Statistics and Machine Learning Toolbox (bootci) 
+- Signal processing toolbox?
+- Image processing toolbox (gaussian filter)
+
+Additional tools/functions:
+Tools to compute grid scores: gridSCORE_packed (from Roddy Grieves, based on geom2D toolbox: https://uk.mathworks.com/matlabcentral/fileexchange/7844-geom2d)
+Plotting - unvariate scatterplots: https://uk.mathworks.com/matlabcentral/fileexchange/37105-plot-spread-points-beeswarm-plot
+
+## Scripts for simulations
 
 covering_map_batch_run.m
 - main run script for running clustering algorithm and simulation
@@ -43,25 +38,19 @@ covering_map_batch_sim_clusPosIn.m
 - called by run_trapzKfrmSq_covering_map.m - loads in an existing set of cluster positions and runs the clustering algorithm 
 
 
-##################
-#PLOTTING SCRIPTS#
-##################
-
+## Scripts for plotting
 covering_map_batch_plot.m
 covering_map_batch_plot_testSet_perm.m
 catLearn_batch_plot.m
 covering_map_plot_simple_wOut_load.m
 
-###########
-#FUNCTIONS#
-###########
+## FUNCTIONS
 
 bootrm.m - bootstrap confidence intervals for mean and percent/proportion
 createTrls.m - creates trials (x-y coordinates) for different spatial environments
-nanconv.m - convolution in 1D or 2D ignoring NaNs; used for smoothing
+nanconv.m - convolution in 1D or 2D ignoring NaNs; used for smoothing - https://uk.mathworks.com/matlabcentral/fileexchange/41961-nanconv
 
-
-#Functions for univariate scatterplots
+# Functions for univariate scatterplots  - https://uk.mathworks.com/matlabcentral/fileexchange/37105-plot-spread-points-beeswarm-plot
 isEven.m
 myErrorbar.m 
 plotSpread.m
