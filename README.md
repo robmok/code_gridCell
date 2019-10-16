@@ -40,21 +40,15 @@ Move code directory (code_gridCell) to the working directory for the code
 Create an empty data directory in the working directory for data to live (data_gridCell)
 
 ## Examples 
+### Simple example to test things are working
 
-# Simple example to test things are working
+Script: covering_map_batch_run.m (to set up learning phase simulations)
+- Run one condition - Edit line 23 to only run one condition to e.g.: clus2run = 20
+- Run script (runs 1 iteration)
+- Plot using a simplified plotting script: covering_map_plot_simple_wOut_load.m
+- run first 3 cells... (ones below require muAll...)
 
-Use script covering_map_batch_run.m to set up learning phase simulations
-
-Run one condition - Edit line 23 to only run one condition to e.g.:
-clus2run = 20
-
-Run script (runs 1 iteration)
-
-Plot using a simplified plotting script: covering_map_plot_simple_wOut_load.m
-- run first 3 cells
-
-# Full run through of learning plus testing and permutation stats
-
+### Full run through of learning plus testing and permutation stats
 
 Learning (or 'training') phase - learning cluster positions
 Script: covering_map_batch_run.m
@@ -79,7 +73,10 @@ Plotting test phase
 
 Script: covering_map_batch_plot_testSet_perm.m
 
-# Trapezoid learning and stats
+
+
+
+### Trapezoid learning and stats
 
 
 
