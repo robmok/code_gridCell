@@ -69,8 +69,9 @@ Note: gA is grid score that is reported in the manuscript (method from Perez-Esc
 Plotting learning phase
 Script: covering_map_batch_plot.m
 
-Plotting test phase
 
+
+Plotting test phase
 Script: covering_map_batch_plot_testSet_perm.m
 
 
@@ -109,23 +110,26 @@ covering_map_batch_sim_clusPosIn.m
 
 ## Scripts for plotting
 covering_map_batch_plot.m
+
 covering_map_batch_plot_testSet_perm.m
+
 catLearn_batch_plot.m
+
 covering_map_plot_simple_wOut_load.m
 
-## FUNCTIONS
+## Functions
 
 bootrm.m - bootstrap confidence intervals for mean and percent/proportion
 createTrls.m - creates trials (x-y coordinates) for different spatial environments
 nanconv.m - convolution in 1D or 2D ignoring NaNs; used for smoothing - https://uk.mathworks.com/matlabcentral/fileexchange/41961-nanconv
 
-# Functions for univariate scatterplots  - https://uk.mathworks.com/matlabcentral/fileexchange/37105-plot-spread-points-beeswarm-plot
+### Functions for univariate scatterplots  - https://uk.mathworks.com/matlabcentral/fileexchange/37105-plot-spread-points-beeswarm-plot
 isEven.m
 myErrorbar.m 
 plotSpread.m
 repeatEntries.m
 
-#Computing grid scores - within directory: gridSCORE_packed
+### Computing grid scores - within directory: gridSCORE_packed
 ndautoCORR.m - computes an autocorrelation or crosscorrelation across two arrays
 gridSCORE.m - takes autocorrelation plot and computes grid score - can compute two grid scores, the one used in this project is the ’allen’ method
 
