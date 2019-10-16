@@ -1,10 +1,9 @@
-%% clustering algorithm with a batch update
+%% Clustering Spaces (with batch update)
 clear all;
 
 % Set working directory
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell']; %where the code lives
@@ -20,14 +19,14 @@ dat = 'circ';
 % dat = 'square';   
 % dat = 'catLearn';
 
-% set number of clusters to run (set to one value during testing, e.g. 10)
-clus2run = 10:30;
+% set number of clusters to run (set to one value during testing, e.g. 20 or a few, 20:22)
+clus2run = 20; 
 
 %compute activation (densityPlotActNorm) over training time - takes longer
 %(only required for inspecting gridness over time)
 actOverTime = 1; 
 
-%annealed learning rate
+%annealed learning rate: standard = 1
 annEps = 1; %1 or 0
 
 % learning rate
@@ -37,10 +36,10 @@ else
     epsMuVals = 0.025; %fixed learning rate
 end
 
-% if cat learning, specify number of categories (cluster centres) and sigma of the gaussan
+% if category learning, specify number of categories (cluster centres) and sigma of the gaussan
 catsInfo.nCats = 2;  % 2 categories
 sigmaG = [7 0; 0 7]; catsInfo.R = chol(sigmaG); % variance - isotropic
-catsInfo.msExample = 1; % set 2 gaussians in opposite sides of the square - example for ms
+catsInfo.msExample = 1; % set 2 gaussians in opposite sides of the square - example for ms. else set to 0 for random 2 gaussians.
 
 % number of learning/training trials
 if ~strcmp(dat(1:3),'cat')
@@ -66,9 +65,9 @@ jointTrls = 1; % simulating agent moving around environment
 % use the same training data (trials) across current sims or gen new data
 useSameTrls=0; %set to 0
 %%
-saveDat=0; %save simulations
+saveDat = 0; %save simulations
 
-nIter=1;%1000; %200 for doing activations over time, 1000 for full simulations without activations over time (variable size gets large), 20-50 for catLearn demo
+nIter = 1;%1000; %200 for doing activations over time, 1000 for full simulations without activations over time (variable size gets large), 20-50 for catLearn demo
 
 if useSameTrls
     trials=[]; trialsUnique=[];

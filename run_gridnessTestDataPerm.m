@@ -4,7 +4,6 @@ clear all;
 % Set working directory
 % wd='/Users/robertmok/Documents/Postdoc_ucl/Grid_cell_model';
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
-% wd='/home/robmok/Documents/Grid_cell_model'; %on love01
 
 cd(wd);
 codeDir = [wd '/code_gridCell'];  %where the code lives
@@ -18,12 +17,12 @@ nTrialsTest = 100000; % orig nTrials/10
 % Set environment
 dat = 'circ';
 % dat = 'square';
-dat = 'trapzKfrmSq1'; % trapz from square
+% dat = 'trapzKfrmSq1'; % trapz from square
 
 %set
 saveDat=1;
 nIter = 200;  %for doPerm (500 perms on each iter: 500*200)
-nIter = 1000; %noPerm - if just to make activation maps
+% nIter = 1000; %noPerm - if just to make activation maps
 
 clus2run = 10:30;
 epsMuVals=.025;

@@ -5,21 +5,12 @@ spacing=linspace(locRange(1),locRange(2),locRange(2)+1)+1;
 gaussSmooth = 1; %smoothing for density map
 imageFilter = fspecial('gaussian',5,gaussSmooth); % param for smoothing (for nanconv - smoothing that deals with nans; this param is default for imgaussfilt)
 
-%% plot centres at end of learning (requires muAll)
-
-colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
-for iSet=1
-    figure; hold on;
-    scatter(muAll(:,1,end),muAll(:,2,end),20e+2,colors,'.');
-    xlim(locRange); ylim(locRange);
-end
-
 %% plot autocorrelogram, gridness over time
 
 for iSet=1:21
     for iterI = 1
-        % densityPlotCentresSm = nanconv(densityPlot(:,:,iSet,iterI),imageFilter, 'nanout'); % just takes cluster positions and smooths
-        densityPlotCentresSm = densityPlotActNorm(:,:,iSet,iterI);
+        densityPlotCentresSm = nanconv(densityPlot(:,:,iSet,iterI),imageFilter, 'nanout'); % just takes cluster positions and smooths
+%         densityPlotCentresSm = densityPlotActNorm(:,:,iSet,iterI);
         figure; hold on;
         subplot(1,2,1)
         imagesc(densityPlotCentresSm);
@@ -52,7 +43,47 @@ for iSet=1:21
         [g,gdataA] = gridSCORE(aCorrMap,'allen',1);
     end
 end
-%% plot over time - single plot
+%% plot over time - subplots (need muAll as output arg)
+
+savePlots=0;
+
+iterI = 1;
+
+nClus = size(muAll,1);
+colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
+figure('units','normalized','outerposition',[0 0 1 1]);
+iPlot = 1; subplot(3,4,iPlot); hold on;%subplot
+for iTrl = 1:nBatches
+    if mod(iTrl,500)==0
+        iPlot=iPlot+1;
+        subplot(3,4,iPlot); hold on;
+    end
+    xlim(locRange); ylim(locRange);
+    if mod(iTrl,500)==0 || iTrl == 1 %plot centers after x trials
+        for i=1:nClus
+            plot(squeeze(muAll(i,1,iTrl,iterI)),squeeze(muAll(i,2,iTrl,iterI)),'.','Color',colors(i,:),'MarkerSize',20); hold on;
+        end
+        drawnow;
+    end
+end
+
+if savePlots
+    fname=[saveDir, sprintf('/covering_map_%d_clus_locs_plotOverTime_top_%d_trls_eps%d_alpha%d_%diters',nClus,nTrials,epsMuOrig100,alpha10,nIter)];
+    if warpBox
+        fname = [fname sprintf('_warpBox_resetEps%d',resetEps)];
+    end
+    saveas(gcf,fname,'png');
+end
+%% plot centres at end of learning (requires muAll)
+
+colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
+for iSet=1
+    figure; hold on;
+    scatter(muAll(:,1,end),muAll(:,2,end),20e+2,colors,'.');
+    xlim(locRange); ylim(locRange);
+end
+
+%% plot over time - single plot  (need muAll as output arg)
 
 if ~exist('dat')
     dat=dat2;
@@ -99,37 +130,6 @@ for iTrl = 1000:nTrials
         scatter(squeeze(muTrls(:,1,iTrl)),squeeze(muTrls(:,2,iTrl)),1000,colors,'.'); hold on;
         drawnow;
     end
-end
-%% plot over time - subplots (need muAll as output arg)
-
-savePlots=0;
-
-iterI = 1;
-
-nClus = size(muAll,1);
-colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
-figure('units','normalized','outerposition',[0 0 1 1]);
-iPlot = 1; subplot(3,4,iPlot); hold on;%subplot
-for iTrl = 1:nBatches
-    if mod(iTrl,500)==0
-        iPlot=iPlot+1;
-        subplot(3,4,iPlot); hold on;
-    end
-    xlim(locRange); ylim(locRange);
-    if mod(iTrl,500)==0 || iTrl == 1 %plot centers after x trials
-        for i=1:nClus
-            plot(squeeze(muAll(i,1,iTrl,iterI)),squeeze(muAll(i,2,iTrl,iterI)),'.','Color',colors(i,:),'MarkerSize',20); hold on;
-        end
-        drawnow;
-    end
-end
-
-if savePlots
-    fname=[saveDir, sprintf('/covering_map_%d_clus_locs_plotOverTime_top_%d_trls_eps%d_alpha%d_%diters',nClus,nTrials,epsMuOrig100,alpha10,nIter)];
-    if warpBox
-        fname = [fname sprintf('_warpBox_resetEps%d',resetEps)];
-    end
-    saveas(gcf,fname,'png');
 end
 
 %% plot navigation example - over 3 time points
