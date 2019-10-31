@@ -45,6 +45,7 @@ if ~strcmp(dat(1:4),'trap')
     doPerm=1;
 else
     doPerm=0;
+	nIter=1000;
 end
 if nIter==1000
     doPerm=0; %if 1000 iters

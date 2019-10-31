@@ -21,7 +21,7 @@ Plotting - unvariate scatterplots: https://uk.mathworks.com/matlabcentral/fileex
 
 Set up directories:
 
-Edit directory path at the top of each scripts:
+1. Edit directory path at the top of each of these scripts:
 - covering_map_batch_run.m 
 - covering_map_plot_simple_wOut_load
 - covering_map_batch_plot.m
@@ -35,9 +35,12 @@ wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
 
 Directories:
 
-Move code directory (code_gridCell) to the working directory for the code 
+2. Move code directory (code_gridCell) to the working directory for the code 
 
-Create an empty data directory in the working directory for data to live (data_gridCell)
+3. Create an empty data directory in the working directory for data to live (data_gridCell)
+
+- OR: download data directory data_gridCell from osf (https://osf.io/2dz3x/)
+
 
 ## Examples 
 ### Simple example to test things are working
@@ -46,7 +49,7 @@ Script: covering_map_batch_run.m (to set up learning phase simulations)
 - Run one condition - Edit line 23 to only run one condition to e.g.: clus2run = 20
 - Run script (runs 1 iteration)
 - Plot using a simplified plotting script: covering_map_plot_simple_wOut_load.m
-- run first 3 cells... (ones below require muAll...)
+- Run first 3 cells for plotting... (ones below require muAll...)
 
 ### Full run through of learning plus testing and permutation stats
 
@@ -60,10 +63,14 @@ Script: covering_map_batch_run.m
 
 Test phase - fix cluster positions and compute activations and grid scores; default, circle
 Script: run_gridnessTestDataPerm.m
-- default, circle. uncomment line 19 if previously ran square environment (category learning no need to assess grid scores)
+- default environment/shape is circle. uncomment line 19 if previously ran square environment (category learning no need to assess grid scores)
 - if you have run the above and saved it, you should be able to run this script and it will give you the activation maps and grid scores)
+- Permutation testing (on/off)
+	- To compute activation maps and grid scores after learning WITHOUT permutation tests, set nIter=1000
+	- To compute activation maps, grid scores, and permutation tests, set nIter=200 (else takes long, and not necessary)
 
-Note: gA is grid score that is reported in the manuscript (method from Perez-Escobar et al., 2016), gW is a more conservative method (Wills et al., 2012).
+
+Note: gA is grid score that is reported in the manuscript (method from Perez-Escobar et al., 2016), gW is a more conservative method (from Wills et al., 2012).
 
 
 Plotting learning phase
@@ -75,17 +82,16 @@ Plotting test phase
 Script: covering_map_batch_plot_testSet_perm.m
 
 
-
-
 ### Trapezoid learning and stats
 
-
-
-
-
-
-
-
+Learning (or 'training') phase - learning cluster positions in a trapezoid after learning in a square
+Script: run_trapzKfrmSq_covering_map.m
+- this loads in the data from the data directory (corresponding nClus condition) and runs the learning algorithm in a trapezoid
+ 
+Test phase - fix cluster positions and compute activations and grid scores
+Script: run_gridnessTestDataPerm.m
+- uncomment line 20 to make dat = 'trapzKfrmSq1'
+- this should automatically set doPerm=0, and nIter=1000, since mainly we want activation maps and grid scores after learning in the trapz
 
 ## Scripts for simulations
 
