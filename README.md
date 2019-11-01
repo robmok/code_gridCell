@@ -21,14 +21,18 @@ Plotting - unvariate scatterplots: https://uk.mathworks.com/matlabcentral/fileex
 
 Set up directories:
 
-1. Edit directory path at the top of each of these scripts:
+1. Edit working directory path at the top of each of these scripts :
+- this working directory (wd) should have directories code_gridCell and data_gridCell
+
+For running the simulations:
 - covering_map_batch_run.m 
 - covering_map_plot_simple_wOut_load
-- covering_map_batch_plot.m
-- catLearn_batch_plot.m
 - run_gridnessTestDataPerm.m
 - run_trapzKfrmSq_covering_map
 - square_splitInHalf_gridness.m
+For plotting:
+- covering_map_batch_plot.m
+- catLearn_batch_plot.m
 
 e.g. for covering_map_batch_run.m, set to working directory by editing line 5:
 wd='/Users/robert.mok/Documents/Postdoc_ucl/Grid_cell_model';
