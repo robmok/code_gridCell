@@ -17,9 +17,6 @@ addpath(genpath([codeDir '/gridSCORE_packed']));
 gaussSmooth = 1; 
 imageFilter = fspecial('gaussian',5,gaussSmooth); %this is default for imgaussfilt
 
-% load
-fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
-
 dat='circ';
 % dat='square';
 
@@ -42,16 +39,17 @@ clus2run      = 10:30;
 epsMuVals     = 0.25;
 nTrials       = 1000000;
 batchSizeVals = 200;
-annEps        =1;
+annEps        = 1;
 
 rHex = 0; %if inspect raw 60deg corr values, rather than grid score
-
-%trapzKfrmSq 
-dat           = 'trapzKfrmSq1';
-nTrials       = 500000;
-batchSizeVals = 400;
-clus2run      = 10:30;
-nIter         = 1000;
+% 
+% %trapzKfrmSq 
+% dat           = 'trapzKfrmSq1';
+% nTrials       = 250000;
+% batchSizeVals = 200;
+% clus2run      = 10:30;
+% nIter         = 1000;
+% actOverTime   = 1;
 
 % annEps=0;
 % epsMuVals = 0.025;
@@ -130,6 +128,7 @@ for iClus2run = 1:length(clus2run)
         end
     end
 end
+
 %% Making figs: plot univariate scatters over time
 
 savePlots = 0;

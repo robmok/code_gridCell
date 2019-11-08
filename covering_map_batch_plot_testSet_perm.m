@@ -19,7 +19,7 @@ fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
 
 dat='circ';
 % dat='square';
-dat='trapzKfrmSq1';
+% dat='trapzKfrmSq1';
 
 compareCircSq = 0; %if compare circ-sq gridness, dat=circ, but load sq too
 
@@ -44,7 +44,7 @@ annEps=1;
 epsMuVals = 0.25;
 
 %perm
-doPerm = 1; %load up with perm or no perm 
+doPerm = 0; %load up with perm or no perm 
 nPerm=500;
 nIters2run=nIter;
 rHex=0; %if choose raw 60deg corr values, not gridness
@@ -501,13 +501,14 @@ end
 
 savePlots = 0;
 
-doPlot=0; %do plot when computing gridness
+doPlot = 0; %do plot when computing gridness
 clusPosAct = 'actNorm'; %'clus' or 'actNorm'
 gridMsrType = 'a';
-fontSiz=25;
+fontSiz = 25;
 
-clus2plot = [12, 18, 20, 23, 25, 28]-9; % minus 9 because starts with clus=10
-% clus2plot = [12, 14, 18, 20, 23]-9; %trapz
+% clus2plot = [12, 18, 20, 23, 25, 28]-9; % note: minus 9 because starts with clus=10
+% clus2plot = [12, 14, 18, 20, 23]-9; %trapz figures
+clus2plot = 12; %this cell produces multiple examples per nClus condition, so run 1 ora few at a time or else too many figs pop up
 
 myColorMap = parula;
 myColorMap(end,:) = 1;
@@ -620,10 +621,10 @@ for iClus = clus2plot%:length(clus2run)
     end
 end
 
-%% Thresholds from perm stats
+%% Plot thresholds from permutations (for proprtion 'grid cell' analysis)
 figsDir = [wd '/grid_figs'];
 
-savePlots=1;
+savePlots=0;
 
 clusPosAct = 'actNorm'; %'act' or 'actNorm'
 
