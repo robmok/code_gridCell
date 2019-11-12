@@ -42,13 +42,13 @@ jointTrls=1; %for test trials
 
 %doPerm or not
 if ~strcmp(dat(1:4),'trap')
-    doPerm=1;
+    doPerm = 1;
 else
-    doPerm=0;
-	nIter=1000;
+    doPerm = 0;
+	nIter  = 1000;
 end
 if nIter==1000
-    doPerm=0; %if 1000 iters
+    doPerm = 0; %if 1000 iters
 end
 
 % number of perm tests

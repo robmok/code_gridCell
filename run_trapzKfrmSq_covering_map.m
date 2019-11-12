@@ -17,9 +17,9 @@ locRange = [0 49];
 dat1 = 'square';
 dat2 = 'trapzKfrmSq1'; % run covering map on sq, then assess gridness in trapz
 
-saveDat=1;
+saveDat = 1;
 
-%for loading
+%for loading in square
 nTrials=1000000;
 nIter=1000;
 % nIter=200;
@@ -39,7 +39,7 @@ nBvals = length(batchSizeVals);
 nIter2run = nIter;
 epsMuTrapz = 0.0025; % used if fixed learning rate
 clus2run = 10:30;
-%%
+%% run
 
 for iClus2run = 1:length(clus2run)
     nClus = clus2run(iClus2run);

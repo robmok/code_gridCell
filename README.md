@@ -80,6 +80,7 @@ Script: run_gridnessTestDataPerm.m
 	- To compute activation maps and grid scores after learning WITHOUT permutation tests, set nIter=1000
 	- To compute activation maps, grid scores, and permutation tests, set nIter=200 (else takes long, and not necessary)
 (Note: gA is grid score that is reported in the manuscript (method from Perez-Escobar et al., 2016), gW is a more conservative method (from Wills et al., 2012).)
+- edit clus2run (nClus conditions) - line 27 - if only ran square on a few conditions and loading in those conditions
 
 #### Plotting
 Plotting learning phase
@@ -108,17 +109,13 @@ Script: covering_map_batch_plot_testSet_perm.m
 
 Learning (or 'training') phase - learning cluster positions in a trapezoid after learning in a square
 Script: run_trapzKfrmSq_covering_map.m
-- this loads in the data from the data directory (corresponding nClus condition) and runs the learning algorithm in a trapezoid
- 
+- this loads in the data from the data directory (corresponding nClus condition, with cluster positions learnt in square environment) and runs the learning algorithm in a new environment - a trapezoid
+- edit clus2run (nClus conditions) - line 41 - if only ran square on a few conditions and loading in those conditions
+
 Test phase - fix cluster positions and compute activations and grid scores
 Script: run_gridnessTestDataPerm.m
-- uncomment line 20 to make dat = 'trapzKfrmSq1'
-- this should automatically set doPerm=0, and nIter=1000, since mainly we want activation maps and grid scores after learning in the trapz
-
-
-
-
-
+- uncomment line 20 to make dat = 'trapzKfrmSq1' - this should automatically set doPerm=0, and nIter=1000, since mainly we want activation maps and grid scores after learning in the trapz
+- edit clus2run (nClus conditions) - line 27 - if only ran square on a few conditions and loading in those conditions
 
 
 ## Scripts and data index
