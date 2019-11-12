@@ -15,8 +15,8 @@ figsDir = [wd '/grid_figs'];
 
 % Set environment
 dat='circ';
-dat='square';
-dat='trapzKfrmSq1';
+% dat='square';
+% dat='trapzKfrmSq1';
 
 %set loadPerm - set to 0 to plot all sims; set to 1 to load permutations
 loadPerm = 0; %load up data with permutations or not
@@ -28,6 +28,8 @@ batchSizeVals = 200;
 jointTrls = 1;
 nIter=1000;
 
+
+%
 if strcmp(dat(1:4),'trap') %no perms for trapz
     loadPerm=0;
 end
@@ -49,7 +51,6 @@ if strcmp(dat(1:4),'trap')
     epsMuTrapz10 = 25;
     loadPerm=0;
 end
-
 
 %load loop
 for iClus2run = 1:length(clus2run) 
@@ -201,7 +202,7 @@ savePlots=0;
 clusPosAct = 'actNorm'; %'act' or 'actNorm'
 gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
 gridMeasure = 'grid';
-computeCIs = 1; %takes a bit of time
+computeCIs = 0; %takes a bit of time
 
 switch clusPosAct
     case 'act'

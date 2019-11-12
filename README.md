@@ -84,42 +84,25 @@ Script: run_gridnessTestDataPerm.m
 #### Plotting
 Plotting learning phase
 Script: covering_map_batch_plot.m
-
-- first cell loads in data (default loads in nClus (number of clusters) conditions 10:30 - edit line 38 if ran less/different nClus conditions)
-
-***TO DO
-- General: probably need to edit first section for better readability, so that user will only need to edit a couple lines
-- need to fix cells 2 and 3 - plotting / stats over time
-- cell 4 works fine (univar scatters at the end)
-- cell 5 - density plot examples - mostly ok; not sure why the act maps colorscale isn't correct; autocorr maps are ok
-- cell 6 - needs muAll; used to generate fig from fig panel 1 (many clusters, spatial case)
-***
-- NOTE: atm loading in trapz doesn't work. looks like first problem is loading in the file, since the strings/words are mixed up for the trapz compared to circ/sq. fix or just leave 
-- think about whether to include orientation, rad, wav measures, or edit so don't even see them. if remove; probabably save a copy for myself
-
-
+- default: circle (uncomment line 18 for square)
+- set actOverTime (line 21). if this is set to 0, load up simulations where only the final activations maps and grid scores (after learning). Set to 1, load up simulation where activations and grid scores over time are saved, and can plot this - however, there are fewer simulations (iterations).
+-  edit clus2run (nClus conditions) - line 33 - if only loading a few conditions. Script was made for 10:30 (default in script), so plotting might not be perfect if using different numbers.
+- cell 2 - univariate scatterplots of grid scores at the end of learning
+- cell 3 - plot univariate scatters over time (NOTE: needs actOverTime = 1) - default: plotSubPlots = 0 (line 249). this will plot a selection of nClus condition (edit 286 to plot different set). if plotSubPlots = 1, you'll get a subplot of all 10:30 nClus conditions, but very small
+- cell 4 - computes bootstrapped confidence intervals for gridness over time (glm betas for an increase in grid score)
+- cell 5 - activation map examples. edit clus2plot to plot examples from different nClus conditions (see line 347-348)
+- cell 6 - commented out cells below require the 'muAll' variable which allows plotting some visualisations over time. Used to plot figure 1 spatial case
 
 Plotting test phase
 Script: covering_map_batch_plot_testSet_perm.m
 - default: circle (uncomment line 18 or 19 for square or trapz)
 - set loadPerm on line 22. default is 0, so loads up all simulations, but not permutations (which is needed to load up and plot the proportion grid cells after permutation stats). if set to 1, fewer simulations are plot in cell 2.
-- edit nClus conditions - line 25 - if only loading a few conditions. Script was made for 10:30 (default in script), so plotting might not be perfect if using different numbers.
+- edit clus2run (nClus conditions) - line 25 - if only loading a few conditions. Script was made for 10:30 (default in script), so plotting might not be perfect if using different numbers.
 - Cell 2 plots univariate scatterplots in figure 3 and 4 in the manuscript
 - Cell 3 plots examples of activation maps as show in figure 3 and 4, and in supplementary figures. edit clus2plot to plot examples from different nClus conditions (see line 509-511)
 - Cell 4 plot univariate scatterplots of the thresholds for 'grid cell like' activation maps, from the permutation method - NOTE: need to set loadPerm to 1
 - Cell 5 plots univariate scatterplots of square versus trapezoid gridscores, from figure 4.
 - in cells 2 & 5, set computeCIs to 1 to get bootstrapped confidence intervals reported in the manuscript (takes 10s of seconds to a minute compute)
-
-
-**TO DO
-- General: DEFINITELY need to edit first section for better readability, so that user will only need to edit a couple lines
-- loads in ok
-- 2nd cell - produces 2 plots. only keep first univar scatter? also, it spits out a bunch of stats, significance things - maybe remove this stuff that is not reported in the paper
-- prop grid cell measures - check which one i used. average across all simulations, or across nClus conds? remove the one i did not use
-
-
-
-
 
 ### Trapezoid learning and stats
 

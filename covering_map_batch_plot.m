@@ -13,36 +13,34 @@ figsDir = [wd '/grid_figs'];
 addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed']));
 
-%smoothing
-gaussSmooth = 1; 
-imageFilter = fspecial('gaussian',5,gaussSmooth); %this is default for imgaussfilt
-
+% Set environment
 dat='circ';
 % dat='square';
 
-% joined trials
-jointTrls=1;
+%set - if load in simuations where activation maps were saved over time (fewer iterations)
+actOverTime = 1; 
+nSet        = 21; % if load actOverTime, this is the number of timepoints saved and to plot
 
-actOverTime = 1;
-nSet        = 21;
-
-%1000 iters
-nIter=1000;
-
-if nIter == 1000
-   actOverTime = 0;
-   nSet        = 1;
+if actOverTime
+    nIter = 200;
+else
+    nIter = 1000;
+    nSet  = 1;
 end
 
-%new - annealed learning rate
+% To load in
 clus2run      = 10:30;
 epsMuVals     = 0.25;
 nTrials       = 1000000;
 batchSizeVals = 200;
 annEps        = 1;
+jointTrls     = 1;
 
+%other
+gaussSmooth = 1; %smoothing
+imageFilter = fspecial('gaussian',5,gaussSmooth); %this is default for imgaussfilt
 rHex = 0; %if inspect raw 60deg corr values, rather than grid score
-% 
+
 % %trapzKfrmSq 
 % dat           = 'trapzKfrmSq1';
 % nTrials       = 250000;
@@ -50,7 +48,6 @@ rHex = 0; %if inspect raw 60deg corr values, rather than grid score
 % clus2run      = 10:30;
 % nIter         = 1000;
 % actOverTime   = 1;
-
 % annEps=0;
 % epsMuVals = 0.025;
 
@@ -129,136 +126,14 @@ for iClus2run = 1:length(clus2run)
     end
 end
 
-%% Making figs: plot univariate scatters over time
-
-savePlots = 0;
-plotSubPlots = 0;
-
-fontSiz = 25;
-iBatchVals=1;
-nTimePts=size(datTmp,1)-1;
-colors  = distinguishable_colors(length(clus2run));
-
-if plotSubPlots
-    clus2plot = 1:length(clus2run);
-    figure; hold on;
-    for iClus = clus2plot
-        subplot(4,6,iClus-clus2plot(1)+1); hold on;
-        dat1     = squeeze(datTmp(1:nTimePts,:,iEps,iBatchVals,:,iClus))';
-        barpos  = .25:.5:.5*size(dat1,2);
-        colgrey = [.5, .5, .5];
-        mu      = nanmean(dat1,1);
-        sm      = nanstd(dat1)./sqrt(size(dat1,1));
-        plotSpread(dat1,'xValues',barpos,'distributionColors',repmat(colors(iClus,:),nTimePts,1));
-        scatter(barpos,mu,10,colgrey,'d','filled');
-        xlim([barpos(1)-.5, barpos(end)+.5]);
-        ylim([-.5,1.25]);
-        xticks([]); xticklabels({''});
-        title(sprintf('%d clusters',clus2run(clus2plot(iClus))));
-    end
-    fname = [figsDir sprintf('/gridness_%s_univarScatters_overTime_nClus%d-%d_eps%d_batchSiz%d_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
-    if annEps
-        fname = [fname '_annEps'];
-    end
-    if savePlots
-        set(gcf,'Renderer','painters');
-        print(gcf,'-depsc2',fname)
-        saveas(gcf,fname,'png');
-        close all
-    end
-    
-else % plot single plots - but better to plot subset, else too many
-    %select subset of nClus conds
-    clus2plot = [10,12,18,25]-9; % plot selection
-    %     clus2plot = 1:length(clus2run); % plot all
-    for iClus = clus2plot
-        figure;
-        dat1     = squeeze(datTmp(1:nTimePts,:,:,iEps,iBatchVals,iClus,:))';
-        barpos  = .25:.5:.5*size(dat1,2);
-        colgrey = [.5, .5, .5];
-        mu      = nanmean(dat1,1);
-        sm      = nanstd(dat1)./sqrt(size(dat1,1));
-        plotSpread(dat1,'xValues',barpos,'distributionColors',repmat(colors(iClus,:),nTimePts,1));
-        %     errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
-        scatter(barpos,mu,100,colgrey,'d','filled');
-        %         scatter(barpos,mu,100,repmat(colors(iClus,:),nTimePts,1),'d','filled');
-        xlim([barpos(1)-.5, barpos(end)+.5]);
-        ylim([-.5,1.3]);
-        xticks([]); xticklabels({''});
-        %         title(sprintf('nClus=%d, batchSize=%d',clus2plot(iClus),batchSizeVals(iBatchVals)))
-        title(sprintf('%d clusters',clus2run(iClus)));
-        set(gca,'FontSize',fontSiz,'fontname','Arial')
-        
-        fname = [figsDir sprintf('/gridness_%s_univarScatters_overTime_singlePlot_nClus%d_eps%d_batchSiz%d_%s',dat,clus2run(iClus),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
-        if annEps
-            fname = [fname '_annEps'];
-        end
-        if savePlots
-            set(gcf,'Renderer','painters');
-            print(gcf,'-depsc2',fname)
-            saveas(gcf,fname,'png');
-            close all
-        end
-    end
-end
-
-%% gridness over time stats
-
-nTimePts = 20;
-
-clus2plot = 1:length(clus2run);
-
-clear gt_b gt_p ciClus ciClusSig
-cnter=0;
-for iClus = clus2plot
-    dat1 = squeeze(datTmp(1:end-1,:,iEps,iBatchVals,:,iClus))';
-    cnter=cnter+1;
-    for iterI=1:nIter
-        [b,d,s]=glmfit(1:nTimePts,dat1(iterI,:)');
-        gt_b(cnter,iterI) = b(2);
-    end
-    ciTmp = bootci(nIter,@mean,gt_b(cnter,:));
-    ciClus(:,cnter) = [nanmean(gt_b(cnter,:)); ciTmp]; % mean & CIs    
-    
-    %check CIs sig
-    posInd=ciClus(:,cnter)>0;
-    negInd=ciClus(:,cnter)<0;
-    if all(posInd)
-       ciClusSig(cnter)=1;
-    end
-    if all(negInd)
-        ciClusSig(cnter)=-1;
-    end
-    if ~all(posInd) && ~all(negInd)
-        ciClusSig(cnter)=0;
-    end
-end
-ci = bootci(numel(gt_b),@nanmean,reshape(gt_b,1,numel(gt_b))); %CI over ALL runs
-
-fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig betas > 0, out of %d sig betas. %0.2f percent\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),mean(reshape(gt_b,1,numel(gt_b))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
-
-
-%TO DO:
-
-% % mean & bootstrap 95 CIs - taken from above. - edit here to compute
-% means as well. note: ciClus is 2 x nClus above. below flipped so can
-% print to copy and paste
-
-% nBoot = nIter;
-% clear ciTrain
-% for iClus=clus2plot
-%     ciTmp = bootci(nBoot,@mean,dat1(:,iClus));
-%     ciTrain(iClus,:) = [mean(dat1(:,iClus),1); ciTmp]; % mean & CIs
-% end
-% ciTrain
-
-%% Making figs - univar scatters 1 - training set
+%% Making figs - univar scatters 1 - training set at end of learning
 
 savePlots=0;
 
 clusPosAct = 'actNorm'; %'clus' or 'actNorm'
 gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
 gridMeasure = 'grid';
+computeCIs = 0; %takes a bit of time
 
 switch clusPosAct
 case 'clus'
@@ -357,23 +232,115 @@ if savePlots
 end
 
 % mean & bootstrap 95 CIs
-nBoot = nIter;
-clear ciTrain ciTmp
-for iClus=1:length(clus2plot)
-    ciTmp = bootci(nBoot,@mean,dat1(:,iClus));
-    ciTrain(iClus,:) = [mean(dat1(:,iClus),1); ciTmp]; % mean & CIs
+if computeCIs
+    nBoot = nIter;
+    clear ciTrain ciTmp
+    for iClus=1:length(clus2plot)
+        ciTmp = bootci(nBoot,@mean,dat1(:,iClus));
+        ciTrain(iClus,:) = [mean(dat1(:,iClus),1); ciTmp]; % mean & CIs
+    end
+%overall mean
+    ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs
+    fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2));
+end
+%% Making figs: plot univariate scatters over time - needs actOverTime = 1
+
+savePlots = 0;
+plotSubPlots = 0;
+
+fontSiz = 25;
+iBatchVals=1;
+nTimePts=size(datTmp,1)-1;
+colors  = distinguishable_colors(length(clus2run));
+
+if plotSubPlots
+    clus2plot = 1:length(clus2run);
+    figure; hold on;
+    for iClus = clus2plot
+        subplot(4,6,iClus-clus2plot(1)+1); hold on;
+        dat1     = squeeze(datTmp(1:nTimePts,:,iEps,iBatchVals,:,iClus))';
+        barpos  = .25:.5:.5*size(dat1,2);
+        colgrey = [.5, .5, .5];
+        mu      = nanmean(dat1,1);
+        sm      = nanstd(dat1)./sqrt(size(dat1,1));
+        plotSpread(dat1,'xValues',barpos,'distributionColors',repmat(colors(iClus,:),nTimePts,1));
+        scatter(barpos,mu,10,colgrey,'d','filled');
+        xlim([barpos(1)-.5, barpos(end)+.5]);
+        ylim([-.5,1.25]);
+        xticks([]); xticklabels({''});
+        title(sprintf('%d clusters',clus2run(clus2plot(iClus))));
+    end
+    fname = [figsDir sprintf('/gridness_%s_univarScatters_overTime_nClus%d-%d_eps%d_batchSiz%d_%s',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
+    if annEps
+        fname = [fname '_annEps'];
+    end
+    if savePlots
+        set(gcf,'Renderer','painters');
+        print(gcf,'-depsc2',fname)
+        saveas(gcf,fname,'png');
+        close all
+    end
+    
+else % plot single plots - but better to plot subset, else too many
+    %select subset of nClus conds
+    clus2plot = [10,12,18,25]-9; % plot selection
+    %     clus2plot = 1:length(clus2run); % plot all
+    for iClus = clus2plot
+        figure;
+        dat1     = squeeze(datTmp(1:nTimePts,:,:,iEps,iBatchVals,iClus,:))';
+        barpos  = .25:.5:.5*size(dat1,2);
+        colgrey = [.5, .5, .5];
+        mu      = nanmean(dat1,1);
+        sm      = nanstd(dat1)./sqrt(size(dat1,1));
+        plotSpread(dat1,'xValues',barpos,'distributionColors',repmat(colors(iClus,:),nTimePts,1));
+        %     errorbar(barpos,mu,ci,'Color',colgrey,'LineStyle','None','LineWidth',1);
+        scatter(barpos,mu,100,colgrey,'d','filled');
+        %         scatter(barpos,mu,100,repmat(colors(iClus,:),nTimePts,1),'d','filled');
+        xlim([barpos(1)-.5, barpos(end)+.5]);
+        ylim([-.5,1.3]);
+        xticks([]); xticklabels({''});
+        %         title(sprintf('nClus=%d, batchSize=%d',clus2plot(iClus),batchSizeVals(iBatchVals)))
+        title(sprintf('%d clusters',clus2run(iClus)));
+        set(gca,'FontSize',fontSiz,'fontname','Arial')
+        
+        fname = [figsDir sprintf('/gridness_%s_univarScatters_overTime_singlePlot_nClus%d_eps%d_batchSiz%d_%s',dat,clus2run(iClus),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),gridMsrType)];
+        if annEps
+            fname = [fname '_annEps'];
+        end
+        if savePlots
+            set(gcf,'Renderer','painters');
+            print(gcf,'-depsc2',fname)
+            saveas(gcf,fname,'png');
+            close all
+        end
+    end
 end
 
-%overall mean
-ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs
-fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2));
+%% gridness over time stats
 
+nTimePts = 20;
+
+clus2plot = 1:length(clus2run);
+
+clear gt_b gt_p ciClus ciClusSig
+cnter=0;
+for iClus = clus2plot
+    dat1 = squeeze(datTmp(1:end-1,:,iEps,iBatchVals,:,iClus))';
+    cnter=cnter+1;
+    for iterI=1:nIter
+        [b,d,s]=glmfit(1:nTimePts,dat1(iterI,:)');
+        gt_b(cnter,iterI) = b(2);
+    end
+    ciTmp = bootci(nIter,@mean,gt_b(cnter,:));
+    ciClus(:,cnter) = [nanmean(gt_b(cnter,:)); ciTmp]; % mean & CIs    
+end
+
+ci = bootci(numel(gt_b),@nanmean,reshape(gt_b,1,numel(gt_b))); %CI over ALL runs
 %% Making figs: density plot examples
 
 savePlots = 0;
 
-doPlot=0; %do plot when computing gridness
-
+doPlot=0; % also plot with the gridSCORE function to see how it finds the peaks and computes grid score
 fontSiz=15;
 clusPosAct = 'actNorm'; %'clus' or 'actNorm'
 gridMsrType = 'a';
@@ -418,101 +385,101 @@ for iClus = clus2plot%:length(clus2run)
     end
 end
 %% Making figs - cluster positions over time, with agent - needs muAll and trials
-
-savePlots=0;
-
-%if plotAgent, need trials as an output argument
-plotAgent = 1;
-
-fntSiz=25;
-nClus = size(muAll,1);
-iterI = 1;
-colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
-colAgent = [.75, .75, .75];
-
-% make cluster positions same over trials in a batch
-muTrls = nan(nClus,2,nTrials);
-for iBatch = 1:nBatches
-    muTrls(:,1,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(muAll(:,1,iBatch),1,batchSize);
-    muTrls(:,2,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(muAll(:,2,iBatch),1,batchSize);
-end
-
-figure;
-clear h1
-fromTrl = 1;
-iTrl = 100; %end trial
-%agent - have to start from X trials min
-plotTrls=fromTrl:iTrl;
-h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'Color',colAgent); hold on;
-%clusters
-h2(iTrl)=scatter(squeeze(muTrls(:,1,iTrl)),squeeze(muTrls(:,2,iTrl)),1000,colors,'.'); hold on;
-xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
-title(sprintf('Trials 1-100 (start)'),'fontname','Arial','fontsize',fntSiz);
-
-fname = [figsDir sprintf('/learnOverTime_clus_wAgent_%s_nClus%d_eps%d_batchSiz%d_trls%d-%d',dat,nClus,epsMuVals(iEps)*1000,batchSizeVals(iBvals),fromTrl,iTrl)];
-if savePlots
-        set(gcf,'Renderer','painters');
-        print(gcf,'-depsc2',fname)
-    saveas(gcf,fname,'png');
-    close all
-end
-        
-figure;
-clear h1
-%plot previous trials plotted above
-plotTrls=fromTrl:iTrl;
-h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'Color',colAgent); hold on;
-
-fromTrl = 10000;
-iTrl = fromTrl+2000;
-plotTrls=fromTrl:iTrl;
-h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'Color',colAgent); hold on;
-
-%clusters
-h2(iTrl)=scatter(squeeze(muTrls(:,1,iTrl)),squeeze(muTrls(:,2,iTrl)),1000,colors,'.'); hold on;
-xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
-title(sprintf('Trials %d-%d (1%%)',fromTrl,iTrl),'fontname','Arial','fontsize',fntSiz);
-
-fname = [figsDir sprintf('/learnOverTime_clus_wAgent_%s_nClus%d_eps%d_batchSiz%d_trls%dk-%dk',dat,nClus,epsMuVals(iEps)*1000,batchSizeVals(iBvals),fromTrl/1000,iTrl/1000)];
-if savePlots
-        set(gcf,'Renderer','painters');
-        print(gcf,'-depsc2',fname)
-    saveas(gcf,fname,'png');
-    close all
-end
-
-figure;
-clear h1
-fromTrl = nTrials*.4;
-iTrl = fromTrl+7500;
-plotTrls=fromTrl:iTrl;
-h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'Color',colAgent); hold on;
-%clusters
-h2(iTrl)=scatter(squeeze(muTrls(:,1,iTrl)),squeeze(muTrls(:,2,iTrl)),1000,colors,'.'); hold on;
-xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
-title(sprintf('Trials %d-%d (40%%)',fromTrl,iTrl),'fontname','Arial','fontsize',fntSiz);
-fname = [figsDir sprintf('/learnOverTime_clus_wAgent_%s_nClus%d_eps%d_batchSiz%d_trls%dkplus7500trls',dat,nClus,epsMuVals(iEps)*1000,batchSizeVals(iBvals),fromTrl/1000)];
-if savePlots
-        set(gcf,'Renderer','painters');
-        print(gcf,'-depsc2',fname)
-    saveas(gcf,fname,'png');
-    close all
-end
-
-figure;
-clear h1
-fromTrl = nTrials*.75;
-iTrl = fromTrl+7500;
-plotTrls=fromTrl:iTrl;
-h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'Color',colAgent); hold on;
-%clusters
-h2(iTrl)=scatter(squeeze(muTrls(:,1,iTrl)),squeeze(muTrls(:,2,iTrl)),1000,colors,'.'); hold on;
-xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
-title(sprintf('Trials %d-%d (75%%)',fromTrl,iTrl),'fontname','Arial','fontsize',fntSiz);
-fname = [figsDir sprintf('/learnOverTime_clus_wAgent_%s_nClus%d_eps%d_batchSiz%d_trls%dkplus7500trls',dat,nClus,epsMuVals(iEps)*1000,batchSizeVals(iBvals),fromTrl/1000)];
-if savePlots
-        set(gcf,'Renderer','painters');
-        print(gcf,'-depsc2',fname)
-    saveas(gcf,fname,'png');
-    close all
-end
+% 
+% savePlots=0;
+% 
+% %if plotAgent, need trials as an output argument
+% plotAgent = 1;
+% 
+% fntSiz=25;
+% nClus = size(muAll,1);
+% iterI = 1;
+% colors = distinguishable_colors(nClus); %function for making distinguishable colors for plotting
+% colAgent = [.75, .75, .75];
+% 
+% % make cluster positions same over trials in a batch
+% muTrls = nan(nClus,2,nTrials);
+% for iBatch = 1:nBatches
+%     muTrls(:,1,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(muAll(:,1,iBatch),1,batchSize);
+%     muTrls(:,2,batchSize*(iBatch-1)+1:batchSize*(iBatch-1)+batchSize)=repmat(muAll(:,2,iBatch),1,batchSize);
+% end
+% 
+% figure;
+% clear h1
+% fromTrl = 1;
+% iTrl = 100; %end trial
+% %agent - have to start from X trials min
+% plotTrls=fromTrl:iTrl;
+% h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'Color',colAgent); hold on;
+% %clusters
+% h2(iTrl)=scatter(squeeze(muTrls(:,1,iTrl)),squeeze(muTrls(:,2,iTrl)),1000,colors,'.'); hold on;
+% xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
+% title(sprintf('Trials 1-100 (start)'),'fontname','Arial','fontsize',fntSiz);
+% 
+% fname = [figsDir sprintf('/learnOverTime_clus_wAgent_%s_nClus%d_eps%d_batchSiz%d_trls%d-%d',dat,nClus,epsMuVals(iEps)*1000,batchSizeVals(iBvals),fromTrl,iTrl)];
+% if savePlots
+%         set(gcf,'Renderer','painters');
+%         print(gcf,'-depsc2',fname)
+%     saveas(gcf,fname,'png');
+%     close all
+% end
+%         
+% figure;
+% clear h1
+% %plot previous trials plotted above
+% plotTrls=fromTrl:iTrl;
+% h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'Color',colAgent); hold on;
+% 
+% fromTrl = 10000;
+% iTrl = fromTrl+2000;
+% plotTrls=fromTrl:iTrl;
+% h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'Color',colAgent); hold on;
+% 
+% %clusters
+% h2(iTrl)=scatter(squeeze(muTrls(:,1,iTrl)),squeeze(muTrls(:,2,iTrl)),1000,colors,'.'); hold on;
+% xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
+% title(sprintf('Trials %d-%d (1%%)',fromTrl,iTrl),'fontname','Arial','fontsize',fntSiz);
+% 
+% fname = [figsDir sprintf('/learnOverTime_clus_wAgent_%s_nClus%d_eps%d_batchSiz%d_trls%dk-%dk',dat,nClus,epsMuVals(iEps)*1000,batchSizeVals(iBvals),fromTrl/1000,iTrl/1000)];
+% if savePlots
+%         set(gcf,'Renderer','painters');
+%         print(gcf,'-depsc2',fname)
+%     saveas(gcf,fname,'png');
+%     close all
+% end
+% 
+% figure;
+% clear h1
+% fromTrl = nTrials*.4;
+% iTrl = fromTrl+7500;
+% plotTrls=fromTrl:iTrl;
+% h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'Color',colAgent); hold on;
+% %clusters
+% h2(iTrl)=scatter(squeeze(muTrls(:,1,iTrl)),squeeze(muTrls(:,2,iTrl)),1000,colors,'.'); hold on;
+% xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
+% title(sprintf('Trials %d-%d (40%%)',fromTrl,iTrl),'fontname','Arial','fontsize',fntSiz);
+% fname = [figsDir sprintf('/learnOverTime_clus_wAgent_%s_nClus%d_eps%d_batchSiz%d_trls%dkplus7500trls',dat,nClus,epsMuVals(iEps)*1000,batchSizeVals(iBvals),fromTrl/1000)];
+% if savePlots
+%         set(gcf,'Renderer','painters');
+%         print(gcf,'-depsc2',fname)
+%     saveas(gcf,fname,'png');
+%     close all
+% end
+% 
+% figure;
+% clear h1
+% fromTrl = nTrials*.75;
+% iTrl = fromTrl+7500;
+% plotTrls=fromTrl:iTrl;
+% h1(iTrl)=plot(trials(plotTrls,1),trials(plotTrls,2),'Color',colAgent); hold on;
+% %clusters
+% h2(iTrl)=scatter(squeeze(muTrls(:,1,iTrl)),squeeze(muTrls(:,2,iTrl)),1000,colors,'.'); hold on;
+% xticks([]); xticklabels({''}); yticks([]); yticklabels({''});
+% title(sprintf('Trials %d-%d (75%%)',fromTrl,iTrl),'fontname','Arial','fontsize',fntSiz);
+% fname = [figsDir sprintf('/learnOverTime_clus_wAgent_%s_nClus%d_eps%d_batchSiz%d_trls%dkplus7500trls',dat,nClus,epsMuVals(iEps)*1000,batchSizeVals(iBvals),fromTrl/1000)];
+% if savePlots
+%         set(gcf,'Renderer','painters');
+%         print(gcf,'-depsc2',fname)
+%     saveas(gcf,fname,'png');
+%     close all
+% end
