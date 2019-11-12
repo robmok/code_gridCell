@@ -162,8 +162,8 @@ Main test results (clusters fixed - first 2 without permutation test, latter 2 w
 - covering_map_batch_dat_10clus_1000ktrls_eps250_batchSiz200_200iters_square_wActNorm_jointTrls_stepSiz_annEps_actNorm_perm_500permsOn200iters_053554.mat
 
 Main learning results with activations and grid score saved over time (with fewer - 200 - iterations)
-covering_map_batch_dat_10clus_1000ktrls_eps250_batchSiz200_200iters_circ_wActNorm_jointTrls_stepSiz_annEps_142357.mat
-covering_map_batch_dat_10clus_1000ktrls_eps250_batchSiz200_200iters_square_wActNorm_jointTrls_stepSiz_annEps_200530.mat
+- covering_map_batch_dat_10clus_1000ktrls_eps250_batchSiz200_200iters_circ_wActNorm_jointTrls_stepSiz_annEps_142357.mat
+- covering_map_batch_dat_10clus_1000ktrls_eps250_batchSiz200_200iters_square_wActNorm_jointTrls_stepSiz_annEps_200530.mat
 
 Trapezoid:
 - covering_map_batch_dat_10clus_250ktrls_eps250_batchSiz200_1000iters_trapzKfrmSq1_wActNorm_epsMuTrapz_25_jointTrls_stepSiz_annEps_201604.mat
@@ -176,16 +176,14 @@ For the manuscript, I ran 2 simulations for the concept structure example
 - covering_map_batch_dat_20clus_50ktrls_eps25_batchSiz10_50iters_catLearn_wActNorm_2cats_stoch0_c0_msExample_144044.mat
 
 
-
-
-
-## Function index
+## Functions index
 
 bootrm.m - bootstrap confidence intervals for mean and percent/proportion
 createTrls.m - creates trials (x-y coordinates) for different spatial environments
 nanconv.m - convolution in 1D or 2D ignoring NaNs; used for smoothing - https://uk.mathworks.com/matlabcentral/fileexchange/41961-nanconv
 
-### Functions for univariate scatterplots  - https://uk.mathworks.com/matlabcentral/fileexchange/37105-plot-spread-points-beeswarm-plot
+### Functions for univariate scatterplots
+From: https://uk.mathworks.com/matlabcentral/fileexchange/37105-plot-spread-points-beeswarm-plot
 isEven.m
 myErrorbar.m 
 plotSpread.m
