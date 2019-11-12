@@ -22,16 +22,18 @@ Plotting - unvariate scatterplots: https://uk.mathworks.com/matlabcentral/fileex
 Set up directories:
 
 1. Edit working directory path at the top of each of these scripts :
-- this working directory (wd) should have directories code_gridCell and data_gridCell
+- Note: the working directory (wd) should have directories code_gridCell and data_gridCell
 
-For running the simulations:
-- covering_map_batch_run.m 
-- covering_map_plot_simple_wOut_load
+For learning phase:
+- covering_map_batch_run.m
 - run_gridnessTestDataPerm.m
 - run_trapzKfrmSq_covering_map
 - square_splitInHalf_gridness.m
+
 For plotting:
-- covering_map_batch_plot.m
+- covering_map_batch_plot.m 
+- covering_map_batch_plot_testSet_perm.m
+- covering_map_plot_simple_wOut_load
 - catLearn_batch_plot.m
 
 e.g. for covering_map_batch_run.m, set to working directory by editing line 5:
@@ -43,10 +45,13 @@ Directories:
 
 3. Create an empty data directory in the working directory for data to live (data_gridCell)
 
-- OR: download data directory data_gridCell from osf (https://osf.io/2dz3x/)
+- OR: download data directory data_gridCell from osf (https://osf.io/2dz3x/) to load up results
 	
 
 ## Examples 
+
+NOTE: In most scripts, I run them cell by cell (Section by section) using cmd+return (for mac) or ctrl+enter (windows). They will run if you run the whole script, but for some (e.g. plotting scripts), a lot of windows may pop up.
+
 ### Simple example to test things are working
 
 Script: covering_map_batch_run.m (to set up learning phase simulations)
@@ -96,12 +101,23 @@ Script: covering_map_batch_plot.m
 
 Plotting test phase
 Script: covering_map_batch_plot_testSet_perm.m
+- default: circle (uncomment line 18 or 19 for square or trapz)
+- set loadPerm on line 22. default is 0, so loads up all simulations, but not permutations (which is needed to load up and plot the proportion grid cells after permutation stats). if set to 1, fewer simulations are plot in cell 2.
+- edit nClus conditions - line 25 - if only loading a few conditions. Script was made for 10:30 (default in script), so plotting might not be perfect if using different numbers.
+- Cell 2 plots univariate scatterplots in figure 3 and 4 in the manuscript
+- Cell 3 plots examples of activation maps as show in figure 3 and 4, and in supplementary figures. edit clus2plot to plot examples from different nClus conditions (see line 509-511)
+- Cell 4 plot univariate scatterplots of the thresholds for 'grid cell like' activation maps, from the permutation method - NOTE: need to set loadPerm to 1
+- Cell 5 plots univariate scatterplots of square versus trapezoid gridscores, from figure 4.
+- in cells 2 & 5, set computeCIs to 1 to get bootstrapped confidence intervals reported in the manuscript (takes 10s of seconds to a minute compute)
+
 
 **TO DO
 - General: DEFINITELY need to edit first section for better readability, so that user will only need to edit a couple lines
 - loads in ok
 - 2nd cell - produces 2 plots. only keep first univar scatter? also, it spits out a bunch of stats, significance things - maybe remove this stuff that is not reported in the paper
 - prop grid cell measures - check which one i used. average across all simulations, or across nClus conds? remove the one i did not use
+
+
 
 
 

@@ -1,4 +1,5 @@
 %% Plotting script 2: test set
+% Load in data
 clear all;
 
 % Set working directory
@@ -12,45 +13,44 @@ addpath(codeDir); addpath(saveDir);
 addpath(genpath([codeDir '/gridSCORE_packed']));
 figsDir = [wd '/grid_figs'];
 
-% load
-nSet        = 22;
-gaussSmooth = 1; 
-fixBatchSize = 1; %fixed batch size or depend on nClus (for fname)
-
+% Set environment
 dat='circ';
-% dat='square';
-% dat='trapzKfrmSq1';
+dat='square';
+dat='trapzKfrmSq1';
 
-compareCircSq = 0; %if compare circ-sq gridness, dat=circ, but load sq too
+%set loadPerm - set to 0 to plot all sims; set to 1 to load permutations
+loadPerm = 0; %load up data with permutations or not
 
-%load perm data when nIter=1000 - this is with nIter=200. doPerm should=0
-loadPerm = 1;
-
+% To load in
 clus2run = 10:30;
-jointTrls=1;
-nTrials=1000000;
-batchSizeVals=200;
-% nIter=200;
+nTrials  = 1000000;
+batchSizeVals = 200;
+jointTrls = 1;
 nIter=1000;
 
+if strcmp(dat(1:4),'trap') %no perms for trapz
+    loadPerm=0;
+end
+if loadPerm
+    nIter = 200;
+    nPerm = 500;
+    nIters2run=nIter;
+end
+
+% learning rate
+annEps=1; %annealed learning rate
+epsMuVals = 0.25;
+
+%other
+rHex=0; %if choose raw 60deg corr values, not gridness
+compareCircSq = 0; %if compare circ-sq gridness, dat=circ, but load sq too
 if strcmp(dat(1:4),'trap')
     nTrials=1000000/4;
     epsMuTrapz10 = 25;
     loadPerm=0;
 end
 
-% annEps
-annEps=1;
-epsMuVals = 0.25;
 
-%perm
-doPerm = 0; %load up with perm or no perm 
-nPerm=500;
-nIters2run=nIter;
-rHex=0; %if choose raw 60deg corr values, not gridness
-if strcmp(dat(1:4),'trap') %no perms for trapz
-    doPerm=0;
-end
 %load loop
 for iClus2run = 1:length(clus2run) 
     nClus = clus2run(iClus2run);
@@ -61,7 +61,7 @@ for iClus2run = 1:length(clus2run)
             batchSize = batchSizeVals(iBvals);
             fprintf('Loading %s, nClus=%d, epsMu=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000,batchSize)
 
-            if doPerm
+            if loadPerm
                 if ~annEps
                     fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_actNorm_perm_%dpermsOn%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,nPerm,nIters2run)];
                 else
@@ -136,7 +136,7 @@ for iClus2run = 1:length(clus2run)
                 perm=load(f(1).name);
                 nIter = nIterOrig; nIters2run = nIter;
             end
-            if doPerm || loadPerm
+            if loadPerm || loadPerm
                 gA_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = perm.permPrc_gA_actNorm(:,3,:);
                 gW_actNorm_permPrc(:,iEps,iBvals,iClus2run,:)   = perm.permPrc_gW_actNorm(:,3,:);
             end
@@ -148,7 +148,7 @@ end
 if strcmp(dat,'trapzKfrmSq1') || compareCircSq %added compare circ vs sq - should work?
     datOrig = dat;
     dat = 'square';
-    doPerm=0; % sq 200iter noPerm not run yet
+    loadPerm=0; % sq 200iter noPerm not run yet
     nTrials=1000000;
     %load sq gridness to compare with trapz
     for iClus2run = 1:length(clus2run)
@@ -160,7 +160,7 @@ if strcmp(dat,'trapzKfrmSq1') || compareCircSq %added compare circ vs sq - shoul
                 batchSize = batchSizeVals(iBvals);
                 fprintf('Loading %s, nClus=%d, epsMu=%d, batchSize=%d\n',dat,nClus,epsMuOrig1000,batchSize)
                 
-                if doPerm
+                if loadPerm
                     fname = [sprintf('/covering_map_batch_dat_%dclus_%dktrls_eps%d_batchSiz%d_%diters_%s_wActNorm_jointTrls_stepSiz_actNorm_perm_%dpermsOn%diters',nClus,round(nTrials/1000),epsMuOrig1000,batchSize,nIter,dat,nPerm,nIters2run)];
                 else
                     if ~annEps
@@ -294,51 +294,51 @@ if savePlots
    close all
 end
 
-%prop grid cells
-permPrc = 100; %use top x prctile of the perm distributions - 97.5/99/99.5/100
-if ~strcmp(dat(1:4),'trap') && loadPerm
-        propGrid = nan(size(dat1,2),1);
-        propGridCI = nan(size(dat1,2),2);
-        propGridMaxThresh = nan(size(dat1,2),1);
-        propGridCIMaxThresh = nan(size(dat1,2),2);
-        for i=1:size(dat1,2)
-            propGrid(i)     = nnz(dat1(:,i)>squeeze(prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot(i)),permPrc)))./nIter; %cond-wise thresh
-            propGridCI(i,:) = bootrm(dat1(:,i),[2.5, 97.5],'percentGr',nIter,prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot(i)),permPrc));
-            
-            propGridMaxThresh(i)     = nnz(dat1(:,i)>max((prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot),permPrc))))./nIter; %max thresh
-            propGridCIMaxThresh(i,:) = bootrm(dat1(:,i),[2.5, 97.5],'percentGr',nIter,max((prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot),permPrc))));
-        end
-        fprintf('%d to %d clusters: \npropGrid mean across cond means: %.3f\n', clus2run(clus2plot(1)),clus2run(clus2plot(end)), mean(propGrid))
-        fprintf('propGrid mean across cond means maxThresh: %.3f\n', mean(propGridMaxThresh))
-        
-        %prop Grid over all conditions with max threshold
-        propGridAll     = nnz(dat1>max((prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot),permPrc))))./nnz(dat1);
-        propGridAllCI = bootrm(reshape(dat1,numel(dat1),1),[2.5, 97.5],'percentGr',nIter,max(prctile(squeeze(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot)),permPrc)));
-        fprintf('propGrid mean and CI across cond all iters - max thresh: %.3f, CIs [%.3f,%.3f]\n', propGridAll, propGridAllCI)
-    
-    %plot mean + CI as errorbars
-    figure; hold on;
-    mu = propGrid;
-    ci = propGridCI;
-    barpos  = .25:.5:.5*size(dat1,2);
-    colors  = distinguishable_colors(size(dat1,2));
-    colgrey = [.6, .6, .6];
-    scatter(barpos,mu,200,colors,'.');
-    errorbar(barpos,mu,mu-ci(:,1),abs(mu-ci(:,2)),'Color',colgrey,'LineStyle','None','LineWidth',1);
-    xticks(barpos);
-    xticklabels(xTickLabs);
-    xlim([barpos(1)-.5, barpos(end)+.5]);
-    xlabel('Number of Clusters');
-    ylabel('Proportion "Grid Cells"');
-    set(gca,'FontSize',fontSiz,'fontname','Arial')
-    fname = [figsDir sprintf('/gridness_%s_propGridCells_permPrc%d_testSet_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,permPrc,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
-    if savePlots
-        set(gcf,'Renderer','painters');
-        print(gcf,'-depsc2',fname)
-        saveas(gcf,fname,'png');
-        close all
-    end
-end
+% %prop grid cells - uncomment to plot prop grid cells per nClus condition
+% permPrc = 100; %use top x prctile of the perm distributions - 97.5/99/99.5/100
+% if ~strcmp(dat(1:4),'trap') && loadPerm
+%         propGrid = nan(size(dat1,2),1);
+%         propGridCI = nan(size(dat1,2),2);
+%         propGridMaxThresh = nan(size(dat1,2),1);
+%         propGridCIMaxThresh = nan(size(dat1,2),2);
+%         for i=1:size(dat1,2)
+%             propGrid(i)     = nnz(dat1(:,i)>squeeze(prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot(i)),permPrc)))./nIter; %cond-wise thresh
+%             propGridCI(i,:) = bootrm(dat1(:,i),[2.5, 97.5],'percentGr',nIter,prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot(i)),permPrc));
+%             
+%             propGridMaxThresh(i)     = nnz(dat1(:,i)>max((prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot),permPrc))))./nIter; %max thresh
+%             propGridCIMaxThresh(i,:) = bootrm(dat1(:,i),[2.5, 97.5],'percentGr',nIter,max((prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot),permPrc))));
+%         end
+%         fprintf('%d to %d clusters: \npropGrid mean across cond means: %.3f\n', clus2run(clus2plot(1)),clus2run(clus2plot(end)), mean(propGrid))
+%         fprintf('propGrid mean across cond means maxThresh: %.3f\n', mean(propGridMaxThresh))
+%         
+%         %prop Grid over all conditions with max threshold
+%         propGridAll     = nnz(dat1>max((prctile(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot),permPrc))))./nnz(dat1);
+%         propGridAllCI = bootrm(reshape(dat1,numel(dat1),1),[2.5, 97.5],'percentGr',nIter,max(prctile(squeeze(gA_actNorm_permPrc(:,iEps,iBvals,clus2plot)),permPrc)));
+%         fprintf('propGrid mean and CI across cond all iters - max thresh: %.3f, CIs [%.3f,%.3f]\n', propGridAll, propGridAllCI)
+%     
+%     %plot mean + CI as errorbars
+%     figure; hold on;
+%     mu = propGrid;
+%     ci = propGridCI;
+%     barpos  = .25:.5:.5*size(dat1,2);
+%     colors  = distinguishable_colors(size(dat1,2));
+%     colgrey = [.6, .6, .6];
+%     scatter(barpos,mu,200,colors,'.');
+%     errorbar(barpos,mu,mu-ci(:,1),abs(mu-ci(:,2)),'Color',colgrey,'LineStyle','None','LineWidth',1);
+%     xticks(barpos);
+%     xticklabels(xTickLabs);
+%     xlim([barpos(1)-.5, barpos(end)+.5]);
+%     xlabel('Number of Clusters');
+%     ylabel('Proportion "Grid Cells"');
+%     set(gca,'FontSize',fontSiz,'fontname','Arial')
+%     fname = [figsDir sprintf('/gridness_%s_propGridCells_permPrc%d_testSet_nClus%d-%d_eps%d_batchSiz%d_%s_%s',dat,permPrc,clus2run(clus2plot(1)),clus2run(clus2plot(end)),epsMuVals(iEps)*1000,batchSizeVals(iBatchVals),clusPosAct,gridMsrType)];
+%     if savePlots
+%         set(gcf,'Renderer','painters');
+%         print(gcf,'-depsc2',fname)
+%         saveas(gcf,fname,'png');
+%         close all
+%     end
+% end
 
 if strcmp(dat(1:4),'trap')
     figure; hold on;
@@ -413,58 +413,14 @@ if ~strcmp(dat,'trapzKfrmSq1')
         ciTmp = bootci(nBoot,@nanmean,dat1(:,iClus));
         ciTest(iClus,:) = [nanmean(dat1(:,iClus),1); ciTmp]; % mean & CIs
     end
-%     ci = bootci(length(clus2run),@nanmean,nanmean(dat1,1)); %CI over mean of nClus conds - prob not as gd
     ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs 
-    fprintf('%d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2))
-    
-    % individual nClus cond CIs, whole trapz
-    nBoot = nIter;
-    clear ciTest ciTmp ciClusSig
-    cnter=0;
-    for iClus=1:length(clus2plot)
-        cnter = cnter+1;
-        ciTmp = bootci(nBoot,@nanmean,dat1(:,iClus));
-        ciTest(:,cnter) = [nanmean(dat1(:,iClus),1); ciTmp]; % mean & CIs for all nClus conds - use for tables
-        %check CIs sig - pos/neg
-        posInd=ciTest(:,cnter)>0;
-        negInd=ciTest(:,cnter)<0;
-        if all(posInd)
-            ciClusSig(cnter)=1;
-        end
-        if all(negInd)
-            ciClusSig(cnter)=-1;
-        end
-        if ~all(posInd) && ~all(negInd)
-            ciClusSig(cnter)=0;
-        end
-    end
-    fprintf('%s, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f];  %d sig > 0, out of %d sig conds. %0.2f percent\n',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
+    fprintf('%s, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f] \n',dat,clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2));
 else
     %trapz 
     dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,1));
     ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs 
     % individual nClus cond CIs, whole trapz
-    nBoot = nIter;
-    clear ciTest ciTmp ciClusSig
-    cnter=0;
-    for iClus=1:length(clus2plot)
-        cnter = cnter+1;
-        ciTmp = bootci(nBoot,@nanmean,dat1(:,iClus));
-        ciTest(:,cnter) = [nanmean(dat1(:,iClus),1); ciTmp]; % mean & CIs
-        %check CIs sig - pos/neg
-        posInd=ciTest(:,cnter)>0;
-        negInd=ciTest(:,cnter)<0;
-        if all(posInd)
-            ciClusSig(cnter)=1;
-        end
-        if all(negInd)
-            ciClusSig(cnter)=-1;
-        end
-        if ~all(posInd) && ~all(negInd)
-            ciClusSig(cnter)=0;
-        end
-    end
-    fprintf('trapz, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f];  %d sig > 0, out of %d sig conds. %0.2f percent\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
+    fprintf('trapz, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2));
     dat1  = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,2));
     ci    = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs 
     fprintf('trapzL %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2));
@@ -473,35 +429,15 @@ else
     fprintf('trapzR %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2));
     % individual nClus cond CIs, L-R
     dat1     = squeeze(datTmp(:,iEps,iBatchVals,clus2plot,2))-squeeze(datTmp(:,iEps,iBatchVals,clus2plot,3));
-    nBoot = nIter;
-    clear ciTest2 ciTmp ciClusSig
-    cnter=0;
-    for iClus=1:length(clus2plot)
-        cnter = cnter+1;
-        ciTmp = bootci(nBoot,@nanmean,dat1(:,iClus));
-        ciTest2(:,cnter) = [nanmean(dat1(:,iClus),1); ciTmp]; % mean & CIs
-        
-        posInd=ciTest2(:,cnter)>0;
-        negInd=ciTest2(:,cnter)<0;
-        if all(posInd)
-            ciClusSig(cnter)=1;
-        end
-        if all(negInd)
-            ciClusSig(cnter)=-1;
-        end
-        if ~all(posInd) && ~all(negInd)
-            ciClusSig(cnter)=0;
-        end
-    end
     ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs 
-    fprintf('trapzL-R, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f];  %d sig > 0, out of %d sig conds. %0.2f percent\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
+    fprintf('trapzL-R, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),nanmean(reshape(dat1,1,numel(dat1))),ci(1),ci(2));
 end
 end
 %% Making figs: density plot examples
 
 savePlots = 0;
 
-doPlot = 0; %do plot when computing gridness
+doPlot = 0; % also plot with the gridSCORE function to see how it finds the peaks and computes grid score
 clusPosAct = 'actNorm'; %'clus' or 'actNorm'
 gridMsrType = 'a';
 fontSiz = 25;
@@ -621,17 +557,15 @@ for iClus = clus2plot%:length(clus2run)
     end
 end
 
-%% Plot thresholds from permutations (for proprtion 'grid cell' analysis)
+%% Plot thresholds from permutations (for proprtion 'grid cell' analysis) 
+% NOTE: needs loadPerm = 1
+
 figsDir = [wd '/grid_figs'];
 
 savePlots=0;
 
-clusPosAct = 'actNorm'; %'act' or 'actNorm'
-
-gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
-
-gridMeasure = 'grid';
-
+clusPosAct = 'actNorm'; 
+gridMsrType = 'a'; 
 switch clusPosAct
     case 'act'
         switch gridMsrType
@@ -650,8 +584,7 @@ switch clusPosAct
 end
 
 clus2plot=1:length(clus2run);
-
-iBatchVals=1; %'medium' one
+iBatchVals=1; 
 
 %fig specs
 xTickLabs = num2cell(clus2run(clus2plot));
@@ -683,14 +616,14 @@ if savePlots
     print(gcf,'-depsc2',fname)
     saveas(gcf,fname,'png');
 end
-%% trapz vs orig sq gridness / circ vs sq
+%% trapz vs orig square gridness / circ vs square
 
 savePlots=0;
 
 clusPosAct = 'actNorm'; %'act' or 'actNorm'
 gridMsrType = 'a'; % 'a' or 'w' for allen or willis method - a preferred
 gridMeasure = 'grid';
-computeCIs=1; 
+computeCIs = 1; % takes longer
 
 switch clusPosAct
     case 'actNorm'
@@ -752,32 +685,11 @@ if savePlots
 end
 
 if computeCIs
-    % mean & bootstrap 95 CIs
-    nBoot = nIter;
-    clear ciTest ciTmp ciClusSig
-    cnter=0;
-    for iClus=1:length(clus2plot)
-        cnter = cnter+1;
-        ciTmp = bootci(nBoot,@nanmean,dat1(:,iClus));
-        ciTest(:,cnter) = [nanmean(dat1(:,iClus),1); ciTmp]; % mean & CIs
-        %check CIs sig
-        posInd=ciTest(:,cnter)>0;
-        negInd=ciTest(:,cnter)<0;
-        if all(posInd)
-            ciClusSig(cnter)=1;
-        end
-        if all(negInd)
-            ciClusSig(cnter)=-1;
-        end
-        if ~all(posInd) && ~all(negInd)
-            ciClusSig(cnter)=0;
-        end
-    end
-    
+    % mean & bootstrap 95 CIs    
     ci = bootci(numel(dat1),@nanmean,reshape(dat1,1,numel(dat1))); %CI over ALL runs
     if strcmp(dat(1:4),'trap')
-        fprintf('Square-Trapezoid box, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig Square-Trapezoid, %d sig Trapezoid-Square , %0.2f percent Sq>T\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),mean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig==-1),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
+        fprintf('Square-Trapezoid box, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig Square-Trapezoid, %d sig Trapezoid-Square \n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),mean(reshape(dat1,1,numel(dat1))),ci(1),ci(2));
     elseif strcmp(dat(1:4),'circ')
-        fprintf('Circ-Square box, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]; %d sig Circ-Square, %d sig Square-Circ, %0.2f percent C>Sq\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),mean(reshape(dat1,1,numel(dat1))),ci(1),ci(2),nnz(ciClusSig==1),nnz(ciClusSig==-1),(nnz(ciClusSig==1)./nnz(ciClusSig))*100);
+        fprintf('Circ-Square box, %d to %d clusters: mean=%0.4f; CI=[%0.4f,%0.4f]\n',clus2run(clus2plot(1)),clus2run(clus2plot(end)),mean(reshape(dat1,1,numel(dat1))),ci(1),ci(2));
     end
 end
