@@ -54,10 +54,11 @@ Script: covering_map_batch_run.m (to set up learning phase simulations)
 - Run script (runs 1 iteration)
 - Plot using a simplified plotting script: covering_map_plot_simple_wOut_load.m
 - Run first 3 cells for plotting 
-- (Note: cells below require the 'muAll' variable which allows plotting some visualisations over time. To do this, edit script 'covering_map_batch_run' -  comment line 95 and uncomment line 97)
+- (Note: commented out cells below require the 'muAll' variable which allows plotting some visualisations over time. To do this, edit script 'covering_map_batch_run' to output muAll - i.e.  comment line 95 and uncomment line 97)
 
 ### Full run through of learning plus testing and permutation stats
 
+#### Learning
 Learning (or 'training') phase - learning cluster positions
 Script: covering_map_batch_run.m
 - default (i.e. in the script now): circle (uncomment line 19 or 20 for square environment or category learning)
@@ -75,6 +76,7 @@ Script: run_gridnessTestDataPerm.m
 	- To compute activation maps, grid scores, and permutation tests, set nIter=200 (else takes long, and not necessary)
 (Note: gA is grid score that is reported in the manuscript (method from Perez-Escobar et al., 2016), gW is a more conservative method (from Wills et al., 2012).)
 
+#### Plotting
 Plotting learning phase
 Script: covering_map_batch_plot.m
 
