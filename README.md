@@ -50,7 +50,7 @@ Directories:
 
 ## Examples 
 
-NOTE: In most scripts, I run them cell by cell (Section by section) using cmd+return (for mac) or ctrl+enter (windows). They will run if you run the whole script, but for some (e.g. plotting scripts), a lot of windows may pop up.
+NOTE: In most scripts, I run them cell by cell (section by section) using cmd+return (for mac) or ctrl+enter (windows) to run each cell. They will run if you run the whole script, but for some (e.g. plotting scripts), a lot of windows may pop up.
 
 ### Simple example to test things are working
 
@@ -172,25 +172,22 @@ For the manuscript, I ran 2 simulations for the concept structure example
 
 
 ## Functions index
-
-bootrm.m - bootstrap confidence intervals for mean and percent/proportion
-createTrls.m - creates trials (x-y coordinates) for different spatial environments
-nanconv.m - convolution in 1D or 2D ignoring NaNs; used for smoothing - https://uk.mathworks.com/matlabcentral/fileexchange/41961-nanconv
+- bootrm.m - bootstrap confidence intervals for mean and percent/proportion
+- createTrls.m - creates trials (x-y coordinates) for different spatial environments
+- nanconv.m - convolution in 1D or 2D ignoring NaNs; used for smoothing - https://uk.mathworks.com/matlabcentral/fileexchange/41961-nanconv
 
 ### Functions for univariate scatterplots
 From: https://uk.mathworks.com/matlabcentral/fileexchange/37105-plot-spread-points-beeswarm-plot
-isEven.m
-myErrorbar.m 
-plotSpread.m
-repeatEntries.m
+- isEven.m
+- myErrorbar.m 
+- plotSpread.m
+- repeatEntries.m
 
 ### Functions for computing grid scores
 Functions within directory: gridSCORE_packed
-ndautoCORR.m - computes an autocorrelation or crosscorrelation across two arrays
-gridSCORE.m - takes autocorrelation plot and computes grid score - can compute two grid scores, the one used in this project is the ’allen’ method
-
-Within gridSCORE_packed/gridSCORE_dependencies
-- from the geom2d toolbox: https://uk.mathworks.com/matlabcentral/fileexchange/7844-geom2d
+- ndautoCORR.m - computes an autocorrelation or crosscorrelation across two arrays
+- gridSCORE.m - takes autocorrelation plot and computes grid score - can compute two grid scores, the one used in this project is the ’allen’ method
+- within gridSCORE_packed/gridSCORE_dependencies, these are from the geom2d toolbox: https://uk.mathworks.com/matlabcentral/fileexchange/7844-geom2d
 
 Unused but could be used (kmeans+ initialisation)
-kmplusInit.m
+- kmplusInit.m
