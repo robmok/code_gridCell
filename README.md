@@ -120,8 +120,7 @@ Script: run_gridnessTestDataPerm.m
 
 ### Scripts: learning
 
-covering_map_batch_run.m
-- main run script for running clustering algorithm and simulation
+covering_map_batch_run.m - main run script for running clustering algorithm and simulation
 
 covering_map_batch_sim.m
 - called by main run script, covering_map_batch_run.m, - simulation script
@@ -140,15 +139,12 @@ covering_map_batch_sim_clusPosIn.m
 
 ### Scripts: plotting
 covering_map_batch_plot.m
-
 covering_map_batch_plot_testSet_perm.m
-
 catLearn_batch_plot.m
-
 covering_map_plot_simple_wOut_load.m
 
 ### Data files for plotting
-SPATIAL CASE:
+####SPATIAL CASE:
 For each nClus condition, there are 10 files. here are 10 files for the nClus=10 condition.
 
 Main learning results for circle and square environment:
@@ -170,11 +166,10 @@ Trapezoid:
 - covering_map_batch_dat_10clus_250ktrls_eps250_batchSiz200_1000iters_trapzKfrmSq1_wActNorm_epsMuTrapz_25_jointTrls_stepSiz_annEps_trlsTest_noPerm_trapzKfrmSq1_184626.mat
 
 
-CONCEPT CASE:
+####CONCEPT CASE:
 For the manuscript, I ran 2 simulations for the concept structure example
 - covering_map_batch_dat_18clus_50ktrls_eps25_batchSiz10_50iters_catLearn_wActNorm_2cats_stoch0_c0_msExample_145757.mat
 - covering_map_batch_dat_20clus_50ktrls_eps25_batchSiz10_50iters_catLearn_wActNorm_2cats_stoch0_c0_msExample_144044.mat
-
 
 ## Functions index
 
@@ -189,7 +184,8 @@ myErrorbar.m
 plotSpread.m
 repeatEntries.m
 
-### Computing grid scores - within directory: gridSCORE_packed
+### Computing grid scores
+Functions within directory: gridSCORE_packed
 ndautoCORR.m - computes an autocorrelation or crosscorrelation across two arrays
 gridSCORE.m - takes autocorrelation plot and computes grid score - can compute two grid scores, the one used in this project is the ’allen’ method
 
